@@ -12,7 +12,7 @@ except:
 [options]
 1 : Relaxation calculation
 2 : Band-DOS calculation (after previous calcualtion)
-3 : CMS relax and Band-DOS
+3 : Relaxation and Band-DOS (not supported yet)
 4 : Static calculation (after previous calcualtion)
 
 [sub_options]

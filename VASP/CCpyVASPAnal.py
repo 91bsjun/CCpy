@@ -10,7 +10,7 @@ except:
     print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [sub_option1] [sub_option2..]")
     print(""""--------------------------------------
 [options]
-1 : Get final structure (or initial strcture)
+1 : Get final structure (or initial structure)
 2 : Energy & Cell volume convergence plot"""
           )
     quit()
