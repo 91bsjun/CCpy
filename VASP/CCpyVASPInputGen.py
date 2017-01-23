@@ -13,7 +13,7 @@ except:
 1 : Relaxation calculation
 2 : Band-DOS calculation (after previous calcualtion)
 3 : Relaxation and Band-DOS (not supported yet)
-4 : Static calculation (after previous calcualtion)
+4 : Static calculation (after previous calculation)
 
 [sub_options]
 INCAR OPTION
