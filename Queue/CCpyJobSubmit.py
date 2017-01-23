@@ -1,5 +1,7 @@
 #!/usr/local/bin/python2.7
 
+# This script is for queue submitting.
+
 import os, sys
 from subprocess import call as shl
 

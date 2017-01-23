@@ -8,10 +8,10 @@ try:
     chk = sys.argv[1]
 except:
     print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [sub_option1] [sub_option2..]")
-    print('''--------------------------------------
+    print(""""--------------------------------------
 [options]
 1 : Get final structure (or initial strcture)
-2 : Energy & Cell volume convergence plot'''
+2 : Energy & Cell volume convergence plot"""
           )
     quit()
 
