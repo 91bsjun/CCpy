@@ -22,6 +22,7 @@ except:
 3 : ATK
 4 : Q-chem
 5 : ATAT [f:fitsvl]
+6 : PBS job display
 
 [queue name]
 xeon1, xeon2, ...
@@ -74,7 +75,7 @@ if sys.argv[1] == "1":
         myJS.gaussian()
 
 ## ------ VASP
-if sys.argv[1] == "2":
+elif sys.argv[1] == "2":
     
     # --- Collect VASP inputs
     static=False
@@ -152,7 +153,7 @@ elif sys.argv[1] == "4":
         myJS.qchem()
 
 ### ATAT ########################################################
-if sys.argv[1] == "5":
+elif sys.argv[1] == "5":
     #### COLLECT INPUT DIRECTORIES ##################################### 
     all_inputs = [int(d) for d in os.listdir("./") if os.path.isdir(d) if "str.out" in os.listdir(d)]
     all_inputs.sort()
@@ -240,4 +241,32 @@ if sys.argv[1] == "5":
     for each_input in inputs:
         os.chdir(pwd)
         myJS = JS(each_input, queue, divided)
-        myJS.atat()        
+        myJS.atat()
+
+## ------ PBS JOBS DISPLAYER
+elif sys.argv[1] == "6":
+
+    # --- PROPER QUEUE NAME CHECK
+    queues = ["xeon1", "xeon2", "xeon3", "xeon4", "xeon5", "I5"]
+    try:
+        queue = sys.argv[2]
+    except:
+        queue = raw_input("Queue (xeon1, xeon2, ...) : ")
+    if queue not in queues:
+        print("Unvalid queue name")
+        quit()
+
+    # --- DEVIDE CPU CHECK
+    try:
+        divided = int(sys.argv[3])
+    except:
+        divided = 1
+
+    # --- COLLECT INPUT FILES
+    input_marker = ["pbs_runner"]
+    inputs = selectInputs(input_marker, "./", ask=ask)
+
+    # --- SUBMIT QUEUE
+    for each_input in inputs:
+        myJS = JS(each_input, queue, divided)
+        myJS.pbs_runner()

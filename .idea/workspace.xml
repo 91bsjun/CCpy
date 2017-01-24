@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fe90ddd4-6adf-4dd8-96fd-3b416717383a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Queue/CCpyJobControl.py" afterPath="$PROJECT_DIR$/Queue/CCpyJobControl.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Queue/CCpyJobSubmit.py" afterPath="$PROJECT_DIR$/Queue/CCpyJobSubmit.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/VASP/CCpyVASPAnal.py" afterPath="$PROJECT_DIR$/VASP/CCpyVASPAnal.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -20,7 +18,7 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="CCpyJobControl.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="CCpyJobControl.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Queue/CCpyJobControl.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="242">
@@ -30,7 +28,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CCpyJobSubmit.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="CCpyJobSubmit.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Queue/CCpyJobSubmit.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="641">
@@ -453,18 +451,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Queue/CCpyJobSubmit.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="641">
-          <caret line="265" column="33" lean-forward="true" selection-start-line="265" selection-start-column="33" selection-end-line="265" selection-end-column="33" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Queue/CCpyJobControl.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="242">
           <caret line="333" column="23" lean-forward="false" selection-start-line="333" selection-start-column="23" selection-end-line="333" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Queue/CCpyJobSubmit.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="641">
+          <caret line="265" column="33" lean-forward="true" selection-start-line="265" selection-start-column="33" selection-end-line="265" selection-end-column="33" />
           <folding />
         </state>
       </provider>

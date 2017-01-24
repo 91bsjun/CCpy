@@ -12,9 +12,9 @@ I5 = [4, 16, "I5.q"]
 
 class JobSubmit():
     def __init__(self, inputfile, queue, divided):
-	self.inputfile = inputfile
-	
-	if queue == "xeon1":
+        self.inputfile = inputfile
+
+        if queue == "xeon1":
             queue = xeon1
         elif queue == "xeon2":
             queue = xeon2
@@ -31,8 +31,7 @@ class JobSubmit():
         self.cpu = cpu
         self.mem = mem
         self.q = q
-        
-	self.divided = divided
+        self.divided = divided
 
     def gaussian(self, cpu=None, mem=None, q=None):
         inputfile = self.inputfile
@@ -315,6 +314,54 @@ cat $TMPDIR/machines
 
  pollmach runstruct_vasp mpirun -np %d
  '''%(cpu, cpu, jobname, q, cpu)
+
+        f = open("mpi.sh", "w")
+        f.write(mpi)
+        f.close()
+
+        shl("qsub mpi.sh", shell=True)
+        shl("rm -rf ./mpi.sh", shell=True)
+
+    def pbs_runner(self, cpu=None, mem=None, q=None):
+        inputfile = self.inputfile
+
+        cpu, mem, q = self.cpu, self.mem, self.q
+        d = self.divided
+
+        cpu = cpu / d
+        mem = mem / d
+
+        jobname = "PBS_running"
+
+        mpi = '''#!/bin/csh
+#!/bin/csh
+
+# pe request
+
+#$ -pe mpi_%d %d
+
+# our Job name
+#$ -N %s
+
+#$ -S /bin/csh
+
+#$ -q %s
+
+#$ -V
+
+#$ -cwd
+
+echo "Got $NSLOTS slots."
+cat $TMPDIR/machines
+
+set  MPI_HOME=/opt/mpi/intel-parallel-studio2013sp1/openmpi-1.6.5
+set  MPI_EXEC=$MPI_HOME/bin/mpirun
+
+ cd $SGE_O_WORKDIR
+
+ python %s
+
+    ''' % (cpu, cpu, jobname, q, inputfile)
 
         f = open("mpi.sh", "w")
         f.write(mpi)
