@@ -263,7 +263,7 @@ elif sys.argv[1] == "6":
         divided = 1
 
     # --- COLLECT INPUT FILES
-    input_marker = ["PBS"]
+    input_marker = [".py"]
     inputs = selectInputs(input_marker, "./", ask=ask)
 
     # --- SUBMIT QUEUE
