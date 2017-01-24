@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fe90ddd4-6adf-4dd8-96fd-3b416717383a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/VASP/CCpyVASPInputGen.py" afterPath="$PROJECT_DIR$/VASP/CCpyVASPInputGen.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Queue/CCpyJobControl.py" afterPath="$PROJECT_DIR$/Queue/CCpyJobControl.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,11 +17,11 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="CCpyJobControl.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="CCpyJobControl.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Queue/CCpyJobControl.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="179">
-              <caret line="333" column="23" lean-forward="false" selection-start-line="333" selection-start-column="23" selection-end-line="333" selection-end-column="23" />
+            <state relative-caret-position="431">
+              <caret line="333" column="44" lean-forward="false" selection-start-line="333" selection-start-column="44" selection-end-line="333" selection-end-column="44" />
               <folding />
             </state>
           </provider>
@@ -49,7 +49,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="VASPio.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="VASPio.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/VASP/VASPio.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="0">
@@ -95,9 +95,9 @@
         <option value="$PROJECT_DIR$/__init__.py" />
         <option value="$PROJECT_DIR$/VASP/CCpyVASPAnal.py" />
         <option value="$PROJECT_DIR$/Queue/CCpyJobSubmit.py" />
-        <option value="$PROJECT_DIR$/Queue/CCpyJobControl.py" />
         <option value="$PROJECT_DIR$/Tools/CCpyTools.py" />
         <option value="$PROJECT_DIR$/VASP/CCpyVASPInputGen.py" />
+        <option value="$PROJECT_DIR$/Queue/CCpyJobControl.py" />
       </list>
     </option>
   </component>
@@ -485,14 +485,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Queue/CCpyJobControl.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="179">
-          <caret line="333" column="23" lean-forward="false" selection-start-line="333" selection-start-column="23" selection-end-line="333" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/VASP/CCpyVASPInputGen.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="84">
@@ -518,6 +510,14 @@
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Queue/CCpyJobControl.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="431">
+          <caret line="333" column="44" lean-forward="false" selection-start-line="333" selection-start-column="44" selection-end-line="333" selection-end-column="44" />
+          <folding />
         </state>
       </provider>
     </entry>

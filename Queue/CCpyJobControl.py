@@ -331,7 +331,7 @@ cat $TMPDIR/machines
         cpu = cpu / d
         mem = mem / d
 
-        jobname = "PBS_running"
+        jobname = inputfile.replace(".py","")
 
         mpi = '''#!/bin/csh
 #!/bin/csh
