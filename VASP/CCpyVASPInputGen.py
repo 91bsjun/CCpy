@@ -2,7 +2,7 @@
 
 import os, sys
 from CCpy.VASP.VASPio import VASPInput
-from CCpy.Tools.CCpytools import selectInputs, selectVASPInputs, selectVASPOutputs, linux_command
+from CCpy.Tools.CCpyTools import selectInputs, selectVASPInputs, selectVASPOutputs, linux_command
 
 try:
     chk = sys.argv[1]
