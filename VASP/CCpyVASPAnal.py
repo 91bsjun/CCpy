@@ -2,7 +2,7 @@
 
 import os, sys
 from CCpy.VASP.VASPio import VASPOutput
-from CCpy.Tools.CCpyTools import selectVASPOutputs
+from CCpy.Tools.CCpyTools import selectVASPOutputs, linux_command
 
 try:
     chk = sys.argv[1]
@@ -10,10 +10,31 @@ except:
     print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [sub_option1] [sub_option2..]")
     print(""""--------------------------------------
 [options]
+0 : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
 1 : Get final structure (or initial structure)
 2 : Energy & Cell volume convergence plot"""
           )
     quit()
+
+if sys.argv[1] == "0":
+    inputfiles = ["INCAR","POSCAR","POTCAR","KPOINTS"]
+    inputs = selectVASPOutputs("./")
+    for each_input in inputs:
+        print(each_input)
+    yn = raw_input("Are you sure to remove these output files? (y/n)")
+    if yn == "y" or yn == "yes":
+        pass
+    else:
+        quit()
+    for each_input in inputs:
+        os.chdir(each_input)
+        flies = [f for f in os.listdir("./")]
+        for f in files:
+            if f in inputfiles:
+                pass
+            else:
+                linux_command("rm -rf "+f)
+        os.chdir("../")
 
 if sys.argv[1] == "1":
     inputs = selectVASPOutputs("./")
