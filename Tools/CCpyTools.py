@@ -162,6 +162,7 @@ def selectInputs(marker, directory_path, ask=True):
     if len(inputs) == 0:
         print("No available file detected.")
         quit()
+    inputs.sort()
     return inputs
 
     
