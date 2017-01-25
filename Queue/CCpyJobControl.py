@@ -3,6 +3,11 @@
 import os, sys
 from subprocess import call as shl
 
+
+# -- Queue command location
+queue_path = "/opt/sge/bin/lx24-amd64/"
+
+# -- Queues
 xeon1 = [16, 32, "xeon1.q"] # node01
 xeon2 = [24, 64, "xeon2.q"] # node02, node03, node04
 xeon3 = [24, 256, "xeon3.q"] # node05, node06
@@ -93,7 +98,7 @@ set  MPI_EXEC=$MPI_HOME/bin/mpirun
         f.write(mpi)
         f.close()
 
-        shl("qsub mpi.sh", shell=True)
+        shl(queue_path+"qsub mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
 
@@ -213,7 +218,7 @@ cat $TMPDIR/machines
         f.write(mpi)
         f.close()
 
-        shl("qsub mpi.sh", shell=True)
+        shl(queue_path+"qsub mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
         
 
@@ -267,7 +272,7 @@ qchem %s %s
         f.write(mpi)
         f.close()
 
-        shl("qsub mpi.sh", shell=True)
+        shl(queue_path+"qsub mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
 
@@ -319,7 +324,7 @@ cat $TMPDIR/machines
         f.write(mpi)
         f.close()
 
-        shl("qsub mpi.sh", shell=True)
+        shl(queue_path+"qsub mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def pbs_runner(self, cpu=None, mem=None, q=None):
@@ -363,7 +368,7 @@ set  MPI_EXEC=$MPI_HOME/bin/mpirun
 
     ''' % (cpu, cpu, jobname, q, inputfile)
 
-        f = open("mpi.sh", "w")
+        f = open(queue_path+"mpi.sh", "w")
         f.write(mpi)
         f.close()
 

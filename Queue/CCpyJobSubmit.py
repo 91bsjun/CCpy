@@ -35,6 +35,8 @@ a : no check files, calculate all inputs'''
           )
     quit()
 
+
+# -- Check node00
 ip = get_ip()
 if ip != "166.104.249.249":
     print("DO AT NODE00 !!")
@@ -43,6 +45,8 @@ if ip != "166.104.249.249":
 ask = True
 if "a" in sys.argv:
     ask = False
+
+
 ## ------ GAUSSIAN
 if sys.argv[1] == "1":
 

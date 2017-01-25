@@ -15,11 +15,15 @@ except:
           )
     quit()
 
+# -- Check node00
 ip = get_ip()
 if ip != "166.104.249.249":
     print("DO AT NODE00 !!")
     quit()
-    
+
+# -- Queue command location
+queue_path = "/opt/sge/bin/lx24-amd64/"
+
 li = os.popen('qstat.py').readlines()
 
 ids = []
@@ -37,7 +41,7 @@ if sys.argv[1] == "1":
     tmp = raw_input("Job ids (1154-1932) ? ")
     nums = tmp.split("-")
     for i in range(int(nums[0]),int(nums[1])+1):
-        shl("qdel "+str(i), shell=True)
+        shl(queue_path+"qdel "+str(i), shell=True)
 
 elif sys.argv[1] == "2":
     lat = raw_input("Keyword ? ")
@@ -48,7 +52,7 @@ elif sys.argv[1] == "2":
 
     for i in nums:
         job_id = ids[i]
-        shl("qdel "+job_id, shell=True)
+        shl(queue_path+"qdel "+job_id, shell=True)
         #print(job_id)
 
 elif sys.argv[1] == "3":
@@ -77,7 +81,7 @@ elif sys.argv[1] == "3":
             index=0
             for i in range(len(names)):            
                 if names[i] == f:
-                    shl("qdel "+str(ids[i]), shell=True)
+                    shl(queue_path+"qdel "+str(ids[i]), shell=True)
                     #print("qdel "+str(names[i]))
                 index+=1            
         
@@ -101,7 +105,7 @@ elif sys.argv[1] == "3":
             index=0
             for i in range(len(names)):            
                 if names[i] == prefix+f:
-                    shl("qdel "+str(ids[i]), shell=True)
+                    shl(queue_path+"qdel "+str(ids[i]), shell=True)
                 index+=1
 
     
