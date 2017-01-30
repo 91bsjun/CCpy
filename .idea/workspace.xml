@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fe90ddd4-6adf-4dd8-96fd-3b416717383a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ATAT/ATATio.py" afterPath="$PROJECT_DIR$/ATAT/ATATio.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CASM/CASMio.py" afterPath="$PROJECT_DIR$/CASM/CASMio.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,78 +17,12 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="CCpyJobControl.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Queue/CCpyJobControl.py">
+      <file leaf-file-name="CASMio.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/CASM/CASMio.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="15" column="20" lean-forward="false" selection-start-line="15" selection-start-column="20" selection-end-line="15" selection-end-column="20" />
+            <state relative-caret-position="529">
+              <caret line="23" column="29" lean-forward="false" selection-start-line="23" selection-start-column="29" selection-end-line="23" selection-end-column="29" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CCpyJobDelete.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Queue/CCpyJobDelete.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="92">
-              <caret line="6" column="4" lean-forward="false" selection-start-line="6" selection-start-column="4" selection-end-line="6" selection-end-column="4" />
-              <folding>
-                <element signature="e#28#42#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CCpyJobSubmit.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Queue/CCpyJobSubmit.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="966">
-              <caret line="48" column="0" lean-forward="false" selection-start-line="48" selection-start-column="0" selection-end-line="48" selection-end-column="0" />
-              <folding>
-                <element signature="e#68#82#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="binary_plot.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../CMS/Bsjun/IKST/ATAT/Li_Vac/120 dirs/binary_plot.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1633">
-              <caret line="71" column="38" lean-forward="false" selection-start-line="71" selection-start-column="38" selection-end-line="71" selection-end-column="38" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CCpyATATAnal.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ATAT/CCpyATATAnal.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ATATio.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ATAT/ATATio.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4554">
-              <caret line="198" column="25" lean-forward="false" selection-start-line="198" selection-start-column="25" selection-end-line="198" selection-end-column="25" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="VASPio.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/VASP/VASPio.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2426">
-              <caret line="158" column="43" lean-forward="false" selection-start-line="158" selection-start-column="37" selection-end-line="158" selection-end-column="43" />
-              <folding>
-                <element signature="e#0#18#0" expanded="false" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -121,6 +54,7 @@
         <option value="$PROJECT_DIR$/Queue/CCpyJobControl.py" />
         <option value="$PROJECT_DIR$/ATAT/ATATio.py" />
         <option value="$PROJECT_DIR$/../../CMS/Bsjun/IKST/ATAT/Li_Vac/120 dirs/binary_plot.py" />
+        <option value="$PROJECT_DIR$/CASM/CASMio.py" />
       </list>
     </option>
   </component>
@@ -188,49 +122,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="VASP" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="CCpy" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="CCpy" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Tools" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="CCpy" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="CCpy" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Queue" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="CCpy" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="CCpy" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ATAT" />
+              <option name="myItemId" value="CASM" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -773,11 +665,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/VASP/VASPio.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2426">
+        <state relative-caret-position="3450">
           <caret line="158" column="43" lean-forward="false" selection-start-line="158" selection-start-column="37" selection-end-line="158" selection-end-column="43" />
           <folding>
             <element signature="e#0#18#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CASM/CASMio.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="529">
+          <caret line="23" column="29" lean-forward="false" selection-start-line="23" selection-start-column="29" selection-end-line="23" selection-end-column="29" />
+          <folding />
         </state>
       </provider>
     </entry>

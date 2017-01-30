@@ -21,7 +21,7 @@ class CASMInput():
             name = filename.replace(".cif","")
         elif "POSCAR" in filename:
             fileparsing.vaspFile()
-            name = os.getcwd("./").split("/")[-1]
+            name = os.getcwd().split("/")[-1]
 
         self.atoms = fileparsing.atoms
         self.fcoords = fileparsing.fcoords
