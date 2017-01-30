@@ -368,9 +368,9 @@ set  MPI_EXEC=$MPI_HOME/bin/mpirun
 
     ''' % (cpu, cpu, jobname, q, inputfile)
 
-        f = open(queue_path+"mpi.sh", "w")
+        f = open("mpi.sh", "w")
         f.write(mpi)
         f.close()
 
-        shl("qsub mpi.sh", shell=True)
+        shl(queue_path+"qsub mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
