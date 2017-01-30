@@ -128,7 +128,7 @@ class ATATOut():
             dfs.append(f_df)
 
     def plotter(self):
-        def get_xy(lines=None, index=None):
+        def get_xy(lines=None, x_index=0, y_index=None):
             x = []
             y = []
 
@@ -136,7 +136,7 @@ class ATATOut():
                 el = l.split()
                 if len(el) > 2:
                     x.append(float(el[0]))
-                    y.append(float(el[index]))
+                    y.append(float(el[y_index]))
 
             return [x, y]
 
@@ -144,36 +144,67 @@ class ATATOut():
         gs = open("gs.out", "r")
         gs_lines = gs.readlines()
         gs.close()
-        gs = get_xy(lines=gs_lines, index=2)
+        gs = get_xy(lines=gs_lines, y_index=2)
 
         # predicted gs
         prdgs = open("newgs.out", "r")
         prdgs_lines = prdgs.readlines()
         prdgs.close()
-        prdgs = get_xy(lines=prdgs_lines, index=2)
+        prdgs = get_xy(lines=prdgs_lines, y_index=2)
 
         # fitted energy
         fit = open("fit.out", "r")
         fit_lines = fit.readlines()
         fit.close()
-        fit = get_xy(lines=fit_lines, index=2)
+        calc = get_xy(lines=fit_lines, y_index=1)
+        fit = get_xy(lines=fit_lines, y_index=2)
 
         # predicted energy
         prd = open("predstr.out", "r")
         prd_lines = prd.readlines()
         prd.close()
-        prd = get_xy(lines=prd_lines, index=2)
+        prd = get_xy(lines=prd_lines, y_index=2)
 
-        plt.scatter(prd[0], prd[1], marker="x", color="#FF0000", label="predicted")
-        plt.scatter(fit[0], fit[1], marker="o", color="#1DDB16", label="known str")
-        plt.plot(gs[0], gs[1], color="k", label="known gs")
-        plt.scatter(prdgs[0], prdgs[1], marker="x", color="#0100FF", label="predicted gs")
+        # ECI
+        eci = open("clusinfo.out", "r")
+        eci_lines = eci.readlines()
+        eci.close()
+        eci = get_xy(eci_lines, x_index=1, y_index=3)
 
-        plt.xlabel("Li Concentration")
-        plt.ylabel("Formation energy (eV)")
+        # -- Whole info
+        plt.scatter(prd[0], prd[1], marker="+", color="#00B700", s=30, label="Predicted energy")
+        plt.scatter(prdgs[0], prdgs[1], marker="o", color="#5F00FF", s=30, label="Predicted GS energy")
+        plt.scatter(calc[0], calc[1], marker="D", color="#0054FF", s=10, label="Calculated energy")
+        plt.plot(gs[0], gs[1], marker='o', markersize=8, color="#DB0000", label="Calculated GS energy")
+        plt.xlabel("Li Concentration", fontsize=20)
+        plt.ylabel("Formation energy (eV)", fontsize=20)
         plt.legend()
+        plt.xlim(0, 1)
         plt.tight_layout()
-        plt.savefig("convex_hull.png",dpi=200)
+        plt.savefig("convex_hull.png", dpi=200)
+        plt.show()
+
+        # -- Calc vs Fitted
+        plt.scatter(calc[0], calc[1], marker="o", color="b", s=50, alpha=0.7, label="Calculated energy")
+        plt.scatter(fit[0], fit[1], marker="+", color="red", s=50, label="Fitted energy")
+        plt.plot(gs[0], gs[1], color="#0054FF")
+        plt.xlabel("Li Concentration", fontsize=20)
+        plt.ylabel("Formation energy (eV)", fontsize=20)
+        plt.legend()
+        plt.xlim(0, 1)
+        plt.tight_layout()
+        plt.savefig("calc_fitted.png", dpi=200)
+        plt.show()
+
+        # -- Eci vs diameters
+        plt.scatter(eci[0], eci[1], marker="+", color="b", s=50)
+        plt.axhline(y=0, ls='--', color='gray')
+        plt.xlabel("Diameter", fontsize=20)
+        plt.ylabel("ECI", fontsize=20)
+        plt.xlim(min(eci[0]) - 0.3, max(eci[0]) + 0.3)
+        plt.ylim(min(eci[1]) - 0.1, max(eci[1]) + 0.1)
+        plt.tight_layout()
+        plt.savefig("eci.png", dpi=200)
         plt.show()
         
 
