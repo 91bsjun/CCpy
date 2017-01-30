@@ -261,6 +261,19 @@ def selectVASPOutputs(directory_path, ask=True):
 
     return inputs
 
+def find_convex_hull(points):
+    """
+    :param points: numpy array of [[1,2], [2,4], [3,5]]
+    :return: dictionary
+    """
+    from scipy.spatial import ConvexHull
+    hull = ConvexHull(points)
+    hull_x = points[hull.vertices,0]
+    hull_y = points[hull.vertices,1]
+    hull_data = {'x':hull_x, 'y':hull_y}
+
+    return hull_data
+
 def file_writer(filename, string):
     f = open(filename, "w")
     f.write(string)
