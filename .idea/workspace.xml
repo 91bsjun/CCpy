@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fe90ddd4-6adf-4dd8-96fd-3b416717383a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IKST/CCpyIKSTgetForm.py" afterPath="$PROJECT_DIR$/IKST/CCpyIKSTgetForm.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IKST/CCpyIKSTeditINCAR.py" afterPath="$PROJECT_DIR$/IKST/CCpyIKSTeditINCAR.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,7 +17,17 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="CCpyIKSTgetForm.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="CCpyIKSTeditINCAR.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/IKST/CCpyIKSTeditINCAR.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="364">
+              <caret line="70" column="0" lean-forward="true" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CCpyIKSTgetForm.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/IKST/CCpyIKSTgetForm.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="594">
@@ -78,6 +88,7 @@
         <option value="$PROJECT_DIR$/VASP/VASPio.py" />
         <option value="$PROJECT_DIR$/VASP/CCpyVASPAnal.py" />
         <option value="$PROJECT_DIR$/IKST/CCpyIKSTgetForm.py" />
+        <option value="$PROJECT_DIR$/IKST/CCpyIKSTeditINCAR.py" />
       </list>
     </option>
   </component>
@@ -744,14 +755,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/IKST/CCpyIKSTeditINCAR.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="23">
-          <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/VASP/CCpyVASPAnal.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="502">
@@ -778,6 +781,14 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/IKST/CCpyIKSTgetForm.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="594">
+          <caret line="89" column="9" lean-forward="true" selection-start-line="89" selection-start-column="9" selection-end-line="89" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Tools/CCpyTools.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="502">
@@ -786,10 +797,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/IKST/CCpyIKSTgetForm.py">
+    <entry file="file://$PROJECT_DIR$/IKST/CCpyIKSTeditINCAR.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="594">
-          <caret line="89" column="9" lean-forward="true" selection-start-line="89" selection-start-column="9" selection-end-line="89" selection-end-column="9" />
+        <state relative-caret-position="364">
+          <caret line="70" column="0" lean-forward="true" selection-start-line="70" selection-start-column="0" selection-end-line="70" selection-end-column="0" />
           <folding />
         </state>
       </provider>
