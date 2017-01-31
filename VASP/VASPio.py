@@ -341,7 +341,7 @@ class VASPOutput():
         cif.write_file(target_name)
         print(target_name+" is generated.")
 
-    def getConvergence(self):
+    def getConvergence(self, show_plot=True):
        
         li = []
         oszi = open("OSZICAR","r")
@@ -395,20 +395,22 @@ class VASPOutput():
         # OUTCAR analyse end #
         print("Initial volume : "+str(vol[0]))
         print("  Final volume : "+str(vol[-1]))
-    
-        # make plot
-        fig, ax1 = plt.subplots()
-        ax2 = ax1.twinx()
-        ax1.plot(x, y, color="b", marker="o", mec="b", label="Energy", lw=1.5)
-        ax2.plot(x, vol, color="#DB0000", marker="o", mec="#DB0000", label="Volume", lw=1.5)
 
-        ax1.set_xlabel('Steps', fontsize=19)
-        ax1.set_ylabel('Energy', color='b', fontsize=19)
-        ax2.set_ylabel('Cell volume', color='#DB0000', fontsize=19)
+        if show_plot:
+            # make plot
+            fig, ax1 = plt.subplots()
+            ax2 = ax1.twinx()
+            ax1.plot(x, y, color="b", marker="o", mec="b", label="Energy", lw=1.5)
+            ax2.plot(x, vol, color="#DB0000", marker="o", mec="#DB0000", label="Volume", lw=1.5)
 
-        plt.grid()
-        plt.tight_layout()
-        plt.show()
+            ax1.set_xlabel('Steps', fontsize=19)
+            ax1.set_ylabel('Energy', color='b', fontsize=19)
+            ax2.set_ylabel('Cell volume', color='#DB0000', fontsize=19)
+
+            plt.grid()
+            plt.tight_layout()
+            plt.savefig("convergence.png")
+            plt.show()
 
 
 

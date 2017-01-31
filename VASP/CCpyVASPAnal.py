@@ -13,8 +13,9 @@ except:
 0 : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
 1 : Get final structures (from output directories)
 2 : Energy & Cell volume convergence plot
+    ex) CCpyVASPAnal.py 2 n : sub option n -> do not show plot
 3 : Generate cif file from POSCAR or CONTCAR
-    ex) CCpyVASPAnaly 3 POSCAR"""
+    ex) CCpyVASPAnal.py 3 POSCAR"""
           )
     quit()
 
@@ -47,6 +48,15 @@ if sys.argv[1] == "1":
         os.chdir("../")
 
 elif sys.argv[1] == "2":
+    # -- Check show plot
+    show_plot = True
+    try:
+        show_chk = sys.argv[2]
+        if show_chk == "n":
+            show_plot = False
+    except:
+        show_plot = True
+
     inputs = selectVASPOutputs("./")
     for each_input in inputs:
         os.chdir(each_input)
