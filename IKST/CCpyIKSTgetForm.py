@@ -91,6 +91,8 @@ hull_df.to_csv("Convex_hull_points.csv")
 ifplot = raw_input("plot? (y/n)")
 if ifplot == "y":
     import matplotlib.pyplot as plt
-    plt.scatter(df['Concentration'], df['Formation energy'], marker="D")
+    plt.scatter(df['Concentration'], df['Formation energy'], marker="D", color='b', s=10)
     plt.plot(hull_df['x'], hull_df['y'], marker='o', color="r")
+    plt.xlim(0.0,1.0)
+    plt.savefig("Convexhull.png")
     plt.show()
