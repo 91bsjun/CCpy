@@ -59,7 +59,7 @@ class VASPInput():
         # INCAR        
         incar_dict = {
             "NWRITE":2,"LPETIM":"F","ISTART":0,"INIWAV":1,"IWAVPR":1,"ICHARG":2,"LWAVE":".FALSE.",
-            "ALGO":"NORMAL","NELM":100,"EDIFF":0.0001,"BMIX":3.00,"ENCUT":500,"GGA":"PE",
+            "ALGO":"FAST","NELM":100,"EDIFF":0.0001,"BMIX":3.00,"ENCUT":500,"GGA":"PE","ISYM":2,
             "LDIAG":"T","LREAL":"auto","PREC":"Medium",
             "NSW":200,"NBLOCK":1,"KBLOCK":10,"IBRION":2,"ISIF":3,"POTIM":0.5,"SMASS":3.0,
             "ISMEAR":0,"SIGMA":0.05,"LORBIT":11,
@@ -106,7 +106,7 @@ class VASPInput():
             kpts = []
             for param in length:
                 if 20 // param == 0:
-                    kpts.append(1)
+                    kpts.append(2)
                 else:
                     kpts.append(int(20 // param))
         kpoints = dirname+"\n0\nMonkhorst-Pack\n"+str(kpts[0])+" "+str(kpts[1])+" "+str(kpts[2])+"\n0 0 0\n"
@@ -230,7 +230,7 @@ class VASPInput():
             kpts = []
             for param in length:
                 if 20 // param == 0:
-                    kpts.append(1)
+                    kpts.append(2)
                 else:
                     kpts.append(int(20 // param))
         kpoints = dirname+"\n0\nMonkhorst-Pack\n"+str(kpts[0])+" "+str(kpts[1])+" "+str(kpts[2])+"\n0 0 0\n"

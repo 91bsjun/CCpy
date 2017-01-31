@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fe90ddd4-6adf-4dd8-96fd-3b416717383a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IKST/CCpyIKSTeditINCAR.py" afterPath="$PROJECT_DIR$/IKST/CCpyIKSTeditINCAR.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/VASP/VASPio.py" afterPath="$PROJECT_DIR$/VASP/VASPio.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,7 +17,7 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="CCpyIKSTeditINCAR.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="CCpyIKSTeditINCAR.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/IKST/CCpyIKSTeditINCAR.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="276">
@@ -33,6 +33,18 @@
             <state relative-caret-position="594">
               <caret line="89" column="9" lean-forward="true" selection-start-line="89" selection-start-column="9" selection-end-line="89" selection-end-column="9" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="VASPio.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/VASP/VASPio.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2392">
+              <caret line="139" column="35" lean-forward="true" selection-start-line="139" selection-start-column="35" selection-end-line="139" selection-end-column="35" />
+              <folding>
+                <element signature="e#0#18#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -85,10 +97,10 @@
         <option value="$PROJECT_DIR$/IKST/__init__.py" />
         <option value="$PROJECT_DIR$/Queue/CCpyJobControl.py" />
         <option value="$PROJECT_DIR$/VASP/CCpyVASPInputGen.py" />
-        <option value="$PROJECT_DIR$/VASP/VASPio.py" />
         <option value="$PROJECT_DIR$/VASP/CCpyVASPAnal.py" />
         <option value="$PROJECT_DIR$/IKST/CCpyIKSTgetForm.py" />
         <option value="$PROJECT_DIR$/IKST/CCpyIKSTeditINCAR.py" />
+        <option value="$PROJECT_DIR$/VASP/VASPio.py" />
       </list>
     </option>
   </component>
@@ -763,16 +775,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/VASP/VASPio.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="343" column="43" lean-forward="false" selection-start-line="343" selection-start-column="43" selection-end-line="343" selection-end-column="43" />
-          <folding>
-            <element signature="e#0#18#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/VASP/CCpyVASPInputGen.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="847">
@@ -802,6 +804,16 @@
         <state relative-caret-position="276">
           <caret line="15" column="26" lean-forward="false" selection-start-line="15" selection-start-column="26" selection-end-line="15" selection-end-column="26" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/VASP/VASPio.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2392">
+          <caret line="139" column="35" lean-forward="true" selection-start-line="139" selection-start-column="35" selection-end-line="139" selection-end-column="35" />
+          <folding>
+            <element signature="e#0#18#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
