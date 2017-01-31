@@ -8,7 +8,7 @@ from CCpy.Tools.CCpyTools import find_convex_hull
 try:
     root = sys.argv[1]
 except:
-    root = raw_input("Directory name ?")
+    root = raw_input("Directory name (contained DBinfo files) ?")
 os.chdir(root)
 
 # -- User Handle Area ----
@@ -22,69 +22,49 @@ dirnames = []       # Directory names
 con0_energy = None  # 0.0 Concentration energy (for calculating formation energy)
 con1_energy = None  # 1.0 Concentration energy (for calculating formation energy)
 
-# -- supcells = [1-1-1, 1-2-1, ...]
-supcells = [d for d in os.listdir("./") if os.path.isdir(d)]
-if len(supcells) > 1:
-    print("This script should be modified in case of multi supecell systems.")
-    quit()
-for supcell in supcells:
-    os.chdir(supcell)
-    dirs = os.listdir("./")
-    dirs.sort()
-    # -- dirs = [Co3Mn3Ni3O18Vac9, ...]
-    for d in dirs:
-        os.chdir(d)
-        sub_ds = os.listdir("./")
-        # -- sub_ds = [c0001, ..]
-        for sd in sub_ds:
-            os.chdir(sd)
-            files = [f for f in os.listdir("./")]
-            for f in files:
-                if "DBinfo" in f:
-                    dbinfo = f
-            f = open(dbinfo, "r")
-            lines = f.readlines()
-            f.close()
-            es = [] # all energies in each DBinfo file
-            for l in lines:
-                # -- Find element list
-                if "Element List" in l:
-                    elts = l.split("=")[1]
-                    elts = elts.split()
-                    index = False
-                    cnt = 0
-                    for e in elts:
-                        if e == base:
-                            index = cnt
-                        cnt += 1
-                # -- Find the number of each element
-                elif "Number of atoms" in l:
-                    nums = l.split("=")[1]
-                    nums = nums.split()
-                    if index:
-                        n_of_base = float(nums[index])
-                    else:
-                        n_of_base = 0.0
-                    con = round(n_of_base / tot_base, 6)
-                    cons.append(con)
-                # -- Find total energies (All iteration)
-                elif "Total Energy" in l:
-                    tot_e = float(l.split()[5])
-                    es.append(tot_e)
-            energies.append(es[0])
-            if con == 0.0:
-                con0_energy = es[0]
-            elif con == 1.0:
-                con1_energy = es[0]
+dbinfo_files = [f for f in os.listdir("./") if "DBinfo" in f]
+for dbinfo in dbinfo_files:
+    f = open(dbinfo, "r")
+    lines = f.readlines()
+    f.close()
+    es = [] # all energies in each DBinfo file
+    for l in lines:
+        # -- Find element list
+        if "Element List" in l:
+            elts = l.split("=")[1]
+            elts = elts.split()
+            index = False
+            cnt = 0
+            for e in elts:
+                if e == base:
+                    index = cnt
+                cnt += 1
+        # -- Find the number of each element
+        elif "Number of atoms" in l:
+            nums = l.split("=")[1]
+            nums = nums.split()
+            if index:
+                n_of_base = float(nums[index])
+            else:
+                n_of_base = 0.0
+            con = round(n_of_base / tot_base, 6)
+            cons.append(con)
+        # -- Find total energies (All iteration)
+        elif "Total Energy" in l:
+            tot_e = float(l.split()[5])
+            es.append(tot_e)
+        elif "Run Dir" in l:
+            rundir = l.split("=")[1]
+            rundir = rundir.replace(" ","")
+    energies.append(es[0])
+    if con == 0.0:
+        con0_energy = es[0]
+    elif con == 1.0:
+        con1_energy = es[0]
 
-            dirname = os.getcwd()
-            dirname = dirname.split("/")
-            dirname = dirname[-3] + "/" + dirname[-2] + "/" + dirname[-1]
-            dirnames.append(dirname)
+    dirnames.append(rundir)
 
-            os.chdir("../")
-        os.chdir("../")
-    os.chdir("../")
+os.chdir("../")
 
 data = {"Concentration": cons, "Directory": dirnames, "Energy": energies}
 df = pd.DataFrame(data)
