@@ -105,7 +105,7 @@ class VASPInput():
             length = [lattice['length'][0], lattice['length'][1], lattice['length'][2]]
             kpts = []
             for param in length:
-                if 20 // param == 0:
+                if 20 // param == 0 or 20 // param == 1:
                     kpts.append(2)
                 else:
                     kpts.append(int(20 // param))
