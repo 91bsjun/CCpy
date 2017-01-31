@@ -56,7 +56,7 @@ for supcell in supcells:
 
             mag_string = ""
             for i in range(len(n_of_atoms)):
-                mag_strin += str(mag[elts[i]]) + "*" + str(n_of_atoms[i]) + " "
+                mag_string += str(mag[elts[i]]) + "*" + str(n_of_atoms[i]) + " "
 
             LDAUL_string = ""
             for i in range(len(elts)):
