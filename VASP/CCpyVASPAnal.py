@@ -60,6 +60,7 @@ elif sys.argv[1] == "2":
     inputs = selectVASPOutputs("./")
     for each_input in inputs:
         os.chdir(each_input)
+        print(each_input)
         VO = VASPOutput()
         VO.getConvergence(show_plot=show_plot)
         os.chdir("../")
