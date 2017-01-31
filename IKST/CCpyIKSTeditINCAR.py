@@ -13,7 +13,7 @@ import os, sys
 mag = {'Mn3+': 4, 'Ni4+': 0.6, 'Cr': 5, 'Mn4+': 3, 'Ta': 5, 'Ni3+': 1, 'Mo': 5,
        'Ni': 2, 'V': 5, 'Mn2+': 5, 'Co': 5, 'Co4+': 1, 'W': 5, 'Fe3+': 5, 'Fe2+': 4,
        'Mn': 5, 'Fe4+': 4, 'Fe': 5, 'Co3+': 0.6,
-       'Li': 0, 'O': 0}
+       'Li': 0.6, 'O': 0.6}
 LDAUL = {'Mo': 2, 'V': 2, 'Cu': 2, 'W': 2, 'Ag': 2, 'Cr': 2, 'Ta': 2,
          'Nb': 2, 'Mn': 2, 'Re': 2, 'Co': 2, 'Ni': 2, 'Fe': 2,
          'Li': 0, 'O': 0}
@@ -75,13 +75,12 @@ for supcell in supcells:
                 LDAUJ_string += str(LDAUJ[elts[i]]) + " "
 
             LDAU = """MAGMOM = %s
-
-    # LDA+U parameters
-    LDAU = .TRUE.
-    LDAUTYPE = 2
-    LDAUL = %s
-    LDAUU = %s
-    LDAUJ = %s"""%(mag_string, LDAUL_string, LDAUU_string, LDAUJ_string)
+LDAU = .TRUE.
+LMAXMIX = 4
+LDAUTYPE = 2
+LDAUL = %s
+LDAUU = %s
+LDAUJ = %s"""%(mag_string, LDAUL_string, LDAUU_string, LDAUJ_string)
 
             f = open("INCAR", "a")
             f.write(LDAU)
