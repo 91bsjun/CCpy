@@ -55,7 +55,7 @@ for dbinfo in dbinfo_files:
             es.append(tot_e)
         elif "Run Dir" in l:
             rundir = l.split("=")[1]
-            rundir = rundir.replace(" ","")
+            rundir = rundir.replace(" ","").replace("\n","")
     energies.append(es[0])
     if con == 0.0:
         con0_energy = es[0]
