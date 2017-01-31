@@ -77,12 +77,8 @@ elif sys.argv[1] == "5":
     input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
     inputs = selectInputs(input_marker, "./")
     for each_input in inputs:
-        os.chdir(each_input)
-
         MIT_relax_VI = VASPInput(each_input)
         MIT_relax_VI.MIT_relax_set()
-
-        os.chdir("../")
 
 
 
