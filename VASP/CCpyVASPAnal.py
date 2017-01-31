@@ -11,8 +11,10 @@ except:
     print(""""--------------------------------------
 [options]
 0 : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
-1 : Get final structure (or initial structure)
-2 : Energy & Cell volume convergence plot"""
+1 : Get final structures (from output directories)
+2 : Energy & Cell volume convergence plot
+3 : Generate cif file from POSCAR or CONTCAR
+    ex) CCpyVASPAnaly 3 POSCAR"""
           )
     quit()
 
@@ -51,3 +53,12 @@ elif sys.argv[1] == "2":
         VO = VASPOutput()
         VO.getConvergence()
         os.chdir("../")
+
+elif sys.argv[1] == "3":
+    try:
+        filename = sys.argv[2]
+    except:
+        filename = raw_input("POSCAR? CONTCAR?")
+
+    VO = VASPOutput()
+    VO.getFinalStructure(filename=filename)
