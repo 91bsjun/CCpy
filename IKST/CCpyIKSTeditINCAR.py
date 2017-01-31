@@ -26,6 +26,7 @@ try:
 except:
     dirname = raw_input("Directory name?")
 
+os.chdir(dirname)
 # -- supcells = [1-1-1, 1-2-1, ...]
 supcells = [d for d in os.listdir("./") if os.path.isdir(d)]
 for supcell in supcells:
