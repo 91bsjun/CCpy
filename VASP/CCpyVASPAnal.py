@@ -61,7 +61,7 @@ elif sys.argv[1] == "2":
     for each_input in inputs:
         os.chdir(each_input)
         VO = VASPOutput()
-        VO.getConvergence()
+        VO.getConvergence(show_plot=show_plot)
         os.chdir("../")
 
 elif sys.argv[1] == "3":
