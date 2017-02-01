@@ -94,7 +94,7 @@ class VASPInput():
         if mag:
             mag_string = ""
             for i in range(len(n_of_atoms)):
-                mag_string += str(n_of_atoms[i]) + "*" + str(mag[elts[i]]) + " "
+                mag_string += str(n_of_atoms[i]) + "*" + str(magmom[elts[i]]) + " "
             incar_dict['MAGMOM'] = mag_string
         if ldau:
             LDAUL_string = ""
@@ -229,7 +229,7 @@ class VASPInput():
         if mag:
             mag_string = ""
             for i in range(len(n_of_atoms)):
-                mag_string += str(n_of_atoms[i]) + "*" + str(mag[elts[i]]) + " "
+                mag_string += str(n_of_atoms[i]) + "*" + str(magmom[elts[i]]) + " "
             incar_dict['MAGMOM'] = mag_string
         if ldau:
             LDAUL_string = ""
@@ -359,7 +359,7 @@ class VASPInput():
         mit_neb.write_input(dirname)
 
 # Magnetic moment parameters : from Pymatgen
-mag = {'Mn3+': 4, 'Ni4+': 0.6, 'Cr': 5, 'Mn4+': 3, 'Ta': 5, 'Ni3+': 1, 'Mo': 5,
+magmom = {'Mn3+': 4, 'Ni4+': 0.6, 'Cr': 5, 'Mn4+': 3, 'Ta': 5, 'Ni3+': 1, 'Mo': 5,
        'Ni': 2, 'V': 5, 'Mn2+': 5, 'Co': 5, 'Co4+': 1, 'W': 5, 'Fe3+': 5, 'Fe2+': 4,
        'Mn': 5, 'Fe4+': 4, 'Fe': 5, 'Co3+': 0.6,
        'Li': 0.6, 'O': 0.6}
