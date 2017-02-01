@@ -12,7 +12,7 @@ xeon1 = [16, 32, "xeon1.q"] # node01
 xeon2 = [24, 64, "xeon2.q"] # node02, node03, node04
 xeon3 = [24, 256, "xeon3.q"] # node05, node06
 xeon4 = [32, 256, "xeon4.q"] # node07
-xeon5 = [72, 512, "xeon5.q"] # node08, node09
+xeon5 = [72, 512, "xeon5.q"] # node08, node09, node10
 I5 = [4, 16, "I5.q"]
 
 class JobSubmit():
@@ -111,6 +111,9 @@ set  MPI_EXEC=$MPI_HOME/bin/mpirun
         cpu = cpu / d        
 
         os.chdir(inputfile)
+
+        # -- Band calculation after previous calculation
+        # -- Generate Precalc -> Band-DOS
         if band:
             jobname = "VB"+inputfile
             jobname = jobname.replace(".","_").replace("-","_")
@@ -153,6 +156,7 @@ cat $TMPDIR/machines
 
  '''%(cpu, cpu, jobname, q)
 
+        # -- Static calculation at STATiC directory
         elif static:
             jobname = "VS"+inputfile
             jobname = jobname.replace(".","_").replace("-","_")
@@ -185,6 +189,8 @@ cat $TMPDIR/machines
 
 
  '''%(cpu, cpu, jobname, q)
+
+        # -- Normal VASP calculation
         else:
             jobname = "V"+inputfile
             jobname = jobname.replace(".","_").replace("-","_")
@@ -327,6 +333,7 @@ cat $TMPDIR/machines
         shl(queue_path+"qsub mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
+    # -- To show SGE queue system that " I'm running now "
     def pbs_runner(self, cpu=None, mem=None, q=None):
         inputfile = self.inputfile
 
