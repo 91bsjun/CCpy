@@ -17,11 +17,14 @@ except:
 5 : MIT relaxation calculation
 
 [sub_options]
+ex) CCpyVASPInputGen.py 1 -isif=2 spin mag -kp=4,4,2 ...
 INCAR OPTION
-sp : Single point calculation (DEFAULT : non-single)
+sp : Single point calculation (DEFAULT : NSW = 200)
 -isif=# : ISIF value (3: full relax, 2: cell fixed,... DEFAULT:3)
 vdw : DFT-D2 grimme's function
 spin : Spin polarized calculation (DEFAULT : unpolarized)
+mag : Add magnetic monet parameters (values from Pymatgen)
+ldau : Add LDA+U parameters (values from Pymatgen)
 
 KPOINTS
 -kp=#,#,# (DEFAULT : reciprocal parameter as devided by 20)'''
@@ -33,6 +36,8 @@ single_point=False
 cell_fixed=False
 vdw=False
 spin=False
+mag=False
+ldau=False
 isif=False
 kpoints=False
 
@@ -47,6 +52,10 @@ for arg in sys.argv:
         spin=True
     elif "-kp" in arg:
         kpoints = arg.split("=")[1].split(",")
+    elif "u" in arg:
+        ldau = True
+    elif "mag" in arg:
+        mag = True
 
 
 if sys.argv[1] == "1":
@@ -54,13 +63,14 @@ if sys.argv[1] == "1":
     inputs = selectInputs(input_marker, "./")
     for each_input in inputs:
         VI = VASPInput(each_input)
-        VI.cms_vasp_set(single_point=single_point,isif=isif,vdw=vdw,kpoints=kpoints,spin=spin)        
+        VI.cms_vasp_set(single_point=single_point,isif=isif,vdw=vdw,kpoints=kpoints,spin=spin,mag=mag,ldau=ldau)
+
 elif sys.argv[1] == "2":
     inputs = selectVASPOutputs("./")
     for each_input in inputs:
         os.chdir(each_input)
         VI = VASPInput("CONTCAR")
-        VI.cms_band_set()
+        VI.cms_band_set(spin=spin,mag=mag,ldau=ldau)
         os.chdir("../")
 
 elif sys.argv[1] == "4":
