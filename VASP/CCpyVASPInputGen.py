@@ -52,7 +52,7 @@ for arg in sys.argv:
         spin=True
     elif "-kp" in arg:
         kpoints = arg.split("=")[1].split(",")
-    elif "u" in arg:
+    elif "ldau" in arg:
         ldau = True
     elif "mag" in arg:
         mag = True
