@@ -162,7 +162,7 @@ class CMSBand():
         else:            
             band_data = plotter.bs_plot_data(zero_to_efermi=True)
             if band_data['vbm'][0][1] != band_data['vbm'][1][1]:
-            print("???? 2 vbm ?? Notice to bsjun please")
+                print("???? 2 vbm ?? Notice to bsjun please")
             vbm = band_data['vbm'][0][1]
             cbm = band_data['cbm'][0][1]
             gap = band_data['band_gap']
