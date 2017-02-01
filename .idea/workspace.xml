@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fe90ddd4-6adf-4dd8-96fd-3b416717383a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Queue/CCpyJobControl.py" afterPath="$PROJECT_DIR$/Queue/CCpyJobControl.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/VASP/VASPio.py" afterPath="$PROJECT_DIR$/VASP/VASPio.py" />
     </list>
@@ -32,8 +31,8 @@
       <file leaf-file-name="VASPio.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/VASP/VASPio.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1102">
-              <caret line="96" column="67" lean-forward="false" selection-start-line="96" selection-start-column="67" selection-end-line="96" selection-end-column="67" />
+            <state relative-caret-position="-372">
+              <caret line="79" column="33" lean-forward="false" selection-start-line="79" selection-start-column="33" selection-end-line="79" selection-end-column="33" />
               <folding>
                 <element signature="e#0#18#0" expanded="false" />
               </folding>
@@ -811,8 +810,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/VASP/VASPio.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1102">
-          <caret line="96" column="67" lean-forward="false" selection-start-line="96" selection-start-column="67" selection-end-line="96" selection-end-column="67" />
+        <state relative-caret-position="-372">
+          <caret line="79" column="33" lean-forward="false" selection-start-line="79" selection-start-column="33" selection-end-line="79" selection-end-column="33" />
           <folding>
             <element signature="e#0#18#0" expanded="false" />
           </folding>

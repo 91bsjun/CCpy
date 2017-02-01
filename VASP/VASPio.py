@@ -78,19 +78,6 @@ class VASPInput():
             incar_dict['ISIF']=isif
         if spin:
             incar_dict['ISPIN']=2
-        if vdw:            
-            C6 = ""
-            R0 = ""
-            for el in elements:
-                C6+=str(vdw_C6[el])+" "
-                R0+=str(vdw_R0[el])+" "
-            incar_dict['LVDW']=".TRUE."
-            incar_dict['VDW_RADIUS']=30.0
-            incar_dict['VDW_SCALING']=0.75
-            incar_dict['VDW_D']=20.0
-            incar_dict['VDW_C6']=C6
-            incar_dict['VDW_R0']=R0
-        incar = Incar(incar_dict)
         if mag:
             mag_string = ""
             for i in range(len(n_of_atoms)):
@@ -115,6 +102,19 @@ class VASPInput():
             incar_dict['LDAUL'] = LDAUL_string
             incar_dict['LDAUU'] = LDAUU_string
             incar_dict['LDAUJ'] = LDAUJ_string
+        if vdw:
+            C6 = ""
+            R0 = ""
+            for el in elements:
+                C6+=str(vdw_C6[el])+" "
+                R0+=str(vdw_R0[el])+" "
+            incar_dict['LVDW']=".TRUE."
+            incar_dict['VDW_RADIUS']=30.0
+            incar_dict['VDW_SCALING']=0.75
+            incar_dict['VDW_D']=20.0
+            incar_dict['VDW_C6']=C6
+            incar_dict['VDW_R0']=R0
+        incar = Incar(incar_dict)
 
         if band_dos:
             incar_dict['NSW']=0            
