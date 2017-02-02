@@ -20,8 +20,8 @@
       <file leaf-file-name="CCpyBand.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/VASP/CCpyBand.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="686">
-              <caret line="439" column="25" lean-forward="true" selection-start-line="439" selection-start-column="25" selection-end-line="439" selection-end-column="25" />
+            <state relative-caret-position="184">
+              <caret line="155" column="22" lean-forward="false" selection-start-line="155" selection-start-column="22" selection-end-line="155" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -819,8 +819,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/VASP/CCpyBand.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="686">
-          <caret line="439" column="25" lean-forward="true" selection-start-line="439" selection-start-column="25" selection-end-line="439" selection-end-column="25" />
+        <state relative-caret-position="184">
+          <caret line="155" column="22" lean-forward="false" selection-start-line="155" selection-start-column="22" selection-end-line="155" selection-end-column="22" />
           <folding />
         </state>
       </provider>

@@ -20,7 +20,7 @@ import pickle
 
 
 class CMSBand():
-    def __init__(self, elt_projected=False, dos=False):
+    def __init__(self, elt_projected=False, dos=False, fig=None):
         # -- plot with DOS : Full VASP run
         if dos:
             if elt_projected:
@@ -78,6 +78,7 @@ class CMSBand():
                     save_pickle_data(name="bands.pkl", obj=bands)
 
         self.bands = bands
+        self.fig = fig
         
 
     def blueBand(self, miny=None,maxy=None,line_width=3):
@@ -152,6 +153,7 @@ class CMSBand():
 
 
     def save_band_data(self, color=False, savefig=True):
+        fig = self.fig
         plotter = self.plotter
         metal = plotter._bs.is_metal()
         if metal:
@@ -233,7 +235,7 @@ def main_run():
     if sys.argv[1] == "1":
         fig = plt.figure(figsize=(6, 10))
 
-        cms_band = CMSBand()
+        cms_band = CMSBand(fig=fig)
         plt = cms_band.blueBand(miny=miny, maxy=maxy, line_width=line_width)
         plt.tight_layout()
 
@@ -245,7 +247,7 @@ def main_run():
     elif sys.argv[1] == "2":
         fig = plt.figure(figsize=(6, 10))
 
-        cms_band = CMSBand(elt_projected=True)
+        cms_band = CMSBand(elt_projected=True, fig=fig)
 
         elt_argv = [argv for argv in sys.argv if "-e" in argv]
         if len(elt_argv) > 0:
@@ -317,7 +319,7 @@ def main_run():
             dosmax = None
 
         plt.subplot(121)
-        cms_band = CMSBand(elt_projected=True, dos=True)
+        cms_band = CMSBand(elt_projected=True, dos=True, fig=fig)
         plt = cms_band.blueBand(miny=miny, maxy=maxy, line_width=line_width)
 
         cms_band.save_band_data(color=False, savefig=False)
@@ -342,7 +344,7 @@ def main_run():
     elif sys.argv[1] == "4":
         fig = plt.figure(figsize=(12, 10))
 
-        cms_band = CMSBand(elt_projected=True, dos=True)
+        cms_band = CMSBand(elt_projected=True, dos=True, fig=fig)
 
         ## setting element order
         elt_argv = [argv for argv in sys.argv if "-e" in argv]
