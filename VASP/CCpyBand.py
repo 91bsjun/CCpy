@@ -78,19 +78,19 @@ class CMSBand():
         self.bands = bands
         
 
-    def blueBand(self, miny=None,maxy=None):
+    def blueBand(self, miny=None,maxy=None,line_width=3):
         bands = self.bands        
         plotter = BSPlotter(bands)
         self.plotter = plotter
 
-        plotter.get_plot(zero_to_efermi=True)        
+        plotter.get_plot(zero_to_efermi=True, line_width=line_width)
         plt.axhline(y=0, lw=1, ls=':', color='gray')
         plt.tick_params(labelsize=15)
         plt.ylim(miny, maxy)
                
         return plt
 
-    def colorBand(self, miny=None,maxy=None,elt_ordered=None):
+    def colorBand(self, miny=None,maxy=None,elt_ordered=None,line_width=3):
         bands = self.bands
         plotter = BSPlotterProjected(bands)
         self.plotter = plotter
@@ -108,7 +108,7 @@ class CMSBand():
 
         self.elt_ordered = elt_ordered
         
-        plotter.get_elt_projected_plots_color(zero_to_efermi=True, elt_ordered=elt_ordered)        
+        plotter.get_elt_projected_plots_color(zero_to_efermi=True, elt_ordered=elt_ordered, line_width=line_width)
         plt.axhline(y=0, lw=1, ls=':', color='gray')
         plt.tick_params(labelsize=15)
 
@@ -215,16 +215,17 @@ if __name__=="__main__":
         print("""-------------------------------------
 Usage : cms_band [option] [miny] [maxy] [sub_option1] [sub_option2]...
 [option]
-1  : blue band
-2  : color band
-3  : blue band & element DOS
-4  : color band & element DOS
+1   : blue band
+2   : color band
+3   : blue band & element DOS
+4   : color band & element DOS
 [sub_options]
-n  : Do not show figure, just save images (ex : cms_band 1 -3 3 n)
-a  : Make element order as default (ex : cms_band 2 -3 3 a)
--e : Make element order (ex : cms_band 2 -3 3 -eCo,Ni)
--d : Make DOS x-axis limitation (ex : cms_band 3 -3 3 -d0,5)
+n   : Do not show figure, just save images (ex : cms_band 1 -3 3 n)
+a   : Make element order as default (ex : cms_band 2 -3 3 a)
+-e  : Make element order (ex : cms_band 2 -3 3 -eCo,Ni)
+-d  : Set DOS x-axis limitation (ex : cms_band 3 -3 3 -d0,5)
                                 (ex : cms_band 3 -3 3 -eC,N -d0,5)
+-lw : Set line width of figure (ex : cms_band 3 -3 3 -lw5) // default = 3
 -------------------------------------"""
               )
         quit()
@@ -238,11 +239,19 @@ a  : Make element order as default (ex : cms_band 2 -3 3 a)
         miny = float(min(lims))
         maxy = float(max(lims))
 
+    line_width = [argv for argv in sys.argv if "-lw" in argv]
+    if len(doslim) > 0:
+        line_width = line_width[0]
+        line_width = line_width.replace("-lw", "")
+        line_width = float(line_width)
+    else:
+        line_width = 3
+
     if sys.argv[1] == "1":
         fig = plt.figure(figsize=(6,10))
         
         cms_band = CMSBand()
-        plt = cms_band.blueBand(miny=miny,maxy=maxy)
+        plt = cms_band.blueBand(miny=miny,maxy=maxy,line_width=line_width)
         plt.tight_layout()
 
         cms_band.save_band_data(color=False)        
@@ -276,7 +285,7 @@ a  : Make element order as default (ex : cms_band 2 -3 3 a)
                 elt_ordered = get_atoms.split(',')
             elt_ordered = elt_ordered
         
-        plt = cms_band.colorBand(miny=miny,maxy=maxy,elt_ordered=elt_ordered)
+        plt = cms_band.colorBand(miny=miny,maxy=maxy,elt_ordered=elt_ordered,line_width=line_width)
         plt.tight_layout()
 
         cms_band.save_band_data(color=True)        
@@ -325,7 +334,7 @@ a  : Make element order as default (ex : cms_band 2 -3 3 a)
 
         plt.subplot(121)
         cms_band = CMSBand(elt_projected=True, dos=True)        
-        plt = cms_band.blueBand(miny=miny,maxy=maxy)
+        plt = cms_band.blueBand(miny=miny,maxy=maxy,line_width=line_width)
         
         cms_band.save_band_data(color=False, savefig=False)
         
@@ -387,7 +396,7 @@ a  : Make element order as default (ex : cms_band 2 -3 3 a)
             dosmax = None
 
         plt.subplot(121)
-        plt = cms_band.colorBand(miny=miny,maxy=maxy,elt_ordered=elt_ordered)
+        plt = cms_band.colorBand(miny=miny,maxy=maxy,elt_ordered=elt_ordered,line_width=line_width)
         cms_band.save_band_data(color=True, savefig=False)
 
         plt.subplot(122)

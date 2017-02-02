@@ -511,7 +511,7 @@ class BSPlotter(object):
                 if not self._bs.is_metal() else ""}
 
     def get_plot(self, zero_to_efermi=True, ylim=None, smooth=False,
-                 vbm_cbm_marker=False,smooth_tol=None):
+                 vbm_cbm_marker=False,smooth_tol=None, line_width=3):
         """
         Get a matplotlib object for the bandstructure plot.
         Blue lines are up spin, red lines are down
@@ -545,7 +545,8 @@ class BSPlotter(object):
         if self._bs.is_metal():
             e_min = -10
             e_max = 10
-        band_linewidth = 3
+
+        band_linewidth = line_width ## edit
 
         data = self.bs_plot_data(zero_to_efermi)
         if not smooth:
@@ -1008,7 +1009,7 @@ class BSPlotterProjected(BSPlotter):
 
         return plt
 
-    def get_elt_projected_plots_color(self, zero_to_efermi=True,
+    def get_elt_projected_plots_color(self, zero_to_efermi=True, line_width=3,
                                       elt_ordered=None):
         """
         returns a pylab plot object with one plot where the band structure
@@ -1030,7 +1031,8 @@ class BSPlotterProjected(BSPlotter):
 
         import matplotlib.pyplot as plt
 
-        band_linewidth = 3
+        band_linewidth = line_width # editted
+
         if len(self._bs.structure.composition.elements) > 3:
             raise ValueError
         if elt_ordered is None:
