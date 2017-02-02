@@ -437,5 +437,6 @@ ed  : Make element order as default
     inputs = selectVASPBandOutputs("./", ask=ask)
     for each_input in inputs:
         os.chdir(each_input)
+        print(each_input)
         main_run()
         os.chdir("../")
