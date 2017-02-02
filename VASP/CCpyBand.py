@@ -240,7 +240,7 @@ a   : Make element order as default (ex : cms_band 2 -3 3 a)
         maxy = float(max(lims))
 
     line_width = [argv for argv in sys.argv if "-lw" in argv]
-    if len(doslim) > 0:
+    if len(line_width) > 0:
         line_width = line_width[0]
         line_width = line_width.replace("-lw", "")
         line_width = float(line_width)
