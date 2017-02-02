@@ -218,9 +218,6 @@ def selectVASPInputs(directory_path, ask=True, static=False, band=False):
     return inputs
 
 def selectVASPOutputs(directory_path, ask=True):
-    """
-    Needs edition -> pick <INCAR POSCAR KPOINTS POTCAR> included directories
-    """
     all_dirs = [each_dir for each_dir in os.listdir(directory_path) if os.path.isdir(each_dir)]
     all_inputs = []
     for each_dir in all_dirs:
@@ -261,6 +258,48 @@ def selectVASPOutputs(directory_path, ask=True):
 
     return inputs
 
+
+def selectVASPBandOutputs(directory_path, ask=True):
+    all_dirs = [each_dir for each_dir in os.listdir(directory_path) if os.path.isdir(each_dir)]
+    all_inputs = []
+    for each_dir in all_dirs:
+        files = os.listdir(each_dir)
+        if "Band-DOS" in files:
+            all_inputs.append(each_dir)
+
+    if ask == True:
+        print("0 : All files")
+        for i in range(len(all_inputs)):
+            print(str(i + 1) + " : " + all_inputs[i])
+        get_num = raw_input("Choose file : ")
+    else:
+        get_num = "0"
+
+    try:
+        if get_num == "0":
+            inputs = all_inputs
+        else:
+            inputs = []
+            get_num = get_num.split(",")  # 1-4,6-10,11,12
+            for i in get_num:
+                if "-" in i:
+                    r = i.split("-")
+                    for j in range(int(r[0]), int(r[1]) + 1):
+                        inputs.append(all_inputs[j - 1])
+                else:
+                    i = int(i)
+                    inputs.append(all_inputs[i - 1])
+    except:
+        print("Unvalid input type.")
+        print("ex : 1-3,5-10,11,12,13")
+        quit()
+
+    if len(inputs) == 0:
+        print("No available file detected.")
+        quit()
+
+    return inputs
+
 def find_convex_hull(points):
     """
     :param points: numpy array of [[1,2], [2,4], [3,5]]
@@ -290,8 +329,6 @@ def get_ip():
             ip = l.split()[1]
             ip = ip.split(":")[1]
             return ip
-                
-            
 
 def ssh_command(servername,portnum,msg):
     command = "sshpass ssh -p %d %s \"%s\""%(portnum,servername,msg)

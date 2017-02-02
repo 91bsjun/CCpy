@@ -14,6 +14,8 @@ from pymatgen_plotter import BSPlotter
 from pymatgen_plotter import BSPlotterProjected
 from pymatgen_plotter import DosPlotter
 
+from CCpy.Tools.CCpyTools import selectVASPBandOutputs
+
 import pickle
 
 
@@ -207,33 +209,12 @@ def load_pickle_data(name=None):
     print("Done!")
     return loaded
 
-
-if __name__=="__main__":
+def main_run():
     try:
-        sys.argv[1]
-    except:
-        print("""-------------------------------------
-Usage : cms_band [option] [miny] [maxy] [sub_option1] [sub_option2]...
-[option]
-1   : blue band
-2   : color band
-3   : blue band & element DOS
-4   : color band & element DOS
-[sub_options]
-n   : Do not show figure, just save images (ex : cms_band 1 -3 3 n)
-a   : Make element order as default (ex : cms_band 2 -3 3 a)
--e  : Make element order (ex : cms_band 2 -3 3 -eCo,Ni)
--d  : Set DOS x-axis limitation (ex : cms_band 3 -3 3 -d0,5)
-                                (ex : cms_band 3 -3 3 -eC,N -d0,5)
--lw : Set line width of figure (ex : cms_band 3 -3 3 -lw5) // default = 3
--------------------------------------"""
-              )
-        quit()
-    try:
-        lims = [float(sys.argv[2]), float(sys.argv[3])]        
+        lims = [float(sys.argv[2]), float(sys.argv[3])]
         miny = min(lims)
         maxy = max(lims)
-    except:        
+    except:
         get_lim = raw_input("** Set y-limitaion (ex: -5,5) : ")
         lims = get_lim.split(",")
         miny = float(min(lims))
@@ -247,71 +228,74 @@ a   : Make element order as default (ex : cms_band 2 -3 3 a)
     else:
         line_width = 3
 
+    # -- blue band
     if sys.argv[1] == "1":
-        fig = plt.figure(figsize=(6,10))
-        
+        fig = plt.figure(figsize=(6, 10))
+
         cms_band = CMSBand()
-        plt = cms_band.blueBand(miny=miny,maxy=maxy,line_width=line_width)
+        plt = cms_band.blueBand(miny=miny, maxy=maxy, line_width=line_width)
         plt.tight_layout()
 
-        cms_band.save_band_data(color=False)        
+        cms_band.save_band_data(color=False)
         if "n" not in sys.argv:
             plt.show()
 
+    # -- color band
     elif sys.argv[1] == "2":
-        fig = plt.figure(figsize=(6,10))
+        fig = plt.figure(figsize=(6, 10))
 
         cms_band = CMSBand(elt_projected=True)
 
         elt_argv = [argv for argv in sys.argv if "-e" in argv]
         if len(elt_argv) > 0:
-            elt=True
+            elt = True
             elt_argv = elt_argv[0]
-            elt_argv = elt_argv.replace("-e","")
+            elt_argv = elt_argv.replace("-e", "")
         else:
-            elt=False                
-        
-        if "a" in sys.argv:
+            elt = False
+
+        if "ed" in sys.argv:
             elt_ordered = None
         elif elt:
             elt_ordered = elt_argv.split(",")
             elt_ordered = elt_ordered
         else:
             get_atoms = raw_input("* Input the elements order to plot band (ex : C,N) : ")
-            get_atoms = get_atoms.replace(" ","")
+            get_atoms = get_atoms.replace(" ", "")
             elt_ordered = get_atoms.split(',')
             if len(elt_ordered) > 3:
                 get_atoms = raw_input("* Maximum 3 elements available : ")
                 elt_ordered = get_atoms.split(',')
             elt_ordered = elt_ordered
-        
-        plt = cms_band.colorBand(miny=miny,maxy=maxy,elt_ordered=elt_ordered,line_width=line_width)
+
+        plt = cms_band.colorBand(miny=miny, maxy=maxy, elt_ordered=elt_ordered, line_width=line_width)
         plt.tight_layout()
 
-        cms_band.save_band_data(color=True)        
+        cms_band.save_band_data(color=True)
         if "n" not in sys.argv:
             plt.show()
 
+    # -- blue band & elt DOS
     elif sys.argv[1] == "3":
-        fig = plt.figure(figsize=(12,10))
+        fig = plt.figure(figsize=(12, 10))
 
         ## setting element order
         elt_argv = [argv for argv in sys.argv if "-e" in argv]
         if len(elt_argv) > 0:
-            elt=True
+            elt = True
             elt_argv = elt_argv[0]
-            elt_argv = elt_argv.replace("-e","")
+            elt_argv = elt_argv.replace("-e", "")
         else:
-            elt=False
-        
-        if "a" in sys.argv:
+            elt = False
+
+        if "ed" in sys.argv:
             elt_ordered = None
         elif elt:
             elt_ordered = elt_argv.split(",")
             elt_ordered = elt_ordered
         else:
             get_atoms = raw_input("* Input the elements order to plot band (ex : C,N) : ")
-            get_atoms = get_atoms.replace(" ","")
+            get_atoms = get_atoms.replace(" ", "")
             elt_ordered = get_atoms.split(',')
             if len(elt_ordered) > 3:
                 get_atoms = raw_input("* Maximum 3 elements available : ")
@@ -322,7 +306,7 @@ a   : Make element order as default (ex : cms_band 2 -3 3 a)
         doslim = [argv for argv in sys.argv if "-d" in argv]
         if len(doslim) > 0:
             doslim = doslim[0]
-            doslim = doslim.replace("-d","")
+            doslim = doslim.replace("-d", "")
             doslim = doslim.split(",")
             doslim = [float(doslim[0]), float(doslim[1])]
             dosmin = min(doslim)
@@ -330,52 +314,52 @@ a   : Make element order as default (ex : cms_band 2 -3 3 a)
         else:
             dosmin = None
             dosmax = None
-            
 
         plt.subplot(121)
-        cms_band = CMSBand(elt_projected=True, dos=True)        
-        plt = cms_band.blueBand(miny=miny,maxy=maxy,line_width=line_width)
-        
+        cms_band = CMSBand(elt_projected=True, dos=True)
+        plt = cms_band.blueBand(miny=miny, maxy=maxy, line_width=line_width)
+
         cms_band.save_band_data(color=False, savefig=False)
-        
+
         plt.subplot(122)
-        plt = cms_band.element_DOS(miny=miny,maxy=maxy,minx=dosmin,maxx=dosmax,elt_ordered=elt_ordered,with_band=True)
+        plt = cms_band.element_DOS(miny=miny, maxy=maxy, minx=dosmin, maxx=dosmax, elt_ordered=elt_ordered,
+                                   with_band=True)
         plt.tight_layout()
 
         pwd = os.getcwd()
         dirname = pwd.split("/")[-1]
-        figname = dirname+"_blueBand_DOS.png"
+        figname = dirname + "_blueBand_DOS.png"
         plt.savefig(figname)
-        makejpg="convert "+figname+" "+figname.replace(".png",".jpg")
+        makejpg = "convert " + figname + " " + figname.replace(".png", ".jpg")
         subprocess.call(makejpg, shell=True)
-        print("* Save figure : "+figname+", "+figname.replace(".png",".jpg"))
-        
+        print("* Save figure : " + figname + ", " + figname.replace(".png", ".jpg"))
+
         if "n" not in sys.argv:
             plt.show()
 
+    # -- color band & elt band
     elif sys.argv[1] == "4":
-        fig = plt.figure(figsize=(12,10))
+        fig = plt.figure(figsize=(12, 10))
 
         cms_band = CMSBand(elt_projected=True, dos=True)
-        
 
         ## setting element order
         elt_argv = [argv for argv in sys.argv if "-e" in argv]
         if len(elt_argv) > 0:
-            elt=True
+            elt = True
             elt_argv = elt_argv[0]
-            elt_argv = elt_argv.replace("-e","")
+            elt_argv = elt_argv.replace("-e", "")
         else:
-            elt=False
-        
-        if "a" in sys.argv:
+            elt = False
+
+        if "ed" in sys.argv:
             elt_ordered = None
         elif elt:
             elt_ordered = elt_argv.split(",")
             elt_ordered = elt_ordered
         else:
             get_atoms = raw_input("* Input the elements order to plot band (ex : C,N) : ")
-            get_atoms = get_atoms.replace(" ","")
+            get_atoms = get_atoms.replace(" ", "")
             elt_ordered = get_atoms.split(',')
             if len(elt_ordered) > 3:
                 get_atoms = raw_input("* Maximum 3 elements available : ")
@@ -386,7 +370,7 @@ a   : Make element order as default (ex : cms_band 2 -3 3 a)
         doslim = [argv for argv in sys.argv if "-d" in argv]
         if len(doslim) > 0:
             doslim = doslim[0]
-            doslim = doslim.replace("-d","")
+            doslim = doslim.replace("-d", "")
             doslim = doslim.split(",")
             doslim = [float(doslim[0]), float(doslim[1])]
             dosmin = min(doslim)
@@ -396,20 +380,61 @@ a   : Make element order as default (ex : cms_band 2 -3 3 a)
             dosmax = None
 
         plt.subplot(121)
-        plt = cms_band.colorBand(miny=miny,maxy=maxy,elt_ordered=elt_ordered,line_width=line_width)
+        plt = cms_band.colorBand(miny=miny, maxy=maxy, elt_ordered=elt_ordered, line_width=line_width)
         cms_band.save_band_data(color=True, savefig=False)
 
         plt.subplot(122)
-        plt = cms_band.element_DOS(miny=miny,maxy=maxy,minx=dosmin,maxx=dosmax,elt_ordered=cms_band.elt_ordered,with_band=True)
+        plt = cms_band.element_DOS(miny=miny, maxy=maxy, minx=dosmin, maxx=dosmax, elt_ordered=cms_band.elt_ordered,
+                                   with_band=True)
         plt.tight_layout()
 
         pwd = os.getcwd()
         dirname = pwd.split("/")[-1]
-        figname = dirname+"_colorBand_DOS.png"
+        figname = dirname + "_colorBand_DOS.png"
         plt.savefig(figname)
-        makejpg="convert "+figname+" "+figname.replace(".png",".jpg")
-        subprocess.call(makejpg, shell=True)        
-        print("* Save figure : "+figname+", "+figname.replace(".png",".jpg"))
+        makejpg = "convert " + figname + " " + figname.replace(".png", ".jpg")
+        subprocess.call(makejpg, shell=True)
+        print("* Save figure : " + figname + ", " + figname.replace(".png", ".jpg"))
 
         if "n" not in sys.argv:
             plt.show()
+
+if __name__=="__main__":
+    try:
+        sys.argv[1]
+    except:
+        print("""-------------------------------------
+Usage : cms_band [option] [miny] [maxy] [sub_option1] [sub_option2]...
+-------------------------------------
+[option]
+1   : blue band
+2   : color band
+3   : blue band & element DOS
+4   : color band & element DOS
+[sub_options]
+a   : Select all possible directories
+      (ex : cms_band 1 -3 3 a)
+n   : Do not show figure, just save figure and band.dat
+      (ex : cms_band 1 -3 3 n)
+ed  : Make element order as default
+      (ex : cms_band 2 -3 3 ed)
+-e  : Make element order
+      (ex : cms_band 2 -3 3 -eCo,Ni)
+-d  : Set DOS x-axis limitation
+      (ex : cms_band 3 -3 3 -d0,5)
+      (ex : cms_band 3 -3 3 -eC,N -d0,5)
+-lw : Set line width of figure
+      (ex : cms_band 3 -3 3 -lw5) // default = 3
+-------------------------------------"""
+              )
+        quit()
+
+    ask = True
+    if "a" in sys.argv:
+        ask = False
+
+    inputs = selectVASPBandOutputs("./")
+    for each_input in inputs:
+        os.chdir(each_input)
+        main_run()
+        os.chdir("../")
