@@ -433,7 +433,7 @@ ed  : Make element order as default
     if "a" in sys.argv:
         ask = False
 
-    inputs = selectVASPBandOutputs("./")
+    inputs = selectVASPBandOutputs("./", ask=ask)
     for each_input in inputs:
         os.chdir(each_input)
         main_run()
