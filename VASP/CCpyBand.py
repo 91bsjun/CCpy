@@ -110,7 +110,7 @@ class CMSBand():
                 elt_ordered = [str(e) for e in elts]
 
         # -- if single atom : return to blue band
-        if len(elt_ordred) == 0:
+        if len(elt_ordered) == 0:
             return CMSBand.blueBand(miny=None,maxy=None,line_width=line_width)
         else:
             self.elt_ordered = elt_ordered
