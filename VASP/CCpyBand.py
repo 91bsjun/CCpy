@@ -210,6 +210,7 @@ def load_pickle_data(name=None):
     return loaded
 
 def main_run():
+    import matplotlib.pyplot as plt
     try:
         lims = [float(sys.argv[2]), float(sys.argv[3])]
         miny = min(lims)
