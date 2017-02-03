@@ -140,9 +140,12 @@ class CMSBand():
 
         plotter = DosPlotter(zero_at_efermi=True, sigma=0.02)
         if with_band:
-            for i in range(len(elt_ordered)):
-                i=i+1
-                plotter.add_dos_dict({Element(elt_ordered[-i]) : elt_dos[Element(elt_ordered[-i])]})
+            if elt_ordered == None:
+                plotter.add_dos_dict(elt_dos)
+            else:
+                for i in range(len(elt_ordered)):
+                    i=i+1
+                    plotter.add_dos_dict({Element(elt_ordered[-i]) : elt_dos[Element(elt_ordered[-i])]})
         else:
             plotter.add_dos_dict(elt_dos)
 
