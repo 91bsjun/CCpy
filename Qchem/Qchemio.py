@@ -1,6 +1,6 @@
 #!/usr/local/bin/python2.7
 
-import os, sys
+import os, sys, re
 from subprocess import call as shl
 
 import numpy as np
@@ -211,35 +211,34 @@ class QchemOutput():
     def __init__(self, filename):
         self.filename = filename
         
-        f = open(filename, "r")
-        lines = f.readlines()
-        f.close()
-        self.lines = lines
+        out = open(filename, "r").read()
+        dc_pattern = re.compile("Effective Coupling \(in eV\) = \s+\S+")
+        m = dc_pattern.search(out)
+        dc = m.group(0)
+        dc = dc.split()[-1]
+
+        terminate_pattern = re.compile("Thank you very much for using Q-Chem")
+        m = terminate_pattern.search(out)
+        if m:
+            chk = True
+        else:
+            chk = False
+
+        self.finished = chk
+        self.dc = dc
 
     def checkTerminated(self):
-        lines = self.lines
-        finished = False
-        for line in lines:
-            if "Thank you very much for using Q-Chem.  Have a nice day." in line:
-                finished = True
-            elif "Effective Coupling (in eV)" in line:
-                finished = True
-            else:
-                pass
+        finished = self.finished
 
         return finished
 
     def getChargetransferIntegral(self):
         filename = self.filename
-        lines = self.lines
         if not self.checkTerminated():
             print("This file is NOT PROPERLY TERMINATED : "+filename)
             return "ERR"
 
-        for line in lines:
-            if "Effective Coupling (in eV)" in line:
-                tmp = line.split()
-                v = float(tmp[-1])
+        v = self.dc
 
         return v
 
