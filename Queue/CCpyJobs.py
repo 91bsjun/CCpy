@@ -81,10 +81,9 @@ if __name__=="__main__":
             print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [option2]...")
             print('''--------------------------------------
 [option]
--m       : My jobs                  (ex : CCpyJobs.py m)
+-m       : My jobs                  (ex : CCpyJobs.py -m)
 -uNAME   : Specific user's jobs     (ex : CCpyJobs.py -ubsjun)
--r       : Current running jobs     (ex : CCpyJobs.py r) (ex : CCpyJobs.py m r)
-queue    : Specific queue jobs      (ex : CCpyJobs.py xeon2)'''
+-r       : Current running jobs     (ex : CCpyJobs.py -r) (ex : CCpyJobs.py m r)'''
                   )
             quit()
 
