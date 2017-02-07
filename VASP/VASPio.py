@@ -419,12 +419,13 @@ class VASPOutput():
         findF = re.compile("E0= \S+", re.M)
         strings = findF.findall(oszi)
 
-        y=[]
+        e=[]
         for s in strings:
-            y.append(float(s.split()[1]))
+            e.append(float(s.split()[1]))
+        x_e = range(len(e))
 
-        print("Initial energy : "+str(y[0]))
-        print("  Final energy : "+str(y[-1]))
+        print("Initial energy : "+str(e[0]))
+        print("  Final energy : "+str(e[-1]))
 
         OUTCAR = open("OUTCAR","r").read()
         findV = re.compile("volume of cell :\s+\S+", re.M)
@@ -432,7 +433,7 @@ class VASPOutput():
         vol = []
         for s in strings:
             vol.append(float(s.split()[4]))
-        x = range(len(y))
+        x_vol = range(len(y))
         # OUTCAR analyse end #
         print("Initial volume : "+str(vol[0]))
         print("  Final volume : "+str(vol[-1]))
@@ -441,8 +442,8 @@ class VASPOutput():
             # make plot
             fig, ax1 = plt.subplots()
             ax2 = ax1.twinx()
-            ax1.plot(x, y, color="b", marker="o", mec="b", label="Energy", lw=1.5)
-            ax2.plot(x, vol, color="#DB0000", marker="o", mec="#DB0000", label="Volume", lw=1.5)
+            ax1.plot(x_e, y, color="b", marker="o", mec="b", label="Energy", lw=1.5)
+            ax2.plot(x_vol, vol, color="#DB0000", marker="o", mec="#DB0000", label="Volume", lw=1.5)
 
             ax1.set_xlabel('Steps', fontsize=19)
             ax1.set_ylabel('Energy', color='b', fontsize=19)
