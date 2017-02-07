@@ -414,56 +414,25 @@ class VASPOutput():
         print(target_name+" is generated.")
 
     def getConvergence(self, show_plot=True):
-       
-        li = []
-        oszi = open("OSZICAR","r")
-        for i in oszi:
-            
-            findF = re.compile(r'....F=......................')
-            mo = findF.search(i)
-            if mo == None:
-                continue
-            else :
-                #print(mo.group())
-                li.append(mo.group())
 
-        # make x,y axis values
-        x=[]
+        oszi = open("OSZICAR","r").read()
+        findF = re.compile("E0= \S+", re.M)
+        strings = findF.findall(oszi)
+
         y=[]
-        for j in range(len(li)):
-            f = li[j].split()
-            x.append(int(f[0]))
-            vf = f[2].split('.')
-            tvf = '-0.'+vf[1]
-            tvf = float(tvf)
-            y.append(tvf)
+        for s in strings:
+            y.append(float(s.split()[1]))
 
         print("Initial energy : "+str(y[0]))
         print("  Final energy : "+str(y[-1]))
 
-        outcar = open("OUTCAR","r")
-        line = outcar.readlines()
-        p = re.compile('volume of cell.........\d*.\d*')
-        step=[]
-        li=[]
-        for i in range(len(line)):
-            m = p.search(line[i])
-            if m == None:
-                continue
-            else:        
-                cat = m.group()
-                li.append(cat)
-        x=[]      
-        vol=[]
-        cnt=1
-        for i in range(len(li)-1):
-            tmp = li[i+1].split()
-            vol.append(tmp[4])
-            x.append(cnt)
-            cnt+=1
-        inivol=vol[0]
-        finvol=vol[len(vol)-1]
-        outcar.close()
+        OUTCAR = open("OUTCAR","r").read()
+        findV = re.compile("volume of cell :\s+\S+", re.M)
+        strings = findV.findall(OUTCAR)
+        vol = []
+        for s in strings:
+            vol.append(float(s.split()[4]))
+        x = range(len(y))
         # OUTCAR analyse end #
         print("Initial volume : "+str(vol[0]))
         print("  Final volume : "+str(vol[-1]))
