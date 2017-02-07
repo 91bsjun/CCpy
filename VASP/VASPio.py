@@ -415,26 +415,26 @@ class VASPOutput():
 
     def getConvergence(self, show_plot=True):
 
-        oszi = open("OSZICAR","r").read()
-        findF = re.compile("E0= \S+", re.M)
-        strings = findF.findall(oszi)
+        OUTCAR = open("OUTCAR", "r").read()
 
-        e=[]
+        # -- energy parsing
+        findE = re.compile("volume of cell :\s+\S+", re.M)
+        strings = findE.findall(OUTCAR)
+        e = []
         for s in strings:
-            e.append(float(s.split()[1]))
-        x_e = range(len(e))
+            e.append(float(s.split()[4]))
+        x = range(len(e))
 
         print("Initial energy : "+str(e[0]))
         print("  Final energy : "+str(e[-1]))
 
-        OUTCAR = open("OUTCAR","r").read()
+        # -- volume parsing
         findV = re.compile("volume of cell :\s+\S+", re.M)
         strings = findV.findall(OUTCAR)
         vol = []
         for s in strings:
             vol.append(float(s.split()[4]))
-        x_vol = range(len(y))
-        # OUTCAR analyse end #
+
         print("Initial volume : "+str(vol[0]))
         print("  Final volume : "+str(vol[-1]))
 
@@ -442,8 +442,8 @@ class VASPOutput():
             # make plot
             fig, ax1 = plt.subplots()
             ax2 = ax1.twinx()
-            ax1.plot(x_e, y, color="b", marker="o", mec="b", label="Energy", lw=1.5)
-            ax2.plot(x_vol, vol, color="#DB0000", marker="o", mec="#DB0000", label="Volume", lw=1.5)
+            ax1.plot(x, e, color="b", marker="o", mec="b", label="Energy", lw=1.5)
+            ax2.plot(x, vol, color="#DB0000", marker="o", mec="#DB0000", label="Volume", lw=1.5)
 
             ax1.set_xlabel('Steps', fontsize=19)
             ax1.set_ylabel('Energy', color='b', fontsize=19)
