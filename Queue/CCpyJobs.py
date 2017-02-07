@@ -69,23 +69,23 @@ def CCpyqstat(in_user="*",in_status=""):
 
 if __name__=="__main__":
     for arg in sys.argv:
-        if "m" in arg:
+        if "-m" in arg:
             username = getpass.getuser()
         elif "-u" in arg:
             username = arg.replace("-u","")
         else:
             username = "*"
 
-        status = "r" if "r" in arg else ""
+        status = "-r" if "-s r" in arg else ""
 
         if "-h" in arg:
             print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [option2]...")
             print('''--------------------------------------
-                [option]
-                m        : My jobs                  (ex : CCpyJobs.py m)
-                -uNAME   : Specific user's jobs     (ex : CCpyJobs.py -ubsjun)
-                r        : Current running jobs     (ex : CCpyJobs.py r) (ex : CCpyJobs.py m r)
-                queue    : Specific queue jobs      (ex : CCpyJobs.py xeon2)'''
+[option]
+-m       : My jobs                  (ex : CCpyJobs.py m)
+-uNAME   : Specific user's jobs     (ex : CCpyJobs.py -ubsjun)
+-r       : Current running jobs     (ex : CCpyJobs.py r) (ex : CCpyJobs.py m r)
+queue    : Specific queue jobs      (ex : CCpyJobs.py xeon2)'''
                   )
             quit()
 
