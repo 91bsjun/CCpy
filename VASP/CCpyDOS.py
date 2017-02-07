@@ -1,14 +1,14 @@
 #!/usr/local/bin/python2.7
 
 import os,sys
-import subprocess
 import matplotlib.pyplot as plt
 
 from pymatgen.io.vasp.outputs import Vasprun
-# from pymatgen.io.vasp.outputs import BSVasprun
 from pymatgen_plotter import DosPlotter
-# from pymatgen_plotter import BSPlotterProjected
 
+version = sys.version
+if version[0] == '3':
+    raw_input = input
 
 class CMSDOS():
     def __init__(self):
