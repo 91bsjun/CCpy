@@ -65,7 +65,6 @@ def CCpyqstat(in_user="*",in_status=""):
     df = pd.DataFrame(ps)
     df = df[['ID', 'JOBNAME', 'USER', '   STATUS', 'START-TIME', 'RUN-TIME', 'QUEUE-NODE', 'SLOTS']]
     print(df)
-    print("Show option?  CCpyJobs.py -h")
 
 if __name__=="__main__":
     for arg in sys.argv:
