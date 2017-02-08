@@ -18,6 +18,9 @@ from CCpy.Tools.CCpyTools import selectVASPBandOutputs
 
 import pickle
 
+version = sys.version
+if version[0] == '3':
+    raw_input = input
 
 class CMSBand():
     def __init__(self, elt_projected=False, dos=False, fig=None):
