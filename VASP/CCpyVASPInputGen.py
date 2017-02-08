@@ -78,6 +78,9 @@ elif sys.argv[1] == "3":
     inputs = selectInputs(input_marker, "./")
     for each_input in inputs:
         VI = VASPInput(each_input)
+        dirname = each_input.replace(".cif","").replace(".xsd","")
+        os.mkdir(dirname)
+        os.chdir(dirname)
         VI.cms_band_set()
         os.chdir("../")
 
