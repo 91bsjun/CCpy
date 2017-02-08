@@ -555,7 +555,7 @@ class BSPlotter(object):
                 for i in range(self._nb_bands):
                     plt.plot(data['distances'][d],
                              [data['energy'][d][str(Spin.up)][i][j]
-                              for j in range(len(data['distances'][d]))], color='g',
+                              for j in range(len(data['distances'][d]))], color='b',
                              linewidth=band_linewidth)
                     if self._bs.is_spin_polarized:
                         plt.plot(data['distances'][d],
