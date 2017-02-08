@@ -3,6 +3,10 @@ import os, sys
 import numpy as np
 from CCpy.Tools.CCpyStructure import NonPeriodicCoordinates
 
+version = sys.version
+if version[0] == '3':
+    raw_input = input
+
 def coord_shift(filename, atom_range, axis, delta_range, negative=False):
     """
     Function for shift coordinate in non-periodic structure
