@@ -549,12 +549,13 @@ class BSPlotter(object):
         band_linewidth = line_width ## edit
 
         data = self.bs_plot_data(zero_to_efermi)
+
         if not smooth:
             for d in range(len(data['distances'])):
                 for i in range(self._nb_bands):
                     plt.plot(data['distances'][d],
                              [data['energy'][d][str(Spin.up)][i][j]
-                              for j in range(len(data['distances'][d]))], color='b',
+                              for j in range(len(data['distances'][d]))], color='g',
                              linewidth=band_linewidth)
                     if self._bs.is_spin_polarized:
                         plt.plot(data['distances'][d],
@@ -675,6 +676,116 @@ class BSPlotter(object):
         #plt.tight_layout()
 
         return plt
+
+    def get_site_projected_plot(self, zero_to_efermi=True, ylim=None, occupancy=None,
+                 vbm_cbm_marker=False, smooth_tol=None, line_width=3):
+        """
+        Get a matplotlib object for the bandstructure plot.
+        Blue lines are up spin, red lines are down
+        spin.
+
+        Args:
+            zero_to_efermi: Automatically subtract off the Fermi energy from
+                the eigenvalues and plot (E-Ef).
+            ylim: Specify the y-axis (energy) limits; by default None let
+                the code choose. It is vbm-4 and cbm+4 if insulator
+                efermi-10 and efermi+10 if metal
+            smooth: interpolates the bands by a spline cubic
+            smooth_tol (float) : tolerance for fitting spline to band data.
+                Default is None such that no tolerance will be used.
+        """
+        # plt = get_publication_quality_plot(12, 8)
+        # from matplotlib import rc
+        import scipy.interpolate as scint
+        # try:
+        #    rc('text', usetex=True)
+        # except:
+        #    # Fall back on non Tex if errored.
+        #    rc('text', usetex=False)
+
+        # main internal config options
+
+        import matplotlib.pyplot as plt
+
+        e_min = -4
+        e_max = 4
+        if self._bs.is_metal():
+            e_min = -10
+            e_max = 10
+
+        band_linewidth = line_width  ## edit
+
+        data = self.bs_plot_data(zero_to_efermi)
+        for d in range(len(data['distances'])):
+            for i in range(self._nb_bands):
+                for j in range(len(data['energy'][d][str(Spin.up)][i])):
+                    plt.plot(data['distances'][d][j], data['energy'][d][str(Spin.up)][i][j], 'bo',
+                             markersize=occupancy[Spin.up][i][j] * 15.0)
+
+                # -- example of BSPlooterProjected dot plot
+                # for j in range(len(data['energy'][b][str(Spin.up)][i])):
+                #     plt.plot(data['distances'][b][j],
+                #              data['energy'][b][str(Spin.down)][i][
+                #                  j], 'ro',
+                #              markersize=
+                #              proj[b][str(Spin.down)][i][j][str(el)][
+                #                  o] * 15.0)
+
+
+                # -- original plot
+                # plt.plot(data['distances'][d],
+                #          [data['energy'][d][str(Spin.up)][i][j]
+                #           for j in range(len(data['distances'][d]))], color='b',
+                #          linewidth=band_linewidth)
+                if self._bs.is_spin_polarized:
+                    plt.plot(data['distances'][d],
+                             [data['energy'][d][str(Spin.down)][i][j]
+                              for j in range(len(data['distances'][d]))],
+                             'r--', linewidth=band_linewidth)
+
+
+        self._maketicks(plt)
+
+        # Main X and Y Labels
+        ##        plt.xlabel(r'$\mathrm{Wave\ Vector}$', fontsize=30)
+        ##        ylabel = r'$\mathrm{E\ -\ E_f\ (eV)}$' if zero_to_efermi \
+        ##            else r'$\mathrm{Energy\ (eV)}$'
+        ##        plt.ylabel(ylabel, fontsize=30)
+
+        # Draw Fermi energy, only if not the zero
+        ##        if not zero_to_efermi:
+        ##            ef = self._bs.efermi
+        ##            plt.axhline(ef, linewidth=2, color='k')
+
+        # X range (K)
+        # last distance point
+        x_max = data['distances'][-1][-1]
+        plt.xlim(0, x_max)
+
+        if ylim is None:
+            if self._bs.is_metal():
+                # Plot A Metal
+                if zero_to_efermi:
+                    plt.ylim(e_min, e_max)
+                else:
+                    plt.ylim(self._bs.efermi + e_min, self._bs.efermi + e_max)
+            else:
+                if vbm_cbm_marker:
+                    for cbm in data['cbm']:
+                        plt.scatter(cbm[0], cbm[1], color='r', marker='o',
+                                    s=100)
+                    for vbm in data['vbm']:
+                        plt.scatter(vbm[0], vbm[1], color='g', marker='o',
+                                    s=100)
+                plt.ylim(data['vbm'][0][1] + e_min,
+                         data['cbm'][0][1] + e_max)
+        else:
+            plt.ylim(ylim)
+
+        # plt.tight_layout()
+
+        return plt
+
 
     def show(self, zero_to_efermi=True, ylim=None, smooth=False, 
              smooth_tol=None):
