@@ -73,6 +73,13 @@ elif sys.argv[1] == "2":
         VI.cms_band_set(spin=spin,mag=mag,ldau=ldau)
         os.chdir("../")
 
+elif sys.argv[1] == "3":
+    inputs = selectVASPInputs("./")
+    for each_input in inputs:
+        VI = VASPInput(each_input)
+        VI.cms_band_set(spin=spin,mag=mag,ldau=ldau)
+        os.chdir("../")
+
 elif sys.argv[1] == "4":
     inputs = selectVASPOutputs("./")
     for each_input in inputs:
