@@ -12,7 +12,7 @@ except:
 [options]
 1 : Relaxation calculation
 2 : Band-DOS calculation (after previous calcualtion)
-3 : Relaxation and Band-DOS (not supported yet)
+3 : Band-DOS calculation (from initial structure file)
 4 : Static calculation (after previous calculation)
 5 : MIT relaxation calculation
 
@@ -74,10 +74,11 @@ elif sys.argv[1] == "2":
         os.chdir("../")
 
 elif sys.argv[1] == "3":
-    inputs = selectVASPInputs("./")
+    input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
+    inputs = selectInputs(input_marker, "./")
     for each_input in inputs:
         VI = VASPInput(each_input)
-        VI.cms_band_set(spin=spin,mag=mag,ldau=ldau)
+        VI.cms_band_set()
         os.chdir("../")
 
 elif sys.argv[1] == "4":
