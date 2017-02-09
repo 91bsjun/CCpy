@@ -11,7 +11,6 @@ def CCpyqstat(in_user="*",in_status=""):
     Modules to show SGE qstat more effectively
     """
     q = "/opt/sge/bin/lx24-amd64/qstat -r -u '%s' %s" % (in_user, in_status)
-    print(q)
     qstat = os.popen(q).read()
 
     # -- parsing
@@ -68,7 +67,6 @@ def CCpyqstat(in_user="*",in_status=""):
     print(df)
 
 if __name__=="__main__":
-    print(sys.argv)
     username = "*"
     status = ""
     for arg in sys.argv:
