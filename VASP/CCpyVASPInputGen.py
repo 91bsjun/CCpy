@@ -10,24 +10,24 @@ except:
     print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [sub_option1] [sub_option2..]")
     print('''--------------------------------------
 [options]
-1 : Relaxation calculation
-2 : Band-DOS calculation (after previous calcualtion)
-3 : Band-DOS calculation (from initial structure file)
-4 : Static calculation (after previous calculation)
+1 : Relaxation calculation  (from initial structure files)
+2 : Band-DOS calculation    (after previous calculation)
+3 : Band-DOS calculation    (from initial structure files)
+4 : Static calculation      (after previous calculation)
 5 : MIT relaxation calculation
 
 [sub_options]
 ex) CCpyVASPInputGen.py 1 -isif=2 spin mag -kp=4,4,2 ...
-INCAR OPTION
-sp : Single point calculation (DEFAULT : NSW = 200)
--isif=# : ISIF value (3: full relax, 2: cell fixed,... DEFAULT:3)
-vdw : DFT-D2 grimme's function
-spin : Spin polarized calculation (DEFAULT : unpolarized)
-mag : Add magnetic monet parameters (values from Pymatgen)
-ldau : Add LDA+U parameters (values from Pymatgen)
+    < INCAR OPTION >
+    -sp      : Single point calculation      (DEFAULT : NSW = 200)
+    -isif=# : ISIF value                     (DEFAULT : 3)
+    -vdw     : DFT-D2 grimme's function      (DEFAULT : not used)
+    -spin    : Spin polarized calculation    (DEFAULT : unpolarized)
+    -mag     : Add magnetic monet parameters (values from Pymatgen)
+    -ldau    : Add LDA+U parameters          (values from Pymatgen)
 
-KPOINTS
--kp=#,#,# (DEFAULT : reciprocal parameter as devided by 20)'''
+    < KPOINTS OPTION >
+    -kp=#,#,#                                (DEFAULT : reciprocal parameter as devided by 20)'''
           )
     quit()
 
@@ -42,19 +42,19 @@ isif=False
 kpoints=False
 
 for arg in sys.argv:
-    if "sp" == arg:
+    if "-sp" == arg:
         single_point=True
     elif "-isif=" in arg:
         isif = int(arg.split("=")[-1])
-    elif "vdw" in arg:
+    elif "-vdw" in arg:
         vdw=True
-    elif "spin" in arg:
+    elif "-spin" in arg:
         spin=True
     elif "-kp" in arg:
         kpoints = arg.split("=")[1].split(",")
-    elif "ldau" in arg:
+    elif "-ldau" in arg:
         ldau = True
-    elif "mag" in arg:
+    elif "-mag" in arg:
         mag = True
 
 
@@ -81,7 +81,7 @@ elif sys.argv[1] == "3":
         dirname = each_input.replace(".cif","").replace(".xsd","")
         os.mkdir(dirname)
         os.chdir(dirname)
-        VI.cms_band_set()
+        VI.cms_band_set(kpoints=kpoints,spin=spin,mag=mag,ldau=ldau)
         os.chdir("../")
 
 elif sys.argv[1] == "4":
