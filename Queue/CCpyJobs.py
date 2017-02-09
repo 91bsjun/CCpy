@@ -6,7 +6,7 @@ from datetime import timedelta, date
 import getpass
 import pandas as pd
 
-def CCpyqstat(in_user="*",in_status=""):
+def CCpyqstat(in_user,in_status):
     """
     Modules to show SGE qstat more effectively
     """
@@ -86,10 +86,10 @@ if __name__=="__main__":
             print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [option2]...")
             print('''--------------------------------------
 [option]
--m       : My jobs                  (ex : CCpyJobs.py -m)
--uNAME   : Specific user's jobs     (ex : CCpyJobs.py -ubsjun)
--r       : Current running jobs     (ex : CCpyJobs.py -r) (ex : CCpyJobs.py m r)'''
+-m       : My jobs                  (ex : CCpyJobs.py -m)       (ex : CCpyJobs.py -m -r)
+-uNAME   : Specific user's jobs     (ex : CCpyJobs.py -ubsjun)  (ex : CCpyJobs.py -ubsjun -r)
+-r       : Current running jobs     (ex : CCpyJobs.py -r)       (ex : CCpyJobs.py -m -r)'''
                   )
             quit()
 
-    CCpyqstat(in_user=username,in_status=status)
+    CCpyqstat(username,status)
