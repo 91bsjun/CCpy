@@ -103,7 +103,7 @@ class CMSDOS():
         cdos = self.cdos
         plotter = self.plotter
         structure = cdos.structure
-        print(structure.species)
+        print(structure)
         index = self.site_choose_tool()
 
         init = True
@@ -122,7 +122,7 @@ class CMSDOS():
         plt.xlim(minx,maxx)
         plt.ylim(miny,maxy)
 
-        return plt
+        return plt, index
 
     def site_spd_dos(self, minx=None, maxx=None, miny=None, maxy=None, with_band=False):
         from pymatgen.electronic_structure.core import OrbitalType
@@ -401,9 +401,9 @@ n  : Do not show figure, just save images (ex : cms_dos 1 -3 3 n)
     elif sys.argv[1] == "4":
         fig = plt.figure(figsize=(10,6))
         cms_dos = CMSDOS()
-        plt = cms_dos.site_dos(minx=minx,maxx=maxx,miny=miny,maxy=maxy)
+        plt, index = cms_dos.site_dos(minx=minx,maxx=maxx,miny=miny,maxy=maxy)
         plt.tight_layout()
-        plt.savefig(dirname+"_site_DOS.png")
+        plt.savefig(dirname+"_site_DOS_"+str(index)+".png")
       
         if "n" not in sys.argv:
             plt.show()

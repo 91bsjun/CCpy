@@ -124,12 +124,12 @@ class CMSBand():
             plt.tick_params(labelsize=15)
 
             if len(elt_ordered) == 3:
-                colors = ["b","r","g"]
+                colors = ["r","#1DDB16","b"]
             elif len(elt_ordered) == 2:
                 colors = ["b","r"]
             for i in range(len(elt_ordered)):
                 plt.plot(0,0,color=colors[i],label=elt_ordered[i],linewidth=2)
-            plt.legend(fancybox=True,shadow=True,prop={'size':18})
+            plt.legend(fancybox=True,shadow=True,prop={'size':18}, loc='upper right')
             plt.ylim(miny,maxy)
 
             return plt

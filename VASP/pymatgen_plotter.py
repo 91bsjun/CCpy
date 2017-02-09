@@ -144,7 +144,7 @@ class DosPlotter(object):
         import palettable
 
         colors = palettable.colorbrewer.qualitative.Set1_9.mpl_colors
-        colors = ["#0054FF","#ED0000","#0BC904","#FFBB00","#000000"]
+        colors = ["r","#1DDB16","b","#FFBB00","#000000"]
 
         y = None
         alldensities = []
@@ -242,8 +242,14 @@ class DosPlotter(object):
 
         import palettable
 
-        colors = palettable.colorbrewer.qualitative.Set1_9.mpl_colors
-        colors = ["#0054FF","#ED0000","#0BC904","#FFBB00","#000000"]
+        if len(self._doses) == 2:
+            colors = ["b", "r"]
+        elif len(self._doses) == 3:
+            colors = ["r", "#1DDB16", "b"]
+        elif 4 <= len(self._doses) <= 5:
+            colors = ["r", "#1DDB16", "b", "#FFBB00", "#000000"]
+        else:
+            colors = palettable.colorbrewer.qualitative.Set1_9.mpl_colors
 
         y = None
         alldensities = []
@@ -310,9 +316,9 @@ class DosPlotter(object):
                          if xlim[0] < p[0] < xlim[1]]
             plt.ylim((min(relevanty), max(relevanty)))
 
-        if self.zero_at_efermi:
-            ylim = plt.ylim()
-            plt.plot([0, 0], ylim, 'k--', linewidth=2)
+        # if self.zero_at_efermi:
+        #     ylim = plt.ylim()
+        #     plt.plot([0, 0], ylim, 'k--', linewidth=2)
 
         #plt.xlabel('Energies (eV)')
         #plt.ylabel('Density of states')
@@ -677,6 +683,7 @@ class BSPlotter(object):
 
         return plt
 
+    # -- Made function
     def get_site_projected_plot(self, zero_to_efermi=True, ylim=None, occupancy=None,
                  vbm_cbm_marker=False, smooth_tol=None, line_width=3):
         """
@@ -720,7 +727,8 @@ class BSPlotter(object):
             for i in range(self._nb_bands):
                 for j in range(len(data['energy'][d][str(Spin.up)][i])):
                     plt.plot(data['distances'][d][j], data['energy'][d][str(Spin.up)][i][j], 'bo',
-                             alpha=occupancy[Spin.up][i][j])
+                             alpha=occupancy[Spin.up][i][j],
+                             markersize=1 + occupancy[Spin.up][i][j] * 7.0)
 
                 # -- example of BSPlooterProjected dot plot
                 # for j in range(len(data['energy'][b][str(Spin.up)][i])):
@@ -1148,6 +1156,7 @@ class BSPlotterProjected(BSPlotter):
             raise ValueError
         if elt_ordered is None:
             elt_ordered = self._bs.structure.composition.elements
+
         proj = self._get_projections_by_branches(
             {e.symbol: ['s', 'p', 'd']
              for e in self._bs.structure.composition.elements})
@@ -1191,6 +1200,10 @@ class BSPlotterProjected(BSPlotter):
                                  [data['energy'][b][str(s)][i][j],
                                   data['energy'][b][str(s)][i][j + 1]], sign,
                                  color=color, linewidth=band_linewidth)
+
+        x_max = data['distances'][-1][-1]
+        plt.xlim(0, x_max)
+
         try:
             plt.ylim(data['vbm'][0][1] - 4.0, data['cbm'][0][1] + 2.0)
         except:
