@@ -68,6 +68,7 @@ def CCpyqstat(in_user="*",in_status=""):
     print(df)
 
 if __name__=="__main__":
+    print(sys.argv)
     for arg in sys.argv:
         if "-m" in arg:
             username = getpass.getuser()
