@@ -728,7 +728,7 @@ class BSPlotter(object):
                 for j in range(len(data['energy'][d][str(Spin.up)][i])):
                     plt.plot(data['distances'][d][j], data['energy'][d][str(Spin.up)][i][j], 'bo',
                              alpha=occupancy[Spin.up][i][j],
-                             markersize=1 + occupancy[Spin.up][i][j] * 7.0)
+                             markersize=2 + occupancy[Spin.up][i][j] * 7.0)
 
                 # -- example of BSPlooterProjected dot plot
                 # for j in range(len(data['energy'][b][str(Spin.up)][i])):
