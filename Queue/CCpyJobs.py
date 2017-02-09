@@ -75,7 +75,7 @@ if __name__=="__main__":
         else:
             username = "*"
 
-        status = "-s -r" if "-r" in arg else ""
+        status = "-s r" if "-r" in arg else ""
 
         if "-h" in arg:
             print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [option2]...")
