@@ -21,8 +21,9 @@ except:
 2 : VASP
 3 : ATK
 4 : Q-chem
-5 : ATAT [f:fitsvl]
-6 : PBS job display
+5 : ATK
+6 : ATAT [f:fitsvl]
+7 : PBS job display
 
 [queue name]
 xeon1, xeon2, ...
@@ -35,6 +36,10 @@ a : no check files, calculate all inputs'''
           )
     quit()
 
+# -- version chk
+version = sys.version
+if version[0] == '3':
+    raw_input = input
 
 # -- Check node00
 ip = get_ip()
@@ -42,80 +47,37 @@ if ip != "166.104.249.249":
     print("DO AT NODE00 !!")
     quit()
 
+# -- Select all inputs automatically
 ask = True
 if "a" in sys.argv:
     ask = False
 
-
-## ------ GAUSSIAN
-if sys.argv[1] == "1":
-
-    # --- PROPER QUEUE NAME CHECK
-    queues = ["xeon1", "xeon2", "xeon3", "xeon4", "xeon5", "I5"]
-    try:
-        queue = sys.argv[2]
-    except:
-        queue = raw_input("Queue (xeon1, xeon2, ...) : ")
-    if queue not in queues:
-        print("Unvalid queue name")
-        quit()
-
-        
-    # --- DEVIDE CPU CHECK 
-    try:
-        divided = int(sys.argv[3])
-    except:
-        divided = 1
-
-
-    # --- COLLECT INPUT FILES     
+def gaussian(queue=None, divided=1):
+    # --- COLLECT INPUT FILES
     input_marker = [".com"]
     inputs = selectInputs(input_marker, "./", ask=ask)
-    
 
     # --- SUBMIT QUEUE
     for each_input in inputs:
         myJS = JS(each_input, queue, divided)
         myJS.gaussian()
 
-## ------ VASP
-elif sys.argv[1] == "2":
-    
+def vasp(queue=None, divided=1):
     # --- Collect VASP inputs
-    static=False
-    band=False
+    static = False
+    band = False
     if "static" in sys.argv:
-        static=True
+        static = True
         inputs = selectVASPInputs("./", ask=ask, static=True)
     elif "band" in sys.argv:
-        band=True
+        band = True
         inputs = selectVASPInputs("./", ask=ask, band=True)
-    else:        
-        inputs = selectVASPInputs("./", ask=ask)    
-
-
-    # --- PROPER QUEUE NAME CHECK
-    queues = ["xeon1", "xeon2", "xeon3", "xeon4", "xeon5", "I5"]
-    try:
-        queue = sys.argv[2]
-    except:
-        queue = raw_input("Queue (xeon1, xeon2, ...) : ")
-    if queue not in queues:
-        print("Unvalid queue name")
-        quit()
-
-
-        
-    # --- DEVIDE CPU CHECK
-    try:
-        divided = int(sys.argv[3])
-    except:
-        divided = 1
-
+    else:
+        inputs = selectVASPInputs("./", ask=ask)
 
     # --- SUBMIT QUEUE
     pwd = os.getcwd()
-    for each_input in inputs:        
+    for each_input in inputs:
         os.chdir(pwd)
         myJS = JS(each_input, queue, divided)
         if static:
@@ -123,42 +85,29 @@ elif sys.argv[1] == "2":
         elif band:
             myJS.vasp(band=True)
         else:
-            myJS.vasp()        
+            myJS.vasp()
 
-### QCHEM ########################################################
-elif sys.argv[1] == "4":
-
-    #### COLLECT INPUT FILES #####################################    
+def qchem(queue=None, divided=1):
+    # --- Collect inputs
     input_marker = [".in"]
     inputs = selectInputs(input_marker, "./", ask=ask)
 
-
-    #### PROPER QUEUE NAME CHECK #################################
-    queues = ["xeon1", "xeon2", "xeon3", "xeon4", "xeon5", "I5"]
-    try:
-        queue = sys.argv[2]
-    except:
-        queue = raw_input("Queue (xeon1, xeon2, ...) ? ")
-    if queue not in queues:
-        print("Unvalid queue name")
-        quit()
-
-        
-    ### DIVIDE CPU CHECK #########################################
-    try:
-        divided = int(sys.argv[3])
-    except:
-        divided = 1
-    
-
-    ### SUBMIT QUEUE #############################################
+    # --- SUBMIT QUEUE
     for each_input in inputs:
         myJS = JS(each_input, queue, divided)
         myJS.qchem()
 
-### ATAT ########################################################
-elif sys.argv[1] == "5":
-    #### COLLECT INPUT DIRECTORIES ##################################### 
+def atk(queue=None, divided=1):
+    # --- COLLECT INPUT FILES
+    input_marker = [".py"]
+    inputs = selectInputs(input_marker, "./", ask=ask)
+
+    # --- SUBMIT QUEUE
+    for each_input in inputs:
+        myJS = JS(each_input, queue, divided)
+        myJS.ATK()
+
+def atat(queue=None, divided=1):
     all_inputs = [int(d) for d in os.listdir("./") if os.path.isdir(d) if "str.out" in os.listdir(d)]
     all_inputs.sort()
 
@@ -195,10 +144,10 @@ elif sys.argv[1] == "5":
     else:
         print("0 : All files")
         for i in range(len(all_inputs)):
-            if len(os.listdir(str(all_inputs[i])))==2:
-                print(str(i+1) + " : " + str(all_inputs[i]))
+            if len(os.listdir(str(all_inputs[i]))) == 2:
+                print(str(i + 1) + " : " + str(all_inputs[i]))
             else:
-                print(str(i+1) + " : " + str(all_inputs[i])+" , running or calculated.")
+                print(str(i + 1) + " : " + str(all_inputs[i]) + " , running or calculated.")
         get_num = raw_input("Choose file : ")
         all_inputs = [str(d) for d in all_inputs]
         try:
@@ -206,38 +155,19 @@ elif sys.argv[1] == "5":
                 inputs = all_inputs
             else:
                 inputs = []
-                get_num = get_num.split(",")  # 1-4,6-10,11,12                
+                get_num = get_num.split(",")  # 1-4,6-10,11,12
                 for i in get_num:
                     if "-" in i:
                         r = i.split("-")
-                        for j in range(int(r[0]),int(r[1])+1):
-                            inputs.append(all_inputs[j-1])
-                    else:                    
+                        for j in range(int(r[0]), int(r[1]) + 1):
+                            inputs.append(all_inputs[j - 1])
+                    else:
                         i = int(i)
-                        inputs.append(all_inputs[i-1])
+                        inputs.append(all_inputs[i - 1])
         except:
             print("Unvalid input type.")
             print("ex : 1-3,5-10,11,12,13")
-            quit()    
-
-
-    #### PROPER QUEUE NAME CHECK #################################
-    queues = ["xeon1", "xeon2", "xeon3", "xeon4", "xeon5", "I5"]
-    try:
-        queue = sys.argv[2]
-    except:
-        queue = raw_input("Queue (xeon1, xeon2, ...) : ")
-    if queue not in queues:
-        print("Unvalid queue name")
-        quit()
-
-
-        
-    ### DIVIDE CPU CHECK #########################################
-    try:
-        divided = int(sys.argv[3])
-    except:
-        divided = 1
+            quit()
 
     print(inputs)
     ### SUBMIT QUEUE #############################################
@@ -247,10 +177,18 @@ elif sys.argv[1] == "5":
         myJS = JS(each_input, queue, divided)
         myJS.atat()
 
-## ------ PBS JOBS DISPLAYER
-elif sys.argv[1] == "6":
+def pbs_runner(queue=None, divided=1):
+    # --- COLLECT INPUT FILES
+    input_marker = [".py"]
+    inputs = selectInputs(input_marker, "./", ask=ask)
 
-    # --- PROPER QUEUE NAME CHECK
+    # --- SUBMIT QUEUE
+    for each_input in inputs:
+        myJS = JS(each_input, queue, divided)
+        myJS.pbs_runner()
+
+if __name__=="__main__":
+    # --- Queue name check
     queues = ["xeon1", "xeon2", "xeon3", "xeon4", "xeon5", "I5"]
     try:
         queue = sys.argv[2]
@@ -260,17 +198,36 @@ elif sys.argv[1] == "6":
         print("Unvalid queue name")
         quit()
 
-    # --- DEVIDE CPU CHECK
+    # --- Separate queue check
     try:
         divided = int(sys.argv[3])
     except:
         divided = 1
 
-    # --- COLLECT INPUT FILES
-    input_marker = [".py"]
-    inputs = selectInputs(input_marker, "./", ask=ask)
+    ## ------ GAUSSIAN
+    if sys.argv[1] == "1":
+        gaussian(queue=queue, divided=divided)
 
-    # --- SUBMIT QUEUE
-    for each_input in inputs:
-        myJS = JS(each_input, queue, divided)
-        myJS.pbs_runner()
+
+    ## ------ VASP
+    elif sys.argv[1] == "2":
+        vasp(queue=queue, divided=divided)
+
+
+    ## ------ Q-chem
+    elif sys.argv[1] == "4":
+        qchem(queue=queue, divided=divided)
+
+
+    ## ------ ATK
+    elif sys.argv[1] == "5":
+        atk(queue=queue, divided=divided)
+
+
+    ## ------ ATAT
+    elif sys.argv[1] == "6":
+        atat(queue=queue, divided=divided)
+
+    ## ------ PBS JOBS DISPLAYER
+    elif sys.argv[1] == "7":
+        pbs_runner(queue=queue, divided=divided)

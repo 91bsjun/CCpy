@@ -281,6 +281,62 @@ qchem %s %s
         shl(queue_path+"qsub mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
+    def ATK(self, cpu=None, mem=None, q=None):
+        inputfile = self.inputfile
+
+        cpu, mem, q = self.cpu, self.mem, self.q
+        d = self.divided
+
+        cpu = cpu / d
+        mem = mem / d
+
+        jobname = "A" + inputfile.replace(".py", "")
+        jobname = jobname.replace(".", "_").replace("-", "_")
+        outputfile = inputfile.replace(".py",".out")
+
+        mpi = '''#!/bin/csh
+
+# pe request
+
+#$ -pe mpi_%d %d
+
+# our Job name
+#$ -N %s
+
+#$ -S /bin/csh
+
+#$ -q %s
+
+#$ -V
+
+#$ -cwd
+
+echo "Got $NSLOTS slots."
+cat $TMPDIR/machines
+
+set MPI_HOME=/opt/intel/mpi-rt/4.0.0
+set MPI_EXEC=$MPI_HOME/bin/mpirun
+
+setenv OMP_NUM_THREADS 1
+setenv OMP_DYNAMIC FALSE
+setenv LD_PRELOAD "libGLU.so libstdc++.so.6"
+
+setenv QUANTUM_LICENSE_PATH 6200@166.104.249.249
+
+cd $SGE_O_WORKDIR
+
+env | grep PRELOAD
+$MPI_EXEC -n $ncpu /opt/QuantumWise/VNL-ATK-2016.3/bin/atkpython %s > %s
+
+''' % (cpu, cpu, jobname, q, inputfile, outputfile)
+
+        f = open("mpi.sh", "w")
+        f.write(mpi)
+        f.close()
+
+        shl(queue_path + "qsub mpi.sh", shell=True)
+        shl("rm -rf ./mpi.sh", shell=True)
+
 
     def atat(self, cpu=None, mem=None, q=None):
         dirname = os.getcwd()
