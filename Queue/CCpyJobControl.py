@@ -326,9 +326,9 @@ setenv QUANTUM_LICENSE_PATH 6200@166.104.249.249
 cd $SGE_O_WORKDIR
 
 env | grep PRELOAD
-$MPI_EXEC -n $ncpu /opt/QuantumWise/VNL-ATK-2016.3/bin/atkpython %s > %s
+$MPI_EXEC -n %d /opt/QuantumWise/VNL-ATK-2016.3/bin/atkpython %s > %s
 
-''' % (cpu, cpu, jobname, q, inputfile, outputfile)
+''' % (cpu, cpu, jobname, q, cpu, inputfile, outputfile)
 
         f = open("mpi.sh", "w")
         f.write(mpi)
