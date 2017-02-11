@@ -10,31 +10,6 @@ from CCpy.Tools.CCpyTools import selectInputs, selectVASPInputs
 from CCpy.Tools.CCpyTools import linux_command as lc
 from CCpy.Tools.CCpyTools import get_ip
 
-try:
-    chk = sys.argv[1]
-    chk = sys.argv[2]
-except:
-    print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [queue name] [divide]")
-    print('''--------------------------------------
-[option]
-1 : Gaussian09
-2 : VASP
-3 : ATK
-4 : Q-chem
-5 : ATK
-6 : ATAT [f:fitsvl]
-7 : PBS job display
-
-[queue name]
-xeon1, xeon2, ...
-
-[divide] (optional)
-be integer value, which divide CPU numbers and memories
-
-[suboption]
-a : no check files, calculate all inputs'''
-          )
-    quit()
 
 # -- version chk
 version = sys.version
@@ -188,6 +163,34 @@ def pbs_runner(queue=None, divided=1):
         myJS.pbs_runner()
 
 if __name__=="__main__":
+
+    try:
+        chk = sys.argv[1]
+        chk = sys.argv[2]
+    except:
+        print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [queue name] [divide]")
+        print('''--------------------------------------
+    [option]
+    1 : Gaussian09
+    2 : VASP
+    3 : ATK
+    4 : Q-chem
+    5 : ATK
+    6 : ATAT [f:fitsvl]
+    7 : PBS job display
+
+    [queue name]
+    xeon1, xeon2, ...
+
+    [divide] (optional)
+    be integer value, which divide CPU numbers and memories
+
+    [suboption]
+    a : no check files, calculate all inputs'''
+              )
+        quit()
+
+
     # --- Queue name check
     queues = ["xeon1", "xeon2", "xeon3", "xeon4", "xeon5", "I5"]
     try:
