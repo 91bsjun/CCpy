@@ -15,6 +15,7 @@ except:
 3 : Band-DOS calculation    (from initial structure files)
 4 : Static calculation      (after previous calculation)
 5 : MIT relaxation calculation
+6 : MP HSE band calculation
 
 [sub_options]
 ex) CCpyVASPInputGen.py 1 -isif=2 spin mag -kp=4,4,2 ...
@@ -101,7 +102,12 @@ elif sys.argv[1] == "5":
         MIT_relax_VI = VASPInput(each_input)
         MIT_relax_VI.MIT_relax_set()
 
-
+elif sys.argv[1] == "6":
+    input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
+    inputs = selectInputs(input_marker, "./")
+    for each_input in inputs:
+        MP_HSE_VI = VASPInput(each_input)
+        MP_HSE_VI.MP_HSE_band_set()
 
 
 
