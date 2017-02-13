@@ -348,7 +348,7 @@ class VASPInput():
     def MP_HSE_band_set(self):
         structure = self.structure
         dirname = self.dirname
-        mp_hse_band = MPHSEBSSet(structure)
+        mp_hse_band = MPHSEBSSet(structure,reciprocal_density=20)
         mp_hse_band.write_input(dirname)
         
 
