@@ -176,6 +176,7 @@ class VASPInput():
         incar = Incar(incar_dict)
 
         # -- KPOINTS
+        get_kpts = None
         while get_kpts != "n":
             print("\nHere are the current KPOINTS.")
             print(kpoints)
