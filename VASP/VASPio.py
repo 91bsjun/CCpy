@@ -161,25 +161,29 @@ class VASPInput():
         # -- INCAR
         get_sets = None
         while get_sets != "n":
+            print("\nHere are the current INCAR options.")
             for key in incar_dict.keys():
-                print(str(key) + ":" + str(incar_dict[key]))
+                print(str(key).ljust(8) + " = " + str(incar_dict[key]))
             get_sets = raw_input("Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate) \n: ")
-            vals = get_sets.replace(" ","")
-            vals = vals.split(",")
-            for val in vals:
-                key = val.split("=")[0]
-                value = val.split("=")[1]
-                incar_dict[key] = value
+            if get_sets != "n":
+                vals = get_sets.replace(" ","")
+                vals = vals.split(",")
+                for val in vals:
+                    key = val.split("=")[0]
+                    value = val.split("=")[1]
+                    incar_dict[key] = value
         # make INCAR string type
         incar = Incar(incar_dict)
 
         # -- KPOINTS
         while get_kpts != "n":
+            print("\nHere are the current KPOINTS.")
             print(kpoints)
             get_kpts = raw_input("Anything want to modify? if not, enter \"n\" or (ex: 4,4,2) \n: ")
-            vals = get_sets.replace(" ", "")
-            kpts = vals.split(",")
-            kpoints = dirname + "\n0\nMonkhorst-Pack\n" + str(kpts[0]) + " " + str(kpts[1]) + " " + str(kpts[2]) + "\n0 0 0\n"
+            if get_sets != "n":
+                vals = get_sets.replace(" ", "")
+                kpts = vals.split(",")
+                kpoints = dirname + "\n0\nMonkhorst-Pack\n" + str(kpts[0]) + " " + str(kpts[1]) + " " + str(kpts[2]) + "\n0 0 0\n"
 
         ## ----------------------------- Write inputs ---------------------------- ##
         os.chdir(dirname)
