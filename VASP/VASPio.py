@@ -181,9 +181,8 @@ class VASPInput():
             print("\nHere are the current KPOINTS.")
             print(kpoints)
             get_kpts = raw_input("* Anything want to modify? if not, enter \"n\" or (ex: 4,4,2) \n: ")
-            kpts = get_kpts.split(",")
             if get_kpts != "n":
-                vals = get_sets.replace(" ", "")
+                vals = get_kpts.replace(" ", "")
                 kpts = vals.split(",")
                 kpoints = dirname + "\n0\nMonkhorst-Pack\n" + str(kpts[0]) + " " + str(kpts[1]) + " " + str(kpts[2]) + "\n0 0 0\n"
 
