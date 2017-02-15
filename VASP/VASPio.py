@@ -160,7 +160,7 @@ class VASPInput():
 
         ## --------------------------- Confirm input values ---------------------- ##
         # -- INCAR
-        print("-"*20 + "\n"+ print(str(structure)))
+        print("-"*20 + "\n"+ dirname)
         if not input_incar :        # This process is for avoiding mulitiple inputs genteration.
             get_sets = None
             while get_sets != "n":
