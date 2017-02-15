@@ -18,7 +18,7 @@ except:
 6 : MP HSE band calculation
 
 [sub_options]
-ex) CCpyVASPInputGen.py 1 -isif=2 spin mag -kp=4,4,2 ...
+ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 ...
     < INCAR OPTION >
     -sp      : Single point calculation      (DEFAULT : NSW = 200)
     -isif=# : ISIF value                     (DEFAULT : 3)
