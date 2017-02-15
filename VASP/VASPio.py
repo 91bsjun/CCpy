@@ -2,14 +2,17 @@ import os, sys, re
 import matplotlib.pyplot as plt
 
 from CCpy.Tools.CCpyStructure import PeriodicStructure as PS
+from CCpy.Tools.CCpyStructure import latticeGen
 from CCpy.Tools.CCpyTools import file_writer, linux_command
+
 
 from pymatgen.core import IStructure as pmgIS
 from pymatgen.io.vasp.inputs import Incar, Poscar, Potcar, Kpoints, Kpoints_supported_modes
 from pymatgen.io.vasp.sets import *
 
-
-
+version = sys.version
+if version[0] == '3':
+    raw_input = input
 
 class VASPInput():
     def __init__(self, filename, dirname=None):
@@ -41,17 +44,21 @@ class VASPInput():
 
         linux_command("export VASP_PSP_DIR=/home/bsjun/bin/bsjunCODE/VASP_Potential")
 
+    # -- CMS relaxation VASP input set
     def cms_vasp_set(self, single_point=False,isif=False,vdw=False,
                      spin=False, mag=False, ldau=False,
                      functional="PBE_54",
                      band_dos=False,
                      kpoints=False):
-        from bsjunCODE.bsjunStructure import latticeGen
+
         structure = self.structure
         dirname = self.dirname
 
-        # POSCAR
+        ## -------------------------------- POSCAR -------------------------------- ##
+        # -- Create POSCAR string from pymatgen structure object
         poscar = structure.to(fmt="poscar")
+
+        # -- Parsing elements and its number for MAGMOM and LDA+U parameters
         elements = []
         for el in structure.species:
             if str(el) not in elements:
@@ -63,7 +70,8 @@ class VASPInput():
             elif i == 6:
                 n_of_atoms = lines[i].split()
 
-        # INCAR        
+        ## -------------------------------- INCAR -------------------------------- ##
+        # -- INCAR preset dictionary
         incar_dict = {
             "NWRITE":2,"LPETIM":"F","ISTART":0,"INIWAV":1,"IWAVPR":1,"ICHARG":2,"LWAVE":".FALSE.",
             "ALGO":"FAST","NELM":100,"EDIFF":0.0001,"BMIX":3.00,"ENCUT":500,"GGA":"PE","ISYM":2,
@@ -72,6 +80,7 @@ class VASPInput():
             "ISMEAR":0,"SIGMA":0.05,"LORBIT":11,
             "NPAR":8,"LPLANE":"T","ISPIN":1}
 
+        # -- Parsing system arguments from user commands
         if single_point:
             incar_dict['NSW']=0
         if isif:
@@ -114,21 +123,10 @@ class VASPInput():
             incar_dict['VDW_D']=20.0
             incar_dict['VDW_C6']=C6
             incar_dict['VDW_R0']=R0
-        incar = Incar(incar_dict)
 
-        if band_dos:
-            incar_dict['NSW']=0            
-            incar_dict['NEDOS']=2001
-            incar_dict['PREC']="accur"
-            incar_pre = Incar(incar_dict)
-            
-            incar_dict['SIGMA']=0.02
-            incar_dict['LAECHG']=".True."
-            incar_dict['ICHARG']=11
-            incar_band_dos = Incar(incar_dict)
-        
 
-        # KPOINTS
+        ## -------------------------------- KPOINTS -------------------------------- ##
+        # -- if user input the k-points in command
         if kpoints:
             kpts = kpoints
         else:
@@ -142,14 +140,8 @@ class VASPInput():
                 else:
                     kpts.append(int(20 // param))
         kpoints = dirname+"\n0\nMonkhorst-Pack\n"+str(kpts[0])+" "+str(kpts[1])+" "+str(kpts[2])+"\n0 0 0\n"
-        if band_dos:
-            from pymatgen.symmetry.bandstructure import HighSymmKpath
-            hsk = HighSymmKpath(structure)
-            line_kpoints = Kpoints.automatic_linemode(20, hsk)
 
-
-        # POTCAR (functional : PBE, PBE_52, PBE_54, LDA, LDA_52, LDA_54)
-        linux_command("export VASP_PSP_DIR=/home/bsjun/bin/bsjunCODE/VASP_Potential")
+        ## -------------------------------- POTCAR -------------------------------- ##
         potcar = Potcar(symbols=elements, functional="PBE_54")
 
         try:
@@ -164,42 +156,45 @@ class VASPInput():
                     quit()
             else:
                 pass
+
+        ## --------------------------- Confirm input values ---------------------- ##
+        # -- INCAR
+        get_sets = None
+        while get_sets != "n":
+            for key in incar_dict.keys():
+                print(str(key) + ":" + str(incar_dict[key]))
+            get_sets = raw_input("Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate) \n: ")
+            vals = get_sets.replace(" ","")
+            vals = vals.split(",")
+            for val in vals:
+                key = val.split("=")[0]
+                value = val.split("=")[1]
+                incar_dict[key] = value
+        # make INCAR string type
+        incar = Incar(incar_dict)
+
+        # -- KPOINTS
+        while get_kpts != "n":
+            print(kpoints)
+            get_kpts = raw_input("Anything want to modify? if not, enter \"n\" or (ex: 4,4,2) \n: ")
+            vals = get_sets.replace(" ", "")
+            kpts = vals.split(",")
+            kpoints = dirname + "\n0\nMonkhorst-Pack\n" + str(kpts[0]) + " " + str(kpts[1]) + " " + str(kpts[2]) + "\n0 0 0\n"
+
+        ## ----------------------------- Write inputs ---------------------------- ##
         os.chdir(dirname)
-
-        
-        if band_dos:
-            try:
-                os.mkdir("PreCalc")
-            except:
-                pass
-            os.chdir("PreCalc")
-            file_writer("POSCAR",str(poscar))
-            file_writer("POTCAR",str(potcar))
-            file_writer("INCAR",str(incar_pre))
-            file_writer("KPOINTS",str(kpoints))
-            os.chdir("../")
-            try:
-                os.mkdir("Band-DOS")
-            except:
-                pass
-            os.chdir("Band-DOS")
-            file_writer("POSCAR",str(poscar))
-            file_writer("POTCAR",str(potcar))
-            file_writer("INCAR",str(incar_band_dos))
-            file_writer("KPOINTS",str(line_kpoints))
-        else:
-            file_writer("POSCAR",str(poscar))
-            file_writer("POTCAR",str(potcar))
-            file_writer("INCAR",str(incar))
-            file_writer("KPOINTS",str(kpoints))
-
+        file_writer("POSCAR",str(poscar))
+        file_writer("POTCAR",str(potcar))
+        file_writer("INCAR",str(incar))
+        file_writer("KPOINTS",str(kpoints))
         os.chdir("../")
 
+
+        ## ------------------------- Move structure file ------------------------ ##
         try:
             os.mkdir("structures")
         except:
             pass
-
         linux_command("mv "+self.filename+" structures")
 
     # --- Band calculation after previous calc
