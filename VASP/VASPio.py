@@ -49,7 +49,8 @@ class VASPInput():
                      spin=False, mag=False, ldau=False,
                      functional="PBE_54",
                      band_dos=False,
-                     kpoints=False):
+                     kpoints=False,
+                     input_incar=None, input_kpts=None):
 
         structure = self.structure
         dirname = self.dirname
@@ -159,32 +160,38 @@ class VASPInput():
 
         ## --------------------------- Confirm input values ---------------------- ##
         # -- INCAR
-        get_sets = None
-        while get_sets != "n":
-            print("\nHere are the current INCAR options.")
-            for key in incar_dict.keys():
-                print(str(key).ljust(8) + " = " + str(incar_dict[key]))
-            get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate) \n: ")
-            if get_sets != "n":
-                vals = get_sets.replace(" ","")
-                vals = vals.split(",")
-                for val in vals:
-                    key = val.split("=")[0]
-                    value = val.split("=")[1]
-                    incar_dict[key] = value
-        # make INCAR string type
-        incar = Incar(incar_dict)
+        if not input_incar :        # This process is for avoiding mulitiple inputs genteration.
+            get_sets = None
+            while get_sets != "n":
+                print("\nHere are the current INCAR options.")
+                for key in incar_dict.keys():
+                    print(str(key).ljust(8) + " = " + str(incar_dict[key]))
+                get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate) \n: ")
+                if get_sets != "n":
+                    vals = get_sets.replace(" ","")
+                    vals = vals.split(",")
+                    for val in vals:
+                        key = val.split("=")[0]
+                        value = val.split("=")[1]
+                        incar_dict[key] = value
+            # make INCAR string type
+            incar = Incar(incar_dict)
+        else:
+            incar = input_incar
 
-        # -- KPOINTS
-        get_kpts = None
-        while get_kpts != "n":
-            print("\nHere are the current KPOINTS.")
-            print(kpoints)
-            get_kpts = raw_input("* Anything want to modify? if not, enter \"n\" or (ex: 4,4,2) \n: ")
-            if get_kpts != "n":
-                vals = get_kpts.replace(" ", "")
-                kpts = vals.split(",")
-                kpoints = dirname + "\n0\nMonkhorst-Pack\n" + str(kpts[0]) + " " + str(kpts[1]) + " " + str(kpts[2]) + "\n0 0 0\n"
+        if not input_kpts:
+            # -- KPOINTS
+            get_kpts = None
+            while get_kpts != "n":
+                print("\nHere are the current KPOINTS.")
+                print(kpoints)
+                get_kpts = raw_input("* Anything want to modify? if not, enter \"n\" or (ex: 4,4,2) \n: ")
+                if get_kpts != "n":
+                    vals = get_kpts.replace(" ", "")
+                    kpts = vals.split(",")
+                    kpoints = dirname + "\n0\nMonkhorst-Pack\n" + str(kpts[0]) + " " + str(kpts[1]) + " " + str(kpts[2]) + "\n0 0 0\n"
+        else:
+            kpoints = input_kpts
 
         ## ----------------------------- Write inputs ---------------------------- ##
         os.chdir(dirname)

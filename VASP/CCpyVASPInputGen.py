@@ -62,9 +62,22 @@ for arg in sys.argv:
 if sys.argv[1] == "1":
     input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
     inputs = selectInputs(input_marker, "./")
+    chk = True
     for each_input in inputs:
         VI = VASPInput(each_input)
-        VI.cms_vasp_set(single_point=single_point,isif=isif,vdw=vdw,kpoints=kpoints,spin=spin,mag=mag,ldau=ldau)
+        if chk:
+            VI.cms_vasp_set(single_point=single_point, isif=isif, vdw=vdw, kpoints=kpoints, spin=spin, mag=mag,
+                            ldau=ldau, input_incar=None, input_kpts=None)
+            incar = open(VI.dirname + "/INCAR").read()
+            kpts = open(VI.dirname + "/KPOINTS").read()
+            same_inputs = raw_input("* Do you want create other inputs as same as these INCAR and KPOINTS ? (y/n)")
+            if same_inputs == "y":
+                chk = False
+            else:
+                chk = True
+        else:
+            VI.cms_vasp_set(single_point=single_point,isif=isif,vdw=vdw,kpoints=kpoints,spin=spin,mag=mag,ldau=ldau,
+                            input_incar=incar, input_kpts=kpts)
 
 elif sys.argv[1] == "2":
     inputs = selectVASPOutputs("./")
