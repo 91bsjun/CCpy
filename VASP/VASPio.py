@@ -181,6 +181,7 @@ class VASPInput():
             print("\nHere are the current KPOINTS.")
             print(kpoints)
             get_kpts = raw_input("Anything want to modify? if not, enter \"n\" or (ex: 4,4,2) \n: ")
+            kpts = get_kpts.split(",")
             if get_sets != "n":
                 vals = get_sets.replace(" ", "")
                 kpts = vals.split(",")
