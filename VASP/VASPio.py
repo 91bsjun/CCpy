@@ -21,7 +21,7 @@ class VASPInput():
             ps.xsdFile()
             ps.cifWrite(filename="tmpstructure.cif")
             structure = pmgIS.from_file("tmpstructure.cif")
-            linux_command("rm -rf tmpstructure.cif")
+            os.remove("tmpstructure.cif")
             jobname = filename.replace(".xsd","")
         elif ".cif" in filename: 
             structure = pmgIS.from_file(filename)
@@ -42,15 +42,33 @@ class VASPInput():
         self.structure = structure
         self.dirname = dirname
 
-        linux_command("export VASP_PSP_DIR=/home/bsjun/bin/bsjunCODE/VASP_Potential")
 
-    # -- CMS relaxation VASP input set
-    def cms_vasp_set(self, single_point=False,isif=False,vdw=False,
+    # ------------------------------------------------------------------------------#
+    #                        CMS relaxation VASP input set                          #
+    # ------------------------------------------------------------------------------#
+    def cms_vasp_set(self, single_point=False, isif=False,vdw=False,
                      spin=False, mag=False, ldau=False,
                      functional="PBE_54",
-                     band_dos=False,
-                     kpoints=False,
-                     input_incar=None, input_kpts=None):
+                     kpoints=False, incar_dict=None,
+                     magmom_dict=None, ldau_dict=None,
+                     input_incar=None, input_kpts=None, flask_app=False):
+        """
+
+        :param single_point:
+        :param isif:
+        :param vdw:
+        :param spin:
+        :param mag:
+        :param ldau:
+        :param functional:
+        :param kpoints: list [4,4,1]
+        :param incar_dict: dictionary type of incar
+        :param input_incar: string type of incar (if exist, pass the confirm menu)
+        :param input_kpts: string type of k-points (if exist, pass the confirm menu)
+        :param flask_app: in case of flask app, avoid confirm menu (use default k-points = input_kpts)
+
+        :return: no return, but write VASP input files at dirname
+        """
 
         structure = self.structure
         dirname = self.dirname
@@ -73,13 +91,17 @@ class VASPInput():
 
         ## -------------------------------- INCAR -------------------------------- ##
         # -- INCAR preset dictionary
-        incar_dict = {
-            "NWRITE":2,"LPETIM":"F","ISTART":0,"INIWAV":1,"IWAVPR":1,"ICHARG":2,"LWAVE":".FALSE.",
-            "ALGO":"FAST","NELM":100,"EDIFF":0.0001,"BMIX":3.00,"ENCUT":500,"GGA":"PE","ISYM":2,
-            "LDIAG":"T","LREAL":"auto","PREC":"Medium",
-            "NSW":200,"NBLOCK":1,"KBLOCK":10,"IBRION":2,"ISIF":3,"POTIM":0.5,"SMASS":3.0,
-            "ISMEAR":0,"SIGMA":0.05,"LORBIT":11,
-            "NPAR":8,"LPLANE":"T","ISPIN":1}
+        # -- if incar_dict arg exist use it
+        if incar_dict:
+            pass
+        else:
+            incar_dict = {
+                "NWRITE":2,"LPETIM":"F","ISTART":0,"INIWAV":1,"IWAVPR":1,"ICHARG":2,"LWAVE":".FALSE.",
+                "ALGO":"FAST","NELM":100,"EDIFF":0.0001,"BMIX":3.00,"ENCUT":500,"GGA":"PE","ISYM":2,
+                "LDIAG":"T","LREAL":"auto","PREC":"Medium",
+                "NSW":200,"NBLOCK":1,"KBLOCK":10,"IBRION":2,"ISIF":3,"POTIM":0.5,"SMASS":3.0,
+                "ISMEAR":0,"SIGMA":0.05,"LORBIT":11,
+                "NPAR":8,"LPLANE":"T","ISPIN":1}
 
         # -- Parsing system arguments from user commands
         if single_point:
@@ -89,22 +111,38 @@ class VASPInput():
         if spin:
             incar_dict['ISPIN']=2
         if mag:
+            if magmom_dict:
+                magmom = magmom_dict
             mag_string = ""
             for i in range(len(n_of_atoms)):
-                mag_string += str(n_of_atoms[i]) + "*" + str(magmom[elts[i]]) + " "
+                try:
+                    mag_string += str(n_of_atoms[i]) + "*" + str(magmom[elts[i]]) + " "
+                except:
+                    mag_string += str(n_of_atoms[i]) + "*" + str(0.6) + " "
             incar_dict['MAGMOM'] = mag_string
         if ldau:
+            if ldau_dict:
+                LDAUU = ldau_dict       # ldauu parameters from arg
             LDAUL_string = ""
             for i in range(len(elts)):
-                LDAUL_string += str(LDAUL[elts[i]]) + " "
+                try:
+                    LDAUL_string += str(LDAUL[elts[i]]) + " "
+                except:
+                    LDAUL_string += str(0) + " "
 
             LDAUU_string = ""
             for i in range(len(elts)):
-                LDAUU_string += str(LDAUU[elts[i]]) + " "
+                try:
+                    LDAUU_string += str(LDAUU[elts[i]]) + " "
+                except:
+                    LDAUU_string += str(0) + " "
 
             LDAUJ_string = ""
             for i in range(len(elts)):
-                LDAUJ_string += str(LDAUJ[elts[i]]) + " "
+                try:
+                    LDAUJ_string += str(LDAUJ[elts[i]]) + " "
+                except:
+                    LDAUJ_string += str(0) + " "
 
             incar_dict['LDAU'] = ".TRUE."
             incar_dict['LMAXMIX'] = 4
@@ -159,40 +197,44 @@ class VASPInput():
                 pass
 
         ## --------------------------- Confirm input values ---------------------- ##
-        # -- INCAR
-        print("-"*20 + "\n"+ dirname)
-        if not input_incar :        # This process is for avoiding mulitiple inputs genteration.
-            get_sets = None
-            while get_sets != "n":
-                print("\n* Here are the current INCAR options.")
-                for key in incar_dict.keys():
-                    print(str(key).ljust(8) + " = " + str(incar_dict[key]))
-                get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate) \n: ")
-                if get_sets != "n":
-                    vals = get_sets.replace(" ","")
-                    vals = vals.split(",")
-                    for val in vals:
-                        key = val.split("=")[0]
-                        value = val.split("=")[1]
-                        incar_dict[key] = value
-            # make INCAR string type
+        if flask_app:
             incar = Incar(incar_dict)
+            pass
         else:
-            incar = input_incar
+            # -- INCAR
+            print(dirname)
+            if not input_incar :        # This process is for avoiding multiple inputs generation.
+                get_sets = None
+                while get_sets != "n":
+                    print("\n* Here are the current INCAR options.")
+                    for key in incar_dict.keys():
+                        print(str(key).ljust(8) + " = " + str(incar_dict[key]))
+                    get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate) \n: ")
+                    if get_sets != "n":
+                        vals = get_sets.replace(" ","")
+                        vals = vals.split(",")
+                        for val in vals:
+                            key = val.split("=")[0]
+                            value = val.split("=")[1]
+                            incar_dict[key] = value
+                # make INCAR string type
+                incar = Incar(incar_dict)
+            else:
+                incar = input_incar
 
-        if not input_kpts:
-            # -- KPOINTS
-            get_kpts = None
-            while get_kpts != "n":
-                print("\n* Here are the current KPOINTS.")
-                print(kpoints)
-                get_kpts = raw_input("* Anything want to modify? if not, enter \"n\" or (ex: 4,4,2) \n: ")
-                if get_kpts != "n":
-                    vals = get_kpts.replace(" ", "")
-                    kpts = vals.split(",")
-                    kpoints = dirname + "\n0\nMonkhorst-Pack\n" + str(kpts[0]) + " " + str(kpts[1]) + " " + str(kpts[2]) + "\n0 0 0\n"
-        else:
-            kpoints = input_kpts
+            if not input_kpts:
+                # -- KPOINTS
+                get_kpts = None
+                while get_kpts != "n":
+                    print("\n* Here are the current KPOINTS.")
+                    print(kpoints)
+                    get_kpts = raw_input("* Anything want to modify? if not, enter \"n\" or (ex: 4,4,2) \n: ")
+                    if get_kpts != "n":
+                        vals = get_kpts.replace(" ", "")
+                        kpts = vals.split(",")
+                        kpoints = dirname + "\n0\nMonkhorst-Pack\n" + str(kpts[0]) + " " + str(kpts[1]) + " " + str(kpts[2]) + "\n0 0 0\n"
+            else:
+                kpoints = input_kpts
 
         ## ----------------------------- Write inputs ---------------------------- ##
         os.chdir(dirname)
@@ -208,22 +250,36 @@ class VASPInput():
             os.mkdir("structures")
         except:
             pass
-        linux_command("mv "+self.filename+" structures")
 
-    # --- Band calculation after previous calc
-    def cms_band_set(self, vdw=False, spin=False, mag=False, kpoints=False, ldau=False, functional="PBE_54"):
-        from bsjunCODE.bsjunStructure import latticeGen
+        os.rename(self.filename, "./structures/"+self.filename)
+
+
+
+    # ------------------------------------------------------------------------------#
+    #                     CMS band and DOS calc VASP input set                      #
+    # ------------------------------------------------------------------------------#
+    def cms_band_set(self, vdw=False, spin=False, mag=False, kpoints=False, ldau=False, functional="PBE_54",
+                     input_incar=None, input_kpts=None, input_line_kpts=None):
         structure = self.structure
         dirname = self.dirname
 
-        ## --- POSCAR
+        ## -------------------------------- POSCAR -------------------------------- ##
+        # -- Create POSCAR string from pymatgen structure object
         poscar = structure.to(fmt="poscar")
+
+        # -- Parsing elements and its number for MAGMOM and LDA+U parameters
         elements = []
         for el in structure.species:
             if str(el) not in elements:
                 elements.append(str(el))
+        lines = poscar.split("\n")
+        for i in range(len(lines)):
+            if i == 5:
+                elts = lines[i].split()
+            elif i == 6:
+                n_of_atoms = lines[i].split()
 
-        ## --- INCAR        
+        ## -------------------------------- INCAR -------------------------------- ##
         incar_dict = {
             "NWRITE":2,"LPETIM":"F","ISTART":0,"INIWAV":1,"IWAVPR":1,"ICHARG":2,"LWAVE":".FALSE.",
             "ALGO":"NORMAL","NELM":100,"EDIFF":0.0001,"BMIX":3.00,"ENCUT":500,"GGA":"PE","ISYM":2,
@@ -270,21 +326,10 @@ class VASPInput():
             incar_dict['VDW_D']=20.0
             incar_dict['VDW_C6']=C6
             incar_dict['VDW_R0']=R0
-        incar = Incar(incar_dict)
 
-        # -- Precalc INCAR
-        incar_dict['NSW']=0            
-        incar_dict['NEDOS']=2001
-        incar_dict['PREC']="accur"
-        incar_pre = Incar(incar_dict)
-        # -- Band-DOS INCAR
-        incar_dict['SIGMA']=0.02
-        incar_dict['LAECHG']=".True."
-        incar_dict['ICHARG']=11
-        incar_band_dos = Incar(incar_dict)
-        
 
-        ## --- KPOINTS
+
+        ## -------------------------------- KPOINTS -------------------------------- ##
         if kpoints:
             kpts = kpoints
         else:
@@ -305,12 +350,84 @@ class VASPInput():
         line_kpoints = Kpoints.automatic_linemode(20, hsk)
 
 
-        ## --- POTCAR (functional : PBE, PBE_52, PBE_54, LDA, LDA_52, LDA_54)
+        ## -------------------------------- POTCAR --------------------------------- ##
         linux_command("export VASP_PSP_DIR=/home/bsjun/bin/bsjunCODE/VASP_Potential")
         potcar = Potcar(symbols=elements, functional=functional)
 
-        
-        ## --- Write Files
+
+        ## --------------------------- Confirm input values ---------------------- ##
+        # -- INCAR
+        print(dirname)
+        if not input_incar:  # This process is for avoiding multiple inputs generation.
+            get_sets = None
+            while get_sets != "n":
+                print("""
+Here are the INCAR options.
+NEDOS, PREC, SIGMA, LAECHG, ICHARG
+values will be modified when generate Precalc and Band-DOS input sets as :
+NEDOS=2001, PREC=accur, SIGMA=0.02, LAECHG=.True., ICHARG=11""")
+                for key in incar_dict.keys():
+                    print(str(key).ljust(8) + " = " + str(incar_dict[key]))
+                get_sets = raw_input(
+                    "* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate) \n: ")
+                if get_sets != "n":
+                    vals = get_sets.replace(" ", "")
+                    vals = vals.split(",")
+                    for val in vals:
+                        key = val.split("=")[0]
+                        value = val.split("=")[1]
+                        incar_dict[key] = value
+
+        # INCAR string 을 받아서 dictionary 로 바꾸는 스크립트 찾아야함... 왜냐면 밴드의 INCAR 는 수시로 바뀌므로
+
+        # -- KPOINTS
+        if not input_kpts:
+            get_kpts = None
+            while get_kpts != "n":
+                print("\n* Here are the current KPOINTS (PreCalc).")
+                print(kpoints)
+                get_kpts = raw_input("* Anything want to modify? if not, enter \"n\" or (ex: 4,4,2) \n: ")
+                if get_kpts != "n":
+                    vals = get_kpts.replace(" ", "")
+                    kpts = vals.split(",")
+                    kpoints = dirname + "\n0\nMonkhorst-Pack\n" + str(kpts[0]) + " " + str(kpts[1]) + " " + str(kpts[2]) + "\n0 0 0\n"
+        else:
+            kpoints = input_kpts
+
+        # -- Line mode KPOINTS
+        if not input_line_kpts:
+            get_line_kpts = None
+            while get_line_kpts != "n":
+                print("\n* Here are the current Line mode KPOINTS (Band-DOS).")
+                splt_kpts = line_kpoints.split("\n")
+                for i in range(len(splt_kpts)):
+                    print(str(i) + " : " + splt_kpts[i])
+                get_line_kpts = raw_input("* Anything want to remove line? if not, enter \"n\" or (ex: 1,2,4,5,6) \n: ")
+                if get_line_kpts != "n":
+                    vals = get_line_kpts.replace(" ", "")
+                    line_index = vals.split(",")
+                    for i in line_index:
+                        del splt_kpts[i]
+                    line_kpoints = ""
+                    for line in splt_kpts:
+                        line_kpoints += line+"\n"
+
+        else:
+            line_kpoints = input_line_kpts
+
+
+        ## --------------------------- Write input files ---------------------- ##
+        # -- Precalc INCAR
+        incar_dict['NSW'] = 0
+        incar_dict['NEDOS'] = 2001
+        incar_dict['PREC'] = "accur"
+        incar_pre = Incar(incar_dict)
+        # -- Band-DOS INCAR
+        incar_dict['SIGMA'] = 0.02
+        incar_dict['LAECHG'] = ".True."
+        incar_dict['ICHARG'] = 11
+        incar_band_dos = Incar(incar_dict)
+
         try:
             os.mkdir("PreCalc")
         except:
@@ -327,8 +444,6 @@ class VASPInput():
         file_writer("./Band-DOS/POTCAR",str(potcar))
         file_writer("./Band-DOS/INCAR",str(incar_band_dos))
         file_writer("./Band-DOS/KPOINTS",str(line_kpoints))
-
-
         
     
 
@@ -368,9 +483,9 @@ class VASPInput():
 
 # Magnetic moment parameters : from Pymatgen
 magmom = {'Mn3+': 4, 'Ni4+': 0.6, 'Cr': 5, 'Mn4+': 3, 'Ta': 5, 'Ni3+': 1, 'Mo': 5,
-       'Ni': 2, 'V': 5, 'Mn2+': 5, 'Co': 5, 'Co4+': 1, 'W': 5, 'Fe3+': 5, 'Fe2+': 4,
-       'Mn': 5, 'Fe4+': 4, 'Fe': 5, 'Co3+': 0.6,
-       'Li': 0.6, 'O': 0.6}
+          'Ni': 2, 'V': 5, 'Mn2+': 5, 'Co': 5, 'Co4+': 1, 'W': 5, 'Fe3+': 5, 'Fe2+': 4,
+          'Mn': 5, 'Fe4+': 4, 'Fe': 5, 'Co3+': 0.6,
+          'Li': 0.6, 'O': 0.6}
 
 # LDA+U parameters : from Pymatgen
 LDAUL = {'Mo': 2, 'V': 2, 'Cu': 2, 'W': 2, 'Ag': 2, 'Cr': 2, 'Ta': 2,
