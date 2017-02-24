@@ -378,7 +378,7 @@ NEDOS=2001, PREC=accur, SIGMA=0.02, LAECHG=.True., ICHARG=11""")
                         value = val.split("=")[1]
                         incar_dict[key] = value
 
-        # INCAR string 을 받아서 dictionary 로 바꾸는 스크립트 찾아야함... 왜냐면 밴드의 INCAR 는 수시로 바뀌므로
+        # need to make module : INCAR string to INCAR dict
 
         # -- KPOINTS
         if not input_kpts:
