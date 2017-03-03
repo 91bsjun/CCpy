@@ -157,7 +157,7 @@ class CMSBand():
         else:
             self.elt_ordered = elt_ordered
             import matplotlib.pyplot as plt
-            plotter.get_elt_projected_plots_color_spin(zero_to_efermi=True, elt_ordered=elt_ordered, line_width=line_width, spin="up")
+            plotter.get_elt_projected_plots_color_spin(zero_to_efermi=True, elt_ordered=elt_ordered, line_width=line_width, spin=spin)
             plt.axhline(y=0, lw=1, ls=':', color='gray')
             plt.tick_params(labelsize=15)
 
