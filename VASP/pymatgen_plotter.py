@@ -1210,6 +1210,86 @@ class BSPlotterProjected(BSPlotter):
             plt.ylim(-5,5)
         return plt
 
+    def get_elt_projected_plots_color_spin(self, zero_to_efermi=True, line_width=3,
+                                           elt_ordered=None, spin="up"):
+        """
+        returns a pylab plot object with one plot where the band structure
+        line color depends on the character of the band (along different
+        elements). Each element is associated with red, green or blue
+        and the corresponding rgb color depending on the character of the band
+        is used. The method can only deal with binary and ternary compounds
+
+        spin up and spin down are differientiated by a '-' and a '--' line
+
+        Args:
+            elt_ordered: A list of Element ordered. The first one is red,
+                second green, last blue
+
+        Returns:
+            a pylab object
+
+        """
+
+        import matplotlib.pyplot as plt
+
+        band_linewidth = line_width # editted
+
+        if len(self._bs.structure.composition.elements) > 3:
+            raise ValueError
+        if elt_ordered is None:
+            elt_ordered = self._bs.structure.composition.elements
+
+        proj = self._get_projections_by_branches(
+            {e.symbol: ['s', 'p', 'd']
+             for e in self._bs.structure.composition.elements})
+        data = self.bs_plot_data(zero_to_efermi)
+        #plt = get_publication_quality_plot(12, 8)
+
+        spins = [Spin.up]
+        if spin == "down":
+            spins = [Spin.down]
+        self._maketicks(plt)
+        for s in spins:
+            for b in range(len(data['distances'])):
+                for i in range(self._nb_bands):
+                    for j in range(len(data['energy'][b][str(s)][i]) - 1):
+                        sum_e = 0.0
+                        for el in elt_ordered:
+                            sum_e = sum_e + \
+                                    sum([proj[b][str(s)][i][j][str(el)][o]
+                                         for o
+                                         in proj[b][str(s)][i][j][str(el)]])
+                        if sum_e == 0.0:
+                            color = [0.0] * len(elt_ordered)
+                        else:
+                            color = [sum([proj[b][str(s)][i][j][str(el)][o]
+                                          for o
+                                          in proj[b][str(s)][i][j][str(el)]])
+                                     / sum_e
+                                     for el in elt_ordered]
+                        if len(color) == 2:
+                            color.append(0.0)
+                            color[2] = color[1]
+                            color[1] = 0.0
+                            tmp = color[0] # editted
+                            color[0] = color[2] # editted
+                            color[2] = tmp # editted
+                        sign = '-'
+                        plt.plot([data['distances'][b][j],
+                                  data['distances'][b][j + 1]],
+                                 [data['energy'][b][str(s)][i][j],
+                                  data['energy'][b][str(s)][i][j + 1]], sign,
+                                 color=color, linewidth=band_linewidth)
+
+        x_max = data['distances'][-1][-1]
+        plt.xlim(0, x_max)
+
+        try:
+            plt.ylim(data['vbm'][0][1] - 4.0, data['cbm'][0][1] + 2.0)
+        except:
+            plt.ylim(-5,5)
+        return plt
+
 
 class BoltztrapPlotter(object):
     """

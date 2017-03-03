@@ -134,6 +134,44 @@ class CMSBand():
 
             return plt
 
+    def colorBand_spin(self, miny=None,maxy=None,elt_ordered=None,line_width=3,spin="up"):
+        bands = self.bands
+        plotter = BSPlotterProjected(bands)
+        self.plotter = plotter
+
+        if elt_ordered:
+            pass
+        else:
+            elts = plotter._bs.structure.composition.elements
+            while len(elts) > 3:
+                print("Maximum 3 elements available.")
+                print(elts)
+                print(str(elts[-1])+" will be removed.")
+            else:
+                elt_ordered = [str(e) for e in elts]
+
+        # -- if single atom : return to blue band
+        if len(elt_ordered) == 1:
+            plt = self.blueBand(miny=miny,maxy=maxy,line_width=line_width)
+            return plt
+        else:
+            self.elt_ordered = elt_ordered
+            import matplotlib.pyplot as plt
+            plotter.get_elt_projected_plots_color_spin(zero_to_efermi=True, elt_ordered=elt_ordered, line_width=line_width, spin="up")
+            plt.axhline(y=0, lw=1, ls=':', color='gray')
+            plt.tick_params(labelsize=15)
+
+            if len(elt_ordered) == 3:
+                colors = ["r","#1DDB16","b"]
+            elif len(elt_ordered) == 2:
+                colors = ["b","r"]
+            for i in range(len(elt_ordered)):
+                plt.plot(0,0,color=colors[i],label=elt_ordered[i],linewidth=2)
+            plt.legend(fancybox=True,shadow=True,prop={'size':18}, loc='upper right')
+            plt.ylim(miny,maxy)
+
+            return plt
+
 
     def element_DOS(self, miny=None,maxy=None, minx=None, maxx=None, elt_ordered=None,with_band=False):
         from pymatgen.core.periodic_table import Element
@@ -414,6 +452,56 @@ def main_run():
         if "n" not in sys.argv:
             plt.show()
 
+
+    # -- color band with spin
+    elif sys.argv[1] == "5":
+        fig = plt.figure(figsize=(6, 10))
+
+        cms_band = CMSBand(elt_projected=True, fig=fig)
+
+        elt_argv = [argv for argv in sys.argv if "-e" in argv]
+        if len(elt_argv) > 0:
+            elt = True
+            elt_argv = elt_argv[0]
+            elt_argv = elt_argv.replace("-e", "")
+        else:
+            elt = False
+
+        if "ed" in sys.argv:
+            elt_ordered = None
+        elif elt:
+            elt_ordered = elt_argv.split(",")
+            elt_ordered = elt_ordered
+        else:
+            get_atoms = raw_input("* Input the elements order to plot band (ex : C,N) : ")
+            get_atoms = get_atoms.replace(" ", "")
+            elt_ordered = get_atoms.split(',')
+            if len(elt_ordered) > 3:
+                get_atoms = raw_input("* Maximum 3 elements available : ")
+                elt_ordered = get_atoms.split(',')
+            elt_ordered = elt_ordered
+
+        if "up" in sys.argv:
+            spin = "up"
+        elif "down" in sys.argv:
+            spin = "down"
+
+        plt = cms_band.colorBand_spin(miny=miny, maxy=maxy, elt_ordered=elt_ordered, line_width=line_width, spin=spin)
+        plt.tight_layout()
+
+        pwd = os.getcwd()
+        dirname = pwd.split("/")[-1]
+        figname = dirname + "_colorBand_spin_"+spin+".png"
+        plt.savefig(figname)
+        makejpg = "convert " + figname + " " + figname.replace(".png", ".jpg")
+        subprocess.call(makejpg, shell=True)
+        print("* Save figure : " + figname + ", " + figname.replace(".png", ".jpg"))
+
+        cms_band.save_band_data(color=True, savefig=False)
+        if "n" not in sys.argv:
+            plt.show()
+
+
 if __name__=="__main__":
     try:
         sys.argv[1]
@@ -426,20 +514,23 @@ Usage : cms_band [option] [miny] [maxy] [sub_option1] [sub_option2]...
 2   : color band
 3   : blue band & element DOS
 4   : color band & element DOS
+5   : color band spin UP or DOWN
 [sub_options]
 a   : Select all possible directories
-      (ex : cms_band 1 -3 3 a)
+      (ex : CCpyBand.py 1 -3 3 a)
 n   : Do not show figure, just save figure and band.dat
-      (ex : cms_band 1 -3 3 n)
+      (ex : CCpyBand.py 1 -3 3 n)
 ed  : Make element order as default
-      (ex : cms_band 2 -3 3 ed)
+      (ex : CCpyBand.py 2 -3 3 ed)
 -e  : Make element order
-      (ex : cms_band 2 -3 3 -eCo,Ni)
+      (ex : CCpyBand.py 2 -3 3 -eCo,Ni)
 -d  : Set DOS x-axis limitation
-      (ex : cms_band 3 -3 3 -d0,5)
-      (ex : cms_band 3 -3 3 -eC,N -d0,5)
+      (ex : CCpyBand.py 3 -3 3 -d0,5)
+      (ex : CCpyBand.py 3 -3 3 -eC,N -d0,5)
 -lw : Set line width of figure
-      (ex : cms_band 3 -3 3 -lw5) // default = 3
+      (ex : CCpyBand.py 3 -3 3 -lw5) // default = 3
+up/down  : if spin polarized calculation / option 5
+      (ex : CCpyBand.py 5 -3 3 -eC,N down)
 -------------------------------------"""
               )
         quit()
