@@ -14,7 +14,7 @@ class CMSDOS():
     def __init__(self):
         print("Parsing vasprun.xml... please wait...")
         run = Vasprun("./Band-DOS/vasprun.xml", parse_dos=True)
-        plotter = DosPlotter(zero_at_efermi=False, sigma=0.02)
+        plotter = DosPlotter(zero_at_efermi=True, sigma=0.02)
         
         cdos = run.complete_dos
         
