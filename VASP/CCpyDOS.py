@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from pymatgen.io.vasp.outputs import Vasprun
 from pymatgen_plotter import DosPlotter
 
+from CCpy.Tools.CCpyTools import selectVASPBandOutputs
+
 version = sys.version
 if version[0] == '3':
     raw_input = input
