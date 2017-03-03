@@ -321,6 +321,112 @@ class CMSDOS():
             quit()
 
         return index
+
+def main_run():
+    import matplotlib.pyplot as plt
+    try:
+        lims = [float(sys.argv[2]), float(sys.argv[3])]
+        minx = min(lims)
+        maxx = max(lims)
+    except:
+        get_lim = raw_input("** Set x-limitaion (ex: -5,5) : ")
+        lims = get_lim.split(",")
+        minx = float(min(lims))
+        maxx = float(max(lims))
+    ylim = [argv for argv in sys.argv if "-d" in argv]
+    if len(ylim) > 0:
+        ylim = ylim[0]
+        ylim = ylim.replace("-d", "")
+        ylim = ylim.split(",")
+        ylim = [float(ylim[0]), float(ylim[1])]
+        miny = min(ylim)
+        maxy = max(ylim)
+    else:
+        miny = None
+        maxy = None
+
+    dirname = os.getcwd()
+    dirname = dirname.split("/")[-1]
+
+    if sys.argv[1] == "1":
+        fig = plt.figure(figsize=(10, 6))
+        cms_dos = CMSDOS()
+        plt = cms_dos.spd_dos(minx=minx, maxx=maxx, miny=miny, maxy=maxy)
+        plt.tight_layout()
+        plt.savefig(dirname + "_spd_DOS.png")
+
+        if "n" not in sys.argv:
+            plt.show()
+
+    elif sys.argv[1] == "2":
+        fig = plt.figure(figsize=(10, 6))
+        cms_dos = CMSDOS()
+        plt = cms_dos.elt_dos(minx=minx, maxx=maxx, miny=miny, maxy=maxy)
+        plt.tight_layout()
+        plt.savefig(dirname + "_element_DOS.png")
+
+        if "n" not in sys.argv:
+            plt.show()
+
+    elif sys.argv[1] == "3":
+        fig = plt.figure(figsize=(10, 6))
+        cms_dos = CMSDOS()
+        plt = cms_dos.elt_spd_dos(minx=minx, maxx=maxx, miny=miny, maxy=maxy)
+        plt.tight_layout()
+        plt.savefig(dirname + "_spd_element_DOS.png")
+
+        if "n" not in sys.argv:
+            plt.show()
+
+    elif sys.argv[1] == "4":
+        fig = plt.figure(figsize=(10, 6))
+        cms_dos = CMSDOS()
+        plt, index = cms_dos.site_dos(minx=minx, maxx=maxx, miny=miny, maxy=maxy)
+        plt.tight_layout()
+        plt.savefig(dirname + "_site_DOS_" + str(index) + ".png")
+
+        if "n" not in sys.argv:
+            plt.show()
+
+    elif sys.argv[1] == "5":
+        fig = plt.figure(figsize=(10, 6))
+        cms_dos = CMSDOS()
+        plt = cms_dos.site_spd_dos(minx=minx, maxx=maxx, miny=miny, maxy=maxy)
+        plt.tight_layout()
+        plt.savefig(dirname + "_site_spd_DOS.png")
+
+        if "n" not in sys.argv:
+            plt.show()
+
+    elif sys.argv[1] == "6":
+        fig = plt.figure(figsize=(10, 6))
+        cms_dos = CMSDOS()
+        plt = cms_dos.site_t2g_eg_dos(minx=minx, maxx=maxx, miny=miny, maxy=maxy)
+        plt.tight_layout()
+        plt.savefig(dirname + "_site_t2geg_DOS.png")
+
+        if "n" not in sys.argv:
+            plt.show()
+
+    elif sys.argv[1] == "7":
+        fig = plt.figure(figsize=(10, 6))
+        cms_dos = CMSDOS()
+        plt = cms_dos.partial_p_dos(minx=minx, maxx=maxx, miny=miny, maxy=maxy)
+        plt.tight_layout()
+        plt.savefig(dirname + "_site_partial_p_DOS.png")
+
+        if "n" not in sys.argv:
+            plt.show()
+
+    elif sys.argv[1] == "8":
+        fig = plt.figure(figsize=(10, 6))
+        cms_dos = CMSDOS()
+        plt = cms_dos.partial_d_dos(minx=minx, maxx=maxx, miny=miny, maxy=maxy)
+        plt.tight_layout()
+        plt.savefig(dirname + "_site_partial_d_DOS.png")
+
+        if "n" not in sys.argv:
+            plt.show()
         
 
 if __name__=="__main__":
@@ -344,108 +450,15 @@ n  : Do not show figure, just save images (ex : cms_dos 1 -3 3 n)
 -------------------------------------"""
               )
         quit()
-    try:
-        lims = [float(sys.argv[2]), float(sys.argv[3])]        
-        minx = min(lims)
-        maxx = max(lims)
-    except:        
-        get_lim = raw_input("** Set x-limitaion (ex: -5,5) : ")
-        lims = get_lim.split(",")
-        minx = float(min(lims))
-        maxx = float(max(lims))
-    ylim = [argv for argv in sys.argv if "-d" in argv]
-    if len(ylim) > 0:
-        ylim = ylim[0]
-        ylim = ylim.replace("-d","")
-        ylim = ylim.split(",")
-        ylim = [float(ylim[0]), float(ylim[1])]
-        miny = min(ylim)
-        maxy = max(ylim)
-    else:
-        miny = None
-        maxy = None
 
-    dirname = os.getcwd()
-    dirname = dirname.split("/")[-1]
-    
-    if sys.argv[1] == "1":
-        fig = plt.figure(figsize=(10,6))        
-        cms_dos = CMSDOS()
-        plt = cms_dos.spd_dos(minx=minx,maxx=maxx,miny=miny,maxy=maxy)
-        plt.tight_layout()
-        plt.savefig(dirname+"_spd_DOS.png")
-      
-        if "n" not in sys.argv:
-            plt.show()
+    ask = True
+    if "a" in sys.argv:
+        ask = False
 
-    elif sys.argv[1] == "2":
-        fig = plt.figure(figsize=(10,6))
-        cms_dos = CMSDOS()
-        plt = cms_dos.elt_dos(minx=minx,maxx=maxx,miny=miny,maxy=maxy)
-        plt.tight_layout()
-        plt.savefig(dirname+"_element_DOS.png")
-
-        if "n" not in sys.argv:
-            plt.show()
-
-    elif sys.argv[1] == "3":
-        fig = plt.figure(figsize=(10,6))
-        cms_dos = CMSDOS()
-        plt = cms_dos.elt_spd_dos(minx=minx,maxx=maxx,miny=miny,maxy=maxy)
-        plt.tight_layout()
-        plt.savefig(dirname+"_spd_element_DOS.png")
-
-        if "n" not in sys.argv:
-            plt.show()
-
-    elif sys.argv[1] == "4":
-        fig = plt.figure(figsize=(10,6))
-        cms_dos = CMSDOS()
-        plt, index = cms_dos.site_dos(minx=minx,maxx=maxx,miny=miny,maxy=maxy)
-        plt.tight_layout()
-        plt.savefig(dirname+"_site_DOS_"+str(index)+".png")
-      
-        if "n" not in sys.argv:
-            plt.show()
-
-    elif sys.argv[1] == "5":
-        fig = plt.figure(figsize=(10,6))
-        cms_dos = CMSDOS()
-        plt = cms_dos.site_spd_dos(minx=minx,maxx=maxx,miny=miny,maxy=maxy)
-        plt.tight_layout()
-        plt.savefig(dirname+"_site_spd_DOS.png")
-      
-        if "n" not in sys.argv:
-            plt.show()
-
-    elif sys.argv[1] == "6":
-        fig = plt.figure(figsize=(10,6))
-        cms_dos = CMSDOS()
-        plt = cms_dos.site_t2g_eg_dos(minx=minx,maxx=maxx,miny=miny,maxy=maxy)
-        plt.tight_layout()
-        plt.savefig(dirname+"_site_t2geg_DOS.png")
-      
-        if "n" not in sys.argv:
-            plt.show()
-
-    elif sys.argv[1] == "7":
-        fig = plt.figure(figsize=(10,6))
-        cms_dos = CMSDOS()
-        plt = cms_dos.partial_p_dos(minx=minx,maxx=maxx,miny=miny,maxy=maxy)
-        plt.tight_layout()
-        plt.savefig(dirname+"_site_partial_p_DOS.png")
-      
-        if "n" not in sys.argv:
-            plt.show()
-
-    elif sys.argv[1] == "8":
-        fig = plt.figure(figsize=(10,6))
-        cms_dos = CMSDOS()
-        plt = cms_dos.partial_d_dos(minx=minx,maxx=maxx,miny=miny,maxy=maxy)
-        plt.tight_layout()
-        plt.savefig(dirname+"_site_partial_d_DOS.png")
-      
-        if "n" not in sys.argv:
-            plt.show()
-
+    inputs = selectVASPBandOutputs("./", ask=ask)
+    for each_input in inputs:
+        os.chdir(each_input)
+        print(each_input)
+        main_run()
+        os.chdir("../")
 
