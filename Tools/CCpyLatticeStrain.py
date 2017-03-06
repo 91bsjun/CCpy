@@ -1,3 +1,4 @@
+#!/usr/local/bin/python2.7
 import sys
 from CCpy.Tools.CCpyTools import lattice_strain
 from CCpy.Tools.CCpyTools import selectInputs
@@ -5,7 +6,7 @@ from CCpy.Tools.CCpyTools import selectInputs
 def main_run(filename=None):
     sa, sb, sc, saa, sbb, scc = False, False, False, False, False, False
     for arg in sys.argv:
-        if "a=" in arg:
+        if "a=" in arg and "gamma" not in arg:
             parse = arg.replace("a=","").replace(" ","")
             parse = parse.split(",")
             sa = [float(parse[0]),float(parse[1]),float(parse[2])]
