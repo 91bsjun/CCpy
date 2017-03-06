@@ -56,3 +56,5 @@ CCpyLatticeStrain.py a(-15,15,5) b(-15,15,5) gamma(-9,9,3)
 
     input_marker = [".cif", "POSCAR", "CONTCAR"]
     inputs = selectInputs(input_marker, "./")
+    for i in inputs:
+        main_run(i)
