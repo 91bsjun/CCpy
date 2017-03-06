@@ -1,11 +1,108 @@
 import os, sys
 
 import numpy as np
+import pandas as pd
 from CCpy.Tools.CCpyStructure import NonPeriodicCoordinates
+from CCpy.Tools.CCpyStructure import PeriodicStructure
 
 version = sys.version
 if version[0] == '3':
     raw_input = input
+
+def lattice_strain(filename, sa=False, sb=False, sc=False, saa=False, sbb=False, scc=False):
+    # --------- Parsing structure file ----------- #
+    ps = PeriodicStructure(filename)
+    if ".cif" in filename:
+        ps.cifFile()
+        name = filename.replace(".cif","")
+    elif "POSCAR" in filename or "CONTCAR" in filename:
+        ps.vaspFile()
+        name = filename
+    else:
+        print("Invalid file format. Only *.cif and VASP POSCAR type available.")
+        quit()
+    ori = ps.latticeGen()        # [ori_a, ori_b, ori_c, ori_aa, ori_bb, ori_cc]
+
+    # --------- Check strain parameters ---------- #
+    items = [sa, sb, sc, saa, sbb, scc]
+    for i in items:
+        if i:
+            if i[0] % i[2] != 0:
+                print("Max and min strain value should be divided by interval.")
+                print(str(i[0]) + "/" + str(i[2]) + " = 0")
+                print(str(i[1]) + "/" + str(i[2]) + " = 0")
+    key = ["a", "b", "c", "aa", "bb", "cc"]
+    chg_index = []
+    for i in range(len(items)):
+        if items[i]:
+            chg_index.append(i)
+
+    # ------ Initialize lattice parameters ------- #
+    # -- cell parameters
+    param_vars = {"a":[ori[0]], "b":[ori[1]], "c":[ori[2]], "aa":[ori[3]], "bb":[ori[4]], "cc":[ori[5]]}
+    # -- index for each parameters (strain %)
+    param_vars_index = {"a":[0], "b":[0], "c":[0], "aa":[0], "bb":[0], "cc":[0]}
+
+    # ----- add strained parameters to dict ----- #
+    for i in chg_index:
+        params = []
+        indice = []
+        strain = float(items[i][0])
+        while strain <= items[i][1]:
+            param = ori[i] * (100.0 + strain)/100
+            params.append(param)
+            indice.append(strain)
+            strain = strain + float(items[i][2])
+        param_vars[key[i]] = params
+        param_vars_index[key[i]] = indice
+
+    db = {'filename':[], 'a':[], 'b':[], 'c':[], 'alpha':[], 'beta':[], 'gamma':[],
+          'strain_a':[], 'strain_b':[], 'strain_c':[], 'strain_alpha':[], 'strain_beta':[], 'strain_gamma':[]}
+    for i in range(len(param_vars["a"])):
+        a = param_vars["a"][i]
+        a_index =  "__a"+str(param_vars_index["a"][i])
+        for j in range(len(param_vars["b"])):
+            b = param_vars["b"][j]
+            b_index = "__b"+str(param_vars_index["b"][j])
+            for k in range(len(param_vars["c"])):
+                c = param_vars["c"][k]
+                c_index = "__c" + str(param_vars_index["c"][k])
+                for ii in range(len(param_vars["aa"])):
+                    aa = param_vars["aa"][ii]
+                    aa_index = "__al" + str(param_vars_index["aa"][ii])
+                    for jj in range(len(param_vars["bb"])):
+                        bb = param_vars["bb"][jj]
+                        bb_index = "__be" + str(param_vars_index["bb"][jj])
+                        for kk in range(len(param_vars["cc"])):
+                            cc = param_vars["cc"][kk]
+                            cc_index = "__ga" + str(param_vars_index["cc"][kk])
+
+                            index_name = a_index+b_index+c_index+aa_index+bb_index+cc_index
+                            # -- write cif file
+                            lattice = [a,b,c,aa,bb,cc]
+                            filename = name+index_name+".cif"
+                            ps.cifWrite(lattice=lattice, filename=filename)
+
+                            # -- add to db
+                            db['filename'].append(filename)
+                            db['a'].append(a)
+                            db['b'].append(b)
+                            db['c'].append(c)
+                            db['alpha'].append(aa)
+                            db['beta'].append(bb)
+                            db['gamma'].append(cc)
+                            db['strain_a'].append(param_vars_index["a"][i])
+                            db['strain_b'].append(param_vars_index["b"][j])
+                            db['strain_c'].append(param_vars_index["c"][k])
+                            db['strain_alpha'].append(param_vars_index["aa"][ii])
+                            db['strain_beta'].append(param_vars_index["bb"][jj])
+                            db['strain_gamma'].append(param_vars_index["cc"][kk])
+    df = pd.DataFrame(db)
+    df = df[['filename','a','b','c','alpha','beta','gamma',
+             'strain_a','strain_b','strain_c','strain_alpha','strain_beta','strain_gamma']]
+    df.to_csv("00DB_"+name+".csv")
+
+
 
 def coord_shift(filename, atom_range, axis, delta_range, negative=False):
     """

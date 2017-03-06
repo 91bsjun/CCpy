@@ -250,9 +250,20 @@ class PeriodicStructure():
 
 
     def cifWrite(self, atoms=None, lattice=None, fcoords=None, filename=None):
-        atoms = self.atoms
-        lattice = self.lattice
-        fcoords = self.fcoords
+        """
+
+        :param atoms: list of atoms
+        :param lattice: list of cell parameters [a, b, c, alpha, beta, gamma]
+        :param fcoords:  list of fractional coordinates of atoms
+        :param filename: filename of cif
+        :return: no return, write cif file
+        """
+        if not atoms:
+            atoms = self.atoms
+        if not lattice:
+            lattice = self.lattice
+        if not fcoords:
+            fcoords = self.fcoords
         filename = filename
 
         f = open(filename, "w")
