@@ -5,32 +5,32 @@ from CCpy.Tools.CCpyTools import selectInputs
 def main_run(filename=None):
     sa, sb, sc, saa, sbb, scc = False, False, False, False, False, False
     for arg in sys.argv:
-        if "a(" in arg:
-            parse = arg.replace("a(","").replace(")","").replace(" ","")
+        if "a=" in arg:
+            parse = arg.replace("a=","").replace(" ","")
             parse = parse.split(",")
             sa = [float(parse[0]),float(parse[1]),float(parse[2])]
-        if "b(" in arg:
-            parse = arg.replace("b(","").replace(")","").replace(" ","")
+        if "b=" in arg:
+            parse = arg.replace("b=","").replace(" ","")
             parse = parse.split(",")
             sb = [float(parse[0]),float(parse[1]),float(parse[2])]
-        if "c(" in arg:
-            parse = arg.replace("c(","").replace(")","").replace(" ","")
+        if "c=" in arg:
+            parse = arg.replace("c=","").replace(" ","")
             parse = parse.split(",")
             sc = [float(parse[0]),float(parse[1]),float(parse[2])]
-        if "alpha(" in arg:
-            parse = arg.replace("alpha(","").replace(")","").replace(" ","")
+        if "alpha=" in arg:
+            parse = arg.replace("alpha=","").replace(" ","")
             parse = parse.split(",")
             saa = [float(parse[0]),float(parse[1]),float(parse[2])]
-        if "beta(" in arg:
-            parse = arg.replace("beta(","").replace(")","").replace(" ","")
+        if "beta=" in arg:
+            parse = arg.replace("beta=","").replace(" ","")
             parse = parse.split(",")
             sbb = [float(parse[0]),float(parse[1]),float(parse[2])]
-        if "beta(" in arg:
-            parse = arg.replace("a(","").replace(")","").replace(" ","")
+        if "gamma=" in arg:
+            parse = arg.replace("gamma=","").replace(" ","")
             parse = parse.split(",")
             scc = [float(parse[0]),float(parse[1]),float(parse[2])]
 
-    lattice_strain(filename, sa, sb, sc, saa, sbb, scc)
+    lattice_strain(filename, sa=sa, sb=sb, sc=sc, saa=saa, sbb=sbb, scc=scc)
 
 
 if __name__=="__main__":
@@ -41,15 +41,15 @@ if __name__=="__main__":
 Usage : CCpyLatticeStrain.py [option1] [option2] ...
 -------------------------------------
 [option]
-a(-15,15,5)
+a=-15,15,5
   ==> lattice parameter `a` to -15%, -10%, -5%, ... , 10%, 15%
-b(-4,4,2)
+b=-4,4,2
   ==> lattice parameter `b` to -4%, -2%, 0%, 2%, 4%
-gamma(-9,9,3)
+gamma=-9,9,3
   ==> lattice parameter `gamma` to -9%, -6%, ... , 6%, 9%
 
 [example]
-CCpyLatticeStrain.py a(-15,15,5) b(-15,15,5) gamma(-9,9,3)
+CCpyLatticeStrain.py a=-15,15,5 b=-15,15,5 gamma=-9,9,3
 -------------------------------------"""
               )
         quit()
