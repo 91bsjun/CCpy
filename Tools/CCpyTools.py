@@ -27,7 +27,7 @@ def lattice_strain(filename, sa=False, sb=False, sc=False, saa=False, sbb=False,
     items = [sa, sb, sc, saa, sbb, scc]
     for i in items:
         if i:
-            if i[0] % i[2] != 0:
+            if float(i[0]) % float(i[2]) != 0:
                 print("Max and min strain value should be divided by interval.")
                 print(str(i[0]) + "/" + str(i[2]) + " = 0")
                 print(str(i[1]) + "/" + str(i[2]) + " = 0")
@@ -48,7 +48,7 @@ def lattice_strain(filename, sa=False, sb=False, sc=False, saa=False, sbb=False,
         params = []
         indice = []
         strain = float(items[i][0])
-        while strain <= items[i][1]:
+        while strain <= float(items[i][1]):
             param = ori[i] * (100.0 + strain)/100
             params.append(param)
             indice.append(strain)
