@@ -55,7 +55,7 @@ for o in options["options"]:
     ex += o +" "
 ex+="\n"
 print(ex)
-get_options = raw_input("Enter options (ex: gfinput gfprint nosym opt=gediis\n:")
+get_options = raw_input("Enter options (ex: gfinput gfprint nosym opt=gediis)\n:")
 get_options = get_options.replace(" ","")
 get_options = get_options.split(",")
 options["options"] = get_options
@@ -105,7 +105,7 @@ elif sys.argv[1] == "4":
 myGI = GI(nproc=options['nproc'], mem=options['mem'],
           functional=options['functional'], basis=options['basis'],
           chg=options['chg'], multi=options['multi'],
-          options2=options['options'], options=options['options_under_coordinates'])
+          options=options['options'], options2=options['options_under_coordinates'])
 
 try:
     os.mkdir("check")
