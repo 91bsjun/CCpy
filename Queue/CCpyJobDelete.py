@@ -10,8 +10,7 @@ except:
     print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [queue name] [divide]")
     print('''--------------------------------------
 [1] : From job id
-[2] : From keyword
-[3] : Delete finished ATAT jobs'''
+[2] : From keyword'''
           )
     quit()
 
@@ -24,18 +23,20 @@ if ip != "166.104.249.249":
 # -- Queue command location
 queue_path = "/opt/sge/bin/lx24-amd64/"
 
-li = os.popen('qstat.py').readlines()
+li = os.popen('CCpyJobs.py').readlines()
 
 ids = []
 names = []
 
+index = 0
 for i in li:    
     tmp = i.split()
-    if "bsjun" in tmp:
-        job_id = tmp[0]
+    if index >=0 :
+        job_id = tmp[1]
         job_name = tmp[2]
         ids.append(job_id)
         names.append(job_name)
+    index+=1
 
 if sys.argv[1] == "1":
     tmp = raw_input("Job ids (1154-1932) ? ")

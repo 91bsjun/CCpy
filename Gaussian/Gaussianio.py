@@ -1,11 +1,11 @@
 #!/usr/local/bin/python2.7
 
 import os,sys
-from subprocess import call as shl
 
 import matplotlib.pyplot as plt
 
 from CCpy.Tools.CCpyStructure import NonPeriodicCoordinates as npc
+from CCpy.Tools.CCpyTools import linux_command as lc
 from myGausssum import bsjunGausssum
 
 from pymatgen.io.gaussian import GaussianOutput as pGO
@@ -135,7 +135,7 @@ class GaussianOutput():
                 f.close()
                 go = pGO(filename+"_tmp")
                 final_structure = go.final_structure
-                subprocess.call("rm -rf ./"+filename+"_tmp", shell=True)
+                lc("rm -rf ./"+filename+"_tmp")
 
         
 
@@ -224,7 +224,7 @@ class GaussianOutput():
                 print("UV calculation have not perforemd.")
             else:
                 print(str(e))
-        shl("rm -rf ./GaussSum_tmp/",shell=True)
+        lc("rm -rf ./GaussSum_tmp/")
 
     def getThermalData(self):
         lines = self.log_file_lines
@@ -254,7 +254,7 @@ class GaussianOutput():
         ob_file = open("./GaussSum_tmp/orbital_data.txt","r")
         lines = ob_file.readlines()
         ob_file.close()
-        shl("rm -rf ./GaussSum_tmp/",shell=True)
+        lc("rm -rf ./GaussSum_tmp/")
 
         homo = int(lines[1].split()[1])
         data = {}

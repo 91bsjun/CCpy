@@ -4,12 +4,11 @@ import os,sys
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from subprocess import call as shl
 
 from CCpy.Gaussian.Gaussianio import GaussianOutput as GO
 from CCpy.Gaussian.Gaussianio import getCubefile
 from CCpy.Tools.CCpyStructure import NonPeriodicCoordinates as npc
-from CCpy.Tools.CCpyTools import selectInputs
+from CCpy.Tools.CCpyTools import selectInputs, linux_command
 
 try:
     chk = sys.argv[1]
