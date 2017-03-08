@@ -45,7 +45,8 @@ elif sys.argv[1] == "4":
 # -- option preset
 options = {"nproc":24, "mem":64, "functional":"B3LYP", "basis":"6-31G",
            "chg":0, "multi":1,
-           "options":["gfinput","gfprint","SCF(maxcycle=512,conver=6)","opt=gediis","pop=full","iop(3/33=1,3/36=-1)","nosym"],
+           "options":["gfinput","gfprint","SCF(maxcycle=512,conver=6)","opt=gediis","pop=full","iop(3/33=1,3/36=-1)",
+                      "pseudo=read", "EmpiricalDispersion=GD3","nosym"],
            "options_under_coordinates":""}
 
 # ------ basic option edit ------ #
@@ -63,6 +64,7 @@ if get_sets != "n":
         if key not in options.keys():
             print("You seem to have misspelled.")
             print(key +" is not in our options.")
+            quit()
 
         value = val.split("=")[1]
         options[key] = value
@@ -80,7 +82,7 @@ get_options = get_options.split(",")
 options["options"] = get_options
 tmp = ""
 for o in options["options"]:
-    tmp += o +" "
+    tmp = tmp + o + " "
 options["options"] = tmp
 
 # ------ bottom option edit ------ #
