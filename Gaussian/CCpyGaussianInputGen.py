@@ -30,12 +30,12 @@ options = {"nproc":24, "mem":64, "functional":"B3LYP", "basis":"6-31G",
            "options_under_coordinates":""}
 
 # ------ basic option edit ------ #
-print("------------- Preset of basic options -------------")
+print("\n\n------------- Preset of basic options -------------")
 for key in options.keys():
     if "options" not in str(key):
         print(str(key) + "="+str(options[key]))
 
-get_sets = raw_input("* Anything want to modify ? if not, enter \"n\". if you have (ex: basis=gen,functional=Cam-B3LYP) \n: ")
+get_sets = raw_input("* Anything want to modify ? if not, enter \"n\". \nif you have (ex: basis=gen,functional=Cam-B3LYP) \n: ")
 if get_sets != "n":
     vals = get_sets.replace(" ","")
     vals = vals.split(",")
@@ -49,7 +49,7 @@ if get_sets != "n":
         options[key] = value
 
 # ------ calc option edit ------ #
-print("-------------- Calculation options ---------------")
+print("\n\n-------------- Calculation options ---------------")
 ex = "Example items : "
 for o in options["options"]:
     ex += o +" "
@@ -61,9 +61,9 @@ get_options = get_options.split(",")
 options["options"] = get_options
 
 # ------ bottom option edit ------ #
-print("--------- Options under coordinates area ---------")
+print("\n\n--------- Options under coordinates area ---------")
 print("Enter \"n\" when you finished.")
-print("""(ex)
+print("""(example)
 line:I 0
 line:SDD
 line:****
@@ -102,7 +102,7 @@ elif sys.argv[1] == "4":
 
 
 
-myGI = GI(nproc=options['nporc'], mem=options['mem'],
+myGI = GI(nproc=options['nproc'], mem=options['mem'],
           functional=options['functional'], basis=options['basis'],
           chg=options['chg'], multi=options['multi'],
           options2=options['options'], options=options['options_under_coordinates'])
