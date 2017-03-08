@@ -84,6 +84,7 @@ tmp = ""
 for o in options["options"]:
     tmp = tmp + o + " "
 options["options"] = tmp
+print(tmp)
 
 # ------ bottom option edit ------ #
 print("\n\n--------- Options under coordinates area ---------")
