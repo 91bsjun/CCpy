@@ -29,7 +29,7 @@ class GaussianInput():
         f.write('''%%nproc=%d
 %%mem=%dGb
 %%chk=./check/%s
-#p %s/%s gfinput gfprint SCF(maxcycle=512,conver=6) %s
+#p %s/%s %s
 
 %s
 

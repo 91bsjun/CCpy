@@ -45,7 +45,7 @@ elif sys.argv[1] == "4":
 # -- option preset
 options = {"nproc":24, "mem":64, "functional":"B3LYP", "basis":"6-31G",
            "chg":0, "multi":1,
-           "options":["gfinput","gfprint","SCF(maxcycle=512,conver=6)","pop=full","iop(3/33=1,3/36=-1)","nosym","opt=gediis"],
+           "options":["gfinput","gfprint","SCF(maxcycle=512,conver=6)","opt=gediis","pop=full","iop(3/33=1,3/36=-1)","nosym"],
            "options_under_coordinates":""}
 
 # ------ basic option edit ------ #
@@ -54,7 +54,7 @@ for key in options.keys():
     if "options" not in str(key):
         print(str(key) + "="+str(options[key]))
 
-get_sets = raw_input("* Anything want to modify ? if not, enter \"n\". \nif you have (ex: basis=gen,functional=Cam-B3LYP) \n: ")
+get_sets = raw_input("\n* Anything want to modify ? if not, enter \"n\". \nif you have (ex: basis=gen,functional=Cam-B3LYP) \n: ")
 if get_sets != "n":
     vals = get_sets.replace(" ","")
     vals = vals.split(",")
