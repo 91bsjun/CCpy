@@ -23,6 +23,25 @@ a : no check files, calculate all inputs'''
     quit()
 
 
+
+
+ask = True
+if "a" in sys.argv:
+    ask = False
+
+if sys.argv[1] == "1":
+    input_marker = [".xsd", ".xyz", "car"]
+    inputs = selectInputs(input_marker, "./", ask=ask)
+elif sys.argv[1] == "2":
+    input_marker = [".log"]
+    inputs = selectInputs(input_marker, "./")
+elif sys.argv[1] == "3":
+    input_marker = [".chk"]
+    inputs = selectInputs(input_marker, "./check")
+elif sys.argv[1] == "4":
+    input_marker = [".com"]
+    inputs = selectInputs(input_marker, "./")
+
 # -- option preset
 options = {"nproc":24, "mem":64, "functional":"B3LYP", "basis":"6-31G",
            "chg":0, "multi":1,
@@ -82,25 +101,6 @@ while line_option != "n":
     if line_option != "n":
         get_options += line_option+"\n"
 options["options_under_coordinates"] = get_options
-
-ask = True
-if "a" in sys.argv:
-    ask = False
-
-if sys.argv[1] == "1":
-    input_marker = [".xsd", ".xyz", "car"]
-    inputs = selectInputs(input_marker, "./", ask=ask)
-elif sys.argv[1] == "2":
-    input_marker = [".log"]
-    inputs = selectInputs(input_marker, "./")
-elif sys.argv[1] == "3":
-    input_marker = [".chk"]
-    inputs = selectInputs(input_marker, "./check")
-elif sys.argv[1] == "4":
-    input_marker = [".com"]
-    inputs = selectInputs(input_marker, "./")
-
-
 
 myGI = GI(nproc=options['nproc'], mem=options['mem'],
           functional=options['functional'], basis=options['basis'],
