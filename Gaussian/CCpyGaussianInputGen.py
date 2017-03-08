@@ -22,8 +22,9 @@ a : no check files, calculate all inputs'''
           )
     quit()
 
-
-
+version = sys.version
+if version[0] == '3':
+    raw_input = input
 
 ask = True
 if "a" in sys.argv:
@@ -45,7 +46,8 @@ elif sys.argv[1] == "4":
 # -- option preset
 options = {"nproc":24, "mem":64, "functional":"B3LYP", "basis":"6-31G",
            "chg":0, "multi":1,
-           "options":["gfinput","gfprint","SCF(maxcycle=512,conver=6)","opt=gediis","pop=full","iop(3/33=1,3/36=-1)",
+           "options":["gfinput","gfprint","SCF(maxcycle=512,conver=6)","opt=gediis","freq=noraman",
+                      "pop=full","iop(3/33=1,3/36=-1)",
                       "pseudo=read", "EmpiricalDispersion=GD3","nosym"],
            "options_under_coordinates":""}
 
@@ -77,28 +79,21 @@ for o in options["options"]:
 ex+="\n"
 print(ex)
 get_options = raw_input("Enter options (ex: gfinput gfprint nosym opt=gediis)\n:")
-get_options = get_options.replace(" ","")
-get_options = get_options.split(",")
 options["options"] = get_options
-tmp = ""
-for o in options["options"]:
-    tmp = tmp + o + " "
-options["options"] = tmp
-print(tmp)
 
 # ------ bottom option edit ------ #
 print("\n\n--------- Options under coordinates area ---------")
 print("Enter \"n\" when you finished.")
 print("""(example)
-line:I 0
-line:SDD
-line:****
-line:C H N 0
-line:6-31G*
-line:****
+line: I 0
+line: SDD
+line: ****
+line: C H N 0
+line: 6-31G*
+line: ****
 line:
-line:I 0
-line:SDD
+line: I 0
+line: SDD
 """)
 
 get_options = ""
