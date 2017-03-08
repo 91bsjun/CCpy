@@ -11,7 +11,8 @@ from CCpy.myGausssum import bsjunGausssum
 from pymatgen.io.gaussian import GaussianOutput as pGO
 
 class GaussianInput():
-    def __init__(self, nproc, mem, functional, basis, options, chg, multi, options2):
+    def __init__(self, nproc=None, mem=None, functional=None, basis=None,
+                 options=None, chg=None, multi=None, options2=None):
         self.nproc = nproc
         self.mem = mem
         self.functional = functional
@@ -20,7 +21,7 @@ class GaussianInput():
         self.chg = chg
         self.multi = multi
         self.options2 = options2
-        
+
 
     def comGen(self, name=None, nproc=None, mem=None, chk=None, functional=None, basis=None,
                options=None, chg=None, multi=None, coordinates=None, options2=None):      
@@ -34,7 +35,6 @@ class GaussianInput():
 
 %d %d
 %s
-
 %s
 
 

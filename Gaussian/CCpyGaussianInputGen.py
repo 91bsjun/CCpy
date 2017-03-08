@@ -23,15 +23,65 @@ a : no check files, calculate all inputs'''
     quit()
 
 
-## Input options setting
-nproc = 24
-mem = 64
-functional = "B3LYP"
-basis = "6-31G"
-options = "pop=full iop(3/33=1,3/36=-1) SP"
-chg = 0
-multi = 1
-options2 = ""
+# -- option preset
+options = {"nproc":24, "mem":64, "functional":"B3LYP", "basis":"6-31G",
+           "chg":0, "multi":1,
+           "options":["gfinput","gfprint","SCF(maxcycle=512,conver=6)","pop=full","iop(3/33=1,3/36=-1)","nosym","opt=gediis"],
+           "options_under_coordinates":""}
+
+# ------ basic option edit ------ #
+print("------------- Preset of basic options -------------")
+for key in options.key():
+    if "options" not in str(key):
+        print(str(key) + " : "+options[key])
+
+get_sets = raw_input("* Anything want to modify ? if not, enter \"n\". if you have (ex: basis=gen,functional=Cam-B3LYP) \n: ")
+if get_sets != "n":
+    vals = get_sets.replace(" ","")
+    vals = vals.split(",")
+    for val in vals:
+        key = val.split("=")[0]
+        if key not in options.key():
+            print("You seem to have misspelled.")
+            print(key +" is not in our options.")
+
+        value = val.split("=")[1]
+        options[key] = value
+
+# ------ calc option edit ------ #
+print("-------------- Calculation options ---------------")
+ex = "Example items : "
+for o in options["options"]:
+    ex += o +" "
+ex+="\n"
+print(ex)
+get_options = raw_input("Enter options (ex: gfinput gfprint nosym opt=gediis\n:")
+get_options = get_options.replace(" ","")
+get_options = get_options.split(",")
+options["options"] = get_options
+
+# ------ bottom option edit ------ #
+print("--------- Options under coordinates area ---------")
+print("Enter \"n\" when you finished.")
+print("""(ex)
+line:I 0
+line:SDD
+line:****
+line:C H N 0
+line:6-31G*
+line:****
+line:
+line:I 0
+line:SDD
+""")
+
+get_options = ""
+line_option = ""
+while line_option != "n":
+    line_option = raw_input("line: ")
+    if line_option != "n":
+        get_options += line_option+"\n"
+options["options_under_coordinates"] = get_options
 
 ask = True
 if "a" in sys.argv:
@@ -51,7 +101,12 @@ elif sys.argv[1] == "4":
     inputs = selectInputs(input_marker, "./")
 
 
-myGI = GI(nproc, mem, functional, basis, options, chg, multi, options2)
+
+myGI = GI(nproc=options['nporc'], mem=options['mem'],
+          functional=options['functional'], basis=options['basis'],
+          chg=options['chg'], multi=options['multi'],
+          options2=options['options'], options=options['options_under_coordinates'])
+
 try:
     os.mkdir("check")
 except:
