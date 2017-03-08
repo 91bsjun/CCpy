@@ -78,6 +78,10 @@ get_options = raw_input("Enter options (ex: gfinput gfprint nosym opt=gediis)\n:
 get_options = get_options.replace(" ","")
 get_options = get_options.split(",")
 options["options"] = get_options
+tmp = ""
+for o in options["options"]:
+    tmp += o +" "
+options["options"] = tmp
 
 # ------ bottom option edit ------ #
 print("\n\n--------- Options under coordinates area ---------")
