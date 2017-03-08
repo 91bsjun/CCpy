@@ -6,7 +6,7 @@ from subprocess import call as shl
 import matplotlib.pyplot as plt
 
 from CCpy.Tools.CCpyStructure import NonPeriodicCoordinates as npc
-from CCpy.myGausssum import bsjunGausssum
+from myGausssum import bsjunGausssum
 
 from pymatgen.io.gaussian import GaussianOutput as pGO
 

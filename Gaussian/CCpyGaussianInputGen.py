@@ -31,7 +31,7 @@ options = {"nproc":24, "mem":64, "functional":"B3LYP", "basis":"6-31G",
 
 # ------ basic option edit ------ #
 print("------------- Preset of basic options -------------")
-for key in options.key():
+for key in options.keys():
     if "options" not in str(key):
         print(str(key) + " : "+options[key])
 
