@@ -1,8 +1,8 @@
 #!/usr/local/bin/python2.7
 
 import os, sys
-from subprocess import call as shl
-from CCpy.Tools.CCpyTools import get_ip
+from CCpy.Tools.CCpyTools import get_ip, linux_command
+import getpass
 
 try:
     chk = sys.argv[1]
@@ -14,7 +14,7 @@ except:
           )
     quit()
 
-# -- Check node00
+# -- Check node00 for CMS member
 ip = get_ip()
 if ip != "166.104.249.249":
     print("DO AT NODE00 !!")
@@ -27,11 +27,12 @@ li = os.popen('CCpyJobs.py').readlines()
 
 ids = []
 names = []
+username = getpass.getuser()
 
 index = 0
 for i in li:    
     tmp = i.split()
-    if index >=0 :
+    if index >=0 and username in tmp:
         job_id = tmp[1]
         job_name = tmp[2]
         ids.append(job_id)
@@ -39,10 +40,21 @@ for i in li:
     index+=1
 
 if sys.argv[1] == "1":
-    tmp = raw_input("Job ids (1154-1932) ? ")
-    nums = tmp.split("-")
-    for i in range(int(nums[0]),int(nums[1])+1):
-        shl(queue_path+"qdel "+str(i), shell=True)
+    get_num = raw_input("Job ids (ex: 1154-1232,1357,1411-1422  /  if enter \"0\": delete all your job.) \n:")
+    inputs = []
+    if len(get_num) != 0:
+        get_num = get_num.split(",")  # 1-4,6-10,11,12
+        for i in get_num:
+            if "-" in i:
+                r = i.split("-")
+                for j in range(int(r[0]), int(r[1]) + 1):
+                    inputs.append(j)
+            else:
+                i = int(i)
+                inputs.append(i)
+    for i in inputs:
+        linux_command(queue_path+"qdel "+str(i))
+
 
 elif sys.argv[1] == "2":
     lat = raw_input("Keyword ? ")
@@ -53,8 +65,7 @@ elif sys.argv[1] == "2":
 
     for i in nums:
         job_id = ids[i]
-        shl(queue_path+"qdel "+job_id, shell=True)
-        #print(job_id)
+        linux_command(queue_path+"qdel "+job_id)
 
 elif sys.argv[1] == "3":
     if "f" in sys.argv:
