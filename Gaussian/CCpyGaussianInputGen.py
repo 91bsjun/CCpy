@@ -33,7 +33,7 @@ options = {"nproc":24, "mem":64, "functional":"B3LYP", "basis":"6-31G",
 print("------------- Preset of basic options -------------")
 for key in options.keys():
     if "options" not in str(key):
-        print(str(key) + " : "+str(options[key]))
+        print(str(key) + "="+str(options[key]))
 
 get_sets = raw_input("* Anything want to modify ? if not, enter \"n\". if you have (ex: basis=gen,functional=Cam-B3LYP) \n: ")
 if get_sets != "n":
@@ -41,7 +41,7 @@ if get_sets != "n":
     vals = vals.split(",")
     for val in vals:
         key = val.split("=")[0]
-        if key not in options.key():
+        if key not in options.keys():
             print("You seem to have misspelled.")
             print(key +" is not in our options.")
 
