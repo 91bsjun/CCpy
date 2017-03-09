@@ -206,7 +206,7 @@ class VASPInput():
             if not input_incar :        # This process is for avoiding multiple inputs generation.
                 get_sets = None
                 while get_sets != "n":
-                    print("\n* Here are the current INCAR options.")
+                    print("\n# ---------- Here are the current INCAR options ---------- #")
                     for key in incar_dict.keys():
                         print(str(key).ljust(8) + " = " + str(incar_dict[key]))
                     get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate) \n: ")
@@ -226,7 +226,7 @@ class VASPInput():
                 # -- KPOINTS
                 get_kpts = None
                 while get_kpts != "n":
-                    print("\n* Here are the current KPOINTS.")
+                    print("\n# ---------- Here are the current KPOINTS ---------- #")
                     print(kpoints)
                     get_kpts = raw_input("* Anything want to modify? if not, enter \"n\" or (ex: 4,4,2) \n: ")
                     if get_kpts != "n":

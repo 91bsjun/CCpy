@@ -14,8 +14,6 @@ except:
 2 : Band-DOS calculation    (after previous calculation)
 3 : Band-DOS calculation    (from initial structure files)
 4 : Static calculation      (after previous calculation)
-5 : MIT relaxation calculation
-6 : MP HSE band calculation
 
 [sub_options]
 ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 ...
