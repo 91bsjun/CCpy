@@ -102,8 +102,8 @@ def lattice_strain(filename, sa=False, sb=False, sc=False, saa=False, sbb=False,
                             db['strain_beta'].append(param_vars_index["bb"][jj])
                             db['strain_gamma'].append(param_vars_index["cc"][kk])
     df = pd.DataFrame(db)
-    df = df[['filename','a','b','c','alpha','beta','gamma',
-             'strain_a','strain_b','strain_c','strain_alpha','strain_beta','strain_gamma']]
+    df = df[['filename','strain_a','strain_b','strain_c','strain_alpha','strain_beta','strain_gamma',
+             'a', 'b', 'c', 'alpha', 'beta', 'gamma']]
     df.to_csv("00DB_"+name+".csv")
 
 
