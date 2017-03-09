@@ -435,8 +435,8 @@ def get_ip():
             ip = ip.split(":")[1]
             return ip
 
-def ssh_command(servername,portnum,msg):
-    command = "sshpass ssh -p %d %s \"%s\""%(portnum,servername,msg)
+def ssh_command(servername,portnum,username,password,msg):
+    command = "sshpass -p \""+password+"\" ssh -p "+portnum+" "+username+"@"+servername+" \""+msg+"\""
     linux_command(command)
 
 def ssh_send_file(servername,portnum,username,password,obj,dst):
