@@ -58,26 +58,30 @@ def lattice_strain(filename, sa=False, sb=False, sc=False, saa=False, sbb=False,
 
     db = {'filename':[], 'a':[], 'b':[], 'c':[], 'alpha':[], 'beta':[], 'gamma':[],
           'strain_a':[], 'strain_b':[], 'strain_c':[], 'strain_alpha':[], 'strain_beta':[], 'strain_gamma':[]}
+    cnt=0
     for i in range(len(param_vars["a"])):
         a = param_vars["a"][i]
-        a_index =  "__a"+str(param_vars_index["a"][i])
+        #a_index =  "__a"+str(param_vars_index["a"][i])
         for j in range(len(param_vars["b"])):
             b = param_vars["b"][j]
-            b_index = "__b"+str(param_vars_index["b"][j])
+            #b_index = "__b"+str(param_vars_index["b"][j])
             for k in range(len(param_vars["c"])):
                 c = param_vars["c"][k]
-                c_index = "__c" + str(param_vars_index["c"][k])
+                #c_index = "__c" + str(param_vars_index["c"][k])
                 for ii in range(len(param_vars["aa"])):
                     aa = param_vars["aa"][ii]
-                    aa_index = "__al" + str(param_vars_index["aa"][ii])
+                    #aa_index = "__al" + str(param_vars_index["aa"][ii])
                     for jj in range(len(param_vars["bb"])):
                         bb = param_vars["bb"][jj]
-                        bb_index = "__be" + str(param_vars_index["bb"][jj])
+                        #bb_index = "__be" + str(param_vars_index["bb"][jj])
                         for kk in range(len(param_vars["cc"])):
                             cc = param_vars["cc"][kk]
-                            cc_index = "__ga" + str(param_vars_index["cc"][kk])
+                            #cc_index = "__ga" + str(param_vars_index["cc"][kk])
 
-                            index_name = a_index+b_index+c_index+aa_index+bb_index+cc_index
+
+                            tmp_index = "_%6d" % cnt  # indexing with integer
+                            index_name = tmp_index.replace(" ", "0")
+                            cnt+=1
                             # -- write cif file
                             lattice = [a,b,c,aa,bb,cc]
                             filename = name+index_name+".cif"
