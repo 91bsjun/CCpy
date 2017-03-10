@@ -113,6 +113,8 @@ class VASPInput():
         if mag:
             if magmom_dict:
                 magmom = magmom_dict
+            else:
+                magmom = magmom
             mag_string = ""
             for i in range(len(n_of_atoms)):
                 try:
@@ -123,6 +125,8 @@ class VASPInput():
         if ldau:
             if ldau_dict:
                 LDAUU = ldau_dict       # ldauu parameters from arg
+            else:
+                LDAUU = LDAUU
             LDAUL_string = ""
             for i in range(len(elts)):
                 try:
