@@ -165,7 +165,7 @@ class VASPInput():
                 magmom_keys = magmom.keys()
                 magmom_keys.sort()
                 for key in magmom_keys:
-                    print(str(key).ljust(8) + " = " + str(incar_dict[key]))
+                    print(str(key).ljust(8) + " = " + str(magmom[key]))
                 print("Other atoms which not in here are = 0.6")
                 get_sets = raw_input(
                     "* Anything want to modify or add? if not, enter \"n\" or (Co=6,Ni=4) \n: ")
@@ -194,7 +194,7 @@ class VASPInput():
                 LDAUU_keys = LDAUU.keys()
                 LDAUU_keys.sort()
                 for key in LDAUU_keys:
-                    print(str(key).ljust(8) + " = " + str(incar_dict[key]))
+                    print(str(key).ljust(8) + " = " + str(LDAU[key]))
                 print("Other atoms which not in here are = 0")
                 get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (Ni=7.3,Mn=3.6) \n: ")
                 if get_sets != "n":
