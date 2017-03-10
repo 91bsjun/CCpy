@@ -207,7 +207,9 @@ class VASPInput():
                 get_sets = None
                 while get_sets != "n":
                     print("\n# ---------- Here are the current INCAR options ---------- #")
-                    for key in incar_dict.keys():
+                    incar_keys = incar_dict.keys()
+                    incar_keys.sort()
+                    for key in incar_keys:
                         print(str(key).ljust(8) + " = " + str(incar_dict[key]))
                     get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate) \n: ")
                     if get_sets != "n":
