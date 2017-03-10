@@ -50,7 +50,7 @@ class VASPInput():
                      spin=False, mag=False, ldau=False,
                      functional="PBE_54",
                      kpoints=False, incar_dict=None,
-                     magmom_dict=None, ldau_dict=None,
+                     magmom_dict=magmom, ldau_dict=LDAUU,
                      input_incar=None, input_kpts=None, flask_app=False):
         """
 
@@ -115,6 +115,24 @@ class VASPInput():
                 magmom = magmom_dict
             else:
                 magmom = magmom
+            # -- magmom value edit
+            if not flask_app:
+                print("\n# ---------- Here are the current MAGMOM values ---------- #")
+                magmom_keys = magmom.keys()
+                magmom_keys.sort()
+                for key in magmom_keys:
+                    print(str(key).ljust(8) + " = " + str(incar_dict[key]))
+                print("Other atoms which not in here are = 0.6")
+                get_sets = raw_input(
+                    "* Anything want to modify or add? if not, enter \"n\" or (Co=6,Ni=4) \n: ")
+                if get_sets != "n":
+                    vals = get_sets.replace(" ", "")
+                    vals = vals.split(",")
+                    for val in vals:
+                        key = val.split("=")[0]
+                        value = val.split("=")[1]
+                        magmom[key] = value
+
             mag_string = ""
             for i in range(len(n_of_atoms)):
                 try:
@@ -127,6 +145,21 @@ class VASPInput():
                 LDAUU = ldau_dict       # ldauu parameters from arg
             else:
                 LDAUU = LDAUU
+            if not flask_app:
+                print("\n# -------- Here are the current LDAU+U parameters -------- #")
+                LDAUU_keys = LDAUU.keys()
+                LDAUU_keys.sort()
+                for key in LDAUU_keys:
+                    print(str(key).ljust(8) + " = " + str(incar_dict[key]))
+                print("Other atoms which not in here are = 0")
+                get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (Ni=7.3,Mn=3.6) \n: ")
+                if get_sets != "n":
+                    vals = get_sets.replace(" ", "")
+                    vals = vals.split(",")
+                    for val in vals:
+                        key = val.split("=")[0]
+                        value = val.split("=")[1]
+                        LDAUU[key] = value
             LDAUL_string = ""
             for i in range(len(elts)):
                 try:
