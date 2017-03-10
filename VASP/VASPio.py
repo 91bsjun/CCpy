@@ -294,7 +294,7 @@ class VASPInput():
                         print(str(key).ljust(8) + " = " + str(incar_dict[key]))
                     get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate) \n: ")
                     if get_sets != "n":
-                        vals = get_sets.replace(" ","")
+                        vals = get_sets.replace(", ",",")
                         vals = vals.split(",")
                         for val in vals:
                             key = val.split("=")[0]
