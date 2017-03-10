@@ -7,7 +7,7 @@ import getpass
 try:
     chk = sys.argv[1]
 except:
-    print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [queue name] [divide]")
+    print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option]")
     print('''--------------------------------------
 [1] : From job id
 [2] : From keyword'''
@@ -23,7 +23,7 @@ if ip != "166.104.249.249":
 # -- Queue command location
 queue_path = "/opt/sge/bin/lx24-amd64/"
 
-li = os.popen('CCpyJobs.py').readlines()
+li = os.popen('CCpyqstat.py').readlines()
 
 ids = []
 names = []
