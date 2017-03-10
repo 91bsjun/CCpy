@@ -194,7 +194,7 @@ class VASPInput():
                 LDAUU_keys = LDAUU.keys()
                 LDAUU_keys.sort()
                 for key in LDAUU_keys:
-                    print(str(key).ljust(8) + " = " + str(LDAU[key]))
+                    print(str(key).ljust(8) + " = " + str(LDAUU[key]))
                 print("Other atoms which not in here are = 0")
                 get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (Ni=7.3,Mn=3.6) \n: ")
                 if get_sets != "n":
