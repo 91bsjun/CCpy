@@ -39,7 +39,7 @@ class GaussianInput():
 
 
 
-''' % (nproc, mem, chk, functional, basis, options, name, chg, multi, coordinates, options2)
+''' % (int(nproc), int(mem), chk, functional, basis, options, name, int(chg), int(multi), coordinates, options2)
                 )
         print(name+".com")
         
