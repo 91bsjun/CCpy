@@ -600,7 +600,7 @@ class VASPOutput():
         e = []
         for s in strings:
             e.append(float(s.split()[4]))
-        x = range(len(e))
+        xe = range(len(e))
 
         print("Initial energy : "+str(e[0]))
         print("  Final energy : "+str(e[-1]))
@@ -611,17 +611,18 @@ class VASPOutput():
         vol = []
         for s in strings:
             vol.append(float(s.split()[4]))
+        xv = range(len(vol))
 
         print("Initial volume : "+str(vol[0]))
         print("  Final volume : "+str(vol[-1]))
-        print(len(e), len(vol))
+
 
         if show_plot:
             # make plot
             fig, ax1 = plt.subplots()
             ax2 = ax1.twinx()
-            ax1.plot(x, e, color="b", marker="o", mec="b", label="Energy", lw=1.5)
-            ax2.plot(x, vol, color="#DB0000", marker="o", mec="#DB0000", label="Volume", lw=1.5)
+            ax1.plot(xe, e, color="b", marker="o", mec="b", label="Energy", lw=1.5)
+            ax2.plot(xv, vol, color="#DB0000", marker="o", mec="#DB0000", label="Volume", lw=1.5)
 
             ax1.set_xlabel('Steps', fontsize=19)
             ax1.set_ylabel('Energy', color='b', fontsize=19)
