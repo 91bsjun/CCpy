@@ -588,6 +588,7 @@ class VASPOutput():
 
         cif.write_file(target_name)
         print(target_name+" is generated.")
+        linux_command("mv "+target_name+" ../")
 
     def getConvergence(self, show_plot=True):
 
