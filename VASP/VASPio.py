@@ -595,7 +595,7 @@ class VASPOutput():
         OUTCAR = open("OUTCAR", "r").read()
 
         # -- energy parsing
-        findE = re.compile("free  energy   TOTEN\s+\S+", re.M)
+        findE = re.compile("free  energy   TOTEN  =\s+\S+", re.M)
         strings = findE.findall(OUTCAR)
         e = []
         for s in strings:
