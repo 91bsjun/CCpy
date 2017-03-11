@@ -601,6 +601,7 @@ class VASPOutput():
         for s in strings:
             e.append(float(s.split()[4]))
         xe = range(len(e))
+        xe = [x+1 for x in xe]
 
         print("Initial energy : "+str(e[0]))
         print("  Final energy : "+str(e[-1]))
