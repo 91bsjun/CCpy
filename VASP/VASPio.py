@@ -1,5 +1,6 @@
 import os, sys, re
 import matplotlib.pyplot as plt
+import pandas as pd
 
 from CCpy.Tools.CCpyStructure import PeriodicStructure as PS
 from CCpy.Tools.CCpyStructure import latticeGen
@@ -635,12 +636,37 @@ class VASPOutput():
             plt.show()
 
 
+    def get_energy_list(self, show_plot=True):
+        dirs = [d for d in os.listdir("./") if os.path.isdir(d)]
+        out_dirs = [d for d in dirs if "OUTCAR" in os.listdir(d)]
+        out_dirs.sort()
 
+        x = range(len(out_dirs))
+        energies = []
+        for o in out_dirs:
+            OUTCAR = open(o+"/OUTCAR", "r").read()
+            # -- energy parsing
+            findE = re.compile("free  energy   TOTEN  =\s+\S+", re.M)
+            strings = findE.findall(OUTCAR)
+            e = []
+            for s in strings:
+                e.append(float(s.split()[4]))
+            energies.append(e[-1])
 
+        energy_list = {}
+        energy_list['Directory'] = out_dirs
+        energy_list['Total energy(eV)'] = energies
 
+        df = pd.DataFrame(energy_list)
+        print(df)
 
-
-
+        if show_plot:
+            fig = plt.figure(figsize=(8, 7))
+            plt.plot(x, energies, marker='o', color='#0054FF')
+            plt.xticks(x, out_dirs, rotation=45)
+            plt.tight_layout()
+            plt.grid()
+            plt.show()
 
 
 
