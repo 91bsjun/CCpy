@@ -614,7 +614,8 @@ class VASPOutput():
 
         print("Initial volume : "+str(vol[0]))
         print("  Final volume : "+str(vol[-1]))
-
+        print(e)
+        print(vol)
         if show_plot:
             # make plot
             fig, ax1 = plt.subplots()
