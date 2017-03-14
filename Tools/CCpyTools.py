@@ -276,6 +276,7 @@ def selectVASPInputs(directory_path, ask=True, static=False, band=False):
     Needs edition -> pick <INCAR POSCAR KPOINTS POTCAR> included directories
     """
     all_dirs = [each_dir for each_dir in os.listdir(directory_path) if os.path.isdir(each_dir)]
+    all_dirs.sort()
     all_inputs = []
     for each_dir in all_dirs:
         files = os.listdir(each_dir)
@@ -324,6 +325,7 @@ def selectVASPInputs(directory_path, ask=True, static=False, band=False):
 
 def selectVASPOutputs(directory_path, ask=True):
     all_dirs = [each_dir for each_dir in os.listdir(directory_path) if os.path.isdir(each_dir)]
+    all_dirs.sort()
     all_inputs = []
     for each_dir in all_dirs:
         files = os.listdir(each_dir)
@@ -366,6 +368,7 @@ def selectVASPOutputs(directory_path, ask=True):
 
 def selectVASPBandOutputs(directory_path, ask=True):
     all_dirs = [each_dir for each_dir in os.listdir(directory_path) if os.path.isdir(each_dir)]
+    all_dirs.sort()
     all_inputs = []
     for each_dir in all_dirs:
         files = os.listdir(each_dir)
