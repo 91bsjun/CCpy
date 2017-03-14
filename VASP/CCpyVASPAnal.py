@@ -32,7 +32,7 @@ if sys.argv[1] == "0":
         quit()
     for each_input in inputs:
         os.chdir(each_input)
-        flies = [f for f in os.listdir("./")]
+        files = [f for f in os.listdir("./")]
         for f in files:
             if f in inputfiles:
                 pass
