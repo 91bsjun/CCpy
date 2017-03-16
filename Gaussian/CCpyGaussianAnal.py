@@ -130,7 +130,7 @@ elif sys.argv[1] == "6":
         thermal_correction_hs.append(thermal_correction_h)
         thermal_correction_gs.append(thermal_correction_g)
 
-    if len(thermal_correction_es = []) == 0:
+    if len(thermal_correction_es) == 0:
         print("No thermal data.")
         quit()
 
