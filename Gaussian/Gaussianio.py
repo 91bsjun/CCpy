@@ -232,13 +232,13 @@ class GaussianOutput():
 
         for line in lines:
             spl = line.split()
-            if "Zero-point correction" in line:
-                zero_point_correction_energy = float(spl[-2].replace("\n",""))
+            if "Sum of electronic and zero-point Energies=" in line:
+                zero_point_correction_energy = float(spl[-1].replace("\n",""))
             elif "Thermal correction to Energy" in line:
                 thermal_correction_energy = float(spl[-1].replace("\n",""))
-            elif "Thermal correction to Enthalpy" in line:
+            elif "Thermal correction to Enthalpy=" in line:
                 thermal_correction_enthalpy = float(spl[-1].replace("\n",""))
-            elif "Thermal correction to Gibbs Free Energy" in line:
+            elif "Thermal correction to Gibbs Free Energy=" in line:
                 thermal_correction_gibsfree_energy = float(spl[-1].replace("\n",""))
 
         return zero_point_correction_energy, thermal_correction_energy, thermal_correction_enthalpy, thermal_correction_gibsfree_energy
@@ -283,7 +283,7 @@ class GaussianOutput():
         
 def getCubefile(chkfile, no):
     name = chkfile.replace(".chk","")
-    shl("formchk "+chkfile, shell=True)
+    lc("formchk "+chkfile)
     fchk = chkfile.replace(".chk",".fchk")
     f = open(fchk,"r")
     lines = f.readlines()
@@ -293,13 +293,13 @@ def getCubefile(chkfile, no):
             homo = int(line.split()[-1].replace("\n",""))
             lumo = homo + 1
     print(name+"_H.cube")
-    shl("cubegen 0 MO="+str(homo)+" "+fchk+" "+name+"_H.cube", shell=True)
+    lc("cubegen 0 MO="+str(homo)+" "+fchk+" "+name+"_H.cube")
     print(name+"_L.cube")
-    shl("cubegen 0 MO="+str(lumo)+" "+fchk+" "+name+"_L.cube", shell=True)
+    lc("cubegen 0 MO="+str(lumo)+" "+fchk+" "+name+"_L.cube")
     for i in range(no):
         i+=1
         print(name+"_H-"+str(i)+".cube")
-        shl("cubegen 0 MO="+str(homo-i)+" "+fchk+" "+name+"_H-"+str(i)+".cube", shell=True)
+        lc("cubegen 0 MO="+str(homo-i)+" "+fchk+" "+name+"_H-"+str(i)+".cube")
         print(name+"_L+"+str(i)+".cube")
-        shl("cubegen 0 MO="+str(lumo+i)+" "+fchk+" "+name+"_L+"+str(i)+".cube", shell=True)
+        lc("cubegen 0 MO="+str(lumo+i)+" "+fchk+" "+name+"_L+"+str(i)+".cube")
     
