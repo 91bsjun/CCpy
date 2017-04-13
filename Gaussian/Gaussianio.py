@@ -227,6 +227,16 @@ class GaussianOutput():
         lc("rm -rf ./GaussSum_tmp/")
 
     def getThermalData(self):
+        """
+        Zero-point correction=                          .023261 (Hartree/Particle)
+        Thermal correction to Energy=                   .026094
+        Thermal correction to Enthalpy=                 .027038
+        Thermal correction to Gibbs Free Energy=        .052698
+        Sum of electronic and zero-point Energies=      -527.492585      E0= Eelec+ZPE
+        Sum of electronic and thermal Energies=         -527.489751      E=  E0+ Evib+ Erot+Etrans
+        Sum of electronic and thermal Enthalpies=       -527.488807      H=  E+RT
+        Sum of electronic and thermal Free Energies=    -527.463147      G=  H-TS
+        """
         lines = self.log_file_lines
         final_energy = self.getFinalEnergy()
 
