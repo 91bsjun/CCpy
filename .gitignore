@@ -8,3 +8,6 @@
 .idea/workspace.xml
 *.xml
 *.xml
+*.pyc
+*.pyc
+*.xml

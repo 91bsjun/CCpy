@@ -234,11 +234,11 @@ class GaussianOutput():
             spl = line.split()
             if "Sum of electronic and zero-point Energies=" in line:
                 zero_point_correction_energy = float(spl[-1].replace("\n",""))
-            elif "Thermal correction to Energy" in line:
+            elif "Sum of electronic and thermal Energies=" in line:
                 thermal_correction_energy = float(spl[-1].replace("\n",""))
-            elif "Thermal correction to Enthalpy=" in line:
+            elif "Sum of electronic and thermal Enthalpies=" in line:
                 thermal_correction_enthalpy = float(spl[-1].replace("\n",""))
-            elif "Thermal correction to Gibbs Free Energy=" in line:
+            elif "Sum of electronic and thermal Free Energies=" in line:
                 thermal_correction_gibsfree_energy = float(spl[-1].replace("\n",""))
 
         return zero_point_correction_energy, thermal_correction_energy, thermal_correction_enthalpy, thermal_correction_gibsfree_energy
