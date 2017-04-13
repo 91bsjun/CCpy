@@ -139,7 +139,7 @@ elif sys.argv[1] == "6":
     data["Energy (kcal/mol)"] = np.array(thermal_correction_es) * 627.503
     data["Enthalpy (kcal/mol)"] = np.array(thermal_correction_hs) * 627.503
     data["Gibbs Free Energy (kcal/mol)"] = np.array(thermal_correction_gs) * 627.503
-    data["Entropy (kcal/mol)"] = data["Enthalpy (kcal/mol)"] - (data["Gibbs Free Energy (kcal/mol)"] / 298.15)
+    data["Entropy (kcal/mol)"] = (data["Enthalpy (kcal/mol)"] - data["Gibbs Free Energy (kcal/mol)"]) / 298.15
 
     df = pd.DataFrame(data, index=logs)
     df = df[["Zero-point correction Energy (kcal/mol)", "Energy (kcal/mol)", "Gibbs Free Energy (kcal/mol)", "Enthalpy (kcal/mol)", "Entropy (kcal/mol)"]]
