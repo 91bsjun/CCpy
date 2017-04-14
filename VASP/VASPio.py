@@ -660,6 +660,7 @@ class VASPOutput():
 
         df = pd.DataFrame(energy_list)
         print(df)
+        df.to_csv("FinalEnergies.csv")
 
         if show_plot:
             fig = plt.figure(figsize=(8, 7))
