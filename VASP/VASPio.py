@@ -233,6 +233,8 @@ class VASPInput():
             incar_dict['LDAUU'] = LDAUU_string
             incar_dict['LDAUJ'] = LDAUJ_string
         if vdw:
+            vdw_C6 = self.vdw_C6
+            vdw_R0 = self.vdw_R0
             C6 = ""
             R0 = ""
             for el in elements:
