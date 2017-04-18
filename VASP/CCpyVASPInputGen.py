@@ -68,22 +68,16 @@ if sys.argv[1] == "1":
         # -- If user want to use same options go to else
         if chk:
             VI.cms_vasp_set(single_point=single_point, isif=isif, vdw=vdw, kpoints=kpoints, spin=spin, mag=mag, ldau=ldau,
-                            input_incar=None, input_kpts=None)
+                            input_incar=None)
             incar = open(VI.dirname + "/INCAR").read()
-            kpts = open(VI.dirname + "/KPOINTS").read()
-            same_inputs = raw_input("\n* Do you want create the rest of inputs as same as these INCAR and KPOINTS ? (y/n)")
+            same_inputs = raw_input("\n* Do you want create the rest of inputs as same as these INCAR ? (y/n)")
             if same_inputs == "y":
                 chk = False
             else:
                 chk = True
         else:
-            raw_kpts = kpts.split("\n")
-            raw_kpts[0] = VI.dirname
-            kpts = ""
-            for line in raw_kpts:
-                kpts+=line+"\n"
             VI.cms_vasp_set(single_point=single_point,isif=isif,vdw=vdw,kpoints=kpoints,spin=spin,mag=mag,ldau=ldau,
-                            input_incar=incar, input_kpts=kpts)
+                            input_incar=incar)
 
 elif sys.argv[1] == "2":
     inputs = selectVASPOutputs("./")

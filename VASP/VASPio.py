@@ -96,7 +96,7 @@ class VASPInput():
                      functional="PBE_54",
                      kpoints=False, incar_dict=None,
                      magmom_dict=None, ldau_dict=None,
-                     input_incar=None, input_kpts=None, flask_app=False):
+                     input_incar=None, flask_app=False):
         """
 
         :param single_point:
@@ -109,7 +109,6 @@ class VASPInput():
         :param kpoints: list [4,4,1]
         :param incar_dict: dictionary type of incar
         :param input_incar: string type of incar (if exist, pass the confirm menu)
-        :param input_kpts: string type of k-points (if exist, pass the confirm menu)
         :param flask_app: in case of flask app, avoid confirm menu (use default k-points = input_kpts)
 
         :return: no return, but write VASP input files at dirname
@@ -139,6 +138,8 @@ class VASPInput():
         # -- if incar_dict arg exist use it
         if incar_dict:
             pass
+        elif input_incar:
+            incar_dict = Incar.from_string(input_incar)
         else:
             incar_dict = {
                 "NWRITE":2,"LPETIM":"F","ISTART":0,"INIWAV":1,"IWAVPR":1,"ICHARG":2,"LWAVE":".FALSE.",
@@ -306,21 +307,8 @@ class VASPInput():
                 # make INCAR string type
                 incar = Incar(incar_dict)
             else:
-                incar = input_incar
+                incar = Incar(incar_dict)
 
-            if not input_kpts:
-                # -- KPOINTS
-                get_kpts = None
-                while get_kpts != "n":
-                    print("\n# ---------- Here are the current KPOINTS ---------- #")
-                    print(kpoints)
-                    get_kpts = raw_input("* Anything want to modify? if not, enter \"n\" or (ex: 4,4,2) \n: ")
-                    if get_kpts != "n":
-                        vals = get_kpts.replace(" ", "")
-                        kpts = vals.split(",")
-                        kpoints = dirname + "\n0\nMonkhorst-Pack\n" + str(kpts[0]) + " " + str(kpts[1]) + " " + str(kpts[2]) + "\n0 0 0\n"
-            else:
-                kpoints = input_kpts
 
         ## ----------------------------- Write inputs ---------------------------- ##
         os.chdir(dirname)
