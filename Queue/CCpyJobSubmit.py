@@ -175,7 +175,6 @@ if __name__=="__main__":
     2 : VASP
     3 : ATK
     4 : Q-chem
-    5 : ATK
     6 : ATAT [f:fitsvl]
     7 : PBS job display
 
@@ -216,15 +215,13 @@ if __name__=="__main__":
     elif sys.argv[1] == "2":
         vasp(queue=queue, divided=divided)
 
+    ## ------ ATK
+    elif sys.argv[1] == "3":
+        atk(queue=queue, divided=divided)
 
     ## ------ Q-chem
     elif sys.argv[1] == "4":
         qchem(queue=queue, divided=divided)
-
-
-    ## ------ ATK
-    elif sys.argv[1] == "5":
-        atk(queue=queue, divided=divided)
 
 
     ## ------ ATAT
