@@ -47,7 +47,7 @@ class VASPInput():
         # ------------ check initial config ------------- #
         home = os.getenv("HOME")
         if ".CCpy" not in os.listdir(home):
-            os.mkdir(".CCpy")
+            os.mkdir(home+"/.CCpy")
         configs = os.listdir(home+"/.CCpy")
         if "incar.json" in configs:
             incar_dict = json.loads(home+"/.CCpy/vasp_incar.json")
