@@ -1,6 +1,7 @@
 import os, sys, re
 import matplotlib.pyplot as plt
 import pandas as pd
+import json
 
 from CCpy.Tools.CCpyStructure import PeriodicStructure as PS
 from CCpy.Tools.CCpyStructure import latticeGen
@@ -43,23 +44,67 @@ class VASPInput():
         self.structure = structure
         self.dirname = dirname
 
-        # Magnetic moment parameters : from Pymatgen
-        magmom = {'Mn3+': 4, 'Ni4+': 0.6, 'Cr': 5, 'Mn4+': 3, 'Ta': 5, 'Ni3+': 1, 'Mo': 5,
-                  'Ni': 2, 'V': 5, 'Mn2+': 5, 'Co': 5, 'Co4+': 1, 'W': 5, 'Fe3+': 5, 'Fe2+': 4,
-                  'Mn': 5, 'Fe4+': 4, 'Fe': 5, 'Co3+': 0.6,
-                  'Li': 0.6, 'O': 0.6}
+        # ------------ check initial config ------------- #
+        home = os.getenv("HOME")
+        if ".CCpy" not in os.listdir(home):
+            os.mkdir("CCpy")
+        configs = os.listdir(home+"/.CCpy")
+        if "incar.json" in configs:
+            incar_dict = json.loads(home+"/.CCpy/vasp_incar.json")
+        else:
+            incar_dict = {
+                "NWRITE": 2, "LPETIM": "F", "ISTART": 0, "INIWAV": 1, "IWAVPR": 1, "ICHARG": 2, "LWAVE": ".FALSE.",
+                "ALGO": "FAST", "NELM": 100, "EDIFF": 0.0001, "BMIX": 3.00, "ENCUT": 500, "GGA": "PE", "ISYM": 2,
+                "LDIAG": "T", "LREAL": "auto", "PREC": "Medium",
+                "NSW": 200, "NBLOCK": 1, "KBLOCK": 10, "IBRION": 2, "ISIF": 3, "POTIM": 0.5, "SMASS": 3.0,
+                "ISMEAR": 0, "SIGMA": 0.05, "LORBIT": 11,
+                "NPAR": 8, "LPLANE": "T", "ISPIN": 1}
+            jstring = json.dumps(incar_dict, indent=4)
+            f = open(home + "/.CCpy/vasp_incar.json", "w")
+            f.write(jstring)
+            f.close()
+        if "MAGMOM.json" in configs:
+            magmom = json.loads(home+"/.CCpy/vasp_MAGMOM.json")
+        else:
+            magmom = {'Mn3+': 4, 'Ni4+': 0.6, 'Cr': 5, 'Mn4+': 3, 'Ta': 5, 'Ni3+': 1, 'Mo': 5,
+                      'Ni': 2, 'V': 5, 'Mn2+': 5, 'Co': 5, 'Co4+': 1, 'W': 5, 'Fe3+': 5, 'Fe2+': 4,
+                      'Mn': 5, 'Fe4+': 4, 'Fe': 5, 'Co3+': 0.6,
+                      'Li': 0.6, 'O': 0.6}
+            jstring = json.dumps(magmom, indent=4)
+            f = open(home+"/.CCpy/vasp_MAGMOM.json", "w")
+            f.write(jstring)
+            f.close()
 
-        # LDA+U parameters : from Pymatgen
-        LDAUL = {'Mo': 2, 'V': 2, 'Cu': 2, 'W': 2, 'Ag': 2, 'Cr': 2, 'Ta': 2,
-                 'Nb': 2, 'Mn': 2, 'Re': 2, 'Co': 2, 'Ni': 2, 'Fe': 2,
-                 'Li': 0, 'O': 0}
-        LDAUU = {'Mo': 4.38, 'V': 3.1, 'Cu': 4, 'W': 4.0, 'Ag': 1.5, 'Cr': 3.5, 'Ta': 2,
-                 'Nb': 1.5, 'Mn': 3.9, 'Re': 2, 'Co': 3.4, 'Ni': 6, 'Fe': 4.0,
-                 'Li': 0, 'O': 0}
-        LDAUJ = {'Mo': 0, 'V': 0, 'Cu': 0, 'W': 0, 'Ag': 0, 'Cr': 0, 'Ta': 0,
-                 'Nb': 0, 'Mn': 0, 'Re': 0, 'Co': 0, 'Ni': 0, 'Fe': 0,
-                 'Li': 0, 'O': 0}
-
+        if "LDAUU.json" in configs:
+            LDAUU = json.loads(home+"/.CCpy/vasp_LDAUU.json")
+        else:
+            LDAUU = {'Mo': 4.38, 'V': 3.1, 'Cu': 4, 'W': 4.0, 'Ag': 1.5, 'Cr': 3.5, 'Ta': 2,
+                     'Nb': 1.5, 'Mn': 3.9, 'Re': 2, 'Co': 3.4, 'Ni': 6, 'Fe': 4.0,
+                     'Li': 0, 'O': 0}
+            jstring = json.dumps(LDAUU, indent=4)
+            f = open(home + "/.CCpy/vasp_LDAUU.json", "w")
+            f.write(jstring)
+            f.close()
+        if "LDAUL.json" in configs:
+            LDAUL = json.loads(home+"/.CCpy/vasp_LDAUL.json")
+        else:
+            LDAUL = {'Mo': 2, 'V': 2, 'Cu': 2, 'W': 2, 'Ag': 2, 'Cr': 2, 'Ta': 2,
+                     'Nb': 2, 'Mn': 2, 'Re': 2, 'Co': 2, 'Ni': 2, 'Fe': 2,
+                     'Li': 0, 'O': 0}
+            jstring = json.dumps(LDAUL, indent=4)
+            f = open(home + "/.CCpy/vasp_LDAUL.json", "w")
+            f.write(jstring)
+            f.close()
+        if "LDAUJ.json" in configs:
+            LDAUJ = json.loads(home + "/.CCpy/vasp_LDAUJ.json")
+        else:
+            LDAUJ = {'Mo': 0, 'V': 0, 'Cu': 0, 'W': 0, 'Ag': 0, 'Cr': 0, 'Ta': 0,
+                     'Nb': 0, 'Mn': 0, 'Re': 0, 'Co': 0, 'Ni': 0, 'Fe': 0,
+                     'Li': 0, 'O': 0}
+            jstring = json.dumps(LDAUJ, indent=4)
+            f = open(home + "/.CCpy/vasp_LDAUJ.json", "w")
+            f.write(jstring)
+            f.close()
         # DFT-D2 parameters : From VASP wiki
         vdw_C6 = {'H': 0.14, 'He': 0.08, 'Li': 1.61, 'Be': 1.61, 'B': 3.13, 'C': 1.75, 'N': 1.23, 'O': 0.70, 'F': 0.75,
                   'Ne': 0.63, 'Na': 5.71,
@@ -85,7 +130,7 @@ class VASPInput():
                   'Ag': 1.639, 'Cd': 1.639,
                   'In': 1.672, 'Sn': 1.804, 'Sb': 1.881, 'Te': 1.892, 'I': 1.892, 'Xe': 1.881}
 
-        self.magmom, self.LDAUL, self.LDAUU, self.LDAUJ, self.vdw_C6, self.vdw_R0 = magmom, LDAUL, LDAUU, LDAUJ, vdw_C6, vdw_R0
+        self.incar_dict, self.magmom, self.LDAUL, self.LDAUU, self.LDAUJ, self.vdw_C6, self.vdw_R0 = incar_dict, magmom, LDAUL, LDAUU, LDAUJ, vdw_C6, vdw_R0
 
 
     # ------------------------------------------------------------------------------#
@@ -139,7 +184,7 @@ class VASPInput():
         if incar_dict:
             pass
         elif input_incar:
-            incar_dict = Incar.from_string(input_incar)
+            incar_dict = Incar.from_string(input_incar).as_dict()
         else:
             incar_dict = {
                 "NWRITE":2,"LPETIM":"F","ISTART":0,"INIWAV":1,"IWAVPR":1,"ICHARG":2,"LWAVE":".FALSE.",
