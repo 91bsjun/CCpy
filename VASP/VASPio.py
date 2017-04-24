@@ -191,13 +191,7 @@ class VASPInput():
         elif input_incar:
             incar_dict = Incar.from_string(input_incar).as_dict()
         else:
-            incar_dict = {
-                "NWRITE":2,"LPETIM":"F","ISTART":0,"INIWAV":1,"IWAVPR":1,"ICHARG":2,"LWAVE":".FALSE.",
-                "ALGO":"FAST","NELM":100,"EDIFF":0.0001,"BMIX":3.00,"ENCUT":500,"GGA":"PE","ISYM":2,
-                "LDIAG":"T","LREAL":"auto","PREC":"Medium",
-                "NSW":200,"NBLOCK":1,"KBLOCK":10,"IBRION":2,"ISIF":3,"POTIM":0.5,"SMASS":3.0,
-                "ISMEAR":0,"SIGMA":0.05,"LORBIT":11,
-                "NPAR":8,"LPLANE":"T","ISPIN":1}
+            incar_dict = self.incar_dict
 
         # -- Parsing system arguments from user commands
         if single_point:
