@@ -50,7 +50,7 @@ class VASPInput():
             os.mkdir(home+"/.CCpy")
         configs = os.listdir(home+"/.CCpy")
         if "vasp_incar.json" in configs:
-            jstring = open(home + "/.CCpy/vasp_incar.json", "w").read()
+            jstring = open(home + "/.CCpy/vasp_incar.json", "r").read()
             incar_dict = json.loads(jstring)
         else:
             incar_dict = {
@@ -65,7 +65,7 @@ class VASPInput():
             f.write(jstring)
             f.close()
         if "vasp_MAGMOM.json" in configs:
-            jstring = open(home + "/.CCpy/vasp_MAGMOM.json", "w").read()
+            jstring = open(home + "/.CCpy/vasp_MAGMOM.json", "r").read()
             magmom = json.loads(jstring)
         else:
             magmom = {'Mn3+': 4, 'Ni4+': 0.6, 'Cr': 5, 'Mn4+': 3, 'Ta': 5, 'Ni3+': 1, 'Mo': 5,
@@ -78,7 +78,7 @@ class VASPInput():
             f.close()
 
         if "vasp_LDAUU.json" in configs:
-            jstring = open(home + "/.CCpy/vasp_LDAUU.json", "w").read()
+            jstring = open(home + "/.CCpy/vasp_LDAUU.json", "r").read()
             LDAUU = json.loads(jstring)
         else:
             LDAUU = {'Mo': 4.38, 'V': 3.1, 'Cu': 4, 'W': 4.0, 'Ag': 1.5, 'Cr': 3.5, 'Ta': 2,
@@ -89,7 +89,7 @@ class VASPInput():
             f.write(jstring)
             f.close()
         if "vasp_LDAUL.json" in configs:
-            jstring = open(home + "/.CCpy/vasp_LDAUL.json", "w").read()
+            jstring = open(home + "/.CCpy/vasp_LDAUL.json", "r").read()
             LDAUL = json.loads(jstring)
         else:
             LDAUL = {'Mo': 2, 'V': 2, 'Cu': 2, 'W': 2, 'Ag': 2, 'Cr': 2, 'Ta': 2,
@@ -100,7 +100,7 @@ class VASPInput():
             f.write(jstring)
             f.close()
         if "vasp_LDAUJ.json" in configs:
-            jstring = open(home + "/.CCpy/vasp_LDAUJ.json", "w").read()
+            jstring = open(home + "/.CCpy/vasp_LDAUJ.json", "r").read()
             LDAUJ = json.loads(jstring)
         else:
             LDAUJ = {'Mo': 0, 'V': 0, 'Cu': 0, 'W': 0, 'Ag': 0, 'Cr': 0, 'Ta': 0,
