@@ -50,7 +50,8 @@ class VASPInput():
             os.mkdir(home+"/.CCpy")
         configs = os.listdir(home+"/.CCpy")
         if "vasp_incar.json" in configs:
-            incar_dict = json.loads(home+"/.CCpy/vasp_incar.json")
+            jstring = open(home + "/.CCpy/vasp_incar.json", "w").read()
+            incar_dict = json.loads(jstring)
         else:
             incar_dict = {
                 "NWRITE": 2, "LPETIM": "F", "ISTART": 0, "INIWAV": 1, "IWAVPR": 1, "ICHARG": 2, "LWAVE": ".FALSE.",
@@ -64,7 +65,8 @@ class VASPInput():
             f.write(jstring)
             f.close()
         if "vasp_MAGMOM.json" in configs:
-            magmom = json.loads(home+"/.CCpy/vasp_MAGMOM.json")
+            jstring = open(home + "/.CCpy/vasp_MAGMOM.json", "w").read()
+            magmom = json.loads(jstring)
         else:
             magmom = {'Mn3+': 4, 'Ni4+': 0.6, 'Cr': 5, 'Mn4+': 3, 'Ta': 5, 'Ni3+': 1, 'Mo': 5,
                       'Ni': 2, 'V': 5, 'Mn2+': 5, 'Co': 5, 'Co4+': 1, 'W': 5, 'Fe3+': 5, 'Fe2+': 4,
@@ -76,7 +78,8 @@ class VASPInput():
             f.close()
 
         if "vasp_LDAUU.json" in configs:
-            LDAUU = json.loads(home+"/.CCpy/vasp_LDAUU.json")
+            jstring = open(home + "/.CCpy/vasp_LDAUU.json", "w").read()
+            LDAUU = json.loads(jstring)
         else:
             LDAUU = {'Mo': 4.38, 'V': 3.1, 'Cu': 4, 'W': 4.0, 'Ag': 1.5, 'Cr': 3.5, 'Ta': 2,
                      'Nb': 1.5, 'Mn': 3.9, 'Re': 2, 'Co': 3.4, 'Ni': 6, 'Fe': 4.0,
@@ -86,7 +89,8 @@ class VASPInput():
             f.write(jstring)
             f.close()
         if "vasp_LDAUL.json" in configs:
-            LDAUL = json.loads(home+"/.CCpy/vasp_LDAUL.json")
+            jstring = open(home + "/.CCpy/vasp_LDAUL.json", "w").read()
+            LDAUL = json.loads(jstring)
         else:
             LDAUL = {'Mo': 2, 'V': 2, 'Cu': 2, 'W': 2, 'Ag': 2, 'Cr': 2, 'Ta': 2,
                      'Nb': 2, 'Mn': 2, 'Re': 2, 'Co': 2, 'Ni': 2, 'Fe': 2,
@@ -96,7 +100,8 @@ class VASPInput():
             f.write(jstring)
             f.close()
         if "vasp_LDAUJ.json" in configs:
-            LDAUJ = json.loads(home + "/.CCpy/vasp_LDAUJ.json")
+            jstring = open(home + "/.CCpy/vasp_LDAUJ.json", "w").read()
+            LDAUJ = json.loads(jstring)
         else:
             LDAUJ = {'Mo': 0, 'V': 0, 'Cu': 0, 'W': 0, 'Ag': 0, 'Cr': 0, 'Ta': 0,
                      'Nb': 0, 'Mn': 0, 'Re': 0, 'Co': 0, 'Ni': 0, 'Fe': 0,
