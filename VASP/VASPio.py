@@ -49,7 +49,7 @@ class VASPInput():
         if ".CCpy" not in os.listdir(home):
             os.mkdir(home+"/.CCpy")
         configs = os.listdir(home+"/.CCpy")
-        if "incar.json" in configs:
+        if "vasp_incar.json" in configs:
             incar_dict = json.loads(home+"/.CCpy/vasp_incar.json")
         else:
             incar_dict = {
@@ -63,7 +63,7 @@ class VASPInput():
             f = open(home + "/.CCpy/vasp_incar.json", "w")
             f.write(jstring)
             f.close()
-        if "MAGMOM.json" in configs:
+        if "vasp_MAGMOM.json" in configs:
             magmom = json.loads(home+"/.CCpy/vasp_MAGMOM.json")
         else:
             magmom = {'Mn3+': 4, 'Ni4+': 0.6, 'Cr': 5, 'Mn4+': 3, 'Ta': 5, 'Ni3+': 1, 'Mo': 5,
@@ -75,7 +75,7 @@ class VASPInput():
             f.write(jstring)
             f.close()
 
-        if "LDAUU.json" in configs:
+        if "vasp_LDAUU.json" in configs:
             LDAUU = json.loads(home+"/.CCpy/vasp_LDAUU.json")
         else:
             LDAUU = {'Mo': 4.38, 'V': 3.1, 'Cu': 4, 'W': 4.0, 'Ag': 1.5, 'Cr': 3.5, 'Ta': 2,
@@ -85,7 +85,7 @@ class VASPInput():
             f = open(home + "/.CCpy/vasp_LDAUU.json", "w")
             f.write(jstring)
             f.close()
-        if "LDAUL.json" in configs:
+        if "vasp_LDAUL.json" in configs:
             LDAUL = json.loads(home+"/.CCpy/vasp_LDAUL.json")
         else:
             LDAUL = {'Mo': 2, 'V': 2, 'Cu': 2, 'W': 2, 'Ag': 2, 'Cr': 2, 'Ta': 2,
@@ -95,7 +95,7 @@ class VASPInput():
             f = open(home + "/.CCpy/vasp_LDAUL.json", "w")
             f.write(jstring)
             f.close()
-        if "LDAUJ.json" in configs:
+        if "vasp_LDAUJ.json" in configs:
             LDAUJ = json.loads(home + "/.CCpy/vasp_LDAUJ.json")
         else:
             LDAUJ = {'Mo': 0, 'V': 0, 'Cu': 0, 'W': 0, 'Ag': 0, 'Cr': 0, 'Ta': 0,
