@@ -100,6 +100,7 @@ elif sys.argv[1] == "4":
 elif sys.argv[1] == "5":
     df_li = []    
     for log in logs:
+        print(log)
         orbital_data = {}
         homo, data = GO(log).getOrbitalData()
         orbital_energy = data['Energy']
