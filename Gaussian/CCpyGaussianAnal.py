@@ -102,13 +102,8 @@ elif sys.argv[1] == "5":
     for log in logs:
         orbital_data = {}
         homo, data = GO(log).getOrbitalData()
-        orbital_energy = []
-        orbital_index = []
-        keys = data.keys()
-        keys.reverse()
-        for key in keys:
-            orbital_index.append(data[key][0])
-            orbital_energy.append(data[key][1])
+        orbital_energy = data['Energy']
+        orbital_index = data['Orbital']
         orbital_data[log] = orbital_energy
         df = pd.DataFrame(orbital_data, index=orbital_index)
         df_li.append(df)

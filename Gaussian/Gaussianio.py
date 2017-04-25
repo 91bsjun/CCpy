@@ -256,22 +256,43 @@ class GaussianOutput():
 
     def getOrbitalData(self):
         filename = self.filename
-        gausssum = bsjunGausssum.App(filename)
+        f = open(filename, "r").read()
+        lines = f.split("\n")
+        for i in range(len(lines)):
+            if "Orbital energies and kinetic energies (alpha):" in lines[i]:
+                start = i + 1
+            elif "Total kinetic energy from orbitals" in lines[i]:
+                finish = i
 
-        os.mkdir("./GaussSum_tmp")
-        mo = gausssum.moresult()
-        
-        ob_file = open("./GaussSum_tmp/orbital_data.txt","r")
-        lines = ob_file.readlines()
-        ob_file.close()
-        lc("rm -rf ./GaussSum_tmp/")
+        H = []
+        L = []
+        for i in range(start, finish + 1):
+            spl = lines[i].split()
+            if 'O' in spl:
+                H.append([int(spl[0]), float(spl[2]) * 27.221])
+            elif 'V' in spl:
+                L.append([int(spl[0]), float(spl[2]) * 27.221])
 
-        homo = int(lines[1].split()[1])
-        data = {}
-        for line in lines:
-            spl = line.split()
-            if len(spl) == 4:
-                data[int(spl[0])] = [spl[1], float(spl[2]), spl[3]]
+        H.reverse()
+        L.reverse()
+
+        data = {'Orbital': [], 'Energy': []}
+        for i in range(len(L)):
+            name = "L+" + str(len(L) - i - 1)
+            if name == "L+0":
+                name = "LUMO"
+            index = str(L[i][0]) + ":" + name
+            data['Orbital'].append(index)
+            data['Energy'].append(L[i][1])
+
+        for i in range(len(H)):
+            name = "H-" + str(i)
+            if name == "H-0":
+                name = "HOMO"
+                homo = H[i][0]
+            index = "#" + str(H[i][0]) + " : " + name
+            data['Orbital'].append(index)
+            data['Energy'].append(H[i][1])
 
         self.homo = homo
         self.data = data
