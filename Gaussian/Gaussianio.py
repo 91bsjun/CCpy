@@ -281,7 +281,7 @@ class GaussianOutput():
             name = "L+" + str(len(L) - i - 1)
             if name == "L+0":
                 name = "LUMO"
-            index = str(L[i][0]) + ":" + name
+            index = "#" + str(L[i][0]) + " : " + name
             data['Orbital'].append(index)
             data['Energy'].append(L[i][1])
 
