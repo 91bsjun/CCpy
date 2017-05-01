@@ -51,7 +51,7 @@ if ".CCpy" not in os.listdir(home):
 configs = os.listdir(home+"/.CCpy")
 if "g09_input.json" in configs:
     jstring = open(home + "/.CCpy/g09_input.json", "r").read()
-    incar_dict = json.loads(jstring)
+    options = json.loads(jstring)
 else:
     # -- option preset
     options = {"nproc":24, "mem":64, "functional":"B3LYP", "basis":"6-31G*",
