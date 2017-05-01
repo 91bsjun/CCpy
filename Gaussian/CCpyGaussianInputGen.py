@@ -112,6 +112,7 @@ while line_option != "n" or line_option != "p":
     line_option = raw_input("line: ")
     if line_option == "p":
         get_options = options["options_under_coordinates"]
+        break
     if line_option != "n":
         get_options += line_option+"\n"
 options["options_under_coordinates"] = get_options
