@@ -55,7 +55,7 @@ else:
     # -- option preset
     options = {"nproc":24, "mem":64, "functional":"B3LYP", "basis":"6-31G*",
                "chg":0, "multi":1,
-               "options":"gfinput gfprint SCF(maxcycle=512,conver=6) opt=gediis freq=noraman pop=full iop(3/33=1,3/36=-1) pseudo=read EmpiricalDispersion=GD3 nosym sp",
+               "options":"gfinput gfprint SCF(maxcycle=512,conver=6) opt=gediis freq=noraman",
                "options_under_coordinates":""}
 
 # ------ basic option edit ------ #
@@ -80,13 +80,19 @@ if get_sets != "n":
 
 # ------ calc option edit ------ #
 print("\n\n-------------- Calculation options ---------------")
-ex = "Current option : " + options["options"]
-get_options = raw_input("Enter options to modify (ex: gfinput gfprint nosym opt=gediis) if not, enter \"n\" \n :")
-if get_options == "n":
+print("Current option : " + options["options"])
+print("Option blocks : gfinput gfprint SCF(maxcycle=512,conver=6) opt=gediis freq=noraman pop=full iop(3/33=1,3/36=-1) pseudo=read EmpiricalDispersion=GD3 nosym sp")
+get_options = raw_input("Enter options to modify (ex: gfinput gfprint nosym opt=gediis) if not, enter \"p\" \n :")
+if get_options != "p":
     options["options"] = get_options
 
 # ------ bottom option edit ------ #
 print("\n\n--------- Options under coordinates area ---------")
+if len(options["options_under_coordinates"]) < 2:
+    print("Current option : Empty")
+else:
+    print("Current option : " + options["options_under_coordinates"])
+print("If you want to use current option, enter \"p\". \n Or fill line.")
 print("Enter \"n\" when you finished.")
 print("""(example)
 line: I 0
@@ -107,7 +113,12 @@ while line_option != "n":
     if line_option != "n":
         get_options += line_option+"\n"
 options["options_under_coordinates"] = get_options
-
+chk = raw_input("Do you want to update preset option? (y/n)")
+if chk == "y":
+    jstring = json.dumps(options, indent=4)
+    f = open(home + "/.CCpy/g09_input.json", "w")
+    f.write(jstring)
+    f.close()
 myGI = GI(nproc=options['nproc'], mem=options['mem'],
           functional=options['functional'], basis=options['basis'],
           chg=options['chg'], multi=options['multi'],
