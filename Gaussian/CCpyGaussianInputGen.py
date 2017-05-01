@@ -1,6 +1,7 @@
 #!/usr/local/bin/python2.7
 
 import os, sys
+import json
 from subprocess import call as shl
 
 from CCpy.Gaussian.Gaussianio import GaussianInput as GI
