@@ -92,7 +92,7 @@ print("\n\n--------- Options under coordinates area ---------")
 if len(options["options_under_coordinates"]) < 2:
     print("Current option : Empty")
 else:
-    print("Current option : " + options["options_under_coordinates"])
+    print("Current option : \n" + options["options_under_coordinates"])
 print("If you want to use current option, enter \"p\". \n Or fill line.")
 print("Enter \"n\" when you finished.")
 print("""(example)
