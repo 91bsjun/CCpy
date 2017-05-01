@@ -114,7 +114,7 @@ while line_option != "n" and line_option != "p":
     if line_option == "p":
         get_options = options["options_under_coordinates"]
         break
-    if line_option != "n":
+    if line_option != "n" and line_option != "p":
         get_options += line_option+"\n"
 options["options_under_coordinates"] = get_options
 chk = raw_input("Do you want to update preset option? (y/n)")
