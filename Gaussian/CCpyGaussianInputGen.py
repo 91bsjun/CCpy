@@ -43,13 +43,20 @@ elif sys.argv[1] == "4":
     input_marker = [".com"]
     inputs = selectInputs(input_marker, "./")
 
-# -- option preset
-options = {"nproc":24, "mem":64, "functional":"B3LYP", "basis":"6-31G",
-           "chg":0, "multi":1,
-           "options":["gfinput","gfprint","SCF(maxcycle=512,conver=6)","opt=gediis","freq=noraman",
-                      "pop=full","iop(3/33=1,3/36=-1)",
-                      "pseudo=read", "EmpiricalDispersion=GD3","nosym"],
-           "options_under_coordinates":""}
+
+home = os.getenv("HOME")
+if ".CCpy" not in os.listdir(home):
+    os.mkdir(home+"/.CCpy")
+configs = os.listdir(home+"/.CCpy")
+if "g09_input.json" in configs:
+    jstring = open(home + "/.CCpy/g09_input.json", "r").read()
+    incar_dict = json.loads(jstring)
+else:
+    # -- option preset
+    options = {"nproc":24, "mem":64, "functional":"B3LYP", "basis":"6-31G*",
+               "chg":0, "multi":1,
+               "options":"gfinput gfprint SCF(maxcycle=512,conver=6) opt=gediis freq=noraman pop=full iop(3/33=1,3/36=-1) pseudo=read EmpiricalDispersion=GD3 nosym sp",
+               "options_under_coordinates":""}
 
 # ------ basic option edit ------ #
 print("\n\n------------- Preset of basic options -------------")
@@ -73,13 +80,10 @@ if get_sets != "n":
 
 # ------ calc option edit ------ #
 print("\n\n-------------- Calculation options ---------------")
-ex = "Example items : "
-for o in options["options"]:
-    ex += o +" "
-ex+="\n"
-print(ex)
-get_options = raw_input("Enter options (ex: gfinput gfprint nosym opt=gediis)\n:")
-options["options"] = get_options
+ex = "Current option : " + options["options"]
+get_options = raw_input("Enter options to modify (ex: gfinput gfprint nosym opt=gediis) if not, enter \"n\" \n :")
+if get_options == "n":
+    options["options"] = get_options
 
 # ------ bottom option edit ------ #
 print("\n\n--------- Options under coordinates area ---------")
