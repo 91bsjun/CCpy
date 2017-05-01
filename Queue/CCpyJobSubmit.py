@@ -18,7 +18,7 @@ if version[0] == '3':
 
 # -- Check node00
 ip = get_ip()
-if ip != "166.104.249.249":
+if ip == "166.104.249.31":
     print("DO AT NODE00 !!")
     quit()
 
