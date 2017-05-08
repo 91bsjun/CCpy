@@ -11,7 +11,7 @@ queue_path = "/opt/sge/bin/lx24-amd64/"
 xeon1 = [16, 32, "xeon1.q"] # node01
 xeon2 = [24, 64, "xeon2.q"] # node02, node03, node04
 xeon3 = [24, 256, "xeon3.q"] # node05, node06
-xeon4 = [32, 256, "xeon4.q"] # node07
+xeon4 = [36, 256, "xeon4.q"] # node07
 xeon5 = [72, 512, "xeon5.q"] # node08, node09, node10
 I5 = [4, 16, "I5.q"]
 
