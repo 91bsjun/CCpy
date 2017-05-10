@@ -374,7 +374,8 @@ class VASPInput():
         if update_preset == "y":
             variable_options = ["MAGMOM","LDAUL","LDAUU","LDAUJ","VDW_C6","VDW_R0"]
             for v in variable_options:
-                del incar_dict[v]
+                if v in incar_dict.keys():
+                    del incar_dict[v]
 
             jstring = json.dumps(incar_dict, indent=4)
             home = os.getenv("HOME")
