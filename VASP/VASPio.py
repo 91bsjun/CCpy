@@ -372,8 +372,12 @@ class VASPInput():
         os.rename(self.filename, "./structures/"+self.filename)
         update_preset = raw_input("Do you want to update INCAR preset ? (y/n)")
         if update_preset == "y":
-            home = os.getenv("HOME")
+            variable_options = ["MAGMOM","LDAUL","LDAUU","LDAUJ","VDW_C6","VDW_R0"]
+            for v in variable_options:
+                del incar_dict[v]
+
             jstring = json.dumps(incar_dict, indent=4)
+            home = os.getenv("HOME")
             f = open(home + "/.CCpy/vasp_incar.json", "w")
             f.write(jstring)
             f.close()
