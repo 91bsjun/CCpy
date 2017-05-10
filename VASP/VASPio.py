@@ -370,6 +370,13 @@ class VASPInput():
             pass
 
         os.rename(self.filename, "./structures/"+self.filename)
+        update_preset = raw_input("Do you want to update INCAR preset ? (y/n)")
+        if update_preset == "y":
+            home = os.getenv("HOME")
+            jstring = json.dumps(incar_dict, indent=4)
+            f = open(home + "/.CCpy/vasp_incar.json", "w")
+            f.write(jstring)
+            f.close()
 
 
 
