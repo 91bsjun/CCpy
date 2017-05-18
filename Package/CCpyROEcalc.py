@@ -93,22 +93,22 @@ elif step == "2":
     os.chdir("neutral")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=-1, multi=3, options=sp, options2="")
-    myGI.additionalCalc(name+".chk", comname=name+"_neut_anion.com")
+    myGI.additionalCalc(name+".chk", comname=name+"_neut_anion")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=1, multi=3, options=sp, options2="")
-    myGI.additionalCalc(name + ".chk", comname=name + "_neut_cation.com")
+    myGI.additionalCalc(name + ".chk", comname=name + "_neut_cation")
     os.chdir("../")
 
     # anion structure
     os.chdir("anion")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=0, multi=1, options=sp, options2="")
-    myGI.additionalCalc(name + ".chk", comname=name + "_anion_neut.com")
+    myGI.additionalCalc(name + ".chk", comname=name + "_anion_neut")
     os.chdir("../")
 
     # cation structure
     os.chdir("cation")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=0, multi=1, options=sp, options2="")
-    myGI.additionalCalc(name + ".chk", comname=name + "_cation_neut.com")
+    myGI.additionalCalc(name + ".chk", comname=name + "_cation_neut")
     os.chdir("../")

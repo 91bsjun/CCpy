@@ -78,7 +78,7 @@ class GaussianInput():
             name = comname
 
         if "geom=check" not in self.options:
-            self.options += " geom=check "
+            self.options += " geom=check"
         if "guess=read" not in self.options:
             self.options += " guess=read "
 
