@@ -44,12 +44,12 @@ if step == "1":
         quit()
 
     os.chdir(name)
-    lc("cp ../" + filename + "./")
+    lc("cp ../" + filename + " ./")
 
     # neutral
     os.mkdir("neutral")
     os.chdir("neutral")
-    lc("cp ../" + filename + "./")
+    lc("cp ../" + filename + " ./")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=0, multi=1, options=opt, options2="")
     myGI.newCalc(filename)
@@ -58,7 +58,7 @@ if step == "1":
     # anaion
     os.mkdir("anion")
     os.chdir("anion")
-    lc("cp ../" + filename + "./")
+    lc("cp ../" + filename + " ./")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=-1, multi=3, options=opt, options2="")
     myGI.newCalc(filename)
@@ -67,7 +67,7 @@ if step == "1":
     # cation
     os.mkdir("cation")
     os.chdir("cation")
-    lc("cp ../" + filename + "./")
+    lc("cp ../" + filename + " ./")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=-1, multi=3, options=opt, options2="")
     myGI.newCalc(filename)
