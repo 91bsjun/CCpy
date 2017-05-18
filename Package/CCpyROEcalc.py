@@ -44,6 +44,7 @@ if step == "1":
         quit()
 
     os.chdir(name)
+    lc("cp ../" + filename + "./")
 
     # neutral
     os.mkdir("neutral")
