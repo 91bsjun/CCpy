@@ -57,7 +57,7 @@ if step == "1":
     lc("cp ../" + filename + " ./")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=0, multi=1, options=opt, options2="")
-    myGI.newCalc(filename)
+    myGI.newCalc(filename, comname=name+"_neut")
     os.chdir("../")
 
     # anaion
@@ -67,7 +67,7 @@ if step == "1":
     lc("cp ../" + filename + " ./")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=-1, multi=3, options=opt, options2="")
-    myGI.newCalc(filename)
+    myGI.newCalc(filename, comname=name+"_anion")
     os.chdir("../")
 
     # cation
@@ -77,7 +77,7 @@ if step == "1":
     lc("cp ../" + filename + " ./")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=-1, multi=3, options=opt, options2="")
-    myGI.newCalc(filename)
+    myGI.newCalc(filename, comname=name+"_cation")
     os.chdir("../")
 
 # --------- Step 2. Calculate single point state --------- #
