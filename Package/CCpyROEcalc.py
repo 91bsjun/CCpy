@@ -29,7 +29,7 @@ except:
     print("Assign step. (ex" + sys.argv[0].split("/")[-1] + "benzene.xyz 1")
     quit()
 
-funtional = "B3LYP"
+functional = "B3LYP"
 basis = "6-31G*"
 opt = "gfinput gfprint SCF(maxcycle=512,conver=6) opt=gediis"
 sp = "gfinput gfprint SCF(maxcycle=512,conver=6) sp"
