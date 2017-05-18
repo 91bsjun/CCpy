@@ -1,1 +1,1 @@
-/home/bsjun/Git-Hub/CCpy/Gaussian/CCpyGaussianInputGen.py
+../Gaussian/CCpyGaussianInputGen.py

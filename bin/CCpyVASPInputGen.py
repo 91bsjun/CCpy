@@ -1,1 +1,1 @@
-/home/bsjun/Git-Hub/CCpy/VASP/CCpyVASPInputGen.py
+../VASP/CCpyVASPInputGen.py

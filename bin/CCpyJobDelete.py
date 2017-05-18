@@ -1,1 +1,1 @@
-/home/bsjun/Git-Hub/CCpy/Queue/CCpyJobDelete.py
+../Queue/CCpyJobDelete.py

@@ -1,1 +1,1 @@
-/home/bsjun/Git-Hub/CCpy/Qchem/CCpyQchemInputGen.py
+../Qchem/CCpyQchemInputGen.py

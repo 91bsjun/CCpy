@@ -1,1 +1,1 @@
-/home/bsjun/Git-Hub/CCpy/ATAT/CCpyATATAnal.py
+../ATAT/CCpyATATAnal.py

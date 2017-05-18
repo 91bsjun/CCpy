@@ -1,1 +1,1 @@
-/home/bsjun/Git-Hub/CCpy/Queue/CCpyJobSubmit.py
+../Queue/CCpyJobSubmit.py

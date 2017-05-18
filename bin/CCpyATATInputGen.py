@@ -1,1 +1,1 @@
-/home/bsjun/Git-Hub/CCpy/ATAT/CCpyATATInputGen.py
+../ATAT/CCpyATATInputGen.py

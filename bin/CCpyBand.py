@@ -1,1 +1,1 @@
-/home/bsjun/Git-Hub/CCpy/VASP/CCpyBand.py
+../VASP/CCpyBand.py

@@ -1,1 +1,1 @@
-/home/bsjun/Git-Hub/CCpy/IKST/CCpyIKSTeditINCAR.py
+../IKST/CCpyIKSTeditINCAR.py
