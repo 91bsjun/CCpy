@@ -40,8 +40,11 @@ if step == "1":
     try:
         os.mkdir(name)
     except:
-        print(name + " directory is already exist. Remove it and try again")
-        quit()
+        chk = raw_input(name + " directory is already exist. Do you want remove it?")
+        if chk == "y":
+            lc("rm -rf ./"+name)
+        else:
+            quit()
 
     os.chdir(name)
     lc("cp ../" + filename + " ./")
@@ -49,6 +52,7 @@ if step == "1":
     # neutral
     os.mkdir("neutral")
     os.chdir("neutral")
+    os.mkdir("./check")
     lc("cp ../" + filename + " ./")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=0, multi=1, options=opt, options2="")
@@ -58,6 +62,7 @@ if step == "1":
     # anaion
     os.mkdir("anion")
     os.chdir("anion")
+    os.mkdir("./check")
     lc("cp ../" + filename + " ./")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=-1, multi=3, options=opt, options2="")
@@ -67,6 +72,7 @@ if step == "1":
     # cation
     os.mkdir("cation")
     os.chdir("cation")
+    os.mkdir("./check")
     lc("cp ../" + filename + " ./")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=-1, multi=3, options=opt, options2="")
