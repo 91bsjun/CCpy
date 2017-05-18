@@ -19,8 +19,7 @@ except:
 1 : Step   I. Optimize -1,0,+1 state
 2 : Step  II. Calculate single point energy of each structure (-1 state of neutral, ...)
 3 : Step III. Calculate Reorganization energy
-[suboption]
-a : no check files, calculate all inputs'''
+'''
           )
     quit()
 
@@ -36,7 +35,7 @@ opt = "gfinput gfprint SCF(maxcycle=512,conver=6) opt=gediis"
 sp = "gfinput gfprint SCF(maxcycle=512,conver=6) sp"
 
 # --------- Step 1. optimize -1,0,+1 state --------- #
-if step == 1:
+if step == "1":
     name = filename.split(".")[0]
     try:
         os.mkdir(name)
@@ -74,7 +73,7 @@ if step == 1:
     os.chdir("../")
 
 # --------- Step 2. Calculate single point state --------- #
-elif step == 2:
+elif step == "2":
     name = filename.split(".")[0]
     if name not in os.listdir("./"):
         print("You might have not performed 'step 1' process.")
