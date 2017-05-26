@@ -195,83 +195,111 @@ class VASPInput():
             incar_dict['ISIF']=isif
         if spin:
             incar_dict['ISPIN']=2
+
+        # -- magnetic momentum
+        if magmom_dict:
+            magmom = magmom_dict
+        else:
+            magmom = self.magmom
+        # -- magmom value edit
+        if not flask_app:
+            print("\n# ---------- Here are the current MAGMOM values ---------- #")
+            magmom_keys = magmom.keys()
+            magmom_keys.sort()
+            for key in magmom_keys:
+                print(str(key).ljust(8) + " = " + str(magmom[key]))
+            print("Other atoms which not in here are = 0.6")
+            get_sets = raw_input(
+                "* Anything want to modify or add? if not, enter \"n\" or (Co=6,Ni=4) \n: ")
+            if get_sets != "n":
+                vals = get_sets.replace(" ", "")
+                vals = vals.split(",")
+                for val in vals:
+                    key = val.split("=")[0]
+                    value = val.split("=")[1]
+                    magmom[key] = value
+
+        mag_string = ""
+        for i in range(len(n_of_atoms)):
+            try:
+                mag_string += str(n_of_atoms[i]) + "*" + str(magmom[elts[i]]) + " "
+            except:
+                mag_string += str(n_of_atoms[i]) + "*" + str(0.6) + " "
+
         if mag:
-            if magmom_dict:
-                magmom = magmom_dict
-            else:
-                magmom = self.magmom
-            # -- magmom value edit
-            if not flask_app:
-                print("\n# ---------- Here are the current MAGMOM values ---------- #")
-                magmom_keys = magmom.keys()
-                magmom_keys.sort()
-                for key in magmom_keys:
-                    print(str(key).ljust(8) + " = " + str(magmom[key]))
-                print("Other atoms which not in here are = 0.6")
-                get_sets = raw_input(
-                    "* Anything want to modify or add? if not, enter \"n\" or (Co=6,Ni=4) \n: ")
-                if get_sets != "n":
-                    vals = get_sets.replace(" ", "")
-                    vals = vals.split(",")
-                    for val in vals:
-                        key = val.split("=")[0]
-                        value = val.split("=")[1]
-                        magmom[key] = value
-
-            mag_string = ""
-            for i in range(len(n_of_atoms)):
-                try:
-                    mag_string += str(n_of_atoms[i]) + "*" + str(magmom[elts[i]]) + " "
-                except:
-                    mag_string += str(n_of_atoms[i]) + "*" + str(0.6) + " "
+            if "# MAGMOM" in incar_dict.keys():
+                incar_dict['MAGMOM'] = incar_dict.pop("# MAGMOM")
             incar_dict['MAGMOM'] = mag_string
+        else:
+            if "# MAGMOM" in incar_dict.keys():
+                incar_dict['# MAGMOM'] = mag_string
+
+        # -- ldau
+        if ldau_dict:
+            LDAUU = ldau_dict       # ldauu parameters from arg
+        else:
+            LDAUU = self.LDAUU
+        if not flask_app:
+            print("\n# -------- Here are the current LDAU+U parameters -------- #")
+            LDAUU_keys = LDAUU.keys()
+            LDAUU_keys.sort()
+            for key in LDAUU_keys:
+                print(str(key).ljust(8) + " = " + str(LDAUU[key]))
+            print("Other atoms which not in here are = 0")
+            get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (Ni=7.3,Mn=3.6) \n: ")
+            if get_sets != "n":
+                vals = get_sets.replace(" ", "")
+                vals = vals.split(",")
+                for val in vals:
+                    key = val.split("=")[0]
+                    value = val.split("=")[1]
+                    LDAUU[key] = value
+        LDAUL_string = ""
+        for i in range(len(elts)):
+            try:
+                LDAUL_string += str(LDAUL[elts[i]]) + " "
+            except:
+                LDAUL_string += str(0) + " "
+
+        LDAUU_string = ""
+        for i in range(len(elts)):
+            try:
+                LDAUU_string += str(LDAUU[elts[i]]) + " "
+            except:
+                LDAUU_string += str(0) + " "
+
+        LDAUJ_string = ""
+        for i in range(len(elts)):
+            try:
+                LDAUJ_string += str(LDAUJ[elts[i]]) + " "
+            except:
+                LDAUJ_string += str(0) + " "
+
         if ldau:
-            if ldau_dict:
-                LDAUU = ldau_dict       # ldauu parameters from arg
-            else:
-                LDAUU = self.LDAUU
-            if not flask_app:
-                print("\n# -------- Here are the current LDAU+U parameters -------- #")
-                LDAUU_keys = LDAUU.keys()
-                LDAUU_keys.sort()
-                for key in LDAUU_keys:
-                    print(str(key).ljust(8) + " = " + str(LDAUU[key]))
-                print("Other atoms which not in here are = 0")
-                get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (Ni=7.3,Mn=3.6) \n: ")
-                if get_sets != "n":
-                    vals = get_sets.replace(" ", "")
-                    vals = vals.split(",")
-                    for val in vals:
-                        key = val.split("=")[0]
-                        value = val.split("=")[1]
-                        LDAUU[key] = value
-            LDAUL_string = ""
-            for i in range(len(elts)):
-                try:
-                    LDAUL_string += str(LDAUL[elts[i]]) + " "
-                except:
-                    LDAUL_string += str(0) + " "
+            if "# LDAU" in incar_dict.keys():
+                incar_dict['LDAU'] = incar_dict.pop('# LDAU')
+            if "# LMAXMIX" in incar_dict.keys():
+                incar_dict['LMAXMIX'] = incar_dict.pop('# LMAXMIX')
+            if "# LDAUTYPE" in incar_dict.keys():
+                incar_dict['LDAUTYPE'] = incar_dict.pop('# LDAUTYPE')
+            if "# LDAUL" in incar_dict.keys():
+                incar_dict['LDAUL'] = incar_dict.pop('# LDAUL')
+            if "# LDAUU" in incar_dict.keys():
+                incar_dict['LDAUU'] = incar_dict.pop('# LDAUU')
+            if "# LDAUJ" in incar_dict.keys():
+                incar_dict['LDAUJ'] = incar_dict.pop('# LDAUJ')
 
-            LDAUU_string = ""
-            for i in range(len(elts)):
-                try:
-                    LDAUU_string += str(LDAUU[elts[i]]) + " "
-                except:
-                    LDAUU_string += str(0) + " "
-
-            LDAUJ_string = ""
-            for i in range(len(elts)):
-                try:
-                    LDAUJ_string += str(LDAUJ[elts[i]]) + " "
-                except:
-                    LDAUJ_string += str(0) + " "
-
-            incar_dict['LDAU'] = ".TRUE."
-            incar_dict['LMAXMIX'] = 4
-            incar_dict['LDAUTYPE'] = 2
             incar_dict['LDAUL'] = LDAUL_string
             incar_dict['LDAUU'] = LDAUU_string
             incar_dict['LDAUJ'] = LDAUJ_string
+        else:
+            if "# LDAUL" in incar_dict.keys():
+                incar_dict['# LDAUL'] = LDAUL_string
+            if "# LDAUU" in incar_dict.keys():
+                incar_dict['# LDAUU'] = LDAUU_string
+            if "# LDAUJ" in incar_dict.keys():
+                incar_dict['# LDAUJ'] = LDAUJ_string
+
         if vdw:
             vdw_C6 = self.vdw_C6
             vdw_R0 = self.vdw_R0
@@ -341,14 +369,20 @@ class VASPInput():
                         else:
                             incar_string += key + " = " + incar_dict[key] + "\n"
                     print(incar_string)
-                    get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate) \n: ")
+                    get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate /without spacing) \n: ")
                     if get_sets != "n":
                         vals = get_sets.replace(", ",",")
                         vals = vals.split(",")
                         for val in vals:
                             key = val.split("=")[0]
                             value = val.split("=")[1]
-                            incar_dict[key] = value
+                            if "# "+key in incar_keys:
+                                incar_dict[key] = incar_dict.pop("# "+key)
+                                original = incar_dict["# "+key]
+                                description = original.split("!")[1]
+                                incar_dict[key] = value + "          "+description
+                            else:
+                                incar_dict[key] = value
                 # make INCAR string type
                 incar = incar_string
             else:
