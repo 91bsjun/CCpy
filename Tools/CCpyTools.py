@@ -460,7 +460,7 @@ def vasp_incar_json():
 "LDIAG":"T                    ! sub-space diagonalisation",
 "LREAL":"auto                 ! real-space projection",
 "PREC":"med                   ! accuracy",
-"# NBANDS  ":"30              ! number of bands for diagonalization",
+"# NBANDS":"30              ! number of bands for diagonalization",
 
 "#4 ":"Ionic Relaxation",
 "NSW":"200                    ! number of steps for IOM",

@@ -386,12 +386,15 @@ class VASPInput():
                                     description = ""
                                 incar_dict[key] = value + "          !"+description
                             else:
-                                original = incar_dict[key]
+                                if key in incar_keys:
+                                    original = incar_dict[key]
+                                else:
+                                    original = ""
                                 try:
                                     description = original.split("!")[1]
                                 except:
                                     description = ""
-                                incar_dict[key] = value + "          !" + description
+                                incar_dict[key] = value + "\t\t\t\t\t!" + description
                 # make INCAR string type
                 incar_keys = incar_dict.keys()
                 # incar_keys.sort()
