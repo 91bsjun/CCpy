@@ -368,9 +368,9 @@ class VASPInput():
                     for key in incar_keys:
                         if key[0] == "#" and key[1].isdigit():
                             incar_string += "\n"
-                            incar_string += key + incar_dict[key] + "\n"
+                            incar_string += key + str(incar_dict[key]) + "\n"
                         else:
-                            incar_string += key + " = " + incar_dict[key] + "\n"
+                            incar_string += key + " = " + str(incar_dict[key]) + "\n"
                     print(incar_string)
                     get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate /without spacing) \n: ")
                     if get_sets != "n":
@@ -406,9 +406,9 @@ class VASPInput():
                 for key in incar_keys:
                     if key[0] == "#" and key[1].isdigit():
                         incar_string += "\n"
-                        incar_string += key + incar_dict[key] + "\n"
+                        incar_string += key + str(incar_dict[key]) + "\n"
                     else:
-                        incar_string += key + " = " + incar_dict[key] + "\n"
+                        incar_string += key + " = " + str(incar_dict[key]) + "\n"
                 incar = incar_string
             else:
                 incar = Incar(incar_dict)
