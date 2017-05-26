@@ -201,8 +201,9 @@ class VASPInput():
             magmom = magmom_dict
         else:
             magmom = self.magmom
+
         # -- magmom value edit
-        if not flask_app:
+        if mag and not flask_app:
             print("\n# ---------- Here are the current MAGMOM values ---------- #")
             magmom_keys = magmom.keys()
             magmom_keys.sort()
@@ -239,7 +240,7 @@ class VASPInput():
             LDAUU = ldau_dict       # ldauu parameters from arg
         else:
             LDAUU = self.LDAUU
-        if not flask_app:
+        if ldau and not flask_app:
             print("\n# -------- Here are the current LDAU+U parameters -------- #")
             LDAUU_keys = LDAUU.keys()
             LDAUU_keys.sort()
