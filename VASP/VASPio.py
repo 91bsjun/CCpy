@@ -380,7 +380,6 @@ class VASPInput():
                             key = val.split("=")[0]
                             value = val.split("=")[1]
                             if "# "+key in incar_keys:
-                                incar_dict[key] = incar_dict.pop("# "+key)
                                 incar_dict = OrderedDict(
                                     [(key, incar_dict["# "+key]) if k == "# "+key else (k, v) for k, v in
                                      incar_dict.items()])
