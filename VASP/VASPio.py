@@ -246,8 +246,8 @@ class VASPInput():
         else:
             LDAUU = self.LDAUU
         if ldau and not flask_app:
-            print("# -------------------------------------------------------- #")
-            print("\n# -------- Here are the current LDAU+U parameters -------- #")
+            print("\n# -------------------------------------------------------- #")
+            print("# -------- Here are the current LDAU+U parameters -------- #")
             print("# -------------------------------------------------------- #")
             LDAUU_keys = LDAUU.keys()
             LDAUU_keys.sort()
@@ -398,8 +398,8 @@ class VASPInput():
             if not input_incar :        # This process is for avoiding multiple inputs generation.
                 get_sets = None
                 while get_sets != "n":
-                    print("# -------------------------------------------------------- #")
-                    print("\n# ---------- Here are the current INCAR options ---------- #")
+                    print("\n# -------------------------------------------------------- #")
+                    print("# ---------- Here are the current INCAR options ---------- #")
                     print("# -------------------------------------------------------- #")
                     incar_keys = incar_dict.keys()
                     # incar_keys.sort()
