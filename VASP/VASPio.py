@@ -384,7 +384,7 @@ class VASPInput():
                                     description = original.split("!")[1]
                                 except:
                                     description = ""
-                                incar_dict[key] = value + "          !"+description
+                                incar_dict[key] = value.ljust(22) + "! " + description
                             else:
                                 if key in incar_keys:
                                     original = incar_dict[key]
@@ -394,7 +394,7 @@ class VASPInput():
                                     description = original.split("!")[1]
                                 except:
                                     description = ""
-                                incar_dict[key] = value + "\t\t\t\t\t!" + description
+                                incar_dict[key] = value.ljust(22) + "! " + description
                 # make INCAR string type
                 incar_keys = incar_dict.keys()
                 # incar_keys.sort()
