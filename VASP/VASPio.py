@@ -332,9 +332,14 @@ class VASPInput():
                 while get_sets != "n":
                     print("\n# ---------- Here are the current INCAR options ---------- #")
                     incar_keys = incar_dict.keys()
-                    incar_keys.sort()
-                    for key in incar_keys:
-                        print(str(key).ljust(8) + " = " + str(incar_dict[key]))
+                    # incar_keys.sort()
+                    incar_string = ""
+                    for key in dict.keys():
+                        if key[0] == "#" and key[1].isdigit():
+                            incar_string += "\n"
+                            incar_string += key + dict[key] + "\n"
+                        else:
+                            incar_string += key + " = " + dict[key] + "\n"
                     get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate) \n: ")
                     if get_sets != "n":
                         vals = get_sets.replace(", ",",")
