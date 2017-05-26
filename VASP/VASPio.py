@@ -229,8 +229,7 @@ class VASPInput():
 
         if mag:
             if "# MAGMOM" in incar_dict.keys():
-                incar_dict['MAGMOM'] = incar_dict.pop("# MAGMOM")
-            incar_dict['MAGMOM'] = mag_string
+                incar_dict = OrderedDict([("MAGMOM",mag_string) if k == "# MAGMOM" else (k,v) for k, v in incar_dict.items()])
         else:
             if "# MAGMOM" in incar_dict.keys():
                 incar_dict['# MAGMOM'] = mag_string
@@ -278,21 +277,24 @@ class VASPInput():
 
         if ldau:
             if "# LDAU" in incar_dict.keys():
-                incar_dict['LDAU'] = incar_dict.pop('# LDAU')
+                incar_dict = OrderedDict(
+                    [("LDAU", incar_dict["# LDAU"]) if k == "# LDAU" else (k, v) for k, v in incar_dict.items()])
             if "# LMAXMIX" in incar_dict.keys():
-                incar_dict['LMAXMIX'] = incar_dict.pop('# LMAXMIX')
+                incar_dict = OrderedDict(
+                    [("LMAXMIX", incar_dict["# LMAXMIX"]) if k == "# LMAXMIX" else (k, v) for k, v in incar_dict.items()])
             if "# LDAUTYPE" in incar_dict.keys():
-                incar_dict['LDAUTYPE'] = incar_dict.pop('# LDAUTYPE')
+                incar_dict = OrderedDict(
+                    [("LDAUTYPE", incar_dict["# LDAUTYPE"]) if k == "# LDAUTYPE" else (k, v) for k, v in incar_dict.items()])
             if "# LDAUL" in incar_dict.keys():
-                incar_dict['LDAUL'] = incar_dict.pop('# LDAUL')
+                incar_dict = OrderedDict(
+                    [("LDAUL", LDAUL_string) if k == "# LDAUL" else (k, v) for k, v in incar_dict.items()])
             if "# LDAUU" in incar_dict.keys():
-                incar_dict['LDAUU'] = incar_dict.pop('# LDAUU')
+                incar_dict = OrderedDict(
+                    [("LDAUU", LDAUU_string) if k == "# LDAUU" else (k, v) for k, v in incar_dict.items()])
             if "# LDAUJ" in incar_dict.keys():
-                incar_dict['LDAUJ'] = incar_dict.pop('# LDAUJ')
+                incar_dict = OrderedDict(
+                    [("LDAUJ", LDAUJ_string) if k == "# LDAUJ" else (k, v) for k, v in incar_dict.items()])
 
-            incar_dict['LDAUL'] = LDAUL_string
-            incar_dict['LDAUU'] = LDAUU_string
-            incar_dict['LDAUJ'] = LDAUJ_string
         else:
             if "# LDAUL" in incar_dict.keys():
                 incar_dict['# LDAUL'] = LDAUL_string
@@ -372,7 +374,6 @@ class VASPInput():
                     print(incar_string)
                     get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate /without spacing) \n: ")
                     if get_sets != "n":
-                        incar_dict["#11"]=" Editted Options"
                         vals = get_sets.replace(", ",",")
                         vals = vals.split(",")
                         for val in vals:
@@ -380,6 +381,9 @@ class VASPInput():
                             value = val.split("=")[1]
                             if "# "+key in incar_keys:
                                 incar_dict[key] = incar_dict.pop("# "+key)
+                                incar_dict = OrderedDict(
+                                    [(key, incar_dict["# "+key]) if k == "# "+key else (k, v) for k, v in
+                                     incar_dict.items()])
                                 original = incar_dict[key]
                                 try:
                                     description = original.split("!")[1]
