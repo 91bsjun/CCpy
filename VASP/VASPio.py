@@ -340,6 +340,7 @@ class VASPInput():
                             incar_string += key + incar_dict[key] + "\n"
                         else:
                             incar_string += key + " = " + incar_dict[key] + "\n"
+                    print(incar_string)
                     get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate) \n: ")
                     if get_sets != "n":
                         vals = get_sets.replace(", ",",")
@@ -349,7 +350,7 @@ class VASPInput():
                             value = val.split("=")[1]
                             incar_dict[key] = value
                 # make INCAR string type
-                incar = Incar(incar_dict)
+                incar = incar_string
             else:
                 incar = Incar(incar_dict)
 
