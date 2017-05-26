@@ -384,10 +384,24 @@ class VASPInput():
                                     description = original.split("!")[1]
                                 except:
                                     description = ""
-                                incar_dict[key] = value + "          "+description
+                                incar_dict[key] = value + "          !"+description
                             else:
-                                incar_dict[key] = value
+                                original = incar_dict[key]
+                                try:
+                                    description = original.split("!")[1]
+                                except:
+                                    description = ""
+                                incar_dict[key] = value + "          !" + description
                 # make INCAR string type
+                incar_keys = incar_dict.keys()
+                # incar_keys.sort()
+                incar_string = ""
+                for key in incar_keys:
+                    if key[0] == "#" and key[1].isdigit():
+                        incar_string += "\n"
+                        incar_string += key + incar_dict[key] + "\n"
+                    else:
+                        incar_string += key + " = " + incar_dict[key] + "\n"
                 incar = incar_string
             else:
                 incar = Incar(incar_dict)
