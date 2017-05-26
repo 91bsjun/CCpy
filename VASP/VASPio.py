@@ -227,13 +227,19 @@ class VASPInput():
             except:
                 mag_string += str(n_of_atoms[i]) + "*" + str(0.6) + " "
 
+        # uncomment mag options. if already uncommented, just change MAGMOM parameters
         if mag:
             if "# MAGMOM" in incar_dict.keys():
                 incar_dict = OrderedDict([("MAGMOM",mag_string) if k == "# MAGMOM" else (k,v) for k, v in incar_dict.items()])
+            elif "MAGMOM" in incar_dict.keys():
+                incar_dict['MAGMOM'] = mag_string
+        # comment mag options. if already commented, just change MAGMOM parameters
         else:
             if "# MAGMOM" in incar_dict.keys():
                 incar_dict['# MAGMOM'] = mag_string
-
+            elif "MAGMOM" in incar_dict.keys():
+                incar_dict = OrderedDict(
+                    [("# MAGMOM", mag_string) if k == "MAGMOM" else (k, v) for k, v in incar_dict.items()])
         # -- ldau
         if ldau_dict:
             LDAUU = ldau_dict       # ldauu parameters from arg
@@ -275,6 +281,7 @@ class VASPInput():
             except:
                 LDAUJ_string += str(0) + " "
 
+        # uncomment ldau options. if already uncommented, just change LDAUU,LDAUL,LDAUJ parameters
         if ldau:
             if "# LDAU" in incar_dict.keys():
                 incar_dict = OrderedDict(
@@ -288,13 +295,21 @@ class VASPInput():
             if "# LDAUL" in incar_dict.keys():
                 incar_dict = OrderedDict(
                     [("LDAUL", LDAUL_string) if k == "# LDAUL" else (k, v) for k, v in incar_dict.items()])
+            elif "LDAUL" in incar_dict.keys():
+                incar_dict["LDAUL"] = LDAUL_string
+
             if "# LDAUU" in incar_dict.keys():
                 incar_dict = OrderedDict(
                     [("LDAUU", LDAUU_string) if k == "# LDAUU" else (k, v) for k, v in incar_dict.items()])
+            elif "LDAUU" in incar_dict.keys():
+                incar_dict["LDAUU"] = LDAUU_string
+
             if "# LDAUJ" in incar_dict.keys():
                 incar_dict = OrderedDict(
                     [("LDAUJ", LDAUJ_string) if k == "# LDAUJ" else (k, v) for k, v in incar_dict.items()])
-
+            elif "LDAUJ" in incar_dict.keys():
+                incar_dict["LDAUJ"] = LDAUJ_string
+        # comment ldau options. if already commented, just change LDAUU,LDAUL,LDAUJ parameters
         else:
             if "LDAU" in incar_dict.keys():
                 incar_dict = OrderedDict(
