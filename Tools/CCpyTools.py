@@ -523,6 +523,7 @@ def vasp_incar_json():
 "# LDAUU":"0 5.00 7.0         ! U coefficient (coulomb interaction) for each species",
 "# LDAUJ":"0 1 1              ! J coefficient (exchange) for each species"
 }"""
+    return jstring
 
 def ssh_command(servername,portnum,username,password,msg):
     command = "sshpass -p \""+password+"\" ssh -p "+portnum+" "+username+"@"+servername+" \""+msg+"\""
