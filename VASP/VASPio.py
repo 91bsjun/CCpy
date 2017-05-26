@@ -2,10 +2,11 @@ import os, sys, re
 import matplotlib.pyplot as plt
 import pandas as pd
 import json
+from collections import OrderedDict
 
 from CCpy.Tools.CCpyStructure import PeriodicStructure as PS
 from CCpy.Tools.CCpyStructure import latticeGen
-from CCpy.Tools.CCpyTools import file_writer, linux_command
+from CCpy.Tools.CCpyTools import file_writer, linux_command, vasp_incar_json
 
 
 from pymatgen.core import IStructure as pmgIS
@@ -51,16 +52,10 @@ class VASPInput():
         configs = os.listdir(home+"/.CCpy")
         if "vasp_incar.json" in configs:
             jstring = open(home + "/.CCpy/vasp_incar.json", "r").read()
-            incar_dict = json.loads(jstring)
+            incar_dict = json.loads(jstring, object_pairs_hook=OrderedDict)
         else:
-            incar_dict = {
-                "NWRITE": 2, "LPETIM": "F", "ISTART": 0, "INIWAV": 1, "IWAVPR": 1, "ICHARG": 2, "LWAVE": ".FALSE.",
-                "ALGO": "FAST", "NELM": 100, "EDIFF": 0.0001, "BMIX": 3.00, "ENCUT": 500, "GGA": "PE", "ISYM": 2,
-                "LDIAG": "T", "LREAL": "auto", "PREC": "Medium",
-                "NSW": 200, "NBLOCK": 1, "KBLOCK": 10, "IBRION": 2, "ISIF": 3, "POTIM": 0.5, "SMASS": 3.0,
-                "ISMEAR": 0, "SIGMA": 0.05, "LORBIT": 11,
-                "NPAR": 8, "LPLANE": "T", "ISPIN": 1}
-            jstring = json.dumps(incar_dict, indent=4)
+            jstring = vasp_incar_json()
+            incar_dict = json.loads(jstring, object_pairs_hook=OrderedDict)
             f = open(home + "/.CCpy/vasp_incar.json", "w")
             f.write(jstring)
             f.close()
