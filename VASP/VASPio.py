@@ -379,8 +379,11 @@ class VASPInput():
                             value = val.split("=")[1]
                             if "# "+key in incar_keys:
                                 incar_dict[key] = incar_dict.pop("# "+key)
-                                original = incar_dict["# "+key]
-                                description = original.split("!")[1]
+                                original = incar_dict[key]
+                                try:
+                                    description = original.split("!")[1]
+                                except:
+                                    description = ""
                                 incar_dict[key] = value + "          "+description
                             else:
                                 incar_dict[key] = value
