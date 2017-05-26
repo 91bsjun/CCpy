@@ -372,6 +372,7 @@ class VASPInput():
                     print(incar_string)
                     get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate /without spacing) \n: ")
                     if get_sets != "n":
+                        incar_dict["#11"]=" Editted Options"
                         vals = get_sets.replace(", ",",")
                         vals = vals.split(",")
                         for val in vals:

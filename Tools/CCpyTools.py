@@ -466,7 +466,7 @@ def vasp_incar_json():
     "#4 ":"Ionic Relaxation",
     "NSW":"200                    ! number of steps for IOM",
     "NBLOCK":"1                   ! inner block",
-	"KBLOCK":"10                  ! outer block",
+    "KBLOCK":"10                  ! outer block",
     "IBRION":"2                   ! ionic relax: 0-MD 1-quasi-New 2-CG",
     "ISIF":"3                     ! ion&cell relax: 0-MD 2-ion&stress 3-ion&cell&stress",
     "ISYM":"2",
@@ -476,7 +476,7 @@ def vasp_incar_json():
     "POTIM":"0.50                 ! time-step for ionic motion (fs)",
     "SMASS":"3.00                 ! Nose mass-parameter (am)",
 
-	"#5 DOS":" related values",
+    "#5 DOS":" related values",
     "ISMEAR":"0                   ! Broadening methode -5-tet -1-fermi 0-gaus 1-mp 2-mp2",
     "SIGMA":"0.05                 ! Broadening in eV",
     "LORBIT":"11                  ! l-decomposed DOS",
@@ -496,7 +496,7 @@ def vasp_incar_json():
     "ISPIN":"1                    ! spin polarized = 2, non spin polarized = 1",
     "# MAGMOM":" 8*0 10*4.5 8*4.5 ! initial magnetic moment for the atoms in the cell",
 
-	"#7 optB86b-vdW functional requires":" vdw_kernel.bindat",
+    "#7 optB86b-vdW functional requires":" vdw_kernel.bindat",
     "# GGA":"MK",
     "# PARAM1":"0.1234",
     "# PARAM2":"1.0000",
