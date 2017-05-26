@@ -296,12 +296,32 @@ class VASPInput():
                     [("LDAUJ", LDAUJ_string) if k == "# LDAUJ" else (k, v) for k, v in incar_dict.items()])
 
         else:
-            if "# LDAUL" in incar_dict.keys():
-                incar_dict['# LDAUL'] = LDAUL_string
-            if "# LDAUU" in incar_dict.keys():
-                incar_dict['# LDAUU'] = LDAUU_string
-            if "# LDAUJ" in incar_dict.keys():
-                incar_dict['# LDAUJ'] = LDAUJ_string
+            if "LDAU" in incar_dict.keys():
+                incar_dict = OrderedDict(
+                    [("# LDAU", incar_dict["LDAU"]) if k == "LDAU" else (k, v) for k, v in incar_dict.items()])
+            if "LMAXMIX" in incar_dict.keys():
+                incar_dict = OrderedDict(
+                    [("# LMAXMIX", incar_dict["LMAXMIX"]) if k == "LMAXMIX" else (k, v) for k, v in incar_dict.items()])
+            if "LDAUTYPE" in incar_dict.keys():
+                incar_dict = OrderedDict(
+                    [("# LDAUTYPE", incar_dict["LDAUTYPE"]) if k == "LDAUTYPE" else (k, v) for k, v in incar_dict.items()])
+            if "LDAUL" in incar_dict.keys():
+                incar_dict = OrderedDict(
+                    [("# LDAUL", LDAUL_string) if k == "LDAUL" else (k, v) for k, v in incar_dict.items()])
+            elif "# LDAUL" in incar_dict.keys():
+                incar_dict["# LDAUL"] = LDAUL_string
+
+            if "LDAUU" in incar_dict.keys():
+                incar_dict = OrderedDict(
+                    [("# LDAUU", LDAUU_string) if k == "LDAUU" else (k, v) for k, v in incar_dict.items()])
+            elif "# LDAUU" in incar_dict.keys():
+                incar_dict["# LDAUU"] = LDAUU_string
+
+            if "LDAUJ" in incar_dict.keys():
+                incar_dict = OrderedDict(
+                    [("# LDAUJ", LDAUJ_string) if k == "LDAUJ" else (k, v) for k, v in incar_dict.items()])
+            elif "# LDAUJ" in incar_dict.keys():
+                incar_dict["# LDAUJ"] = LDAUJ_string
 
         if vdw:
             vdw_C6 = self.vdw_C6
