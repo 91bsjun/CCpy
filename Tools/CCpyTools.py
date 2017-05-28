@@ -448,7 +448,7 @@ def vasp_incar_json():
     "INIWAV":"1                   ! 0-jellium  1-random",
     "IWAVPR":"1                   ! prediction:  0-non 1-charg 2-wave 3-comb",
     "ICHARG":"2                   ! 0-from WF  1-from CHGCAR  2-from atom  11-12-fixed",
-    "LWAVE": ".FALSE."            ! determines whether the wavefunctions are written to the WAVECAR file,
+    "LWAVE": ".FALSE.             ! determines whether the wavefunctions are written to the WAVECAR file",
 
     "#2 ":"Electronic Relaxation 1",
     "NELM":"100                   ! number of iterations",
