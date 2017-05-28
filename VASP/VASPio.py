@@ -462,7 +462,14 @@ class VASPInput():
                         incar_string += key + " = " + str(incar_dict[key]) + "\n"
                 incar = incar_string
             else:
-                incar = Incar(incar_dict)
+                incar_keys = incar_dict.keys()
+                for key in incar_keys:
+                    if key[0] == "#" and key[1].isdigit():
+                        incar_string += "\n"
+                        incar_string += key + str(incar_dict[key]) + "\n"
+                    else:
+                        incar_string += key + " = " + str(incar_dict[key]) + "\n"
+                incar = incar_string
 
         # save current options, for rest inputs
         current_options = {"incar":incar_dict, "magmom":magmom, "ldauu":LDAUU}
