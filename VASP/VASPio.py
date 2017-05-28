@@ -4,9 +4,11 @@ import pandas as pd
 import json
 from collections import OrderedDict
 
+from CCpy.VASP.VASPtools import vasp_incar_json, magmom_parameters, ldauu_parameters, ldauj_parameters, ldaul_parameters
+
 from CCpy.Tools.CCpyStructure import PeriodicStructure as PS
 from CCpy.Tools.CCpyStructure import latticeGen
-from CCpy.Tools.CCpyTools import file_writer, linux_command, vasp_incar_json
+from CCpy.Tools.CCpyTools import file_writer, linux_command, change_dict_key, save_json, load_json
 
 
 from pymatgen.core import IStructure as pmgIS
@@ -45,90 +47,45 @@ class VASPInput():
         self.structure = structure
         self.dirname = dirname
 
-        # ------------ check initial config ------------- #
+        # ------------ check preset config ------------- #
         home = os.getenv("HOME")
         if ".CCpy" not in os.listdir(home):
             os.mkdir(home+"/.CCpy")
         configs = os.listdir(home+"/.CCpy")
+        # INCAR preset check
         if "vasp_incar.json" in configs:
-            jstring = open(home + "/.CCpy/vasp_incar.json", "r").read()
-            incar_dict = json.loads(jstring, object_pairs_hook=OrderedDict)
+            incar_dict = load_json(home + "/.CCpy/vasp_incar.json")
         else:
             jstring = vasp_incar_json()
-            incar_dict = json.loads(jstring, object_pairs_hook=OrderedDict)
-            f = open(home + "/.CCpy/vasp_incar.json", "w")
-            f.write(jstring)
-            f.close()
+            incar_dict = json.loads(jstring, ordered=True)
+            save_json(incar_dict, home + "/.CCpy/vasp_incar.json")
+        # MAGMOM value preset check
         if "vasp_MAGMOM.json" in configs:
-            jstring = open(home + "/.CCpy/vasp_MAGMOM.json", "r").read()
-            magmom = json.loads(jstring)
+            magmom = load_json(home + "/.CCpy/vasp_MAGMOM.json")
         else:
-            magmom = {'Mn3+': 4, 'Ni4+': 0.6, 'Cr': 5, 'Mn4+': 3, 'Ta': 5, 'Ni3+': 1, 'Mo': 5,
-                      'Ni': 2, 'V': 5, 'Mn2+': 5, 'Co': 5, 'Co4+': 1, 'W': 5, 'Fe3+': 5, 'Fe2+': 4,
-                      'Mn': 5, 'Fe4+': 4, 'Fe': 5, 'Co3+': 0.6,
-                      'Li': 0.6, 'O': 0.6}
-            jstring = json.dumps(magmom, indent=4)
-            f = open(home+"/.CCpy/vasp_MAGMOM.json", "w")
-            f.write(jstring)
-            f.close()
-
+            magmom = magmom_parameters()
+            save_json(magmom, home+"/.CCpy/vasp_MAGMOM.json")
+        # LDAUU value preset check
         if "vasp_LDAUU.json" in configs:
-            jstring = open(home + "/.CCpy/vasp_LDAUU.json", "r").read()
-            LDAUU = json.loads(jstring)
+            LDAUU = load_json(home + "/.CCpy/vasp_LDAUU.json")
         else:
-            LDAUU = {'Mo': 4.38, 'V': 3.1, 'Cu': 4, 'W': 4.0, 'Ag': 1.5, 'Cr': 3.5, 'Ta': 2,
-                     'Nb': 1.5, 'Mn': 3.9, 'Re': 2, 'Co': 3.4, 'Ni': 6, 'Fe': 4.0,
-                     'Li': 0, 'O': 0}
-            jstring = json.dumps(LDAUU, indent=4)
-            f = open(home + "/.CCpy/vasp_LDAUU.json", "w")
-            f.write(jstring)
-            f.close()
+            LDAUU = ldauu_parameters()
+            save_json(LDAUU, home + "/.CCpy/vasp_LDAUU.json")
+        # LDAUL value preset check
         if "vasp_LDAUL.json" in configs:
-            jstring = open(home + "/.CCpy/vasp_LDAUL.json", "r").read()
-            LDAUL = json.loads(jstring)
+            LDAUL = load_json(home + "/.CCpy/vasp_LDAUL.json")
         else:
-            LDAUL = {'Mo': 2, 'V': 2, 'Cu': 2, 'W': 2, 'Ag': 2, 'Cr': 2, 'Ta': 2,
-                     'Nb': 2, 'Mn': 2, 'Re': 2, 'Co': 2, 'Ni': 2, 'Fe': 2,
-                     'Li': 0, 'O': 0}
-            jstring = json.dumps(LDAUL, indent=4)
-            f = open(home + "/.CCpy/vasp_LDAUL.json", "w")
-            f.write(jstring)
-            f.close()
+            LDAUL = ldaul_parameters()
+            save_json(LDAUL, home + "/.CCpy/vasp_LDAUL.json")
+        # LDAUJ value preset check
         if "vasp_LDAUJ.json" in configs:
-            jstring = open(home + "/.CCpy/vasp_LDAUJ.json", "r").read()
-            LDAUJ = json.loads(jstring)
+            LDAUJ = load_json(home + "/.CCpy/vasp_LDAUJ.json")
         else:
-            LDAUJ = {'Mo': 0, 'V': 0, 'Cu': 0, 'W': 0, 'Ag': 0, 'Cr': 0, 'Ta': 0,
-                     'Nb': 0, 'Mn': 0, 'Re': 0, 'Co': 0, 'Ni': 0, 'Fe': 0,
-                     'Li': 0, 'O': 0}
-            jstring = json.dumps(LDAUJ, indent=4)
-            f = open(home + "/.CCpy/vasp_LDAUJ.json", "w")
-            f.write(jstring)
-            f.close()
-        # DFT-D2 parameters : From VASP wiki
-        vdw_C6 = {'H': 0.14, 'He': 0.08, 'Li': 1.61, 'Be': 1.61, 'B': 3.13, 'C': 1.75, 'N': 1.23, 'O': 0.70, 'F': 0.75,
-                  'Ne': 0.63, 'Na': 5.71,
-                  'Mg': 5.71, 'Al': 10.79, 'Si': 9.23, 'P': 7.84, 'S': 5.57, 'Cl': 5.07, 'Ar': 4.61, 'K': 10.80,
-                  'Ca': 10.80,
-                  'Sc': 10.80, 'Ti': 10.80, 'V': 10.80, 'Cr': 10.80, 'Mn': 10.80, 'Fe': 10.80, 'Co': 10.80, 'Ni': 10.80,
-                  'Cu': 10.80, 'Zn': 10.80,
-                  'Ga': 16.99, 'Ge': 17.10, 'As': 16.37, 'Se': 12.64, 'Br': 12.47, 'Kr': 12.01, 'Rb': 24.67,
-                  'Sr': 24.67,
-                  'Y': 24.67, 'Zr': 24.67, 'Nb': 24.67, 'Mo': 24.67, 'Tc': 24.67, 'Ru': 24.67, 'Rh': 24.67, 'Pd': 24.67,
-                  'Ag': 24.67, 'Cd': 24.67,
-                  'In': 37.32, 'Sn': 38.71, 'Sb': 38.44, 'Te': 31.74, 'I': 31.50, 'Xe': 29.99}
+            LDAUJ = ldauj_parameters()
+            save_json(LDAUJ, home + "/.CCpy/vasp_LDAUJ.json")
 
-        vdw_R0 = {'H': 1.001, 'He': 1.012, 'Li': 0.825, 'Be': 1.408, 'B': 1.485, 'C': 1.452, 'N': 1.397, 'O': 1.342,
-                  'F': 1.287, 'Ne': 1.243, 'Na': 1.144,
-                  'Mg': 1.364, 'Al': 1.716, 'Si': 1.716, 'P': 1.705, 'S': 1.683, 'Cl': 1.639, 'Ar': 1.595, 'K': 1.485,
-                  'Ca': 1.474,
-                  'Sc': 1.562, 'Ti': 1.562, 'V': 1.562, 'Cr': 1.562, 'Mn': 1.562, 'Fe': 1.562, 'Co': 1.562, 'Ni': 1.562,
-                  'Cu': 1.562, 'Zn': 1.562,
-                  'Ga': 1.650, 'Ge': 1.727, 'As': 1.760, 'Se': 1.771, 'Br': 1.749, 'Kr': 1.727, 'Rb': 1.628,
-                  'Sr': 1.606,
-                  'Y': 1.639, 'Zr': 1.639, 'Nb': 1.639, 'Mo': 1.639, 'Tc': 1.639, 'Ru': 1.639, 'Rh': 1.639, 'Pd': 1.639,
-                  'Ag': 1.639, 'Cd': 1.639,
-                  'In': 1.672, 'Sn': 1.804, 'Sb': 1.881, 'Te': 1.892, 'I': 1.892, 'Xe': 1.881}
+        print("Preset options have been saved under :"+home+"/.CCpy")
+
 
         self.incar_dict, self.magmom, self.LDAUL, self.LDAUU, self.LDAUJ, self.vdw_C6, self.vdw_R0 = incar_dict, magmom, LDAUL, LDAUU, LDAUJ, vdw_C6, vdw_R0
 
@@ -144,16 +101,15 @@ class VASPInput():
                      flask_app=False):
         """
 
-        :param single_point:
-        :param isif:
-        :param vdw:
-        :param spin:
-        :param mag:
-        :param ldau:
-        :param functional:
+        :param single_point: set NSW=0
+        :param isif: set ISIF parameter
+        :param vdw: perform DFT-D2 calc
+        :param spin: set ISPIN=2
+        :param mag: MAGMOM value
+        :param ldau: LDA+U method
+        :param functional: POTCAR functional setting
         :param kpoints: list [4,4,1]
-        :param incar_dict: dictionary type of incar
-        :param input_incar: string type of incar (if exist, pass the confirm menu)
+        :param get_pre_options: Load previous option when multiple input generation
         :param flask_app: in case of flask app, avoid confirm menu (use default k-points = input_kpts)
 
         :return: no return, but write VASP input files at dirname
@@ -162,7 +118,7 @@ class VASPInput():
         structure = self.structure
         dirname = self.dirname
 
-        # -- Load pre option
+        # -- Load previous option when multiple input generation
         if get_pre_options:
             pre_dict = get_pre_options
             incar_dict = pre_dict["incar"]
@@ -189,6 +145,7 @@ class VASPInput():
             elif i == 6:
                 n_of_atoms = lines[i].split()
 
+
         ## -------------------------------- INCAR -------------------------------- ##
         # -- INCAR preset dictionary
         # -- if incar_dict arg exist use it
@@ -214,7 +171,7 @@ class VASPInput():
         else:
             magmom = self.magmom
 
-        # -- magmom value edit
+        # -- edit magmom parameters
         if mag and not flask_app and not magmom_dict:
             print("\n# ---------- Here are the current MAGMOM values ---------- #")
             magmom_keys = magmom.keys()
@@ -242,7 +199,8 @@ class VASPInput():
         # uncomment mag options. if already uncommented, just change MAGMOM parameters
         if mag:
             if "# MAGMOM" in incar_dict.keys():
-                incar_dict = OrderedDict([("MAGMOM",mag_string) if k == "# MAGMOM" else (k,v) for k, v in incar_dict.items()])
+                # incar_dict = OrderedDict([("MAGMOM",mag_string) if k == "# MAGMOM" else (k,v) for k, v in incar_dict.items()])
+                incar_dict = change_dict_key(incar_dict, "# MAGMOM", "MAGMOM", mag_string)
             elif "MAGMOM" in incar_dict.keys():
                 incar_dict['MAGMOM'] = mag_string
         # comment mag options. if already commented, just change MAGMOM parameters
@@ -250,8 +208,9 @@ class VASPInput():
             if "# MAGMOM" in incar_dict.keys():
                 incar_dict['# MAGMOM'] = mag_string
             elif "MAGMOM" in incar_dict.keys():
-                incar_dict = OrderedDict(
-                    [("# MAGMOM", mag_string) if k == "MAGMOM" else (k, v) for k, v in incar_dict.items()])
+                # incar_dict = OrderedDict(
+                #     [("# MAGMOM", mag_string) if k == "MAGMOM" else (k, v) for k, v in incar_dict.items()])
+                incar_dict = change_dict_key(incar_dict, "MAGMOM", "# MAGMOM", mag_string)
         # -- ldau
         if ldau_dict:
             LDAUU = ldau_dict       # get ldauu parameters from previous option
@@ -298,57 +257,70 @@ class VASPInput():
         # uncomment ldau options. if already uncommented, just change LDAUU,LDAUL,LDAUJ parameters
         if ldau:
             if "# LDAU" in incar_dict.keys():
-                incar_dict = OrderedDict(
-                    [("LDAU", incar_dict["# LDAU"]) if k == "# LDAU" else (k, v) for k, v in incar_dict.items()])
+                # incar_dict = OrderedDict(
+                #     [("LDAU", incar_dict["# LDAU"]) if k == "# LDAU" else (k, v) for k, v in incar_dict.items()])
+                incar_dict = change_dict_key(incar_dict, "# LDAU", "LDAU", incar_dict["# LDAU"])
             if "# LMAXMIX" in incar_dict.keys():
-                incar_dict = OrderedDict(
-                    [("LMAXMIX", incar_dict["# LMAXMIX"]) if k == "# LMAXMIX" else (k, v) for k, v in incar_dict.items()])
+                # incar_dict = OrderedDict(
+                #     [("LMAXMIX", incar_dict["# LMAXMIX"]) if k == "# LMAXMIX" else (k, v) for k, v in incar_dict.items()])
+                incar_dict = change_dict_key(incar_dict, "# LMAXMIX", "LMAXMIX", incar_dict["# LMAXMIX"])
             if "# LDAUTYPE" in incar_dict.keys():
-                incar_dict = OrderedDict(
-                    [("LDAUTYPE", incar_dict["# LDAUTYPE"]) if k == "# LDAUTYPE" else (k, v) for k, v in incar_dict.items()])
+                # incar_dict = OrderedDict(
+                #     [("LDAUTYPE", incar_dict["# LDAUTYPE"]) if k == "# LDAUTYPE" else (k, v) for k, v in incar_dict.items()])
+                incar_dict = change_dict_key(incar_dict, "# LDAUTYPE", "LDAUTYPE", incar_dict["# LDAUTYPE"])
             if "# LDAUL" in incar_dict.keys():
-                incar_dict = OrderedDict(
-                    [("LDAUL", LDAUL_string) if k == "# LDAUL" else (k, v) for k, v in incar_dict.items()])
+                # incar_dict = OrderedDict(
+                #     [("LDAUL", LDAUL_string) if k == "# LDAUL" else (k, v) for k, v in incar_dict.items()])
+                incar_dict = change_dict_key(incar_dict, "# LDAUL", "LDAUL", LDAUL_string)
             elif "LDAUL" in incar_dict.keys():
                 incar_dict["LDAUL"] = LDAUL_string
 
             if "# LDAUU" in incar_dict.keys():
-                incar_dict = OrderedDict(
-                    [("LDAUU", LDAUU_string) if k == "# LDAUU" else (k, v) for k, v in incar_dict.items()])
+                # incar_dict = OrderedDict(
+                #     [("LDAUU", LDAUU_string) if k == "# LDAUU" else (k, v) for k, v in incar_dict.items()])
+                incar_dict = change_dict_key(incar_dict, "# LDAUU", "LDAUU", LDAUU_string)
+
             elif "LDAUU" in incar_dict.keys():
                 incar_dict["LDAUU"] = LDAUU_string
 
             if "# LDAUJ" in incar_dict.keys():
-                incar_dict = OrderedDict(
-                    [("LDAUJ", LDAUJ_string) if k == "# LDAUJ" else (k, v) for k, v in incar_dict.items()])
+                # incar_dict = OrderedDict(
+                #     [("LDAUJ", LDAUJ_string) if k == "# LDAUJ" else (k, v) for k, v in incar_dict.items()])
+                incar_dict = change_dict_key(incar_dict, "# LDAUJ", "LDAUJ", LDAUJ_string)
             elif "LDAUJ" in incar_dict.keys():
                 incar_dict["LDAUJ"] = LDAUJ_string
         # comment ldau options. if already commented, just change LDAUU,LDAUL,LDAUJ parameters
         else:
             if "LDAU" in incar_dict.keys():
-                incar_dict = OrderedDict(
-                    [("# LDAU", incar_dict["LDAU"]) if k == "LDAU" else (k, v) for k, v in incar_dict.items()])
+                # incar_dict = OrderedDict(
+                #     [("# LDAU", incar_dict["LDAU"]) if k == "LDAU" else (k, v) for k, v in incar_dict.items()])
+                incar_dict = change_dict_key(incar_dict, "LDAU", "# LDAU", incar_dict["LDAU"])
             if "LMAXMIX" in incar_dict.keys():
-                incar_dict = OrderedDict(
-                    [("# LMAXMIX", incar_dict["LMAXMIX"]) if k == "LMAXMIX" else (k, v) for k, v in incar_dict.items()])
+                # incar_dict = OrderedDict(
+                #     [("# LMAXMIX", incar_dict["LMAXMIX"]) if k == "LMAXMIX" else (k, v) for k, v in incar_dict.items()])
+                incar_dict = change_dict_key(incar_dict, "LMAXMIX", "# LMAXMIX", incar_dict["MAXMIX"])
             if "LDAUTYPE" in incar_dict.keys():
-                incar_dict = OrderedDict(
-                    [("# LDAUTYPE", incar_dict["LDAUTYPE"]) if k == "LDAUTYPE" else (k, v) for k, v in incar_dict.items()])
+                # incar_dict = OrderedDict(
+                #     [("# LDAUTYPE", incar_dict["LDAUTYPE"]) if k == "LDAUTYPE" else (k, v) for k, v in incar_dict.items()])
+                incar_dict = change_dict_key(incar_dict, "LDAUTYPE", "# LDAUTYPE", incar_dict["LDAUTYPE"])
             if "LDAUL" in incar_dict.keys():
-                incar_dict = OrderedDict(
-                    [("# LDAUL", LDAUL_string) if k == "LDAUL" else (k, v) for k, v in incar_dict.items()])
+                # incar_dict = OrderedDict(
+                #     [("# LDAUL", LDAUL_string) if k == "LDAUL" else (k, v) for k, v in incar_dict.items()])
+                incar_dict = change_dict_key(incar_dict, "LDAUL", "# LDAUL", LDAUL_string)
             elif "# LDAUL" in incar_dict.keys():
                 incar_dict["# LDAUL"] = LDAUL_string
 
             if "LDAUU" in incar_dict.keys():
-                incar_dict = OrderedDict(
-                    [("# LDAUU", LDAUU_string) if k == "LDAUU" else (k, v) for k, v in incar_dict.items()])
+                # incar_dict = OrderedDict(
+                #     [("# LDAUU", LDAUU_string) if k == "LDAUU" else (k, v) for k, v in incar_dict.items()])
+                incar_dict = change_dict_key(incar_dict, "LDAUU", "# LDAUU", LDAUU_string)
             elif "# LDAUU" in incar_dict.keys():
                 incar_dict["# LDAUU"] = LDAUU_string
 
             if "LDAUJ" in incar_dict.keys():
-                incar_dict = OrderedDict(
-                    [("# LDAUJ", LDAUJ_string) if k == "LDAUJ" else (k, v) for k, v in incar_dict.items()])
+                # incar_dict = OrderedDict(
+                #     [("# LDAUJ", LDAUJ_string) if k == "LDAUJ" else (k, v) for k, v in incar_dict.items()])
+                incar_dict = change_dict_key(incar_dict, "LDAUJ", "# LDAUJ", LDAUJ_string)
             elif "# LDAUJ" in incar_dict.keys():
                 incar_dict["# LDAUJ"] = LDAUJ_string
 
@@ -436,9 +408,10 @@ class VASPInput():
                             key = val.split("=")[0]
                             value = val.split("=")[1]
                             if "# "+key in incar_keys:
-                                incar_dict = OrderedDict(
-                                    [(key, incar_dict["# "+key]) if k == "# "+key else (k, v) for k, v in
-                                     incar_dict.items()])
+                                # incar_dict = OrderedDict(
+                                #     [(key, incar_dict["# "+key]) if k == "# "+key else (k, v) for k, v in
+                                #      incar_dict.items()])
+                                incar_dict = change_dict_key(incar_dict, "# "+key, key, incar_dict["# "+key])
                                 original = incar_dict[key]
                                 try:
                                     description = original.split("!")[1]
@@ -489,10 +462,8 @@ class VASPInput():
 
         # save current options, for rest inputs
         current_options = {"incar":incar_dict, "magmom":magmom, "ldauu":LDAUU}
-        jstring = json.dumps(current_options)
-        f = open("current_options.json", "w")
-        f.write(jstring)
-        f.close()
+        save_json(current_options,"current_options.json")
+
 
         ## ----------------------------- Write inputs ---------------------------- ##
         os.chdir(dirname)

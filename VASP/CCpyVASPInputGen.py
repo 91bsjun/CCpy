@@ -82,6 +82,7 @@ if sys.argv[1] == "1":
         else:
             VI.cms_vasp_set(single_point=single_point,isif=isif,vdw=vdw,kpoints=kpoints,spin=spin,mag=mag,ldau=ldau,
                             get_pre_options=current_options)
+    linux_command("rm current_options.json")
 
 elif sys.argv[1] == "2":
     inputs = selectVASPOutputs("./")
