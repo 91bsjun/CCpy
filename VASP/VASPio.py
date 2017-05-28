@@ -56,9 +56,9 @@ class VASPInput():
         configs = os.listdir(home+"/.CCpy")
         # INCAR preset check
         if "vasp_incar.json" in configs:
-            incar_dict = load_json(home + "/.CCpy/vasp_incar.json")
+            incar_dict = load_json(home + "/.CCpy/vasp_incar.json", ordered=True)
         else:
-            jstring = vasp_incar_json()
+            jstring = vasp_incar_json()         # Generate new INCAR
             incar_dict = json.loads(jstring, ordered=True)
             save_json(incar_dict, home + "/.CCpy/vasp_incar.json")
         # MAGMOM value preset check
