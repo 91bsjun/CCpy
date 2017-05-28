@@ -463,6 +463,7 @@ class VASPInput():
                 incar = incar_string
             else:
                 incar_keys = incar_dict.keys()
+                incar_string = ""
                 for key in incar_keys:
                     if key[0] == "#" and key[1].isdigit():
                         incar_string += "\n"
@@ -492,15 +493,17 @@ class VASPInput():
             os.mkdir("structures")
         except:
             pass
-
         os.rename(self.filename, "./structures/"+self.filename)
-        update_preset = raw_input("Do you want to update INCAR preset ? (y/n)")
-        if update_preset == "y":
-            jstring = json.dumps(incar_dict, indent=4)
-            home = os.getenv("HOME")
-            f = open(home + "/.CCpy/vasp_incar.json", "w")
-            f.write(jstring)
-            f.close()
+
+        ## --------------------------- Update preset ---------------------------- ##
+        if not get_pre_options:
+            update_preset = raw_input("Do you want to update INCAR preset ? (y/n)")
+            if update_preset == "y":
+                jstring = json.dumps(incar_dict, indent=4)
+                home = os.getenv("HOME")
+                f = open(home + "/.CCpy/vasp_incar.json", "w")
+                f.write(jstring)
+                f.close()
 
 
 
