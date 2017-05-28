@@ -53,6 +53,7 @@ class VASPInput():
         home = os.getenv("HOME")
         if ".CCpy" not in os.listdir(home):
             os.mkdir(home+"/.CCpy")
+            print("* Preset options will be saved under :" + home + "/.CCpy/")
         configs = os.listdir(home+"/.CCpy")
         # INCAR preset check
         if "vasp_incar.json" in configs:
@@ -85,8 +86,6 @@ class VASPInput():
         else:
             LDAUJ = ldauj_parameters()
             save_json(LDAUJ, home + "/.CCpy/vasp_LDAUJ.json")
-
-        print("Preset options have been saved under :"+home+"/.CCpy")
 
 
         self.incar_dict, self.magmom, self.LDAUL, self.LDAUU, self.LDAUJ, self.vdw_C6, self.vdw_R0 = incar_dict, magmom, LDAUL, LDAUU, LDAUJ, vdw_C6, vdw_R0
@@ -198,22 +197,20 @@ class VASPInput():
             except:
                 mag_string += str(n_of_atoms[i]) + "*" + str(0.6) + " "
 
-        # uncomment mag options. if already uncommented, just change MAGMOM parameters
+        # Uncomment mag options. if already uncommented, just change MAGMOM parameters
         if mag:
             if "# MAGMOM" in incar_dict.keys():
-                # incar_dict = OrderedDict([("MAGMOM",mag_string) if k == "# MAGMOM" else (k,v) for k, v in incar_dict.items()])
                 incar_dict = change_dict_key(incar_dict, "# MAGMOM", "MAGMOM", mag_string)
             elif "MAGMOM" in incar_dict.keys():
                 incar_dict['MAGMOM'] = mag_string
-        # comment mag options. if already commented, just change MAGMOM parameters
+        # Comment mag options. if already commented, just change MAGMOM parameters
         else:
             if "# MAGMOM" in incar_dict.keys():
                 incar_dict['# MAGMOM'] = mag_string
             elif "MAGMOM" in incar_dict.keys():
-                # incar_dict = OrderedDict(
-                #     [("# MAGMOM", mag_string) if k == "MAGMOM" else (k, v) for k, v in incar_dict.items()])
                 incar_dict = change_dict_key(incar_dict, "MAGMOM", "# MAGMOM", mag_string)
-        # -- ldau
+
+        # -- LDA+U parameters
         if ldau_dict:
             LDAUU = ldau_dict       # get ldauu parameters from previous option
         else:
@@ -259,69 +256,45 @@ class VASPInput():
         # uncomment ldau options. if already uncommented, just change LDAUU,LDAUL,LDAUJ parameters
         if ldau:
             if "# LDAU" in incar_dict.keys():
-                # incar_dict = OrderedDict(
-                #     [("LDAU", incar_dict["# LDAU"]) if k == "# LDAU" else (k, v) for k, v in incar_dict.items()])
                 incar_dict = change_dict_key(incar_dict, "# LDAU", "LDAU", incar_dict["# LDAU"])
             if "# LMAXMIX" in incar_dict.keys():
-                # incar_dict = OrderedDict(
-                #     [("LMAXMIX", incar_dict["# LMAXMIX"]) if k == "# LMAXMIX" else (k, v) for k, v in incar_dict.items()])
                 incar_dict = change_dict_key(incar_dict, "# LMAXMIX", "LMAXMIX", incar_dict["# LMAXMIX"])
             if "# LDAUTYPE" in incar_dict.keys():
-                # incar_dict = OrderedDict(
-                #     [("LDAUTYPE", incar_dict["# LDAUTYPE"]) if k == "# LDAUTYPE" else (k, v) for k, v in incar_dict.items()])
                 incar_dict = change_dict_key(incar_dict, "# LDAUTYPE", "LDAUTYPE", incar_dict["# LDAUTYPE"])
             if "# LDAUL" in incar_dict.keys():
-                # incar_dict = OrderedDict(
-                #     [("LDAUL", LDAUL_string) if k == "# LDAUL" else (k, v) for k, v in incar_dict.items()])
                 incar_dict = change_dict_key(incar_dict, "# LDAUL", "LDAUL", LDAUL_string)
             elif "LDAUL" in incar_dict.keys():
                 incar_dict["LDAUL"] = LDAUL_string
 
             if "# LDAUU" in incar_dict.keys():
-                # incar_dict = OrderedDict(
-                #     [("LDAUU", LDAUU_string) if k == "# LDAUU" else (k, v) for k, v in incar_dict.items()])
                 incar_dict = change_dict_key(incar_dict, "# LDAUU", "LDAUU", LDAUU_string)
 
             elif "LDAUU" in incar_dict.keys():
                 incar_dict["LDAUU"] = LDAUU_string
 
             if "# LDAUJ" in incar_dict.keys():
-                # incar_dict = OrderedDict(
-                #     [("LDAUJ", LDAUJ_string) if k == "# LDAUJ" else (k, v) for k, v in incar_dict.items()])
                 incar_dict = change_dict_key(incar_dict, "# LDAUJ", "LDAUJ", LDAUJ_string)
             elif "LDAUJ" in incar_dict.keys():
                 incar_dict["LDAUJ"] = LDAUJ_string
         # comment ldau options. if already commented, just change LDAUU,LDAUL,LDAUJ parameters
         else:
             if "LDAU" in incar_dict.keys():
-                # incar_dict = OrderedDict(
-                #     [("# LDAU", incar_dict["LDAU"]) if k == "LDAU" else (k, v) for k, v in incar_dict.items()])
                 incar_dict = change_dict_key(incar_dict, "LDAU", "# LDAU", incar_dict["LDAU"])
             if "LMAXMIX" in incar_dict.keys():
-                # incar_dict = OrderedDict(
-                #     [("# LMAXMIX", incar_dict["LMAXMIX"]) if k == "LMAXMIX" else (k, v) for k, v in incar_dict.items()])
                 incar_dict = change_dict_key(incar_dict, "LMAXMIX", "# LMAXMIX", incar_dict["MAXMIX"])
             if "LDAUTYPE" in incar_dict.keys():
-                # incar_dict = OrderedDict(
-                #     [("# LDAUTYPE", incar_dict["LDAUTYPE"]) if k == "LDAUTYPE" else (k, v) for k, v in incar_dict.items()])
                 incar_dict = change_dict_key(incar_dict, "LDAUTYPE", "# LDAUTYPE", incar_dict["LDAUTYPE"])
             if "LDAUL" in incar_dict.keys():
-                # incar_dict = OrderedDict(
-                #     [("# LDAUL", LDAUL_string) if k == "LDAUL" else (k, v) for k, v in incar_dict.items()])
                 incar_dict = change_dict_key(incar_dict, "LDAUL", "# LDAUL", LDAUL_string)
             elif "# LDAUL" in incar_dict.keys():
                 incar_dict["# LDAUL"] = LDAUL_string
 
             if "LDAUU" in incar_dict.keys():
-                # incar_dict = OrderedDict(
-                #     [("# LDAUU", LDAUU_string) if k == "LDAUU" else (k, v) for k, v in incar_dict.items()])
                 incar_dict = change_dict_key(incar_dict, "LDAUU", "# LDAUU", LDAUU_string)
             elif "# LDAUU" in incar_dict.keys():
                 incar_dict["# LDAUU"] = LDAUU_string
 
             if "LDAUJ" in incar_dict.keys():
-                # incar_dict = OrderedDict(
-                #     [("# LDAUJ", LDAUJ_string) if k == "LDAUJ" else (k, v) for k, v in incar_dict.items()])
                 incar_dict = change_dict_key(incar_dict, "LDAUJ", "# LDAUJ", LDAUJ_string)
             elif "# LDAUJ" in incar_dict.keys():
                 incar_dict["# LDAUJ"] = LDAUJ_string
@@ -402,7 +375,7 @@ class VASPInput():
                                 description = ""
                             incar_string += key.ljust(16) + " = " + str(val).ljust(30) + "!" + description + "\n"
                     print(incar_string)
-                    get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate /without spacing) \n: ")
+                    get_sets = raw_input("* Anything want to modify or add? (ex: ISPIN=2,ISYM=1,PREC=Accurate // without spacing) if not, enter \"n\" \n: ")
                     if get_sets != "n":
                         vals = get_sets.replace(", ",",")
                         vals = vals.split(",")
@@ -410,9 +383,6 @@ class VASPInput():
                             key = val.split("=")[0]
                             value = val.split("=")[1]
                             if "# "+key in incar_keys:
-                                # incar_dict = OrderedDict(
-                                #     [(key, incar_dict["# "+key]) if k == "# "+key else (k, v) for k, v in
-                                #      incar_dict.items()])
                                 incar_dict = change_dict_key(incar_dict, "# "+key, key, incar_dict["# "+key])
                                 original = incar_dict[key]
                                 try:
@@ -430,9 +400,8 @@ class VASPInput():
                                 except:
                                     description = ""
                                 incar_dict[key] = value.ljust(22) + "!" + description
-                # make INCAR string type
+                # make INCAR as string type
                 incar_keys = incar_dict.keys()
-                # incar_keys.sort()
                 incar_string = ""
                 for key in incar_keys:
                     if key[0] == "#" and key[1].isdigit():
@@ -485,13 +454,10 @@ class VASPInput():
 
         ## --------------------------- Update preset ---------------------------- ##
         if not get_pre_options:
-            update_preset = raw_input("Do you want to update INCAR preset ? (y/n)")
+            update_preset = raw_input("* Do you want to update INCAR preset ? (y/n)\n: ")
             if update_preset == "y":
-                jstring = json.dumps(incar_dict, indent=4)
-                home = os.getenv("HOME")
-                f = open(home + "/.CCpy/vasp_incar.json", "w")
-                f.write(jstring)
-                f.close()
+                save_json(incar_dict, home + "/.CCpy/vasp_incar.json")
+                print("* Preset options have been updated :" + home + "/.CCpy/vasp_incar.json")
 
 
 

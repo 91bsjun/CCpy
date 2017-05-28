@@ -22,7 +22,7 @@ except:
 ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 ...
     < INCAR OPTION >
     -sp      : Single point calculation      (DEFAULT : NSW = 200)
-    -isif=# : ISIF value                     (DEFAULT : 3)
+    -isif=#  : ISIF value                    (DEFAULT : 3)
     -vdw     : DFT-D2 grimme's function      (DEFAULT : not used)
     -spin    : Spin polarized calculation    (DEFAULT : unpolarized)
     -mag     : Add magnetic monet parameters (values from Pymatgen)
