@@ -440,7 +440,7 @@ def get_ip():
 
 def vasp_incar_json():
     jstring = """{
-    "SYSTEM ":"filename",
+    "SYSTEM":"filename",
 
     "#1 ":"Startparameter for this Run:",
     "NWRITE":"2                   ! LPETIM=F    write-flag & timer",
