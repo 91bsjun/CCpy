@@ -4,7 +4,7 @@ import pandas as pd
 import json
 from collections import OrderedDict
 
-from CCpy.VASP.VASPtools import vasp_incar_json, magmom_parameters, ldauu_parameters, ldauj_parameters, ldaul_parameters
+from CCpy.VASP.VASPtools import vasp_incar_json, magmom_parameters, ldauu_parameters, ldauj_parameters, ldaul_parameters, vasp_grimme_parameters
 
 from CCpy.Tools.CCpyStructure import PeriodicStructure as PS
 from CCpy.Tools.CCpyStructure import latticeGen
@@ -47,6 +47,8 @@ class VASPInput():
         self.structure = structure
         self.dirname = dirname
 
+        # ------------ Grimme's parameters ------------- #
+        vdw_C6, vdw_R0 = vasp_grimme_parameters()
         # ------------ check preset config ------------- #
         home = os.getenv("HOME")
         if ".CCpy" not in os.listdir(home):
