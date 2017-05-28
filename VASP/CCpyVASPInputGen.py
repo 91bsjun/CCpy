@@ -1,6 +1,9 @@
 #!/usr/local/bin/python2.7
 
 import os, sys
+import json
+from collections import OrderedDict
+
 from CCpy.VASP.VASPio import VASPInput
 from CCpy.Tools.CCpyTools import selectInputs, selectVASPInputs, selectVASPOutputs, linux_command
 
@@ -68,16 +71,16 @@ if sys.argv[1] == "1":
         # -- If user want to use same options go to else
         if chk:
             VI.cms_vasp_set(single_point=single_point, isif=isif, vdw=vdw, kpoints=kpoints, spin=spin, mag=mag, ldau=ldau,
-                            input_incar=None)
-            incar = open(VI.dirname + "/INCAR").read()
             same_inputs = raw_input("\n* Do you want create the rest of inputs as same as these INCAR ? (y/n)")
             if same_inputs == "y":
                 chk = False
+                jstring = open("current_options.json", "r").read()
+                current_options = json.loads(jstring, object_pairs_hook=OrderedDict)
             else:
                 chk = True
         else:
             VI.cms_vasp_set(single_point=single_point,isif=isif,vdw=vdw,kpoints=kpoints,spin=spin,mag=mag,ldau=ldau,
-                            input_incar=incar)
+                            get_pre_options=current_options)
 
 elif sys.argv[1] == "2":
     inputs = selectVASPOutputs("./")

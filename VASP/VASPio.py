@@ -136,12 +136,12 @@ class VASPInput():
     # ------------------------------------------------------------------------------#
     #                        CMS relaxation VASP input set                          #
     # ------------------------------------------------------------------------------#
-    def cms_vasp_set(self, single_point=False, isif=False,vdw=False,
+    def cms_vasp_set(self, single_point=False, isif=False, vdw=False,
                      spin=False, mag=False, ldau=False,
                      functional="PBE_54",
-                     kpoints=False, incar_dict=None,
+                     kpoints=False, get_pre_options=None,
                      magmom_dict=None, ldau_dict=None,
-                     input_incar=None, flask_app=False):
+                     flask_app=False):
         """
 
         :param single_point:
@@ -161,6 +161,13 @@ class VASPInput():
 
         structure = self.structure
         dirname = self.dirname
+
+        # -- Load pre option
+        if get_pre_options:
+            pre_dict = get_pre_options
+            incar_dict = pre_dict["incar"]
+            magmom_dict = pre_dict["magmom"]
+            ldau_dict = pre_dict["ldauu"]
 
         ## -------------------------------- POSCAR -------------------------------- ##
         # -- Create POSCAR string from pymatgen structure object
@@ -183,8 +190,6 @@ class VASPInput():
         # -- if incar_dict arg exist use it
         if incar_dict:
             pass
-        elif input_incar:
-            incar_dict = Incar.from_string(input_incar).as_dict()
         else:
             incar_dict = self.incar_dict
 
@@ -201,12 +206,12 @@ class VASPInput():
 
         # -- magnetic momentum
         if magmom_dict:
-            magmom = magmom_dict
+            magmom = magmom_dict        # get magmom parameters from previous option
         else:
             magmom = self.magmom
 
         # -- magmom value edit
-        if mag and not flask_app:
+        if mag and not flask_app and not magmom_dict:
             print("\n# ---------- Here are the current MAGMOM values ---------- #")
             magmom_keys = magmom.keys()
             magmom_keys.sort()
@@ -245,10 +250,10 @@ class VASPInput():
                     [("# MAGMOM", mag_string) if k == "MAGMOM" else (k, v) for k, v in incar_dict.items()])
         # -- ldau
         if ldau_dict:
-            LDAUU = ldau_dict       # ldauu parameters from arg
+            LDAUU = ldau_dict       # get ldauu parameters from previous option
         else:
             LDAUU = self.LDAUU
-        if ldau and not flask_app:
+        if ldau and not flask_app and not ldau_dict:
             print("\n# -------------------------------------------------------- #")
             print("#          Here are the current LDAU+U parameters          #")
             print("# -------------------------------------------------------- #")
@@ -455,6 +460,12 @@ class VASPInput():
             else:
                 incar = Incar(incar_dict)
 
+        # save current options, for rest inputs
+        current_options = {"incar":incar_dict, "magmom":magmom, "ldauu":LDAUU}
+        jstring = json.dumps(current_options)
+        f = open("current_options.json", "w")
+        f.write(jstring)
+        f.close()
 
         ## ----------------------------- Write inputs ---------------------------- ##
         os.chdir(dirname)
