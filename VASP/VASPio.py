@@ -168,6 +168,10 @@ class VASPInput():
             incar_dict = pre_dict["incar"]
             magmom_dict = pre_dict["magmom"]
             ldau_dict = pre_dict["ldauu"]
+        else:
+            incar_dict = None
+            magmom_dict = None
+            ldau_dict = None
 
         ## -------------------------------- POSCAR -------------------------------- ##
         # -- Create POSCAR string from pymatgen structure object
