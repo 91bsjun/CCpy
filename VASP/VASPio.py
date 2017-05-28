@@ -421,7 +421,7 @@ class VASPInput():
                             incar_string += "\n"
                             incar_string += key + str(incar_dict[key]) + "\n"
                         else:
-                            val = str(incar_dict[key]).split("!")
+                            val = str(incar_dict[key]).split("!")[0]
                             try:
                                 description = str(incar_dict[key]).split("!")[1]
                             except:
@@ -464,7 +464,7 @@ class VASPInput():
                         incar_string += "\n"
                         incar_string += key + str(incar_dict[key]) + "\n"
                     else:
-                        val = str(incar_dict[key]).split("!")
+                        val = str(incar_dict[key]).split("!")[0]
                         try:
                             description = str(incar_dict[key]).split("!")[1]
                         except:
@@ -479,7 +479,7 @@ class VASPInput():
                         incar_string += "\n"
                         incar_string += key + str(incar_dict[key]) + "\n"
                     else:
-                        val = str(incar_dict[key]).split("!")
+                        val = str(incar_dict[key]).split("!")[0]
                         try:
                             description = str(incar_dict[key]).split("!")[1]
                         except:
