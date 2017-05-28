@@ -77,6 +77,7 @@ if sys.argv[1] == "1":
                 chk = False
                 jstring = open("current_options.json", "r").read()
                 current_options = json.loads(jstring, object_pairs_hook=OrderedDict)
+                print(current_options)
             else:
                 chk = True
         else:
