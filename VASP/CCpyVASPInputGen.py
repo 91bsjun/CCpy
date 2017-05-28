@@ -71,6 +71,7 @@ if sys.argv[1] == "1":
         # -- If user want to use same options go to else
         if chk:
             VI.cms_vasp_set(single_point=single_point, isif=isif, vdw=vdw, kpoints=kpoints, spin=spin, mag=mag, ldau=ldau,
+                            get_pre_options=None)
             same_inputs = raw_input("\n* Do you want create the rest of inputs as same as these INCAR ? (y/n)")
             if same_inputs == "y":
                 chk = False
