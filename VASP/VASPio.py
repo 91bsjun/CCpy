@@ -188,13 +188,16 @@ class VASPInput():
         else:
             incar_dict = self.incar_dict
 
+        if "SYSTEM" in incar_dict.keys():
+            incar_dict["SYSTEM"] = dirname
+
         # -- Parsing system arguments from user commands
         if single_point:
-            incar_dict['NSW']=0
+            incar_dict['NSW']="0                      ! number of steps for IOM"
         if isif:
-            incar_dict['ISIF']=isif
+            incar_dict['ISIF']=str(isif) + "                     ! ion&cell relax: 0-MD 2-ion&stress 3-ion&cell&stress"
         if spin:
-            incar_dict['ISPIN']=2
+            incar_dict['ISPIN']="2                    ! spin polarized = 2, non spin polarized = 1"
 
         # -- magnetic momentum
         if magmom_dict:
@@ -247,7 +250,7 @@ class VASPInput():
             LDAUU = self.LDAUU
         if ldau and not flask_app:
             print("\n# -------------------------------------------------------- #")
-            print("# -------- Here are the current LDAU+U parameters -------- #")
+            print("#          Here are the current LDAU+U parameters          #")
             print("# -------------------------------------------------------- #")
             LDAUU_keys = LDAUU.keys()
             LDAUU_keys.sort()
@@ -399,7 +402,7 @@ class VASPInput():
                 get_sets = None
                 while get_sets != "n":
                     print("\n# -------------------------------------------------------- #")
-                    print("# ---------- Here are the current INCAR options ---------- #")
+                    print("#            Here are the current INCAR options            #")
                     print("# -------------------------------------------------------- #")
                     incar_keys = incar_dict.keys()
                     # incar_keys.sort()
