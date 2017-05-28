@@ -407,7 +407,7 @@ class VASPInput():
         else:
             # -- INCAR
             print(dirname)
-            if not input_incar :        # This process is for avoiding multiple inputs generation.
+            if not get_pre_options:        # This process is for avoiding multiple inputs generation.
                 get_sets = None
                 while get_sets != "n":
                     print("\n# -------------------------------------------------------- #")
