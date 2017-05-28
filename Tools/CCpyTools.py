@@ -453,7 +453,7 @@ def vasp_incar_json():
     "#2 ":"Electronic Relaxation 1",
     "NELM":"100                   ! number of iterations",
     "EDIFF":"1E-04                ! stopping-criterion for ELM",
-    "BMIX":"3.00"                 ! sets the cutoff wave vector for Kerker mixing for the magnetization density,
+    "BMIX":"3.00                  ! sets the cutoff wave vector for Kerker mixing for the magnetization density",
     "ENCUT":"500                  ! Cut-Off Energy",
 
     "#3 ":"Electronic Relaxation 1",
@@ -469,7 +469,7 @@ def vasp_incar_json():
     "KBLOCK":"10                  ! outer block",
     "IBRION":"2                   ! ionic relax: 0-MD 1-quasi-New 2-CG",
     "ISIF":"3                     ! ion&cell relax: 0-MD 2-ion&stress 3-ion&cell&stress",
-    "ISYM":"2"                    ! switch symmetry stuff ON (1 or 2) or OFF (0),
+    "ISYM":"2                     ! switch symmetry stuff ON (1 or 2) or OFF (0)",
     "# SYMPREC ":" 1e-6",
     "LCORR":"T                    ! Harris-correction to forces",
     "EDIFFG":"-0.04               ! Criterion for geom opt (eV/Ang)",
