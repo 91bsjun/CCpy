@@ -508,7 +508,7 @@ def vasp_incar_json():
     "# SPRING":"-5                ! in eV/Ang*2 (sping constant)",
     "# IMAGES":"3                 ! Number of images btw Reactant & Product",
     "# LCLIMB":".true.            ! cNEB: driven up to the saddle point",
-    "# LTANGENTOLD":" .true.      ! Old central difference tangent",
+    "# LTANGENTOLD":".true.      ! Old central difference tangent",
     "# LDNEB":".true.             ! Modified doubble nudging",
     "# NEBCELL":".true.           ! NEB for variable cell (w/ ISIF=3)",
 
