@@ -77,7 +77,7 @@ if step == "1":
     os.mkdir("./check")
     lc("cp ../" + filename + " ./")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
-              chg=-1, multi=3, options=opt, options2="")
+              chg=-1, multi=2, options=opt, options2="")
     myGI.newCalc(filename, comname=name+"_anion")
     os.chdir("../")
 
@@ -87,7 +87,7 @@ if step == "1":
     os.mkdir("./check")
     lc("cp ../" + filename + " ./")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
-              chg=-1, multi=3, options=opt, options2="")
+              chg=-1, multi=2, options=opt, options2="")
     myGI.newCalc(filename, comname=name+"_cation")
     os.chdir("../")
 
@@ -95,10 +95,10 @@ if step == "1":
     # anion, cation state of neutral structure
     os.chdir("neutral")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
-              chg=-1, multi=3, options=sp, options2="")
+              chg=-1, multi=2, options=sp, options2="")
     myGI.additionalCalc(name+"_neut.chk", comname=name+"_neut_anion")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
-              chg=1, multi=3, options=sp, options2="")
+              chg=1, multi=2, options=sp, options2="")
     myGI.additionalCalc(name + "_neut.chk", comname=name + "_neut_cation")
     os.chdir("../")
 
@@ -181,7 +181,6 @@ elif step == "2":
 
     # make queue submit file
     mpi = '''#!/bin/csh
-#!/bin/csh
 
 # pe request
 
