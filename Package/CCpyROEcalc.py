@@ -96,24 +96,24 @@ if step == "1":
     os.chdir("neutral")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=-1, multi=3, options=sp, options2="")
-    myGI.additionalCalc(name+".chk", comname=name+"_neut_anion")
+    myGI.additionalCalc(name+"_neut.chk", comname=name+"_neut_anion")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=1, multi=3, options=sp, options2="")
-    myGI.additionalCalc(name + ".chk", comname=name + "_neut_cation")
+    myGI.additionalCalc(name + "_neut.chk", comname=name + "_neut_cation")
     os.chdir("../")
 
     # neutral state of anion structure
     os.chdir("anion")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=0, multi=1, options=sp, options2="")
-    myGI.additionalCalc(name + ".chk", comname=name + "_anion_neut")
+    myGI.additionalCalc(name + "_anion.chk", comname=name + "_anion_neut")
     os.chdir("../")
 
     # neutral state of cation structure
     os.chdir("cation")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
               chg=0, multi=1, options=sp, options2="")
-    myGI.additionalCalc(name + ".chk", comname=name + "_cation_neut")
+    myGI.additionalCalc(name + "_cation.chk", comname=name + "_cation_neut")
     os.chdir("../")
 
 # -------------- 2. Submit jobs -------------- #
