@@ -125,11 +125,11 @@ elif step == "2":
 
     # Check inputs whether inputs are exist.
     if name in os.listdir("./"):
-        os.chdir(name)
         subdirs = os.listdir(name)
         if "neutral" not in subdirs or "anion" not in subdirs or "cation" not in subdirs:
             print("Make inputs first.")
             quit()
+        os.chdir(name)
     else:
         print("Make inputs first.")
         quit()
