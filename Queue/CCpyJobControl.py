@@ -54,7 +54,6 @@ class JobSubmit():
         jobname = jobname.replace(".","_").replace("-","_")
 
         mpi = '''#!/bin/csh
-#!/bin/csh
 
 # pe request
 
