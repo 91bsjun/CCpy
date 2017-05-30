@@ -87,7 +87,7 @@ if step == "1":
     os.mkdir("./check")
     lc("cp ../" + filename + " ./")
     myGI = GI(nproc=16, mem=64, functional=functional, basis=basis,
-              chg=-1, multi=2, options=opt, options2="")
+              chg=1, multi=2, options=opt, options2="")
     myGI.newCalc(filename, comname=name+"_cation")
     os.chdir("../")
 
