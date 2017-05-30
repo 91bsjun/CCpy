@@ -176,7 +176,7 @@ elif step == "2":
         f.close()
 
     # set jobname
-    jobname = "GROE" + name
+    jobname = "GROE_" + name
     jobname = jobname.replace(".", "_").replace("-", "_")
 
     # make queue submit file
@@ -224,3 +224,40 @@ set  MPI_EXEC=$MPI_HOME/bin/mpirun
     f.write(mpi)
     f.close()
 
+# -------------- 3. Calculate ROE -------------- #
+elif step == "3":
+    from CCpy.Gaussian.Gaussianio import GaussianOutput as GO
+    # Check whether calculations have been done.
+    if name in os.listdir("./"):
+        subdirs = os.listdir(name)
+        if "neutral" not in subdirs or "anion" not in subdirs or "cation" not in subdirs:
+            print("Make inputs first.")
+            quit()
+        os.chdir(name)
+    else:
+        print("Make inputs first.")
+        quit()
+
+    outputpaths = ["./neutral/" + name + "_neut.log",
+                   "./neutral/" + name + "_neut_anion.log",
+                   "./neutral/" + name + "_neut_cation.log",
+                   "./anion/" + name + "_anion.log",
+                   "./anion/" + name + "_anion_neut.log",
+                   "./cation/" + name + "_cation.log",
+                   "./cation/" + name + "_cation_neut.log"]
+    energies = []
+    for log in outputpaths:
+        final_energy = GO(log).getFinalEnergy
+        energies.append(final_energy)
+
+    neut_neut, neut_anion, neut_cation = energies[0], energies[1], energies[2]
+    anion_anion, anion_neut, cation_cation, cation_neut = energies[3], energies[4], energies[5], energies[6]
+
+    hole_ROE = ((neut_cation - neut_neut) + (cation_neut - cation_cation)) * 27.2144
+    elec_ROE = ((neut_anion - neut_neut) + (anion_neut - anion_anion)) * 27.2144
+
+    f = open("ROE.dat", "w")
+    f.write("hole ROE = " + str(hole_ROE) + "\n")
+    f.write("elec ROE = " + str(elec_ROE) + "\n")
+    f.close()
+    print("ROE.dat")
