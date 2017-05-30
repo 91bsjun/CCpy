@@ -7,7 +7,7 @@ Input : a single molecular structure file (*.xyz, *.car, *.xsd)
 import os, sys
 
 from CCpy.Gaussian.Gaussianio import GaussianInput as GI
-from CCpy.Tools.CCpyTools import selectInputs,linux_command
+from CCpy.Tools.CCpyTools import selectInputs, linux_command
 from CCpy.Tools.CCpyTools import linux_command as lc
 
 
@@ -223,6 +223,8 @@ set  MPI_EXEC=$MPI_HOME/bin/mpirun
     f = open("mpi.sh", "w")
     f.write(mpi)
     f.close()
+
+    linux_command("qsub mpi.sh; rm ./mpi.sh")
 
 # -------------- 3. Calculate ROE -------------- #
 elif step == "3":
