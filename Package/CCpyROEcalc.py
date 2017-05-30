@@ -247,7 +247,7 @@ elif step == "3":
                    "./cation/" + name + "_cation_neut.log"]
     energies = []
     for log in outputpaths:
-        final_energy = GO(log).getFinalEnergy
+        final_energy = GO(log).getFinalEnergy()
         energies.append(final_energy)
 
     neut_neut, neut_anion, neut_cation = energies[0], energies[1], energies[2]
