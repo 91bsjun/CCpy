@@ -112,7 +112,7 @@ class GaussianOutput():
         indice, energies = self.scfConvergence()
         final_energy = energies[-1]
 
-        return final_energy
+        return float(final_energy)
 
     def getFinalStructure(self):
         filename = self.filename
