@@ -96,7 +96,7 @@ class VASPInput():
     # ------------------------------------------------------------------------------#
     def cms_vasp_set(self, single_point=False, isif=False, vdw=False,
                      spin=False, mag=False, ldau=False,
-                     functional="PBE_54",
+                     functional="PBE_54", pseudo=None,
                      kpoints=False, get_pre_options=None,
                      magmom_dict=None, ldau_dict=None,
                      flask_app=False):
@@ -332,7 +332,9 @@ class VASPInput():
         kpoints = dirname+"\n0\nMonkhorst-Pack\n"+str(kpts[0])+" "+str(kpts[1])+" "+str(kpts[2])+"\n0 0 0\n"
 
         ## -------------------------------- POTCAR -------------------------------- ##
-        potcar = Potcar(symbols=elements, functional="PBE_54")
+        if pseudo:
+            pot_elt = [e + "_" + pseudo for e in elements]
+        potcar = Potcar(symbols=elements, functional=functional)
 
         try:
             os.mkdir(dirname)

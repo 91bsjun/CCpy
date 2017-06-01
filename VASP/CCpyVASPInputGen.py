@@ -29,7 +29,15 @@ ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 ...
     -ldau    : Add LDA+U parameters          (values from Pymatgen)
 
     < KPOINTS OPTION >
-    -kp=#,#,#                                (DEFAULT : reciprocal parameter as devided by 20)'''
+    -kp=#,#,#                                (DEFAULT : reciprocal parameter as devided by 20)
+
+    < POTCAR OPTION>
+
+    -pot=PBE_54 : VASP potential setting     (DEFAULT : PBE_54)
+                  Possible potentials = PBE, PBE_52, PBE_54, LDA, LDA_52, LDA_54, PW91, LDA_US, PW91_US
+    -pseudo=    : Select pseudo potential    (DEFAULT : normal)
+                  ex) -pseudo=sv             --> will use 'Nb_sv' pseudo potential to 'Nb'
+    '''
           )
     quit()
 
@@ -42,6 +50,8 @@ mag=False
 ldau=False
 isif=False
 kpoints=False
+pseudo=False
+functional="PBE_54"
 
 for arg in sys.argv:
     if "-sp" == arg:
@@ -58,7 +68,10 @@ for arg in sys.argv:
         ldau = True
     elif "-mag" in arg:
         mag = True
-
+    elif "-pot" in arg:
+        functional = arg.split("=")[1]
+    elif "-pseudo" in arg:
+        pseudo = arg.split("=")[1]
 
 if sys.argv[1] == "1":
     input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
@@ -71,6 +84,7 @@ if sys.argv[1] == "1":
         # -- If user want to use same options go to else
         if chk:
             VI.cms_vasp_set(single_point=single_point, isif=isif, vdw=vdw, kpoints=kpoints, spin=spin, mag=mag, ldau=ldau,
+                            functional=functional, pseudo=pseudo,
                             get_pre_options=None)
             same_inputs = raw_input("\n* Do you want create the rest of inputs as same as these INCAR ? (y/n)")
             if same_inputs == "y":
