@@ -334,7 +334,7 @@ class VASPInput():
         ## -------------------------------- POTCAR -------------------------------- ##
         if pseudo:
             pot_elt = [e + "_" + pseudo for e in elements]
-        potcar = Potcar(symbols=elements, functional=functional)
+        potcar = Potcar(symbols=pot_elt, functional=functional)
 
         try:
             os.mkdir(dirname)
