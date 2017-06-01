@@ -333,7 +333,17 @@ class VASPInput():
 
         ## -------------------------------- POTCAR -------------------------------- ##
         if pseudo:
-            pot_elt = [e + "_" + pseudo for e in elements]
+            pot_elt = []
+            for e in elements:
+                chk=False
+                for p in pseudo:
+                    if e == p.split("_")[0]:
+                        chk=True
+                        pot_elt.append(p)
+                if not chk:
+                    pot_elt.append(e)
+        else:
+            pot_elt = elements
         potcar = Potcar(symbols=pot_elt, functional=functional)
 
         try:

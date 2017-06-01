@@ -36,7 +36,7 @@ ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 ...
     -pot=PBE_54 : VASP potential setting     (DEFAULT : PBE_54)
                   Possible potentials = PBE, PBE_52, PBE_54, LDA, LDA_52, LDA_54, PW91, LDA_US, PW91_US
     -pseudo=    : Select pseudo potential    (DEFAULT : normal)
-                  ex) -pseudo=sv             --> will use 'Nb_sv' pseudo potential to 'Nb'
+                  ex) -pseudo=NB_sv,Ti_sv    --> will use 'Nb_sv, Ti_sv' pseudo potential to 'Nb, Ti'
     '''
           )
     quit()
@@ -71,7 +71,7 @@ for arg in sys.argv:
     elif "-pot" in arg:
         functional = arg.split("=")[1]
     elif "-pseudo" in arg:
-        pseudo = arg.split("=")[1]
+        pseudo = arg.split("=")[1].split(",")
 
 if sys.argv[1] == "1":
     input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
