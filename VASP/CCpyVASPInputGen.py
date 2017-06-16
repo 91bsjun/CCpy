@@ -95,6 +95,7 @@ if sys.argv[1] == "1":
                 chk = True
         else:
             VI.cms_vasp_set(single_point=single_point,isif=isif,vdw=vdw,kpoints=kpoints,spin=spin,mag=mag,ldau=ldau,
+                            pseudo=pseudo, functional=functional,
                             get_pre_options=current_options)
     linux_command("rm current_options.json")
 
