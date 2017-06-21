@@ -84,7 +84,10 @@ def vasp_incar_json():
     "# LDAUTYPE":"1               ! or 2",
     "# LDAUL":"2 2 2              ! l-quantum number on which U acts ((1._q,0._q) for each type",
     "# LDAUU":"0 5.00 7.0         ! U coefficient (coulomb interaction) for each species",
-    "# LDAUJ":"0 1 1              ! J coefficient (exchange) for each species"
+    "# LDAUJ":"0 1 1              ! J coefficient (exchange) for each species",
+
+    "#11 vdW":"corrections",
+    "# IVDW":"0                   ! 0-no , 1-DFT-D2_Grimme, 11-DFT-D3_Grimme, 12-DFT-D3_BJ, 4-dDsC"
 }
 """
     return jstring

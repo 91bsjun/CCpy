@@ -19,24 +19,32 @@ except:
 4 : Static calculation      (after previous calculation)
 
 [sub_options]
-ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 ...
+ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_sv, -pot=LDA_54...
+
     < INCAR OPTION >
     -sp      : Single point calculation      (DEFAULT : NSW = 200)
     -isif=#  : ISIF value                    (DEFAULT : 3)
-    -vdw     : DFT-D2 grimme's function      (DEFAULT : not used)
     -spin    : Spin polarized calculation    (DEFAULT : unpolarized)
     -mag     : Add magnetic monet parameters (values from Pymatgen)
     -ldau    : Add LDA+U parameters          (values from Pymatgen)
+
+    van der Waals corrections                (DEFAULT : do not use)
+    -vdw=D2     : DFT-D2 method of Grimme                   (VASP.5.2.11)
+    -vdw=D3     : zero damping DFT-D3 method of Grimme      (VASP.5.3.4)
+    -vdw=D3damp : DFT-D3 method with Becke-Jonson damping   (VASP.5.3.4)
+    -vdw=dDsC   : dDsC dispersion correction method         (VASP.5.4.1)
 
     < KPOINTS OPTION >
     -kp=#,#,#                                (DEFAULT : reciprocal parameter as devided by 20)
 
     < POTCAR OPTION>
-
     -pot=PBE_54 : VASP potential setting     (DEFAULT : PBE_54)
                   Possible potentials = PBE, PBE_52, PBE_54, LDA, LDA_52, LDA_54, PW91, LDA_US, PW91_US
     -pseudo=    : Select pseudo potential    (DEFAULT : normal)
-                  ex) -pseudo=NB_sv,Ti_sv    --> will use 'Nb_sv, Ti_sv' pseudo potential to 'Nb, Ti'
+                  ex) -pseudo=Nb_sv,Ti_sv    --> will use 'Nb_sv, Ti_sv' pseudo potential to 'Nb, Ti'
+
+[preset options]
+~/.CCpy/*.json
     '''
           )
     quit()
@@ -59,7 +67,7 @@ for arg in sys.argv:
     elif "-isif=" in arg:
         isif = int(arg.split("=")[-1])
     elif "-vdw" in arg:
-        vdw=True
+        vdw=arg.split("=")[1]
     elif "-spin" in arg:
         spin=True
     elif "-kp" in arg:

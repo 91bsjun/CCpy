@@ -300,19 +300,36 @@ class VASPInput():
                 incar_dict["# LDAUJ"] = LDAUJ_string
 
         if vdw:
-            vdw_C6 = self.vdw_C6
-            vdw_R0 = self.vdw_R0
-            C6 = ""
-            R0 = ""
-            for el in elements:
-                C6+=str(vdw_C6[el])+" "
-                R0+=str(vdw_R0[el])+" "
-            incar_dict['LVDW']=".TRUE."
-            incar_dict['VDW_RADIUS']=30.0
-            incar_dict['VDW_SCALING']=0.75
-            incar_dict['VDW_D']=20.0
-            incar_dict['VDW_C6']=C6
-            incar_dict['VDW_R0']=R0
+            if vdw == "D2":
+                vdw_C6 = self.vdw_C6
+                vdw_R0 = self.vdw_R0
+                C6 = ""
+                R0 = ""
+                for el in elements:
+                    C6+=str(vdw_C6[el])+" "
+                    R0+=str(vdw_R0[el])+" "
+                incar_dict['LVDW']=".TRUE."
+                incar_dict['VDW_RADIUS']=30.0
+                incar_dict['VDW_SCALING']=0.75
+                incar_dict['VDW_D']=20.0
+                incar_dict['VDW_C6']=C6
+                incar_dict['VDW_R0']=R0
+            else :
+                if "# IVDW" in incar_dict.keys():
+                    incar_dict = change_dict_key(incar_dict, "# IVDW", "IVDW", incar_dict["# IVDW"])
+                if "LVDW" in incar_dict.keys():     # If LVDW=.TRUE. is defined, IVDW is automatically set to 1
+                    incar_dict = change_dict_key(incar_dict, "LVDW", "# LVDW", ".FALSE.")
+
+                if vdw == "D3":
+                    incar_dict["IVDW"] = "11"
+                elif vdw == "D3damp":
+                    incar_dict["IVDW"] = "12"
+                elif vdw == "dDsC":
+                    incar_dict["IVDW"] = "4"
+        else:
+            if "IVDW" in incar_dict.keys():
+                incar_dict = change_dict_key(incar_dict, "IVDW", "# IVDW", incar_dict["IVDW"])
+
 
 
         ## -------------------------------- KPOINTS -------------------------------- ##
@@ -454,10 +471,14 @@ class VASPInput():
         file_writer("POTCAR",str(potcar))
         file_writer("INCAR",str(incar))
         file_writer("KPOINTS",str(kpoints))
+        # -- vdw kernel
+        if vdw == "optB86b":
+            linux_command("cp ")
+
         os.chdir("../")
 
 
-        ## ------------------------- Move structure file ------------------------ ##
+        ## ------------------------- Move structure file ------------------------- ##
         try:
             os.mkdir("structures")
         except:
