@@ -1,4 +1,4 @@
-#!/usr/local/bin/python2.7
+#!/usr/bin/env python
 # This module is to convert VASP POSCAR file to IKST's DBmaker POSCAR templates
 
 def POStoPOS():

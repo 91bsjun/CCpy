@@ -1,4 +1,4 @@
-#!/usr/local/bin/python2.7
+#!/usr/bin/env python
 
 import os, sys
 from CCpy.Tools.CCpyTools import get_ip, linux_command

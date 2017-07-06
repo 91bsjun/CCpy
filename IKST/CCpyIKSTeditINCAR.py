@@ -1,4 +1,4 @@
-#!/usr/local/bin/python2.7
+#!/usr/bin/env python
 # This script is to add MAGMOM and LDA+U parameters in each INCAR file.
 import os, sys
 
