@@ -1,11 +1,12 @@
-#!/usr/local/bin/python2.7
-
 import os, sys
 from subprocess import call as shl
 
 
-# -- Queue command location (qsub)
+# -------------------- Config ---------------------#
+mpi_run = "/opt/mpi/intel-parallel-studio2013sp1/openmpi-1.6.5/bin/mpirun"
 queue_path = "/opt/sge/bin/lx24-amd64/"
+vasp_path = "/opt/vasp/vasp.5.4.1/bin/vasp"
+g09_path = "g09"
 
 # -- Queues
 #               "arg":[cpu, mem, queue name]
@@ -73,14 +74,13 @@ class JobSubmit():
 echo "Got $NSLOTS slots."
 cat $TMPDIR/machines
 
-set  MPI_HOME=/opt/mpi/intel-parallel-studio2013sp1/openmpi-1.6.5
-set  MPI_EXEC=$MPI_HOME/bin/mpirun
+set  MPI_EXEC=%s
 
  cd $SGE_O_WORKDIR
 
- g09 %s
+ %s %s
  
-'''%(cpu, cpu, jobname, q, inputfile)
+'''%(cpu, cpu, jobname, q, mpi_run, g09_path, inputfile)
         
         f = open("mpi.sh", "w")
         f.write(mpi)
@@ -129,7 +129,7 @@ cat $TMPDIR/machines
  cd $SGE_O_WORKDIR
  
  cd PreCalc
- mpirun -np $NSLOTS /opt/vasp/vasp.5.4.1/bin/vasp
+ %s -np $NSLOTS %s
  cd ..
 
  cd Band-DOS
@@ -139,10 +139,10 @@ cat $TMPDIR/machines
  cp ../PreCalc/* . >& /dev/null
  mv INCAR~ INCAR
  mv KPOINTS~ KPOINTS
- mpirun -np $NSLOTS /opt/vasp/vasp.5.4.1/bin/vasp
+ %s -np $NSLOTS %s
  cd ..
 
- '''%(cpu, cpu, jobname, q)
+ '''%(cpu, cpu, jobname, q, mpi_run, vasp_path, mpi_run, vasp_path)
 
         # -- Static calculation at STATiC directory
         elif static:
@@ -172,11 +172,11 @@ cat $TMPDIR/machines
  cd $SGE_O_WORKDIR
  
  cd STATIC
- mpirun -np $NSLOTS /opt/vasp/vasp.5.4.1/bin/vasp
+ %s -np $NSLOTS %s
  cd ..
 
 
- '''%(cpu, cpu, jobname, q)
+ '''%(cpu, cpu, jobname, q, mpi_run, vasp_path)
 
         # -- Normal VASP calculation
         else:
@@ -205,8 +205,8 @@ cat $TMPDIR/machines
 
  cd $SGE_O_WORKDIR
 
- mpirun -np $NSLOTS /opt/vasp/vasp.5.4.1/bin/vasp
- '''%(cpu, cpu, jobname, q)
+ %s -np $NSLOTS %s
+ '''%(cpu, cpu, jobname, q, mpi_run, vasp_path)
 
         f = open("mpi.sh", "w")
         f.write(mpi)
@@ -250,7 +250,7 @@ echo "Got $NSLOTS slots."
 cat $TMPDIR/machines
 
 set  MPI_HOME=/opt/mpi/intel-parallel-studio2013sp1/openmpi-1.6.5
-set  MPI_EXEC=$MPI_HOME/bin/mpirun
+set  MPI_EXEC=%s
 
 setenv QCSCRATCH /scratch
 setenv QCAUX /opt/QChem4.2/qcaux
@@ -260,7 +260,7 @@ source /opt/QChem4.2/qcenv.csh
  
 qchem %s %s
 
-'''%(cpu, cpu, jobname, q, inputfile, outputfile)
+'''%(cpu, cpu, jobname, q, mpi_run, inputfile, outputfile)
 
         f = open("mpi.sh", "w")
         f.write(mpi)
