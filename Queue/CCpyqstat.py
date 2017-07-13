@@ -5,12 +5,13 @@ import datetime
 from datetime import timedelta, date
 import getpass
 import pandas as pd
+queue_path = "/opt/sge/bin/lx24-amd64/"
 
 def CCpyqstat(in_user="*",in_status=""):
     """
     Modules to show SGE qstat more effectively
     """
-    q = "/opt/sge/bin/lx24-amd64/qstat -r -u '%s' %s" % (in_user, in_status)
+    q = queue_path + "qstat -r -u '%s' %s" % (in_user, in_status)
     qstat = os.popen(q).read()
 
     # -- parsing
