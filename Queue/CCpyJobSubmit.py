@@ -1,4 +1,4 @@
-#!/usr/local/bin/python2.7
+#!/usr/bin/env python
 
 # This script is for queue submitting.
 
@@ -190,15 +190,15 @@ if __name__=="__main__":
         quit()
 
 
-    # --- Queue name check
-    queues = ["xeon1", "xeon2", "xeon3", "xeon4", "xeon5", "I5"]
-    try:
-        queue = sys.argv[2]
-    except:
-        queue = raw_input("Queue (xeon1, xeon2, ...) : ")
-    if queue not in queues:
-        print("Unvalid queue name")
-        quit()
+    # # --- Queue name check
+    # queues = ["xeon1", "xeon2", "xeon3", "xeon4", "xeon5", "I5"]
+    # try:
+    #     queue = sys.argv[2]
+    # except:
+    #     queue = raw_input("Queue (xeon1, xeon2, ...) : ")
+    # if queue not in queues:
+    #     print("Unvalid queue name")
+    #     quit()
 
     # --- Separate queue check
     try:
