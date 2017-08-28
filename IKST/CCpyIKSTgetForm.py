@@ -8,13 +8,15 @@ from CCpy.Tools.CCpyTools import find_convex_hull
 try:
     root = sys.argv[1]
 except:
-    root = raw_input("Directory name (contained DBinfo files) ?")
+    root = raw_input("Directory name : ")
+pwd = os.getcwd()
 os.chdir(root)
 
-# -- User Handle Area ----
-base = "Li"
-tot_base = 8.0        # the number of base in unit cell
-# ------------------------
+# -- Get val from user ----
+base = raw_input("Element name (ex: Li) : ") # base atom
+tot_base = raw_input("Number of " + base + " when full (ex: 9) : ") # the number of base atoms in cell
+tot_base = float(tot_base)
+# -------------------------
 
 cons = []           # Concentrations
 energies = []       # Energies
@@ -22,51 +24,62 @@ dirnames = []       # Directory names
 con0_energy = None  # 0.0 Concentration energy (for calculating formation energy)
 con1_energy = None  # 1.0 Concentration energy (for calculating formation energy)
 
-dbinfo_files = [f for f in os.listdir("./") if "DBinfo" in f]
-dbinfo_files.sort()
-for dbinfo in dbinfo_files:
-    f = open(dbinfo, "r")
-    lines = f.readlines()
-    f.close()
-    es = [] # all energies in each DBinfo file
-    for l in lines:
-        # -- Find element list
-        if "Element List" in l:
-            elts = l.split("=")[1]
-            elts = elts.split()
-            index = False
-            cnt = 0
-            for e in elts:
-                if e == base:
-                    index = cnt
-                cnt += 1
-        # -- Find the number of each element
-        elif "Number of atoms" in l:
-            nums = l.split("=")[1]
-            nums = nums.split()
-            if str(index) == 'False':            # to distinct '0' index number and False..
-                n_of_base = 0.0                  # because 0 == False
-            else:
-                n_of_base = float(nums[index])
-            con = round(n_of_base / tot_base, 6)
+# -- supcells = [1-1-1, 1-2-1, ...]
+supcells = [d for d in os.listdir("./") if os.path.isdir(d)]
+if len(supcells) > 1:
+    print("only 1 supercell is now available..")
+    quit()
+os.chdir(supcells[0])
+# -- dirs = [Co3Mn3Ni3O18Vac9, ...]
+dirs = [d for d in os.listdir("./") if os.path.isdir(d)]
+dirs.sort()
+for d in dirs:
+    os.chdir(d)
+    sub_ds = os.listdir("./")
+    # -- sub_ds = [c0001, ..]
+    for sd in sub_ds:
+        os.chdir(sd)
+
+        # -- find elements
+        f = open("POSCAR", "r")
+        lines = f.readlines()
+        f.close()
+
+        for i in range(len(lines)):
+            if i == 5:
+                elts = lines[i].split()
+            elif i == 6:
+                n_of_atoms = lines[i].split()
+
+        if base in elts:
+            index = elts.index(base)
+            n_of_base = float(n_of_atoms[index])
+            con = round(n_of_base / tot_base, 4)
             cons.append(con)
-        # -- Find total energies (All iteration)
-        elif "Total Energy" in l:
-            tot_e = float(l.split()[5])
-            es.append(tot_e)
-        elif "Run Dir" in l:
-            rundir = l.split("=")[1]
-            rundir = rundir.replace(" ","").replace("\n","")
+        else:
+            con = 0.0
+            cons.append(con)
 
-    energies.append(es[0])
-    if con == 0.0:
-        con0_energy = es[0]
-    elif con == 1.0:
-        con1_energy = es[0]
 
-    dirnames.append(rundir)
+        # -- find energy
+        popen = os.popen("grep \"free  energy   TOTEN\" OUTCAR").readlines()
+        e = float(popen[-1].split()[-2])
+        energies.append(e)
+        if con == 0.0:
+            con0_energy = e
+        elif con == 1.0:
+            con1_energy = e
 
-os.chdir("../")
+
+        # -- dirname
+        spl_dir = os.getcwd().split("/")
+        crr_dir = spl_dir[-3] + "/" + spl_dir[-2] + "/" + spl_dir[-1]
+        dirnames.append(crr_dir)
+
+        os.chdir("../")
+    os.chdir("../")
+os.chdir(pwd)
+
 
 data = {"Concentration": cons, "Directory": dirnames, "Energy": energies}
 df = pd.DataFrame(data)
