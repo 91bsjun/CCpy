@@ -95,3 +95,7 @@ elif sys.argv[1] == "4":
     VO = VASPOutput()
     VO.getFinalStructure(filename=filename, mv=False)
 
+elif sys.argv[1] == "5":
+    dirs = selectVASPInputs(ask=False)
+    VO = VASPOutput()
+    VO.check_terminated(dirs=dirs)

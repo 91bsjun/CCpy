@@ -833,7 +833,47 @@ class VASPOutput():
             plt.grid()
             plt.show()
 
+    def check_terminated(self, dirs=[]):
+        status = []
+        for d in dirs:
+            os.chdir(d)
+            # -- only inputs in dir or OUTCAR not in directory
+            if len(os.listdir("./")) == 4 or "OUTCAR" not in os.listdir("./"):
+                s = "Not started"
+            else:
+                outcar = os.popen("tail OUTCAR").readlines()
+                # -- empty OUTCAR
+                if len(outcar) == 0:
+                    s = "Not calculated"
+                else:
+                    # -- properly terminated
+                    if "User time (sec):" in outcar[0]:
+                        s = "Properly terminated"
+                    # -- check not converged
+                    else:
+                        # -- find queue output
+                        vasp_out = None
+                        if "vasp.out" in os.listdir("./"):
+                            vasp_out = "vasp.out"
+                        else:
+                            for filename in os.listdir("./"):
+                                if filename.split(".o")[-1].isdigit():
+                                    vasp_out = filename
+                        # -- parsing queue output
+                        if vasp_out:
+                            vasp_out = os.popen("tail " + vasp_out).readlines()
+                            if len(vasp_out) < 2:
+                                s = "Can not get output information."
+                            else:
+                                if "please rerun with smaller EDIFF" in vasp_out[-2]:
+                                    s = "Not converged"
+                        else:
+                            s = "Can not get output information."
+            status.append(s)
+            os.chdir("../")
 
+        df = pd.DataFrame({"Directory": dirs, "Status": status})
+        print(df)
 
 
 
