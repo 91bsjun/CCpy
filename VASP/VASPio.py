@@ -51,6 +51,7 @@ class VASPInput():
         vdw_C6, vdw_R0 = vasp_grimme_parameters()
         # ------------ check preset config ------------- #
         home = os.getenv("HOME")
+        self.home = home
         if ".CCpy" not in os.listdir(home):
             os.mkdir(home+"/.CCpy")
             print("* Preset options will be saved under :" + home + "/.CCpy/")
@@ -118,6 +119,7 @@ class VASPInput():
 
         structure = self.structure
         dirname = self.dirname
+        home = self.home
 
         # -- Load previous option when multiple input generation
         if get_pre_options:
@@ -232,12 +234,16 @@ class VASPInput():
                     key = val.split("=")[0]
                     value = val.split("=")[1]
                     LDAUU[key] = value
+
+        LDAUL = self.LDAUL
+        LDAUJ = self.LDAUJ
+
         LDAUL_string = ""
         for i in range(len(elts)):
             try:
                 LDAUL_string += str(LDAUL[elts[i]]) + " "
             except:
-                LDAUL_string += str(0) + " "
+                LDAUL_string += str(2) + " "
 
         LDAUU_string = ""
         for i in range(len(elts)):
@@ -824,9 +830,6 @@ class VASPOutput():
             plt.tight_layout()
             plt.grid()
             plt.show()
-
-
-
 
 
 

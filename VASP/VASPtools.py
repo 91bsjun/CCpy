@@ -22,7 +22,7 @@ def vasp_incar_json():
     "# ALGO":"48                  ! algorithm for the e-relax",
     "LDIAG":"T                    ! sub-space diagonalisation",
     "LREAL":"auto                 ! real-space projection",
-    "PREC":"med                   ! accuracy",
+    "PREC":"normal                ! accuracy",
     "# NBANDS  ":"30              ! number of bands for diagonalization",
 
     "#4 ":"Ionic Relaxation",
@@ -81,10 +81,10 @@ def vasp_incar_json():
     "#10 lda+u":"parameters",
     "# LMAXMIX":"4",
     "# LDAU":".TRUE.              ! or .FALSE.",
-    "# LDAUTYPE":"1               ! or 2",
+    "# LDAUTYPE":"2               ! or 1",
     "# LDAUL":"2 2 2              ! l-quantum number on which U acts ((1._q,0._q) for each type",
     "# LDAUU":"0 5.00 7.0         ! U coefficient (coulomb interaction) for each species",
-    "# LDAUJ":"0 1 1              ! J coefficient (exchange) for each species",
+    "# LDAUJ":"0 0 0              ! J coefficient (exchange) for each species",
 
     "#11 vdW":"corrections",
     "# IVDW":"0                   ! 0-no , 1-DFT-D2_Grimme, 11-DFT-D3_Grimme, 12-DFT-D3_BJ, 4-dDsC"
@@ -100,20 +100,17 @@ def magmom_parameters():
 
 def ldauu_parameters():
     LDAUU = {'Mo': 4.38, 'V': 3.1, 'Cu': 4, 'W': 4.0, 'Ag': 1.5, 'Cr': 3.5, 'Ta': 2,
-             'Nb': 1.5, 'Mn': 3.9, 'Re': 2, 'Co': 3.4, 'Ni': 6, 'Fe': 4.0,
-             'Li': 0, 'O': 0}
+             'Nb': 1.5, 'Mn': 3.9, 'Re': 2, 'Co': 3.4, 'Ni': 6, 'Fe': 4.0}
     return LDAUU
 
 def ldauj_parameters():
     LDAUJ = {'Mo': 0, 'V': 0, 'Cu': 0, 'W': 0, 'Ag': 0, 'Cr': 0, 'Ta': 0,
-             'Nb': 0, 'Mn': 0, 'Re': 0, 'Co': 0, 'Ni': 0, 'Fe': 0,
-             'Li': 0, 'O': 0}
+             'Nb': 0, 'Mn': 0, 'Re': 0, 'Co': 0, 'Ni': 0, 'Fe': 0}
     return LDAUJ
 
 def ldaul_parameters():
     LDAUL = {'Mo': 2, 'V': 2, 'Cu': 2, 'W': 2, 'Ag': 2, 'Cr': 2, 'Ta': 2,
-             'Nb': 2, 'Mn': 2, 'Re': 2, 'Co': 2, 'Ni': 2, 'Fe': 2,
-             'Li': 0, 'O': 0}
+             'Nb': 2, 'Mn': 2, 'Re': 2, 'Co': 2, 'Ni': 2, 'Fe': 2}
     return LDAUL
 
 def vasp_grimme_parameters():

@@ -12,14 +12,20 @@ except:
 [options]
 0 : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
     ex) CCpyVASPAnal.py 0
+
 1 : Get final structures
     ex) CCpyVASPAnal.py 1
+
 2 : Get final total energy list
     ex) CCpyVASPAnal.py 2 n  : sub option n -> do not show plot
+
 3 : Energy & Cell volume convergence plot
     ex) CCpyVASPAnal.py 3 n  : sub option n -> do not show plot
+
 4 : Generate cif file from POSCAR or CONTCAR
-    ex) CCpyVASPAnal.py 4 POSCAR"""
+    ex) CCpyVASPAnal.py 4 POSCAR
+
+5 : Check vasp job status."""
           )
     quit()
 
@@ -88,3 +94,4 @@ elif sys.argv[1] == "4":
 
     VO = VASPOutput()
     VO.getFinalStructure(filename=filename, mv=False)
+

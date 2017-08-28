@@ -3,10 +3,15 @@ from subprocess import call as shl
 
 
 # -------------------- Config ---------------------#
-mpi_run = "/opt/mpi/intel-parallel-studio2013sp1/openmpi-1.6.5/bin/mpirun"
 queue_path = "/opt/sge/bin/lx24-amd64/"
+
+mpi_run = "mpirun"            # default mpirun
+vasp_mpi_run = mpi_run
+atk_mpi_run = "/opt/intel/mpi-rt/4.0.0/bin/mpirun"
+
 vasp_path = "/opt/vasp/vasp.5.4.1/bin/vasp"
 g09_path = "g09"
+atk_path = "/opt/QuantumWise/VNL-ATK/bin/atkpython"
 
 # -- Queues
 #               "arg":[cpu, mem, queue name]
@@ -307,16 +312,16 @@ set MPI_EXEC=$MPI_HOME/bin/mpirun
 
 setenv OMP_NUM_THREADS 1
 setenv OMP_DYNAMIC FALSE
-setenv LD_PRELOAD "libGLU.so libstdc++.so.6"
+# setenv LD_PRELOAD "libGLU.so libstdc++.so.6"
 
 setenv QUANTUM_LICENSE_PATH 6200@166.104.249.249
 
 cd $SGE_O_WORKDIR
 
 env | grep PRELOAD
-$MPI_EXEC -n %d /opt/QuantumWise/VNL-ATK/bin/atkpython %s > %s
+$MPI_EXEC -n %d %s %s > %s
 
-''' % (cpu, cpu, jobname, q, cpu, inputfile, outputfile)
+''' % (cpu, cpu, jobname, q, cpu, atk_path, inputfile, outputfile)
 
         f = open("mpi.sh", "w")
         f.write(mpi)
