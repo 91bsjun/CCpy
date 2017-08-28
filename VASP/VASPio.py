@@ -821,7 +821,9 @@ class VASPOutput():
 
         df = pd.DataFrame(energy_list)
         print(df)
-        df.to_csv("FinalEnergies.csv")
+        pwd = os.getcwd()
+        pwd = pwd.split("/")[-1]
+        df.to_csv(pwd+"_FinalEnergies.csv")
 
         if show_plot:
             fig = plt.figure(figsize=(8, 7))
