@@ -3,6 +3,7 @@
 import os,sys
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from CCpy.Tools.CCpyTools import find_convex_hull
 
 try:
@@ -33,7 +34,7 @@ os.chdir(supcells[0])
 # -- dirs = [Co3Mn3Ni3O18Vac9, ...]
 dirs = [d for d in os.listdir("./") if os.path.isdir(d)]
 dirs.sort()
-print("parsing ...")
+print("\n Start parsing ...")
 for d in dirs:
     os.chdir(d)
     sub_ds = [sd for sd in os.listdir("./") if os.path.isdir(sd)]
@@ -81,14 +82,15 @@ for d in dirs:
     os.chdir("../")
 os.chdir(pwd)
 
-
 data = {"Concentration": cons, "Directory": dirnames, "Energy": energies}
 df = pd.DataFrame(data)
+
 
 # -- Formation energy = E - xE(Lix) - (1-x)ELi(1-x)
 df['Formation energy'] = df['Energy'] - df['Concentration'] * con1_energy - (1.0 - df['Concentration']) * con0_energy
 df = df.sort_values(by='Concentration')
 df.to_csv("01_" + root + "_formation_energy.csv")
+print("Data saved : " + "01_" + root + "_formation_energy.csv")
 
 cons = df['Concentration'].tolist()
 fes = df['Formation energy'].tolist()
@@ -99,22 +101,32 @@ points = np.array(points)
 
 # -- Generate convex hull using scipy
 hull_data = find_convex_hull(points)
-hull_df = pd.DataFrame(hull_data)
-hull_df = hull_df.sort_values(by='x')
-hull_df = hull_df[hull_df['y'] <= 0]
+
+# --
+all_x, all_y, all_d = df['Concentration'].tolist(), df['Formation energy'].tolist(), df['Directory'].tolist()
+x, y = hull_data['x'], hull_data['y']
+
+hullpoint_info = {"Concentration": [], "Formation Energy": [], "Directory": []}
+for i in range(len(all_x)):
+    for j in range(len(x)):
+        if x[j] == all_x[i] and y[j] == all_y[j] and all_y <= 0:
+            hullpoint_info['Concentration'].append(all_x[i])
+            hullpoint_info['Formation Energy'].append(all_y[i])
+            hullpoint_info['Directory'].append(all_d[i])
+
+hull_df = pd.DataFrame(hullpoint_info)
+hull_df = hull_df[['Concentration', 'Formation Energy', 'Directory']]
+
 hull_df.to_csv("02_" + root + "_convex_hull_points.csv")
-print("Hull points")
+print("Data saved : " + "02_" + root + "_convex_hull_points.csv")
+print("\n* Hull points")
 print(hull_df)
 
-# -- Plot
-ifplot = raw_input("plot? (y/n)")
-if ifplot == "y":
-    import matplotlib.pyplot as plt
-
-    plt.scatter(df['Concentration'], df['Formation energy'], marker="D", color='b', s=10)
-    plt.plot(hull_df['x'], hull_df['y'], marker='o', color="r", alpha=0.8)
-    plt.xlim(0.0, 1.0)
-    plt.xlabel(base + " Concentration", fontsize=20)
-    plt.ylabel("Formation energy (eV)", fontsize=20)
-    plt.savefig("03_" + root + "_convexhull.png")
-    plt.show()
+# -- plot
+plt.scatter(df['Concentration'], df['Formation energy'], marker="D", color='b', s=10)
+plt.plot(hull_df['Concentration'], hull_df['Formation energy'], marker='o', color="r", alpha=0.8)
+plt.xlim(0.0, 1.0)
+plt.xlabel(base + " Concentration", fontsize=20)
+plt.ylabel("Formation energy (eV)", fontsize=20)
+plt.savefig("03_" + root + "_convexhull.png")
+plt.show()
