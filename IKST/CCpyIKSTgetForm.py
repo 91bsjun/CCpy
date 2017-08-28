@@ -124,7 +124,7 @@ print(hull_df)
 
 # -- plot
 plt.scatter(df['Concentration'], df['Formation energy'], marker="D", color='b', s=10)
-plt.plot(hull_df['Concentration'], hull_df['Formation energy'], marker='o', color="r", alpha=0.8)
+plt.plot(hull_df['Concentration'], hull_df['Formation energy'], marker='o', color="r", alpha=0.7, ms=8)
 plt.xlim(0.0, 1.0)
 plt.xlabel(base + " Concentration", fontsize=20)
 plt.ylabel("Formation energy (eV)", fontsize=20)
