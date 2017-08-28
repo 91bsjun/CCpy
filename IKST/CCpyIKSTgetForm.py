@@ -38,8 +38,8 @@ for d in dirs:
     sub_ds = [sd for sd in os.listdir("./") if os.path.isdir(sd)]
     # -- sub_ds = [c0001, ..]
     for sd in sub_ds:
+        print("parsing ...")
         os.chdir(sd)
-
 
         # -- find elements
         f = open("POSCAR", "r")
@@ -76,8 +76,6 @@ for d in dirs:
         spl_dir = os.getcwd().split("/")
         crr_dir = spl_dir[-3] + "/" + spl_dir[-2] + "/" + spl_dir[-1]
         dirnames.append(crr_dir)
-
-        print("parsing done " + crr_dir)
 
         os.chdir("../")
     os.chdir("../")
