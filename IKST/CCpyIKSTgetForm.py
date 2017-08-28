@@ -35,7 +35,7 @@ dirs = [d for d in os.listdir("./") if os.path.isdir(d)]
 dirs.sort()
 for d in dirs:
     os.chdir(d)
-    sub_ds = os.listdir("./")
+    sub_ds = [sd for sd in os.listdir("./") if os.path.isdir(sd)]
     # -- sub_ds = [c0001, ..]
     for sd in sub_ds:
         os.chdir(sd)
