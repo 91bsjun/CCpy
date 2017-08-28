@@ -33,12 +33,12 @@ os.chdir(supcells[0])
 # -- dirs = [Co3Mn3Ni3O18Vac9, ...]
 dirs = [d for d in os.listdir("./") if os.path.isdir(d)]
 dirs.sort()
+print("parsing ...")
 for d in dirs:
     os.chdir(d)
     sub_ds = [sd for sd in os.listdir("./") if os.path.isdir(sd)]
     # -- sub_ds = [c0001, ..]
     for sd in sub_ds:
-        print("parsing ...")
         os.chdir(sd)
 
         # -- find elements
@@ -103,6 +103,8 @@ hull_df = pd.DataFrame(hull_data)
 hull_df = hull_df.sort_values(by='x')
 hull_df = hull_df[hull_df['y'] <= 0]
 hull_df.to_csv("02_" + root + "_convex_hull_points.csv")
+print("Hull points")
+print(hull_df)
 
 # -- Plot
 ifplot = raw_input("plot? (y/n)")
@@ -112,7 +114,7 @@ if ifplot == "y":
     plt.scatter(df['Concentration'], df['Formation energy'], marker="D", color='b', s=10)
     plt.plot(hull_df['x'], hull_df['y'], marker='o', color="r", alpha=0.8)
     plt.xlim(0.0, 1.0)
-    plt.xlabel(base + " Concentration", fontsize=14)
-    plt.ylabel("Formation energy (eV)", fontsize=14)
+    plt.xlabel(base + " Concentration", fontsize=20)
+    plt.ylabel("Formation energy (eV)", fontsize=20)
     plt.savefig("03_" + root + "_convexhull.png")
     plt.show()
