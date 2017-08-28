@@ -34,7 +34,7 @@ os.chdir(supcells[0])
 # -- dirs = [Co3Mn3Ni3O18Vac9, ...]
 dirs = [d for d in os.listdir("./") if os.path.isdir(d)]
 dirs.sort()
-print("\n Start parsing ...")
+print("\n Start parsing ...\n")
 for d in dirs:
     os.chdir(d)
     sub_ds = [sd for sd in os.listdir("./") if os.path.isdir(sd)]
@@ -106,16 +106,16 @@ hull_data = find_convex_hull(points)
 all_x, all_y, all_d = df['Concentration'].tolist(), df['Formation energy'].tolist(), df['Directory'].tolist()
 x, y = hull_data['x'], hull_data['y']
 
-hullpoint_info = {"Concentration": [], "Formation Energy": [], "Directory": []}
+hullpoint_info = {"Concentration": [], "Formation energy": [], "Directory": []}
 for i in range(len(all_x)):
     for j in range(len(x)):
-        if x[j] == all_x[i] and y[j] == all_y[j] and all_y[j] <= 0:
+        if x[j] == all_x[i] and y[j] == all_y[i] and all_y[i] <= 0:
             hullpoint_info['Concentration'].append(all_x[i])
-            hullpoint_info['Formation Energy'].append(all_y[i])
+            hullpoint_info['Formation energy'].append(all_y[i])
             hullpoint_info['Directory'].append(all_d[i])
 
 hull_df = pd.DataFrame(hullpoint_info)
-hull_df = hull_df[['Concentration', 'Formation Energy', 'Directory']]
+hull_df = hull_df[['Concentration', 'Formation energy', 'Directory']]
 
 hull_df.to_csv("02_" + root + "_convex_hull_points.csv")
 print("Data saved : " + "02_" + root + "_convex_hull_points.csv")
