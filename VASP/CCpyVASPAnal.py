@@ -10,7 +10,10 @@ except:
     print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [sub_option1] [sub_option2..]")
     print(""""--------------------------------------
 [options]
-0 : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
+d : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
+    ex) CCpyVASPAnal.py d
+
+0 : Check vasp job status.
     ex) CCpyVASPAnal.py 0
 
 1 : Get final structures
@@ -24,12 +27,11 @@ except:
 
 4 : Generate cif file from POSCAR or CONTCAR
     ex) CCpyVASPAnal.py 4 POSCAR
-
-5 : Check vasp job status."""
+"""
           )
     quit()
 
-if sys.argv[1] == "0":
+if sys.argv[1] == "d":
     inputfiles = ["INCAR","POSCAR","POTCAR","KPOINTS"]
     inputs = selectVASPOutputs("./")
     for each_input in inputs:
@@ -49,7 +51,12 @@ if sys.argv[1] == "0":
                 linux_command("rm -rf "+f)
         os.chdir("../")
 
-if sys.argv[1] == "1":
+if sys.argv[1] == "0":
+    dirs = selectVASPInputs("./", ask=False)
+    VO = VASPOutput()
+    VO.check_terminated(dirs=dirs)
+
+elif sys.argv[1] == "1":
     inputs = selectVASPOutputs("./")
     for each_input in inputs:
         os.chdir(each_input)
@@ -95,7 +102,3 @@ elif sys.argv[1] == "4":
     VO = VASPOutput()
     VO.getFinalStructure(filename=filename, mv=False)
 
-elif sys.argv[1] == "5":
-    dirs = selectVASPInputs("./", ask=False)
-    VO = VASPOutput()
-    VO.check_terminated(dirs=dirs)
