@@ -109,7 +109,7 @@ x, y = hull_data['x'], hull_data['y']
 hullpoint_info = {"Concentration": [], "Formation Energy": [], "Directory": []}
 for i in range(len(all_x)):
     for j in range(len(x)):
-        if x[j] == all_x[i] and y[j] == all_y[j] and all_y <= 0:
+        if x[j] == all_x[i] and y[j] == all_y[j] and all_y[j] <= 0:
             hullpoint_info['Concentration'].append(all_x[i])
             hullpoint_info['Formation Energy'].append(all_y[i])
             hullpoint_info['Directory'].append(all_d[i])
