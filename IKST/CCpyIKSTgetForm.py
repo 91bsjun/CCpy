@@ -86,8 +86,8 @@ df = pd.DataFrame(data)
 
 # -- Formation energy = E - xE(Lix) - (1-x)ELi(1-x)
 df['Formation energy'] = df['Energy'] - df['Concentration'] * con1_energy - (1.0 - df['Concentration']) * con0_energy
-df = df.sort(['Concentration', 'Formation energy'], ascending=[True, True])
-df.to_csv("Formation_energy.csv")
+df = df.sort_values(by='Concentration')
+df.to_csv("01" + root + "_formation_energy.csv")
 
 cons = df['Concentration'].tolist()
 fes = df['Formation energy'].tolist()
@@ -99,8 +99,9 @@ points = np.array(points)
 # -- Generate convex hull using scipy
 hull_data = find_convex_hull(points)
 hull_df = pd.DataFrame(hull_data)
-hull_df = hull_df.sort(['x', 'y'], ascending=[True, True])
-hull_df.to_csv("Convex_hull_points.csv")
+hull_df = hull_df.sort_values(by='x')
+hull_df = hull_df[hull_df['y'] <= 0]
+hull_df.to_csv("02" + root + "_convex_hull_points.csv")
 
 # -- Plot
 ifplot = raw_input("plot? (y/n)")
@@ -108,7 +109,9 @@ if ifplot == "y":
     import matplotlib.pyplot as plt
 
     plt.scatter(df['Concentration'], df['Formation energy'], marker="D", color='b', s=10)
-    plt.plot(hull_df['x'], hull_df['y'], marker='o', color="r")
+    plt.plot(hull_df['x'], hull_df['y'], marker='o', color="r", alpha=0.8)
     plt.xlim(0.0, 1.0)
+    plt.xlabel(base + " Concentration")
+    plt.ylabel("Formation energy (eV)")
     plt.savefig("Convexhull.png")
     plt.show()
