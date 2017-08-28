@@ -8,13 +8,13 @@ from CCpy.Tools.CCpyTools import find_convex_hull
 try:
     root = sys.argv[1]
 except:
-    root = raw_input("Directory name : ")
+    root = raw_input("* Directory name : ")
 pwd = os.getcwd()
 os.chdir(root)
 
 # -- Get val from user ----
-base = raw_input("Element name (ex: Li) : ") # base atom
-tot_base = raw_input("Number of " + base + " when full (ex: 9) : ") # the number of base atoms in cell
+base = raw_input("* Element name (ex: Li) : ") # base atom
+tot_base = raw_input("* Number of " + base + " when full (ex: 9) : ") # the number of base atoms in cell
 tot_base = float(tot_base)
 # -------------------------
 
@@ -39,6 +39,7 @@ for d in dirs:
     # -- sub_ds = [c0001, ..]
     for sd in sub_ds:
         os.chdir(sd)
+
 
         # -- find elements
         f = open("POSCAR", "r")
@@ -76,6 +77,8 @@ for d in dirs:
         crr_dir = spl_dir[-3] + "/" + spl_dir[-2] + "/" + spl_dir[-1]
         dirnames.append(crr_dir)
 
+        print("parsing done " + crr_dir)
+
         os.chdir("../")
     os.chdir("../")
 os.chdir(pwd)
@@ -87,7 +90,7 @@ df = pd.DataFrame(data)
 # -- Formation energy = E - xE(Lix) - (1-x)ELi(1-x)
 df['Formation energy'] = df['Energy'] - df['Concentration'] * con1_energy - (1.0 - df['Concentration']) * con0_energy
 df = df.sort_values(by='Concentration')
-df.to_csv("01" + root + "_formation_energy.csv")
+df.to_csv("01_" + root + "_formation_energy.csv")
 
 cons = df['Concentration'].tolist()
 fes = df['Formation energy'].tolist()
@@ -101,7 +104,7 @@ hull_data = find_convex_hull(points)
 hull_df = pd.DataFrame(hull_data)
 hull_df = hull_df.sort_values(by='x')
 hull_df = hull_df[hull_df['y'] <= 0]
-hull_df.to_csv("02" + root + "_convex_hull_points.csv")
+hull_df.to_csv("02_" + root + "_convex_hull_points.csv")
 
 # -- Plot
 ifplot = raw_input("plot? (y/n)")
@@ -111,7 +114,7 @@ if ifplot == "y":
     plt.scatter(df['Concentration'], df['Formation energy'], marker="D", color='b', s=10)
     plt.plot(hull_df['x'], hull_df['y'], marker='o', color="r", alpha=0.8)
     plt.xlim(0.0, 1.0)
-    plt.xlabel(base + " Concentration")
-    plt.ylabel("Formation energy (eV)")
-    plt.savefig("03" + root + "_convexhull.png")
+    plt.xlabel(base + " Concentration", font_size=14)
+    plt.ylabel("Formation energy (eV)", font_size=14)
+    plt.savefig("03_" + root + "_convexhull.png")
     plt.show()
