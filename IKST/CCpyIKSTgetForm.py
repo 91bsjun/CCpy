@@ -113,5 +113,5 @@ if ifplot == "y":
     plt.xlim(0.0, 1.0)
     plt.xlabel(base + " Concentration")
     plt.ylabel("Formation energy (eV)")
-    plt.savefig("Convexhull.png")
+    plt.savefig("03" + root + "_convexhull.png")
     plt.show()
