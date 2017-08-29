@@ -269,7 +269,7 @@ if __name__ == "__main__":
         root = sys.argv[1]
     except:
         root = raw_input("* Directory name : ")
-        print("* Notice : You can start by '" + sys.argv[0] + " " + root + "'")
+        print("* Notice : You can start by '" + sys.argv[0].split("/")[-1] + " " + root + "'")
     root = root.replace("/", "")
 
     # -- Get info ------------
