@@ -733,7 +733,7 @@ class VASPOutput():
     def __init__(self):
         pass
 
-    def getFinalStructure(self, filename="CONTCAR", mv=True):
+    def getFinalStructure(self, filename="CONTCAR", path="../"):
         from pymatgen.io.cif import CifWriter
         
         structure_object = pmgIS.from_file(filename)
@@ -750,8 +750,8 @@ class VASPOutput():
 
         cif.write_file(target_name)
         print(target_name+" is generated.")
-        if mv:
-            linux_command("mv "+target_name+" ../")
+
+        linux_command("mv "+target_name+" "+path)
 
     def getConvergence(self, show_plot=True):
 
