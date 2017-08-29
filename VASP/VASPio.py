@@ -749,7 +749,7 @@ class VASPOutput():
             target_name = filename
 
         cif.write_file(target_name)
-        print(filename + " has been generated.")
+        print(target_name + " has been generated.")
 
         linux_command("mv "+target_name+" "+path)
 
