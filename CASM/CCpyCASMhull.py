@@ -222,7 +222,7 @@ class CASMhull():
         voltage = {'Concentration': x, 'Voltage': y}
         voltage_df = pd.DataFrame(voltage)
         voltage_df.to_csv("./Data/04_voltage_profile.csv")
-        print("Data saved : ./Data/04_voltage_profile.csv")
+        print("\nData saved : ./Data/04_voltage_profile.csv")
 
         plt.plot(x, y, lw=2)
 
