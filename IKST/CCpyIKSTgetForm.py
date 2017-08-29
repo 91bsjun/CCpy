@@ -10,6 +10,7 @@ try:
     root = sys.argv[1]
 except:
     root = raw_input("* Directory name : ")
+root = root.replace("/","")
 pwd = os.getcwd()
 os.chdir(root)
 
