@@ -329,25 +329,25 @@ $MPI_EXEC -n %d %s %s > %s
         shl(queue_path + "qsub mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
-        def atat(self, cpu=None, mem=None, q=None):
-            dirname = os.getcwd()
-            dirname = dirname.split("/")[-1]
+    def atat(self, cpu=None, mem=None, q=None):
+        dirname = os.getcwd()
+        dirname = dirname.split("/")[-1]
 
-            inputfile = self.inputfile
+        inputfile = self.inputfile
 
-            cpu, q = self.cpu, self.q
-            d = self.divided
+        cpu, q = self.cpu, self.q
+        d = self.divided
 
-            cpu = cpu / d
+        cpu = cpu / d
 
-            if "/" in inputfile and "p+" in inputfile:
-                jobname = "AT_" + inputfile.split("/")[-1]
-            else:
-                jobname = "AT_" + dirname + "_" + inputfile
-            jobname = jobname.replace(".", "_").replace("-", "_").replace("+", "_")
+        if "/" in inputfile and "p+" in inputfile:
+            jobname = "AT_" + inputfile.split("/")[-1]
+        else:
+            jobname = "AT_" + dirname + "_" + inputfile
+        jobname = jobname.replace(".", "_").replace("-", "_").replace("+", "_")
 
-            os.chdir(inputfile)
-            mpi = '''#!/bin/csh
+        os.chdir(inputfile)
+        mpi = '''#!/bin/csh
 
 # pe request
 #$ -pe mpi_%d %d
@@ -363,18 +363,18 @@ $MPI_EXEC -n %d %s %s > %s
 echo "Got $NSLOTS slots."
 cat $TMPDIR/machines
 
- cd $SGE_O_WORKDIR
+cd $SGE_O_WORKDIR
 
- runstruct_vasp mpirun -np %d
- rm wait
-     ''' % (cpu, cpu, jobname, q, cpu)
+runstruct_vasp mpirun -np %d
+rm wait
+ ''' % (cpu, cpu, jobname, q, cpu)
 
-            f = open("mpi.sh", "w")
-            f.write(mpi)
-            f.close()
+        f = open("mpi.sh", "w")
+        f.write(mpi)
+        f.close()
 
-            shl(queue_path + "qsub mpi.sh", shell=True)
-            shl("rm -rf ./mpi.sh", shell=True)
+        shl(queue_path + "qsub mpi.sh", shell=True)
+        shl("rm -rf ./mpi.sh", shell=True)
 
     # -- To show SGE queue system that " I'm running now "
     def pbs_runner(self, cpu=None, mem=None, q=None):
