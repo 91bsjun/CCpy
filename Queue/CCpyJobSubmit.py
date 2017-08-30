@@ -145,7 +145,6 @@ def atat(queue=None, divided=1):
             print("ex : 1-3,5-10,11,12,13")
             quit()
 
-    print(inputs)
     ### SUBMIT QUEUE #############################################
     pwd = os.getcwd()
     for each_input in inputs:
