@@ -837,6 +837,7 @@ class VASPOutput():
         status = []
         for d in dirs:
             os.chdir(d)
+            s = ""
             # -- only inputs in dir or OUTCAR not in directory
             if len(os.listdir("./")) == 4 or "OUTCAR" not in os.listdir("./"):
                 s = "Not started"
@@ -863,16 +864,17 @@ class VASPOutput():
                         if vasp_out:
                             vasp_out = os.popen("tail " + vasp_out).readlines()
                             if len(vasp_out) < 2:
-                                s = "Can not get output information."
+                                s = "Not finished or Not converged"
                             else:
                                 if "please rerun with smaller EDIFF" in vasp_out[-2]:
                                     s = "Not converged"
                         else:
-                            s = "Can not get output information."
+                            s = "Not finished or Not converged"
             status.append(s)
             os.chdir("../")
 
         df = pd.DataFrame({"Directory": dirs, "Status": status})
+        pd.set_option('display.max_rows', None)
         print(df)
 
 

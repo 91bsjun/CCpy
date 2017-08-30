@@ -65,6 +65,7 @@ def CCpyqstat(in_user="*",in_status=""):
     pd.set_option('expand_frame_repr', False)
     df = pd.DataFrame(ps)
     df = df[['ID', 'JOBNAME', 'USER', '   STATUS', 'START-TIME', 'RUN-TIME', 'QUEUE-NODE', 'SLOTS']]
+    pd.set_option('display.max_rows', None)
     print(df)
 
 if __name__=="__main__":
