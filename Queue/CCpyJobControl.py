@@ -6,10 +6,10 @@ from subprocess import call as shl
 queue_path = "/opt/sge/bin/lx24-amd64/"
 
 mpi_run = "mpirun"            # default mpirun
-vasp_mpi_run = mpi_run
+vasp_mpi_run = "mpirun"
 atk_mpi_run = "/opt/intel/mpi-rt/4.0.0/bin/mpirun"
 
-vasp_path = "/opt/vasp/vasp.5.4.1/bin/vasp"
+vasp_path = "vasp"
 g09_path = "g09"
 atk_path = "/opt/QuantumWise/VNL-ATK/bin/atkpython"
 
@@ -79,13 +79,11 @@ class JobSubmit():
 echo "Got $NSLOTS slots."
 cat $TMPDIR/machines
 
-set  MPI_EXEC=%s
-
  cd $SGE_O_WORKDIR
 
  %s %s
  
-'''%(cpu, cpu, jobname, q, mpi_run, g09_path, inputfile)
+'''%(cpu, cpu, jobname, q, g09_path, inputfile)
         
         f = open("mpi.sh", "w")
         f.write(mpi)
@@ -210,7 +208,8 @@ cat $TMPDIR/machines
 
  cd $SGE_O_WORKDIR
 
- %s -np $NSLOTS %s
+ %s -np $NSLOTS %s < /dev/null > vasp.out
+ touch vasp.done
  '''%(cpu, cpu, jobname, q, mpi_run, vasp_path)
 
         f = open("mpi.sh", "w")
@@ -330,57 +329,52 @@ $MPI_EXEC -n %d %s %s > %s
         shl(queue_path + "qsub mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
+        def atat(self, cpu=None, mem=None, q=None):
+            dirname = os.getcwd()
+            dirname = dirname.split("/")[-1]
 
-    def atat(self, cpu=None, mem=None, q=None):
-        dirname = os.getcwd()
-        dirname = dirname.split("/")[-1]
-        
-        inputfile = self.inputfile
+            inputfile = self.inputfile
 
-        cpu, q = self.cpu, self.q
-        d = self.divided
-        
-        cpu = cpu / d
+            cpu, q = self.cpu, self.q
+            d = self.divided
 
-        if "/" in inputfile and "p+" in inputfile:            
-            jobname = "AT_"+inputfile.split("/")[-1]
-        else:
-            jobname = "AT_"+dirname+"_"+inputfile
-        jobname = jobname.replace(".","_").replace("-","_").replace("+","_")
+            cpu = cpu / d
 
-        os.chdir(inputfile)
-        mpi = '''#!/bin/csh
+            if "/" in inputfile and "p+" in inputfile:
+                jobname = "AT_" + inputfile.split("/")[-1]
+            else:
+                jobname = "AT_" + dirname + "_" + inputfile
+            jobname = jobname.replace(".", "_").replace("-", "_").replace("+", "_")
+
+            os.chdir(inputfile)
+            mpi = '''#!/bin/csh
 
 # pe request
-
 #$ -pe mpi_%d %d
 
-# our Job name 
+# Job name
 #$ -N %s
 
 #$ -S /bin/csh
-
 #$ -q %s
-
 #$ -V
-
 #$ -cwd
 
 echo "Got $NSLOTS slots."
 cat $TMPDIR/machines
 
-
  cd $SGE_O_WORKDIR
 
- pollmach runstruct_vasp mpirun -np %d
- '''%(cpu, cpu, jobname, q, cpu)
+ runstruct_vasp mpirun -np %d
+ rm wait
+     ''' % (cpu, cpu, jobname, q, cpu)
 
-        f = open("mpi.sh", "w")
-        f.write(mpi)
-        f.close()
+            f = open("mpi.sh", "w")
+            f.write(mpi)
+            f.close()
 
-        shl(queue_path+"qsub mpi.sh", shell=True)
-        shl("rm -rf ./mpi.sh", shell=True)
+            shl(queue_path + "qsub mpi.sh", shell=True)
+            shl("rm -rf ./mpi.sh", shell=True)
 
     # -- To show SGE queue system that " I'm running now "
     def pbs_runner(self, cpu=None, mem=None, q=None):

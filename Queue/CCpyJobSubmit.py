@@ -83,7 +83,8 @@ def atk(queue=None, divided=1):
         myJS.ATK()
 
 def atat(queue=None, divided=1):
-    all_inputs = [int(d) for d in os.listdir("./") if os.path.isdir(d) if "str.out" in os.listdir(d)]
+    all_inputs = [int(d) for d in os.listdir("./") if os.path.isdir(d) if
+                  "str.out" in os.listdir(d) and "wait" in os.listdir(d)]
     all_inputs.sort()
 
     # fitsvl calc
