@@ -120,10 +120,7 @@ def atat(queue=None, divided=1):
     else:
         print("0 : All files")
         for i in range(len(all_inputs)):
-            if len(os.listdir(str(all_inputs[i]))) == 2:
-                print(str(i + 1) + " : " + str(all_inputs[i]))
-            else:
-                print(str(i + 1) + " : " + str(all_inputs[i]) + " , running or calculated.")
+            print(str(i + 1) + " : " + str(all_inputs[i]) + " , running or calculated.")
         get_num = raw_input("Choose file : ")
         all_inputs = [str(d) for d in all_inputs]
         try:

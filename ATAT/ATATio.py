@@ -1,4 +1,5 @@
 import os, sys, re
+from collections import OrderedDict
 
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
@@ -6,41 +7,124 @@ import numpy as np
 from math import sqrt
 import pandas as pd
 
-from bsjunCODE.bsjunStructure import PeriodicStructure as PS
-from bsjunCODE.bsjunStructure import latticeGen
-from bsjunCODE.bsjunTools import file_writer, linux_command
+from CCpy.Tools.CCpyStructure import PeriodicStructure as PS
+from CCpy.Tools.CCpyStructure import latticeGen
+from CCpy.Tools.CCpyTools import file_writer, linux_command
 
 from pymatgen.core import IStructure as pmgIS
 
 
 class ATATInput():
-    def __init__(self, filename, dirname=None):
-        if ".xsd" in filename:
-            ps = PS(filename)
-            ps.xsdFile()
-            ps.cifWrite(filename="tmpstructure.cif")
-            structure = pmgIS.from_file("tmpstructure.cif")
-            linux_command("rm -rf tmpstructure.cif")
-            jobname = filename.replace(".xsd","")
-        elif ".cif" in filename: 
-            structure = pmgIS.from_file(filename)
-            jobname = filename.replace(".cif","")
-        elif "POSCAR" in filename or "CONTCAR" in filename:
-            structure = pmgIS.from_file(filename)
-            pwd = os.getcwd()
-            pwd = pwd.split("/")[-1]
-            jobname = pwd
-        else:
-            print("Not supported file format. (.xsd, .cif, POSCAR, CONTCAR)")
-            quit()
+    def __init__(self, filename=None, dirname=None):
+        if filename:
+            if ".xsd" in filename:
+                ps = PS(filename)
+                ps.xsdFile()
+                ps.cifWrite(filename="tmpstructure.cif")
+                structure = pmgIS.from_file("tmpstructure.cif")
+                linux_command("rm -rf tmpstructure.cif")
+                jobname = filename.replace(".xsd","")
+            elif ".cif" in filename:
+                structure = pmgIS.from_file(filename)
+                jobname = filename.replace(".cif","")
+            elif "POSCAR" in filename or "CONTCAR" in filename:
+                structure = pmgIS.from_file(filename)
+                pwd = os.getcwd()
+                pwd = pwd.split("/")[-1]
+                jobname = pwd
+            else:
+                print("Not supported file format. (.xsd, .cif, POSCAR, CONTCAR)")
+                quit()
 
-        if not dirname:
-            dirname = jobname
+            if not dirname:
+                dirname = jobname
 
-        self.filename = filename
-        self.structure = structure
-        self.dirname = dirname
+            self.filename = filename
+            self.structure = structure
+            self.dirname = dirname
 
+    def vasp_wrap_template(self):
+        vasp_wrap = """SYSTEM           = ATAT                            !
+
+#1 Startparameter for this Run:
+NWRITE           = 2                             ! LPETIM=F    write-flag & timer
+ISTART           = 0                             ! job   : 0-new  1-contEcut  2-sameBS
+INIWAV           = 1                             ! 0-jellium  1-random
+IWAVPR           = 1                             ! prediction:  0-non 1-charg 2-wave 3-comb
+ICHARG           = 2                             ! 0-from WF  1-from CHGCAR  2-from atom  11-12-fixed
+LWAVE            = .FALSE.                       ! determines whether the wavefunctions are written to the WAVECAR file
+
+#2 Electronic Relaxation 1
+NELM             = 100                           ! number of iterations
+EDIFF            = 1E-04                         ! stopping-criterion for ELM
+BMIX             = 3.00                          ! sets the cutoff wave vector for Kerker mixing for the magnetization density
+ENCUT            = 500                           ! Cut-Off Energy
+
+#3 Electronic Relaxation 1
+# ALGO           = 48                            ! algorithm for the e-relax
+LDIAG            = T                             ! sub-space diagonalisation
+LREAL            = auto                          ! real-space projection
+PREC             = normal                        ! accuracy
+# NBANDS         = 30                            ! number of bands for diagonalization
+
+#4 Ionic Relaxation
+NSW              = 200                           ! number of steps for IOM
+NBLOCK           = 1                             ! inner block
+KBLOCK           = 10                            ! outer block
+IBRION           = 2                             ! ionic relax: 0-MD 1-quasi-New 2-CG
+ISIF             = 3                             ! ion&cell relax: 0-MD 2-ion&stress 3-ion&cell&stress
+ISYM             = 2                             ! switch symmetry stuff ON (1 or 2) or OFF (0)
+# SYMPREC        =  1e-6                         !
+LCORR            = T                             ! Harris-correction to forces
+EDIFFG           = -0.04                         ! Criterion for geom opt (eV/Ang)
+POTIM            = 0.50                          ! time-step for ionic motion (fs)
+SMASS            = 3.00                          ! Nose mass-parameter (am)
+
+#5 DOS related values
+ISMEAR           = 0                             ! Broadening methode -5-tet -1-fermi 0-gaus 1-mp 2-mp2
+SIGMA            = 0.05                          ! Broadening in eV
+LORBIT           = 11                            ! l-decomposed DOS
+# RWIGS          = 1.63  1.00                    ! Wigner-Zeits radius
+# EMIN           =                               ! Minimum energy for DOS
+# EMAX           =                               ! Maximum energy for DOS
+# NEDOS          = 1001                          ! Number of DOS points
+# NELECT         = 100                           ! Total number of electrons
+# NUPDOWN        = 2                             ! Difference between UP&DOWN electrons
+
+#6 Parallelizationoption
+LPLANE           = T                             ! Parallelization for PWs
+NCORE            = 8                             !
+LSCALU           = F                             !
+NSIM             = 4                             !
+ISPIN            = 2                             ! spin polarized = 2, non spin polarized = 1
+
+#7 optB86b-vdW functional requires vdw_kernel.bindat
+# GGA            = MK                            !
+# PARAM1         = 0.1234                        !
+# PARAM2         = 1.0000                        !
+# LUSE_VDW       = .TRUE.                        !
+# AGGAC          = 0.0000                        !
+
+#8 TS calculation         ! default:Nudged Elestic Band method
+# ICHAIN         = 0                             ! Method (0=NEB, 1=Dynamical matrix, 2=Dimer, 3=Lanczos)
+# SPRING         = -5                            ! in eV/Ang*2 (sping constant)
+# IMAGES         = 3                             ! Number of images btw Reactant & Product
+# LCLIMB         = .true.                        ! cNEB: driven up to the saddle point
+# LTANGENTOLD    = .true.                        ! Old central difference tangent
+# LDNEB          = .true.                        ! Modified doubble nudging
+# NEBCELL        = .true.                        ! NEB for variable cell (w/ ISIF=3)
+
+#9 Dipole Correctionoption
+# IDIPOL         = 3                             !
+# LDIPOL         =                               !
+
+#11 vdWcorrections
+# IVDW             = 12                            !"""
+
+        f = open("vasp.wrap", "w")
+        f.write(vasp_wrap)
+        f.close()
+        print("vasp.wrap has been generated")
 
     def inputGen(self):
         structure = self.structure
@@ -81,19 +165,73 @@ class ATATInput():
 
         file_writer("lat.in", input_string)
 
-        vasp_wrap="""PREC = med
-ISMEAR = 1
-SIGMA = 0.05
-EDIFF = 0.0001
-ENCUT = 500
-ICHARG = 2
-NSW = 41
-IBRION = 2
-ISIF = 3
-KPPRA = 1000
-USEPOT = PAWPBE
-DOSTATIC"""
-        file_writer("vasp.wrap",vasp_wrap)
+        if "vasp.wrap" not in os.listdir("./"):
+            chk = raw_input("Do you want to make VASP INCAR template? (y/n) ")
+            if chk == "y":
+                self.vasp_wrap_template()
+
+
+    def add_ldau(self):
+        mag = {"Mn": 4.5, "Co": 0.0, "Ni": 1.0, "Li": 0.0, "O": 0.0, "Cl": 0.0, "F": 0.0, "N": 0.0, "S": 0.0}
+        LDAUL = {"Mn": 2, "Co": 2, "Ni": 2, "Li": 2, "O": 2, "Cl": 2, "F": 2, "N": 2, "S": 2}
+        LDAUU = {"Mn": 5.0, "Co": 4.0, "Ni": 6.4, "Li": 0, "O": 0, "Cl": 0, "F": 0, "N": 0, "S": 0}
+        LDAUJ = {"Ni": 0, "Mn": 0, "Co": 0, "Li": 0, "O": 0, "Cl": 0, "F": 0, "N": 0, "S": 0}
+
+        f = open("atomlabel.tmp", "r")
+        lines = f.readlines()
+        f.close()
+
+        elts_dict = OrderedDict()
+        for i in range(len(lines)):
+            elt = lines[i].replace("\n", "")
+            if elt not in elts_dict.keys():
+                elts_dict[elt] = 1
+            else:
+                elts_dict[elt] += 1
+        elts = elts_dict.keys()
+
+        mag_string = ""
+        for i in range(len(elts)):
+            mag_string += str(elts_dict[elts[i]]) + "*" + str(mag[elts[i]]) + " "
+
+        LDAUL_string = ""
+        for i in range(len(elts)):
+            LDAUL_string += str(LDAUL[elts[i]]) + " "
+
+        LDAUU_string = ""
+        for i in range(len(elts)):
+            LDAUU_string += str(LDAUU[elts[i]]) + " "
+
+        LDAUJ_string = ""
+        for i in range(len(elts)):
+            LDAUJ_string += str(LDAUJ[elts[i]]) + " "
+
+        LDAU = """
+# MAGMOM and LDA+U parameters
+MAGMOM = %s
+LDAU = .TRUE.
+LMAXMIX = 4
+LDAUTYPE = 2
+LDAUL = %s
+LDAUU = %s
+LDAUJ = %s
+
+        """ % (mag_string, LDAUL_string, LDAUU_string, LDAUJ_string)
+
+        f = open("vasp.in", "r")
+        lines = f.readlines()
+        f.close()
+        for i in range(len(lines)):
+            if "[POSCAR]" in lines[i]:
+                poscar_start = i
+        f = open("vasp.in", "w")
+        for i in range(len(lines)):
+            if i == poscar_start - 1:
+                f.write(LDAU)
+                f.write(lines[i])
+            else:
+                f.write(lines[i])
+        f.close()
 
 class ATATOut():
     def __init__(self):

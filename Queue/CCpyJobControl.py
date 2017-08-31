@@ -365,7 +365,7 @@ cat $TMPDIR/machines
 
 cd $SGE_O_WORKDIR
 
-runstruct_vasp mpirun -np %d
+runstruct_vasp -ng mpirun -np %d
 rm wait
  ''' % (cpu, cpu, jobname, q, cpu)
 

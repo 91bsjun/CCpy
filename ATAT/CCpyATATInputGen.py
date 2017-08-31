@@ -1,4 +1,4 @@
-#!/usr/local/bin/python2.7
+#!/bin/env python
 
 import os, sys
 from CCpy.ATAT.ATATio import ATATInput
@@ -12,11 +12,17 @@ except:
     print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [sub_option1] [sub_option2..]")
     print('''--------------------------------------
 [options]
+0 : Make vasp.wrap (VASP INCAR template)
 1 : Generate ATAT input file (lat.in)
 2 : Generate configurations
-3 : Background qdel finished job'''
+3 : Generate VASP inputfiles (after [2])
+4 : Add LDA+U, MAGMOM parameters (after [3])'''
           )
     quit()
+
+if sys.argv[1] == "0":
+    AI = ATATInput()
+    AI.vasp_wrap_template()
 
 if sys.argv[1] == "1":
     input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
@@ -29,7 +35,7 @@ elif sys.argv[1] == "2":
     try:
         number_of_set = int(sys.argv[2])
     except:
-        number_of_set = input("How many sets to make? ")
+        number_of_set = input("How many structures to make? ")
 
     
     for i in range(number_of_set):
@@ -41,53 +47,73 @@ elif sys.argv[1] == "2":
         print("Generated : "+new_dir[0])
 
 elif sys.argv[1] == "3":
-    while True:
-        linux_command("bsjunJobDelete.py 3")
-        linux_command("bsjunJobDelete.py 3 f")
-        time.sleep(60)
+    all_inputs = [int(d) for d in os.listdir("./") if os.path.isdir(d) if
+                  "str.out" in os.listdir(d) and "wait" in os.listdir(d)]
+    all_inputs.sort()
+
+    print("0 : All files")
+    for i in range(len(all_inputs)):
+        print(str(i + 1) + " : " + str(all_inputs[i]))
+    get_num = raw_input("Choose file : ")
+    all_inputs = [str(d) for d in all_inputs]
+    try:
+        if get_num == "0":
+            inputs = all_inputs
+        else:
+            inputs = []
+            get_num = get_num.split(",")  # 1-4,6-10,11,12
+            for i in get_num:
+                if "-" in i:
+                    r = i.split("-")
+                    for j in range(int(r[0]), int(r[1]) + 1):
+                        inputs.append(all_inputs[j - 1])
+                else:
+                    i = int(i)
+                    inputs.append(all_inputs[i - 1])
+    except:
+        print("Unvalid input type.")
+        print("ex : 1-3,5-10,11,12,13")
+        quit()
+
+    for d in inputs:
+        os.chdir(d)
+        print(d)
+        linux_command("runstruct_vasp -nr")
+        os.chdir("../")
         
 elif sys.argv[1] == "4":
-    dirs = [d for d in os.listdir("./") if os.path.isdir(d) if "str.out" in os.listdir(d)]
+    all_inputs = [int(d) for d in os.listdir("./") if os.path.isdir(d) if "atomlabel.tmp" in os.listdir(d)]
+    if len(all_inputs) == 0:
+        print("No available directory detected.. ")
+        quit()
+    all_inputs.sort()
+
+    print("0 : All files")
+    for i in range(len(all_inputs)):
+        print(str(i + 1) + " : " + str(all_inputs[i]))
+    get_num = raw_input("Choose file : ")
+    all_inputs = [str(d) for d in all_inputs]
     try:
-        os.mkdir("NOT_1.1.1")
+        if get_num == "0":
+            inputs = all_inputs
+        else:
+            inputs = []
+            get_num = get_num.split(",")  # 1-4,6-10,11,12
+            for i in get_num:
+                if "-" in i:
+                    r = i.split("-")
+                    for j in range(int(r[0]), int(r[1]) + 1):
+                        inputs.append(all_inputs[j - 1])
+                else:
+                    i = int(i)
+                    inputs.append(all_inputs[i - 1])
     except:
-        pass
-    dirs.sort()
-    for d in dirs:
-        f = open(d+"/str.out","r")
-        lines = f.readlines()
-        f.close()
-        n=0
-        m=0
-        c=0
-        for l in lines:
-            if "Ni" in l:
-                n+=1
-            elif "Mn" in l:
-                m+=1
-            elif "Co" in l:
-                c+=1
-        if not n == m == c == 3:
-            print("mv "+d+" NOT_1.1.1")
+        print("Unvalid input type.")
+        print("ex : 1-3,5-10,11,12,13")
+        quit()
 
-elif sys.argv[1] == "3":
-    while True:
-        linux_command("bsjunJobDelete.py 3")
-        time.sleep(30)
-        
-elif sys.argv[1] == "5":
-    elements = ["Ni","Mn","Co"]
-    sets = []
-    
-    
-
-
-
-
-
-
-
-
-
-
-    
+    for d in inputs:
+        os.chdir(d)
+        AI = ATATInput()
+        AI.add_ldau()
+        os.chdir("../")
