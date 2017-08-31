@@ -2,7 +2,7 @@
 
 import os, sys
 from CCpy.VASP.VASPio import VASPOutput
-from CCpy.Tools.CCpyTools import selectVASPInputs, selectVASPOutputs, linux_command
+from CCpy.Tools.CCpyTools import selectVASPInputs, selectVASPOutputs, selectInputs, linux_command
 
 try:
     chk = sys.argv[1]
@@ -98,7 +98,8 @@ elif sys.argv[1] == "4":
         filename = sys.argv[2]
     except:
         filename = raw_input("POSCAR? CONTCAR?")
-
-    VO = VASPOutput()
-    VO.getFinalStructure(filename=filename, path="./")
+    inputs = selectInputs(marker=["POSCAR"], directory_path="./")
+    for each_input in inputs:
+        VO = VASPOutput()
+        VO.getFinalStructure(filename=each_input, path="./")
 
