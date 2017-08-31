@@ -119,7 +119,14 @@ ISPIN            = 2                             ! spin polarized = 2, non spin 
 # LDIPOL         =                               !
 
 #11 vdWcorrections
-# IVDW             = 12                            !"""
+# IVDW             = 12                            !
+
+
+# ATAT own options
+USEPOT = PAWPBE
+KPPRA = 1000
+
+"""
 
         f = open("vasp.wrap", "w")
         f.write(vasp_wrap)
