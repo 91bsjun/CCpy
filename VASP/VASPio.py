@@ -746,7 +746,7 @@ class VASPOutput():
         elif filename == "POSCAR":
             target_name = dirname+"_poscar.cif"
         else:
-            target_name = filename
+            target_name = filename+".cif"
 
         cif.write_file(target_name)
         print(target_name + " has been generated.")

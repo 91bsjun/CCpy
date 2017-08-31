@@ -100,5 +100,5 @@ elif sys.argv[1] == "4":
         filename = raw_input("POSCAR? CONTCAR?")
 
     VO = VASPOutput()
-    VO.getFinalStructure(filename=filename, mv=False)
+    VO.getFinalStructure(filename=filename, path="./")
 
