@@ -235,7 +235,7 @@ def selectInputs(marker, directory_path, ask=True):
     all_inputs = []
     for each_file in all_files:
         for m in marker:
-            if m in each_file:
+            if m in each_file and each_file not in all_inputs:
                 all_inputs.append(each_file)
 
     # -- if ask == False : select all inputs
