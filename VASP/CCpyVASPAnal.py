@@ -94,10 +94,6 @@ elif sys.argv[1] == "3":
         os.chdir("../")
 
 elif sys.argv[1] == "4":
-    try:
-        filename = sys.argv[2]
-    except:
-        filename = raw_input("POSCAR? CONTCAR?")
     inputs = selectInputs(marker=["POSCAR"], directory_path="./")
     for each_input in inputs:
         VO = VASPOutput()

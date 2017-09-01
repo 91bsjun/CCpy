@@ -751,7 +751,10 @@ class VASPOutput():
         cif.write_file(target_name)
         print(target_name + " has been generated.")
 
-        linux_command("mv "+target_name+" "+path)
+        if path == "./" or path == ".":
+            pass
+        else:
+            linux_command("mv "+target_name+" "+path)
 
     def getConvergence(self, show_plot=True):
 
