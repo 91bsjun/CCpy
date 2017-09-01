@@ -26,7 +26,7 @@ d : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
     ex) CCpyVASPAnal.py 3 n  : sub option n -> do not show plot
 
 4 : Generate cif file from POSCAR or CONTCAR
-    ex) CCpyVASPAnal.py 4 POSCAR
+    ex) CCpyVASPAnal.py 4
 """
           )
     quit()
