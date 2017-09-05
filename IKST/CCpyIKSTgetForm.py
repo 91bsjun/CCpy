@@ -147,6 +147,7 @@ class IKSThull():
             concat.append(xy_df)
 
         hull_df = pd.concat(concat)
+        hull_df = hull_df.sort_values('Concentration')
         hull_df = hull_df[
             ['Concentration', 'Formation energy', 'Energy', 'Energy/f.u.', 'Supercell', 'Number of atom', 'Directory']]
 
