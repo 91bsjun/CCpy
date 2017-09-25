@@ -808,7 +808,10 @@ class VASPOutput():
 
         x = range(len(out_dirs))
         energies = []
+        converged = []
         for o in out_dirs:
+            os.chdir(o)
+
             OUTCAR = open(o+"/OUTCAR", "r").read()
             # -- energy parsing
             findE = re.compile("free  energy   TOTEN  =\s+\S+", re.M)
@@ -818,11 +821,36 @@ class VASPOutput():
                 e.append(float(s.split()[4]))
             energies.append(e[-1])
 
+            # -- find convergence
+            c = ""
+            vasp_out = None
+            if "vasp.out" in os.listdir("./"):
+                vasp_out = "vasp.out"
+            else:
+                for filename in os.listdir("./"):
+                    if filename.split(".o")[-1].isdigit():
+                        vasp_out = filename
+            # -- parsing queue output
+            if vasp_out:
+                vasp_out = os.popen("tail " + vasp_out).readlines()
+                if len(vasp_out) < 2:
+                    c = "Not finished or Not converged"
+                else:
+                    if "please rerun with smaller EDIFF" in vasp_out[-2]:
+                        c = "Not converged"
+                    elif "reached required accuracy" in vasp_out[-1]:
+                        c = "Converged"
+            converged.append(c)
+
+            os.chdir("../")
+
         energy_list = {}
         energy_list['Directory'] = out_dirs
         energy_list['Total energy(eV)'] = energies
+        energy_list['Converged'] = converged
 
         df = pd.DataFrame(energy_list)
+        df = df[['Directory', 'Total energy(eV)', 'Converged']]
         print(df)
         pwd = os.getcwd()
         pwd = pwd.split("/")[-1]
@@ -838,9 +866,11 @@ class VASPOutput():
 
     def check_terminated(self, dirs=[]):
         status = []
+        converged = []
         for d in dirs:
             os.chdir(d)
             s = ""
+            c = ""
             # -- only inputs in dir or OUTCAR not in directory
             if len(os.listdir("./")) == 4 or "OUTCAR" not in os.listdir("./"):
                 s = "Not started"
@@ -853,32 +883,39 @@ class VASPOutput():
                     # -- properly terminated
                     if "User time (sec):" in outcar[0]:
                         s = "Properly terminated"
-                    # -- check not converged
                     else:
-                        # -- find queue output
-                        vasp_out = None
-                        if "vasp.out" in os.listdir("./"):
-                            vasp_out = "vasp.out"
+                        s = "Not properly terminated"
+
+                    # -- check not converged
+                    vasp_out = None
+                    if "vasp.out" in os.listdir("./"):
+                        vasp_out = "vasp.out"
+                    else:
+                        for filename in os.listdir("./"):
+                            if filename.split(".o")[-1].isdigit():
+                                vasp_out = filename
+                    # -- parsing queue output
+                    if vasp_out:
+                        vasp_out = os.popen("tail " + vasp_out).readlines()
+                        if len(vasp_out) < 2:
+                            c = "Not finished or Not converged"
                         else:
-                            for filename in os.listdir("./"):
-                                if filename.split(".o")[-1].isdigit():
-                                    vasp_out = filename
-                        # -- parsing queue output
-                        if vasp_out:
-                            vasp_out = os.popen("tail " + vasp_out).readlines()
-                            if len(vasp_out) < 2:
-                                s = "Not finished or Not converged"
-                            else:
-                                if "please rerun with smaller EDIFF" in vasp_out[-2]:
-                                    s = "Not converged"
-                        else:
-                            s = "Not finished or Not converged"
+                            if "please rerun with smaller EDIFF" in vasp_out[-2]:
+                                c = "Not converged"
+                            elif "reached required accuracy" in vasp_out[-1]:
+                                c = "Converged"
+                    else:
+                        c = "Not finished or Not converged"
             status.append(s)
+            converged.append(c)
             os.chdir("../")
 
-        df = pd.DataFrame({"Directory": dirs, "Status": status})
+        df = pd.DataFrame({"Directory": dirs, "Status": status, "Converged": converged})
+        df = df[['Directory', 'Status', 'Converged']]
         pd.set_option('display.max_rows', None)
         print(df)
+
+        return
 
 
 
