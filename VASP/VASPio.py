@@ -809,6 +809,7 @@ class VASPOutput():
         x = range(len(out_dirs))
         energies = []
         converged = []
+
         for o in out_dirs:
             os.chdir(o)
 
@@ -819,7 +820,11 @@ class VASPOutput():
             e = []
             for s in strings:
                 e.append(float(s.split()[4]))
-            energies.append(e[-1])
+
+            if len(e) == 0:
+                energies.append(0)
+            else:
+                energies.append(e[-1])
 
             # -- find convergence
             c = ""
