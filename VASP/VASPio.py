@@ -834,12 +834,18 @@ class VASPOutput():
             if vasp_out:
                 vasp_out = os.popen("tail " + vasp_out).readlines()
                 if len(vasp_out) < 2:
-                    c = "Not finished or Not converged"
+                    c = "Something wrong in queue output file.."
                 else:
                     if "please rerun with smaller EDIFF" in vasp_out[-2]:
-                        c = "Not converged"
+                        c = "X"
                     elif "reached required accuracy" in vasp_out[-1]:
-                        c = "Converged"
+                        c = "O"
+                    elif "ZBRENT:  accuracy reached" in vasp_out[-2]:
+                        c = "X"
+                    else:
+                        c = "Not finished"
+            else:
+                c = "Cannot find queue output file.."
             converged.append(c)
 
             os.chdir("../")
@@ -898,14 +904,18 @@ class VASPOutput():
                     if vasp_out:
                         vasp_out = os.popen("tail " + vasp_out).readlines()
                         if len(vasp_out) < 2:
-                            c = "Not finished or Not converged"
+                            c = "Something wrong in queue output file.."
                         else:
                             if "please rerun with smaller EDIFF" in vasp_out[-2]:
-                                c = "Not converged"
+                                c = "X"
                             elif "reached required accuracy" in vasp_out[-1]:
-                                c = "Converged"
+                                c = "O"
+                            elif "ZBRENT:  accuracy reached" in vasp_out[-2]:
+                                c = "X"
+                            else:
+                                c = "Not finished"
                     else:
-                        c = "Not finished or Not converged"
+                        c = "Cannot find queue output file.."
             status.append(s)
             converged.append(c)
             os.chdir("../")
