@@ -812,7 +812,7 @@ class VASPOutput():
         for o in out_dirs:
             os.chdir(o)
 
-            OUTCAR = open(o+"/OUTCAR", "r").read()
+            OUTCAR = open("OUTCAR", "r").read()
             # -- energy parsing
             findE = re.compile("free  energy   TOTEN  =\s+\S+", re.M)
             strings = findE.findall(OUTCAR)
