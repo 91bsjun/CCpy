@@ -837,11 +837,11 @@ class VASPOutput():
                     c = "Something wrong in queue output file.."
                 else:
                     if "please rerun with smaller EDIFF" in vasp_out[-2]:
-                        c = "X"
+                        c = "False"
                     elif "reached required accuracy" in vasp_out[-1]:
-                        c = "O"
+                        c = "True"
                     elif "ZBRENT:  accuracy reached" in vasp_out[-2]:
-                        c = "X"
+                        c = "False"
                     else:
                         c = "Not finished"
             else:
@@ -907,11 +907,11 @@ class VASPOutput():
                             c = "Something wrong in queue output file.."
                         else:
                             if "please rerun with smaller EDIFF" in vasp_out[-2]:
-                                c = "X"
+                                c = "False"
                             elif "reached required accuracy" in vasp_out[-1]:
-                                c = "O"
+                                c = "True"
                             elif "ZBRENT:  accuracy reached" in vasp_out[-2]:
-                                c = "X"
+                                c = "False"
                             else:
                                 c = "Not finished"
                     else:
