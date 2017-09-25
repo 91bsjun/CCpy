@@ -188,7 +188,7 @@ if __name__=="__main__":
 
 
     # --- Queue name check
-    queues = ["xeon1", "xeon2", "xeon3", "xeon4", "xeon5", "I5"]
+    queues = ["xeon1", "xeon2", "xeon3", "xeon4", "xeon5", "I5", "aws"]
     try:
         queue = sys.argv[2]
     except:
