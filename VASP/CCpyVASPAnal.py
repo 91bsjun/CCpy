@@ -94,7 +94,7 @@ elif sys.argv[1] == "3":
         os.chdir("../")
 
 elif sys.argv[1] == "4":
-    inputs = selectInputs(marker=["POSCAR"], directory_path="./")
+    inputs = selectInputs(marker=["POSCAR", "CONTCAR"], directory_path="./")
     for each_input in inputs:
         VO = VASPOutput()
         VO.getFinalStructure(filename=each_input, path="./")
