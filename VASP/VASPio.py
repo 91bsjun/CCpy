@@ -399,7 +399,9 @@ class VASPInput():
                     # incar_keys.sort()
                     incar_string = ""
                     for key in incar_keys:
-                        if key[0] == "#" and key[1].isdigit():
+                        if key == "SYSTEM":
+                            incar_string += key.ljust(16) + " = " + str(incar_dict[key]).ljust(30) + "\n"
+                        elif key[0] == "#" and key[1].isdigit():
                             incar_string += "\n"
                             incar_string += key + str(incar_dict[key]) + "\n"
                         else:
