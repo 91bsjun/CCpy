@@ -349,7 +349,7 @@ class VASPInput():
             kpts = []
             for param in length:
                 if 20 // param == 0 or 20 // param == 1:
-                    kpts.append(2)
+                    kpts.append(1)
                 else:
                     kpts.append(int(20 // param))
         kpoints = dirname+"\n0\nMonkhorst-Pack\n"+str(kpts[0])+" "+str(kpts[1])+" "+str(kpts[2])+"\n0 0 0\n"
@@ -439,7 +439,9 @@ class VASPInput():
                 incar_keys = incar_dict.keys()
                 incar_string = ""
                 for key in incar_keys:
-                    if key[0] == "#" and key[1].isdigit():
+                    if key == "SYSTEM":
+                        incar_string += key.ljust(16) + " = " + str(incar_dict[key]).ljust(30) + "\n"
+                    elif key[0] == "#" and key[1].isdigit():
                         incar_string += "\n"
                         incar_string += key + str(incar_dict[key]) + "\n"
                     else:
@@ -454,7 +456,9 @@ class VASPInput():
                 incar_keys = incar_dict.keys()
                 incar_string = ""
                 for key in incar_keys:
-                    if key[0] == "#" and key[1].isdigit():
+                    if key == "SYSTEM":
+                        incar_string += key.ljust(16) + " = " + str(incar_dict[key]).ljust(30) + "\n"
+                    elif key[0] == "#" and key[1].isdigit():
                         incar_string += "\n"
                         incar_string += key + str(incar_dict[key]) + "\n"
                     else:
