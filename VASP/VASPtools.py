@@ -19,7 +19,7 @@ def vasp_incar_json():
     "ENCUT":"500                  ! Cut-Off Energy",
 
     "#3 ":"Electronic Relaxation 1",
-    "# ALGO":"48                  ! algorithm for the e-relax",
+    "# IALGO":"48                  ! algorithm for the e-relax",
     "LDIAG":"T                    ! sub-space diagonalisation",
     "LREAL":"auto                 ! real-space projection",
     "PREC":"normal                ! accuracy",
