@@ -8,10 +8,12 @@ queue_path = "/opt/sge/bin/lx24-amd64/"
 mpi_run = "mpirun"            # default mpirun
 vasp_mpi_run = "mpirun"
 atk_mpi_run = "/opt/intel/mpi-rt/4.0.0/bin/mpirun"
+lammps_mpirun_path = "mpirun"
 
 vasp_path = "vasp"
 g09_path = "g09"
 atk_path = "/opt/QuantumWise/VNL-ATK/bin/atkpython"
+lammps_path = "lmp_g++"
 
 # -- Queues
 #               "arg":[cpu, mem, queue name]
@@ -425,3 +427,45 @@ set  MPI_EXEC=$MPI_HOME/bin/mpirun
 
         shl(queue_path+"qsub mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
+
+    def lammps(self, cpu=None, q=None):
+        inputfile = self.inputfile
+        outputfile = inputfile.replace("in.", "out.")
+
+        cpu, q = self.cpu, self.q
+        d = self.divided
+
+        cpu = cpu / d
+
+        jobname = "L" + inputfile.replace("in.", "")
+        jobname = jobname.replace(".", "_").replace("-", "_")
+
+        mpi = '''#!/bin/csh
+
+# pe request
+
+#$ -pe mpi_%d %d
+
+# our Job name
+#$ -N %s
+
+#$ -S /bin/csh
+
+#$ -q %s
+
+#$ -V
+
+#$ -cwd
+
+ cd $SGE_O_WORKDIR
+
+ %s -np %d %s < %s | tee %s
+
+    ''' % (cpu, cpu, jobname, q, lammps_mpirun_path, cpu, lammps_path, inputfile, outputfile)
+
+        f = open("mpi.sh", "w")
+        f.write(mpi)
+        f.close()
+
+        #shl(queue_path + "qsub mpi.sh", shell=True)
+        #shl("rm -rf ./mpi.sh", shell=True)

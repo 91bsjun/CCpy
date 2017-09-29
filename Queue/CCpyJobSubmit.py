@@ -82,6 +82,18 @@ def atk(queue=None, divided=1):
         myJS = JS(each_input, queue, divided)
         myJS.ATK()
 
+
+def lammps(queue=None, divided=1):
+    # --- COLLECT INPUT FILES
+    input_marker = ["in."]
+    inputs = selectInputs(input_marker, "./", ask=ask)
+
+    # --- SUBMIT QUEUE
+    for each_input in inputs:
+        myJS = JS(each_input, queue, divided)
+        myJS.lammps()
+
+
 def atat(queue=None, divided=1):
     all_inputs = [int(d) for d in os.listdir("./") if os.path.isdir(d) if
                   "str.out" in os.listdir(d) and "wait" in os.listdir(d)]
@@ -172,8 +184,9 @@ if __name__=="__main__":
     2 : VASP
     3 : ATK
     4 : Q-chem
-    6 : ATAT [f:fitsvl]
-    7 : PBS job display
+    6 : ATAT
+    7 : LAMMPS
+    8 : PBS job display
 
     [queue name]
     xeon1, xeon2, ...
@@ -225,6 +238,10 @@ if __name__=="__main__":
     elif sys.argv[1] == "6":
         atat(queue=queue, divided=divided)
 
-    ## ------ PBS JOBS DISPLAYER
+    ## ------ ATAT
     elif sys.argv[1] == "7":
+        lammps(queue=queue, divided=divided)
+
+    ## ------ PBS JOBS DISPLAYER
+    elif sys.argv[1] == "8":
         pbs_runner(queue=queue, divided=divided)
