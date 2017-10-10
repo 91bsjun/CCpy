@@ -571,6 +571,6 @@ up/down  : if spin polarized calculation / option 5
     inputs = selectVASPBandOutputs("./", ask=ask)
     for each_input in inputs:
         os.chdir(each_input)
-        print(each_input)
+        print("* Current directory : " + each_input)
         main_run()
         os.chdir("../")
