@@ -62,7 +62,7 @@ class CMSBand():
                     run = load_pickle_data(name="vasprun.elt.pkl")
                     bands = load_pickle_data(name="bands.elt.pkl")
                 except:
-                    sys.stdout.write("Pickled data not exsit.\n")
+                    sys.stdout.write("Cannot find pickled data.\n")
                     sys.stdout.write("Parsing vasprun.xml... please wait... ")
                     sys.stdout.flush()
                     run = BSVasprun("./Band-DOS/vasprun.xml", parse_projected_eigen=True)
@@ -75,7 +75,7 @@ class CMSBand():
                     run = load_pickle_data(name="vasprun.pkl")
                     bands = load_pickle_data(name="bands.pkl")
                 except:
-                    sys.stdout.write("Pickled data not exsit.\n")
+                    sys.stdout.write("Cannot find pickled data.\n")
                     sys.stdout.write("Parsing vasprun.xml... please wait... ")
                     sys.stdout.flush()
                     run = BSVasprun("./Band-DOS/vasprun.xml")
