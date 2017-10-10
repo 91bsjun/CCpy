@@ -247,7 +247,7 @@ class CMSBand():
                 subprocess.call(makejpg, shell=True)        
                 print("* Save figure : "+figname+", "+figname.replace(".png",".jpg"))
 
-    def save_bgap(self):
+    def get_minimal_band_data(self):
         bands = self.bands
         bgap = bands.get_band_gap()
         efermi = bands.efermi
