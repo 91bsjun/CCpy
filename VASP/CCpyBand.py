@@ -253,15 +253,18 @@ class CMSBand():
 
     def get_minimal_band_data(self):
         bands = self.bands
-        bgap = bands.get_band_gap()
-        efermi = bands.efermi
-        cbm = bands.get_cbm()
-        vbm = bands.get_vbm()
+        if bands.is_metal():
+            bgap, cbm, vbm = 0.0, 0.0, 0.0
+        else:
+            bgap = bands.get_band_gap()
+            efermi = bands.efermi
+            cbm = bands.get_cbm()
+            vbm = bands.get_vbm()
 
-        bgap, cbm, vbm = bgap['energy'], cbm['energy'], vbm['energy']
+            bgap, cbm, vbm = bgap['energy'], cbm['energy'], vbm['energy']
 
-        cbm = cbm-efermi
-        vbm = vbm-efermi
+            cbm = cbm-efermi
+            vbm = vbm-efermi
 
         datafile = open("band.dat", "w")
         datafile.write("bandgap " + str(bgap) + "\ncbm " + str(cbm) + "\nvbm " + str(vbm) + "\n")
