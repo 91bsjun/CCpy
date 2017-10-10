@@ -250,7 +250,10 @@ class CMSBand():
     def get_minimal_band_data(self):
         bands = self.bands
         data = bands.get_band_gap()
-        print(data)
+        cbm = bands.get_cbm()
+        vbm = bands.get_vbm()
+        bgap, cbm, vbm = data['energy'], cbm['energy'], vbm['energy']
+        print(bgap, cbm, vbm)
 
 
 
