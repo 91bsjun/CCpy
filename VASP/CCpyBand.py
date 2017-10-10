@@ -281,6 +281,10 @@ def main_run():
     else:
         line_width = 3
 
+    if sys.argv[0] == "0":
+        cms_band = CMSBand()
+        cms_band.save_band_data(color=False)
+
     # -- blue band
     if sys.argv[1] == "1":
         fig = plt.figure(figsize=(6, 10))
