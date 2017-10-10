@@ -253,11 +253,16 @@ class CMSBand():
         efermi = bands.efermi
         cbm = bands.get_cbm()
         vbm = bands.get_vbm()
+
         bgap, cbm, vbm = bgap['energy'], cbm['energy'], vbm['energy']
-        print(bgap, cbm, vbm)
-        print(bgap, cbm-efermi, vbm-efermi)
-        #datafile = open("band.dat", "w")
-        #datafile.write("bandgap " + str(bgap) + "\n")
+
+        cbm = cbm-efermi
+        vbm = vbm-efermi
+
+        datafile = open("band.dat", "w")
+        datafile.write("bandgap " + str(gap) + "\ncbm " + str(cbm) + "\nvbm " + str(vbm) + "\n")
+        datafile.close()
+        print("* Save band data : band.dat")
 
 
 
