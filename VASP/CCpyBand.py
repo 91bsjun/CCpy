@@ -247,13 +247,17 @@ class CMSBand():
                 subprocess.call(makejpg, shell=True)        
                 print("* Save figure : "+figname+", "+figname.replace(".png",".jpg"))
 
-    def get_minimal_band_data(self):
+    def save_bgap(self):
         bands = self.bands
-        data = bands.get_band_gap()
+        bgap = bands.get_band_gap()
+        efermi = bands.efermi
         cbm = bands.get_cbm()
         vbm = bands.get_vbm()
-        bgap, cbm, vbm = data['energy'], cbm['energy'], vbm['energy']
+        bgap, cbm, vbm = bgap['energy'], cbm['energy'], vbm['energy']
         print(bgap, cbm, vbm)
+        print(bgap, cbm-efermi, vbm-efermi)
+        #datafile = open("band.dat", "w")
+        #datafile.write("bandgap " + str(bgap) + "\n")
 
 
 
