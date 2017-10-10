@@ -275,13 +275,13 @@ def save_pickle_data(name=None, obj=None):
     sys.stdout.flush()
     with open(name, 'wb') as data:
         pickle.dump(obj, data)
-    sys.stdout("Done!\n")
+    sys.stdout.write("Done!\n")
 
 def load_pickle_data(name=None):
     sys.stdout.write("Reading pickled data.. " + name + "... ")
     with open(name, 'rb') as data:
         loaded = pickle.load(data)
-    sys.stdout("Done!\n")
+    sys.stdout.write("Done!\n")
     return loaded
 
 def main_run():
