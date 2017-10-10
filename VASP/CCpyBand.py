@@ -260,7 +260,7 @@ class CMSBand():
         vbm = vbm-efermi
 
         datafile = open("band.dat", "w")
-        datafile.write("bandgap " + str(gap) + "\ncbm " + str(cbm) + "\nvbm " + str(vbm) + "\n")
+        datafile.write("bandgap " + str(bgap) + "\ncbm " + str(cbm) + "\nvbm " + str(vbm) + "\n")
         datafile.close()
         print("* Save band data : band.dat")
 
