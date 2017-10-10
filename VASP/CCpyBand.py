@@ -262,7 +262,7 @@ def load_pickle_data(name=None):
     return loaded
 
 def main_run():
-    if sys.argv[0] != "0":
+    if sys.argv[1] != "0":
         import matplotlib.pyplot as plt
         try:
             lims = [float(sys.argv[2]), float(sys.argv[3])]
@@ -282,7 +282,7 @@ def main_run():
         else:
             line_width = 3
 
-    if sys.argv[0] == "0":
+    if sys.argv[1] == "0":
         cms_band = CMSBand()
         cms_band.save_band_data(color=False)
 
