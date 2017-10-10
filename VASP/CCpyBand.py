@@ -247,6 +247,12 @@ class CMSBand():
                 subprocess.call(makejpg, shell=True)        
                 print("* Save figure : "+figname+", "+figname.replace(".png",".jpg"))
 
+    def get_minimal_band_data(self):
+        bands = self.bands
+        data = bands.get_band_gap()
+        print(data)
+
+
 
 def save_pickle_data(name=None, obj=None):
     print("Saving pickled data.. "+name)
@@ -284,7 +290,7 @@ def main_run():
 
     if sys.argv[1] == "0":
         cms_band = CMSBand()
-        cms_band.save_band_data(color=False)
+        cms_band.get_minimal_band_data()
 
     # -- blue band
     elif sys.argv[1] == "1":
