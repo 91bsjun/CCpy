@@ -31,11 +31,12 @@ class CMSBand():
                     run = load_pickle_data(name="vasprun.dos.elt.pkl")
                     bands = load_pickle_data(name="bands.elt.pkl")
                 except:
-                    print("Failed")
-                    print("Parsing vasprun.xml... please wait...")
+                    sys.stdout.write("... Failed\n")
+                    sys.stdout.write("Parsing vasprun.xml... please wait... ")
+                    sys.stdout.flush()
                     run = Vasprun("./Band-DOS/vasprun.xml", parse_dos=True, parse_projected_eigen=True)
                     bands = run.get_band_structure("./Band-DOS/KPOINTS")
-                    print("Done!")
+                    sys.stdout.write("Done!\n")
                     save_pickle_data(name="vasprun.dos.elt.pkl",obj=run)
                     save_pickle_data(name="bands.elt.pkl",obj=bands)
                 cdos = run.complete_dos
@@ -44,11 +45,12 @@ class CMSBand():
                     run = load_pickle_data(name="vasprun.dos.pkl")
                     bands = load_pickle_data(name="bands.pkl")
                 except:
-                    print("Failed")
-                    print("Parsing vasprun.xml... please wait...")
+                    sys.stdout.write("... Failed\n")
+                    sys.stdout.write("Parsing vasprun.xml... please wait... ")
+                    sys.stdout.flush()
                     run = Vasprun("./Band-DOS/vasprun.xml", parse_dos=True)
                     bands = run.get_band_structure("./Band-DOS/KPOINTS")
-                    print("Done!")
+                    sys.stdout.write("Done!\n")
                     save_pickle_data(name="vasprun.dos.pkl", obj=run)
                     save_pickle_data(name="bands.pkl", obj=bands)
                 cdos = run.complete_dos
@@ -60,11 +62,12 @@ class CMSBand():
                     run = load_pickle_data(name="vasprun.elt.pkl")
                     bands = load_pickle_data(name="bands.elt.pkl")
                 except:
-                    print("Pickled data not exsit.")
-                    print("Parsing vasprun.xml... please wait...")
+                    sys.stdout.write("Pickled data not exsit.\n")
+                    sys.stdout.write("Parsing vasprun.xml... please wait... ")
+                    sys.stdout.flush()
                     run = BSVasprun("./Band-DOS/vasprun.xml", parse_projected_eigen=True)
                     bands = run.get_band_structure("./Band-DOS/KPOINTS")
-                    print("Done!")
+                    sys.stdout.write("Done!\n")
                     save_pickle_data(name="vasprun.elt.pkl", obj=run)
                     save_pickle_data(name="bands.elt.pkl", obj=bands)
             else:
@@ -72,11 +75,12 @@ class CMSBand():
                     run = load_pickle_data(name="vasprun.pkl")
                     bands = load_pickle_data(name="bands.pkl")
                 except:
-                    print("Pickled data not exist")
-                    print("Parsing vasprun.xml... please wait...")
+                    sys.stdout.write("Pickled data not exsit.\n")
+                    sys.stdout.write("Parsing vasprun.xml... please wait... ")
+                    sys.stdout.flush()
                     run = BSVasprun("./Band-DOS/vasprun.xml")
                     bands = run.get_band_structure("./Band-DOS/KPOINTS")
-                    print("Done!")
+                    sys.stdout.write("Done!\n")
                     save_pickle_data(name="vasprun.pkl", obj=run)
                     save_pickle_data(name="bands.pkl", obj=bands)
 
@@ -267,16 +271,17 @@ class CMSBand():
 
 
 def save_pickle_data(name=None, obj=None):
-    print("Saving pickled data.. "+name)
+    sys.stdout.write("Saving pickled data.. " + name + "... ")
+    sys.stdout.flush()
     with open(name, 'wb') as data:
         pickle.dump(obj, data)
-    print("Done!")
+    sys.stdout("Done!\n")
 
 def load_pickle_data(name=None):
-    print("Reading pickled data.. "+name)
+    sys.stdout.write("Reading pickled data.. " + name + "... ")
     with open(name, 'rb') as data:
         loaded = pickle.load(data)
-    print("Done!")
+    sys.stdout("Done!\n")
     return loaded
 
 def main_run():
@@ -533,6 +538,7 @@ if __name__=="__main__":
 Usage : cms_band [option] [miny] [maxy] [sub_option1] [sub_option2]...
 -------------------------------------
 [option]
+0   : save band data only (band gap, cbm, vbm)
 1   : blue band
 2   : color band
 3   : blue band & element DOS
