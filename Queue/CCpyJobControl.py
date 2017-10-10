@@ -467,5 +467,5 @@ set  MPI_EXEC=$MPI_HOME/bin/mpirun
         f.write(mpi)
         f.close()
 
-        #shl(queue_path + "qsub mpi.sh", shell=True)
-        #shl("rm -rf ./mpi.sh", shell=True)
+        shl(queue_path + "qsub mpi.sh", shell=True)
+        shl("rm -rf ./mpi.sh", shell=True)
