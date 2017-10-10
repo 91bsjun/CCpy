@@ -262,31 +262,32 @@ def load_pickle_data(name=None):
     return loaded
 
 def main_run():
-    import matplotlib.pyplot as plt
-    try:
-        lims = [float(sys.argv[2]), float(sys.argv[3])]
-        miny = min(lims)
-        maxy = max(lims)
-    except:
-        get_lim = raw_input("** Set y-limitaion (ex: -5,5) : ")
-        lims = get_lim.split(",")
-        miny = float(min(lims))
-        maxy = float(max(lims))
+    if sys.argv[0] != "0":
+        import matplotlib.pyplot as plt
+        try:
+            lims = [float(sys.argv[2]), float(sys.argv[3])]
+            miny = min(lims)
+            maxy = max(lims)
+        except:
+            get_lim = raw_input("** Set y-limitaion (ex: -5,5) : ")
+            lims = get_lim.split(",")
+            miny = float(min(lims))
+            maxy = float(max(lims))
 
-    line_width = [argv for argv in sys.argv if "-lw" in argv]
-    if len(line_width) > 0:
-        line_width = line_width[0]
-        line_width = line_width.replace("-lw", "")
-        line_width = float(line_width)
-    else:
-        line_width = 3
+        line_width = [argv for argv in sys.argv if "-lw" in argv]
+        if len(line_width) > 0:
+            line_width = line_width[0]
+            line_width = line_width.replace("-lw", "")
+            line_width = float(line_width)
+        else:
+            line_width = 3
 
     if sys.argv[0] == "0":
         cms_band = CMSBand()
         cms_band.save_band_data(color=False)
 
     # -- blue band
-    if sys.argv[1] == "1":
+    elif sys.argv[1] == "1":
         fig = plt.figure(figsize=(6, 10))
 
         cms_band = CMSBand(fig=fig)
