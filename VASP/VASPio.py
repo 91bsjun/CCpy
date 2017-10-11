@@ -287,7 +287,7 @@ class VASPInput():
             if "LDAU" in incar_dict.keys():
                 incar_dict = change_dict_key(incar_dict, "LDAU", "# LDAU", incar_dict["LDAU"])
             if "LMAXMIX" in incar_dict.keys():
-                incar_dict = change_dict_key(incar_dict, "LMAXMIX", "# LMAXMIX", incar_dict["MAXMIX"])
+                incar_dict = change_dict_key(incar_dict, "LMAXMIX", "# LMAXMIX", incar_dict["LMAXMIX"])
             if "LDAUTYPE" in incar_dict.keys():
                 incar_dict = change_dict_key(incar_dict, "LDAUTYPE", "# LDAUTYPE", incar_dict["LDAUTYPE"])
             if "LDAUL" in incar_dict.keys():
