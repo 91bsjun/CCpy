@@ -16,7 +16,7 @@ atk_path = "/opt/QuantumWise/VNL-ATK/bin/atkpython"
 lammps_path = "lmp_g++"
 
 # -- Queues
-#               "arg":[cpu, mem, queue name]
+#            {"arg":[cpu, mem, queue name]
 queue_info = {"xeon1":[16, 32, "xeon1.q"],    # node01
               "xeon2":[24, 64, "xeon2.q"],    # node02, node03, node04
               "xeon3":[24, 256, "xeon3.q"],   # node05, node06
@@ -136,7 +136,7 @@ cat $TMPDIR/machines
  %s -np $NSLOTS %s < /dev/null > vasp.out
  touch vasp.done
 
- '''%(cpu, cpu, jobname, q, dirpath, mpi_run, vasp_path)
+ '''%(cpu, cpu, jobname, q, dirpath, vasp_mpi_run, vasp_path)
 
         pwd = os.getcwd()
         os.chdir(dirpath)
@@ -158,7 +158,7 @@ cat $TMPDIR/machines
         jobname = raw_input("Jobname for this job \n: ")
 
         runs = ""
-        each_run = "%s -np $NSLOTS %s < /dev/null > vasp.out\ntouch vasp.done" % (mpi_run, vasp_path)
+        each_run = "%s -np $NSLOTS %s < /dev/null > vasp.out\ntouch vasp.done" % (vasp_mpi_run, vasp_path)
         for d in dirs:
             if scratch:
                 dir_path = "/scratch/vasp" + d
