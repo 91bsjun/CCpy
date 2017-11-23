@@ -636,12 +636,12 @@ Reciprocal
 
             for i in range(len(get_pts)):
                 try:
-                    ini = pts[get_pts[i]] + get_pts[i] + "\n"
-                    fin = pts[get_pts[i + 1]] + get_pts[i + 1] + "\n\n"
+                    ini = pts[get_pts[i]] + " ! " +get_pts[i] + "\n"
+                    fin = pts[get_pts[i + 1]] + " ! " + get_pts[i + 1] + "\n\n"
                     line_kpoints += ini + fin
                 except:
-                    ini = pts[get_pts[i]] + get_pts[i] + "\n"
-                    fin = pts[get_pts[0]] + get_pts[0] + "\n\n"
+                    ini = pts[get_pts[i]] + " ! " + get_pts[i] + "\n"
+                    fin = pts[get_pts[0]] + " ! " + get_pts[0] + "\n\n"
                     line_kpoints += ini + fin
 
             file_writer("../../KPOINTSP", str(line_kpoints))
