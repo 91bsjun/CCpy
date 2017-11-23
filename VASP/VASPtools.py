@@ -51,7 +51,7 @@ def vasp_incar_json():
 
     "#6 Parallelization":"option",
     "LPLANE":"T                   ! Parallelization for PWs",
-    "NCORE":"8",
+    "NCORE":"4",
     "LSCALU":"F",
     "NSIM":"4",
 
