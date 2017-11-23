@@ -147,7 +147,7 @@ cat $TMPDIR/machines
         #shl("rm -rf ./mpi.sh", shell=True)
         os.chdir(pwd)
 
-    def vasp_batch(self, cpu=None, mem=None, q=None, band=False, dirs=None):
+    def vasp_batch(self, cpu=None, mem=None, q=None, band=False, dirs=None, scratch=False):
 
         cpu, q = self.cpu, self.q
         d = self.divided
@@ -160,8 +160,17 @@ cat $TMPDIR/machines
         runs = ""
         each_run = "%s -np $NSLOTS %s < /dev/null > vasp.out\ntouch vasp.done\n\n" % (mpi_run, vasp_path)
         for d in dirs:
-            runs += "cd " + d + "\n"
-            runs += each_run
+            if scratch:
+                dir_path = "/scratch/vasp" + d + "\n"
+                runs += "mkdir -p " + dir_path + "\n"           # make dir under /scratch/vasp
+                runs += "cp " + d + "/* " + dir_path + "\n"     # copy original to /scratch/vasp
+                runs += "cd " + dir_path + "\n"                 # chg dir to /scratch/vasp
+                runs += each_run + "\n"                         # run vasp
+                runs += "cp " + dir_path + "/* " + d + "\n"     # copy finished job to original dir
+                runs += "rm -rf " + dir_path + "\n"             # remove finished job under /scratch/vasp
+            else:
+                runs += "cd " + d + "\n"
+                runs += each_run
         mpi = '''#!/bin/csh
 #$ -pe mpi_%d %d
 #$ -N %s
