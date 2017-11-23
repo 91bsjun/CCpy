@@ -524,7 +524,8 @@ class VASPInput():
         prev_files =["CHG", "CHGCAR", "CONTCAR", "DOSCAR", "EIGENVAL", "IBZKPT", "INCAR", "KPOINTS",
                      "POSCAR", "POTCAR", "PROCAR", "WAVECAR", "XDATCAR"]
         for pf in prev_files:
-            linux_command("cp ../" + pf + " ./")
+            if pf in os.listdir("../"):
+                linux_command("cp ../" + pf + " ./")
         os.rename("POSCAR", "POSCAR.orig")
         os.rename("CONTCAR", "POSCAR")
 
