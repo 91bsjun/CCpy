@@ -656,7 +656,7 @@ Reciprocal
         file_writer("INCAR",str(incar))
         file_writer("KPOINTS",str(line_kpoints))
         os.chdir("../")
-        sys.stdout.write(" Done !")
+        sys.stdout.write(" Done !\n")
         
     
 

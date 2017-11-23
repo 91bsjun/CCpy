@@ -125,6 +125,7 @@ elif sys.argv[1] == "2":
             else:
                 input_line_kpts = False
         sys.stdout.write(each_input + "... ")
+        sys.stdout.flush()
         os.chdir(each_input)
         VI = VASPInput(additional=True, dirname=each_input)
         VI.cms_band_set(input_line_kpts=input_line_kpts)
