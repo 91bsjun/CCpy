@@ -81,7 +81,7 @@ You can make submit jobs of several softwares.
 ### 2.3.0. Configs
 Before run submit codes, you have to modify some environment varaibles in the scripts.
 #### CCpyJobControl.py
-You have to modify two parts in the top of <code> CCpyJobControl.py <code><br>
+You have to modify two parts in the top of <code> CCpyJobControl.py </code><br>
 First, the path of each run command.
 <pre>
 # -------------------- Config ---------------------#
