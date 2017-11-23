@@ -143,8 +143,8 @@ cat $TMPDIR/machines
         f = open("mpi.sh", "w")
         f.write(mpi)
         f.close()
-        #shl(queue_path+"qsub mpi.sh", shell=True)
-        #shl("rm -rf ./mpi.sh", shell=True)
+        shl(queue_path+"qsub mpi.sh", shell=True)
+        shl("rm -rf ./mpi.sh", shell=True)
         os.chdir(pwd)
 
     def vasp_batch(self, cpu=None, mem=None, q=None, band=False, dirs=None, scratch=False):
@@ -185,8 +185,8 @@ cat $TMPDIR/machines
         f = open("mpi.sh", "w")
         f.write(mpi)
         f.close()
-        #shl(queue_path + "qsub mpi.sh", shell=True)
-        #shl("rm -rf ./mpi.sh", shell=True)
+        shl(queue_path + "qsub mpi.sh", shell=True)
+        shl("rm -rf ./mpi.sh", shell=True)
 
     def qchem(self, cpu=None, mem=None, q=None):
         inputfile = self.inputfile
