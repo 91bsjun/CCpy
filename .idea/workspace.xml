@@ -28,11 +28,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="VASPio.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="VASPio.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/VASP/VASPio.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="642">
-              <caret line="654" column="24" lean-forward="false" selection-start-line="654" selection-start-column="24" selection-end-line="654" selection-end-column="24" />
+            <state relative-caret-position="579">
+              <caret line="657" column="35" lean-forward="true" selection-start-line="657" selection-start-column="8" selection-end-line="657" selection-end-column="35" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -40,11 +40,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CCpyVASPInputGen.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="CCpyVASPInputGen.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/VASP/CCpyVASPInputGen.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="441">
-              <caret line="121" column="92" lean-forward="false" selection-start-line="121" selection-start-column="92" selection-end-line="121" selection-end-column="92" />
+            <state relative-caret-position="483">
+              <caret line="126" column="43" lean-forward="false" selection-start-line="126" selection-start-column="43" selection-end-line="126" selection-end-column="43" />
               <folding>
                 <element signature="e#23#37#0" expanded="true" />
               </folding>
@@ -159,9 +159,9 @@
         <option value="$PROJECT_DIR$/Tools/CCpyTools.py" />
         <option value="$PROJECT_DIR$/Queue/CCpyJobSubmit.py" />
         <option value="$PROJECT_DIR$/Queue/CCpyJobControl.py" />
-        <option value="$PROJECT_DIR$/VASP/CCpyVASPInputGen.py" />
         <option value="$PROJECT_DIR$/VASP/VASPtools.py" />
         <option value="$PROJECT_DIR$/VASP/VASPio.py" />
+        <option value="$PROJECT_DIR$/VASP/CCpyVASPInputGen.py" />
       </list>
     </option>
   </component>
@@ -839,16 +839,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/VASP/CCpyVASPInputGen.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="441">
-          <caret line="121" column="92" lean-forward="false" selection-start-line="121" selection-start-column="92" selection-end-line="121" selection-end-column="92" />
-          <folding>
-            <element signature="e#23#37#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Tools/CCpyTools.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-462">
@@ -867,10 +857,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/VASP/VASPio.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="642">
-          <caret line="654" column="24" lean-forward="false" selection-start-line="654" selection-start-column="24" selection-end-line="654" selection-end-column="24" />
+        <state relative-caret-position="579">
+          <caret line="657" column="35" lean-forward="true" selection-start-line="657" selection-start-column="8" selection-end-line="657" selection-end-column="35" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/VASP/CCpyVASPInputGen.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="483">
+          <caret line="126" column="43" lean-forward="false" selection-start-line="126" selection-start-column="43" selection-end-line="126" selection-end-column="43" />
+          <folding>
+            <element signature="e#23#37#0" expanded="true" />
           </folding>
         </state>
       </provider>
