@@ -39,12 +39,8 @@ def gaussian(queue=None, divided=1):
 
 def vasp(queue=None, divided=1):
     # --- Collect VASP inputs
-    static = False
     band = False
-    if "static" in sys.argv:
-        static = True
-        inputs = selectVASPInputs("./", ask=ask, static=True)
-    elif "band" in sys.argv:
+    if "band" in sys.argv:
         band = True
         inputs = selectVASPInputs("./", ask=ask, band=True)
     else:
@@ -53,14 +49,32 @@ def vasp(queue=None, divided=1):
     # --- SUBMIT QUEUE
     pwd = os.getcwd()
     for each_input in inputs:
-        os.chdir(pwd)
+        dirpath = pwd + "/" + each_input
+        if band:
+            dirpath += "/Band-DOS"
         myJS = JS(each_input, queue, divided)
-        if static:
-            myJS.vasp(static=True)
-        elif band:
-            myJS.vasp(band=True)
-        else:
-            myJS.vasp()
+        myJS.vasp(band=band, dirpath=dirpath)
+
+def vasp_batch(queue=None, divided=1):
+    dirs = []
+    # --- Collect VASP inputs
+    band = False
+    if "band" in sys.argv:
+        band = True
+        inputs = selectVASPInputs("./", ask=ask, band=True)
+    else:
+        inputs = selectVASPInputs("./", ask=ask)
+
+    # --- SUBMIT QUEUE
+    pwd = os.getcwd()
+    for each_input in inputs:
+        dirpath = pwd + "/" + each_input
+        if band:
+            dirpath += "/Band-DOS"
+        dirs.append(dirpath)
+    myJS = JS(each_input, queue, divided)
+    myJS.vasp_batch(band=band, dirs=dirs)
+
 
 def qchem(queue=None, divided=1):
     # --- Collect inputs
@@ -180,13 +194,14 @@ if __name__=="__main__":
         print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [queue name] [divide]")
         print('''--------------------------------------
     [option]
-    1 : Gaussian09
-    2 : VASP
-    3 : ATK
-    4 : Q-chem
-    6 : ATAT
-    7 : LAMMPS
-    8 : PBS job display
+    1  : Gaussian09
+    2  : VASP
+    2b : VASP batch job (run multiple jobs in a single queue)
+    3  : ATK
+    4  : Q-chem
+    6  : ATAT
+    7  : LAMMPS
+    8  : PBS job display
 
     [queue name]
     xeon1, xeon2, ...
@@ -195,7 +210,11 @@ if __name__=="__main__":
     be integer value, which divide CPU numbers and memories
 
     [suboption]
-    a : no check files, calculate all inputs'''
+    a : no check files, calculate all inputs
+
+    [VASP band calculation]
+    Add an argument "band" at last.
+    ex) CCpyJobSubmit.py 2 xeon5 3 band'''
               )
         quit()
 
@@ -224,6 +243,9 @@ if __name__=="__main__":
     ## ------ VASP
     elif sys.argv[1] == "2":
         vasp(queue=queue, divided=divided)
+
+    elif sys.argv[1] == "2b":
+        vasp_batch(queue=queue, divided=divided)
 
     ## ------ ATK
     elif sys.argv[1] == "3":

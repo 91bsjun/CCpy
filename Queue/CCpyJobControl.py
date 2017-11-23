@@ -96,7 +96,7 @@ cat $TMPDIR/machines
         shl("rm -rf ./mpi.sh", shell=True)
 
 
-    def vasp(self, cpu=None, mem=None, q=None, band=False, static=False):
+    def vasp(self, cpu=None, mem=None, q=None, band=False, dirpath=None):
         inputfile = self.inputfile
 
         cpu, q = self.cpu, self.q
@@ -104,91 +104,13 @@ cat $TMPDIR/machines
         
         cpu = cpu / d        
 
-        os.chdir(inputfile)
-
         # -- Band calculation after previous calculation
-        # -- Generate Precalc -> Band-DOS
         if band:
-            jobname = "VB"+inputfile
-            jobname = jobname.replace(".","_").replace("-","_")
-            mpi = '''#!/bin/csh
-
-# pe request
-
-#$ -pe mpi_%d %d
-
-# our Job name 
-#$ -N %s
-
-#$ -S /bin/csh
-
-#$ -q %s
-
-#$ -V
-
-#$ -cwd
-
-echo "Got $NSLOTS slots."
-cat $TMPDIR/machines
-
-
- cd $SGE_O_WORKDIR
- 
- cd PreCalc
- %s -np $NSLOTS %s
- cd ..
-
- cd Band-DOS
- mv INCAR INCAR~
- mv KPOINTS KPOINTS~
- 
- cp ../PreCalc/* . >& /dev/null
- mv INCAR~ INCAR
- mv KPOINTS~ KPOINTS
- %s -np $NSLOTS %s
- cd ..
-
- '''%(cpu, cpu, jobname, q, mpi_run, vasp_path, mpi_run, vasp_path)
-
-        # -- Static calculation at STATiC directory
-        elif static:
-            jobname = "VS"+inputfile
-            jobname = jobname.replace(".","_").replace("-","_")
-            mpi = '''#!/bin/csh
-
-# pe request
-
-#$ -pe mpi_%d %d
-
-# our Job name 
-#$ -N %s
-
-#$ -S /bin/csh
-
-#$ -q %s
-
-#$ -V
-
-#$ -cwd
-
-echo "Got $NSLOTS slots."
-cat $TMPDIR/machines
-
-
- cd $SGE_O_WORKDIR
- 
- cd STATIC
- %s -np $NSLOTS %s
- cd ..
-
-
- '''%(cpu, cpu, jobname, q, mpi_run, vasp_path)
-
-        # -- Normal VASP calculation
+            jobname = "VB" + inputfile
         else:
-            jobname = "V"+inputfile
+            jobname = "V" + inputfile
             jobname = jobname.replace(".","_").replace("-","_")
-            mpi = '''#!/bin/csh
+        mpi = '''#!/bin/csh
 
 # pe request
 
@@ -209,19 +131,53 @@ echo "Got $NSLOTS slots."
 cat $TMPDIR/machines
 
 
- cd $SGE_O_WORKDIR
+ cd %s
 
  %s -np $NSLOTS %s < /dev/null > vasp.out
  touch vasp.done
- '''%(cpu, cpu, jobname, q, mpi_run, vasp_path)
 
+ '''%(cpu, cpu, jobname, q, dirpath, mpi_run, vasp_path)
+
+        pwd = os.getcwd()
+        os.chdir(dirpath)
         f = open("mpi.sh", "w")
         f.write(mpi)
         f.close()
+        #shl(queue_path+"qsub mpi.sh", shell=True)
+        #shl("rm -rf ./mpi.sh", shell=True)
+        os.chdir(pwd)
 
-        shl(queue_path+"qsub mpi.sh", shell=True)
-        shl("rm -rf ./mpi.sh", shell=True)
-        
+    def vasp_batch(self, cpu=None, mem=None, q=None, band=False, dirs=None):
+
+        cpu, q = self.cpu, self.q
+        d = self.divided
+
+        cpu = cpu / d
+
+        # -- Band calculation after previous calculation
+        jobname = raw_input("Jobname for this job \n: ")
+
+        runs = ""
+        each_run = "%s -np $NSLOTS %s < /dev/null > vasp.out\ntouch vasp.done\n\n" % (mpi_run, vasp_path)
+        for d in dirs:
+            runs += "cd " + d + "\n"
+            runs += each_run
+        mpi = '''#!/bin/csh
+#$ -pe mpi_%d %d
+#$ -N %s
+#$ -q %s
+#$ -V
+#$ -cwd
+
+%s
+         ''' % (cpu, cpu, jobname, q, runs)
+
+        pwd = os.getcwd()
+        f = open("mpi.sh", "w")
+        f.write(mpi)
+        f.close()
+        #shl(queue_path + "qsub mpi.sh", shell=True)
+        #shl("rm -rf ./mpi.sh", shell=True)
 
     def qchem(self, cpu=None, mem=None, q=None):
         inputfile = self.inputfile
