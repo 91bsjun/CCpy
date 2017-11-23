@@ -158,16 +158,16 @@ cat $TMPDIR/machines
         jobname = raw_input("Jobname for this job \n: ")
 
         runs = ""
-        each_run = "%s -np $NSLOTS %s < /dev/null > vasp.out\ntouch vasp.done\n\n" % (mpi_run, vasp_path)
+        each_run = "%s -np $NSLOTS %s < /dev/null > vasp.out\ntouch vasp.done" % (mpi_run, vasp_path)
         for d in dirs:
             if scratch:
-                dir_path = "/scratch/vasp" + d + "\n"
+                dir_path = "/scratch/vasp" + d
                 runs += "mkdir -p " + dir_path + "\n"           # make dir under /scratch/vasp
                 runs += "cp " + d + "/* " + dir_path + "\n"     # copy original to /scratch/vasp
                 runs += "cd " + dir_path + "\n"                 # chg dir to /scratch/vasp
                 runs += each_run + "\n"                         # run vasp
                 runs += "cp " + dir_path + "/* " + d + "\n"     # copy finished job to original dir
-                runs += "rm -rf " + dir_path + "\n"             # remove finished job under /scratch/vasp
+                runs += "rm -rf " + dir_path + "\n\n"             # remove finished job under /scratch/vasp
             else:
                 runs += "cd " + d + "\n"
                 runs += each_run
