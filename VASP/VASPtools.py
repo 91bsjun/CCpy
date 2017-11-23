@@ -55,7 +55,7 @@ def vasp_incar_json():
     "LSCALU":"F",
     "NSIM":"4",
 
-    "ISPIN":"1                    ! spin polarized = 2, non spin polarized = 1",
+    "ISPIN":"1                    ! spin polarized-2, non spin polarized-1",
     "# MAGMOM":" 8*0 10*4.5 8*4.5 ! initial magnetic moment for the atoms in the cell",
 
     "#7 optB86b-vdW functional requires":" vdw_kernel.bindat",
@@ -66,13 +66,13 @@ def vasp_incar_json():
     "# AGGAC":"0.0000",
 
     "#8 TS calculation":"         ! default:Nudged Elestic Band method",
-    "# ICHAIN":"0                 ! Method (0=NEB, 1=Dynamical matrix, 2=Dimer, 3=Lanczos)",
+    "# ICHAIN":"0                 ! Method (0-NEB, 1-Dynamical matrix, 2-Dimer, 3-Lanczos)",
     "# SPRING":"-5                ! in eV/Ang*2 (sping constant)",
     "# IMAGES":"3                 ! Number of images btw Reactant & Product",
     "# LCLIMB":".true.            ! cNEB: driven up to the saddle point",
     "# LTANGENTOLD":".true.       ! Old central difference tangent",
     "# LDNEB":".true.             ! Modified doubble nudging",
-    "# NEBCELL":".true.           ! NEB for variable cell (w/ ISIF=3)",
+    "# NEBCELL":".true.           ! NEB for variable cell (w/ ISIF-3)",
 
     "#9 Dipole Correction":"option",
     "# IDIPOL":"3",
