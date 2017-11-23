@@ -119,7 +119,7 @@ elif sys.argv[1] == "2":
             print("\n* Line-mode KPOINTS file (KPOINTSP) has been detected.")
             input_line_kpts = open("KPOINTSP", "r").read()
         else:
-            use_kpts = raw_input("\n* Line-mode KPOINTS file (KPOINSTP) is not detected.\n\n* Give file name, else Enter (make new)\n:")
+            use_kpts = raw_input("\n* Line-mode KPOINTS file (KPOINSTP) is not detected.\n\n* Give line-mode KPOINTS file name, else Enter (make new)\n: ")
             if len(use_kpts) >= 1:
                 input_line_kpts = use_kpts
             else:

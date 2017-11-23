@@ -621,10 +621,10 @@ class VASPInput():
                     if name not in pts.keys():
                         pts[name] = tmp[0]
                         keys.append(name)
-            print("Available k-points in this structure")
+            print("\n* Available k-points in this structure")
             for key in keys:
                 print(key + " : " + pts[key])
-            get_pts = raw_input("Choose k-points to use Band calculations (ex: \Gamma,M,K,L) \n:")
+            get_pts = raw_input("\n* Choose k-points to use Band calculations (ex: \Gamma,M,K,L) \n: ")
             get_pts = get_pts.replace(" ", "")
             get_pts = get_pts.split(",")
 

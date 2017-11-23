@@ -5,7 +5,7 @@ def vasp_incar_json():
     "SYSTEM":"filename",
 
     "#1 ":"Startparameter for this Run",
-    "NWRITE":"2                   ! LPETIM=F    write-flag & timer",
+    "NWRITE":"2                   ! LPETIM-F    write-flag & timer",
     "ISTART":"0                   ! job   : 0-new  1-contEcut  2-sameBS",
     "INIWAV":"1                   ! 0-jellium  1-random",
     "IWAVPR":"1                   ! prediction:  0-non 1-charg 2-wave 3-comb",
