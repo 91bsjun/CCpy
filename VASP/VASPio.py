@@ -546,7 +546,7 @@ class VASPInput():
                     key = "# " + key
                 else:
                     key = tmp[0].replace(" ", "")
-                key_val.append((key, tmp[1]))
+                key_val.append((key, tmp[1][1:]))
 
         incar_dict = OrderedDict(key_val)
         incar_keys = incar_dict.keys()
