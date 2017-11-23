@@ -596,10 +596,10 @@ class VASPInput():
 
         ## -------------------------------- KPOINTS -------------------------------- ##
         # -- Line mode KPOINTS is needed to calc band structure
-        print("\n# -------------------------------------------------------- #")
-        print("#              Make new line-mode KPOINTS file             #")
-        print("# -------------------------------------------------------- #")
         if not input_line_kpts:
+            print("\n# -------------------------------------------------------- #")
+            print("#              Make new line-mode KPOINTS file             #")
+            print("# -------------------------------------------------------- #")
             from pymatgen.symmetry.bandstructure import HighSymmKpath
 
             structure = pmgIS.from_file("POSCAR")
@@ -609,14 +609,16 @@ class VASPInput():
             splt_kpts = line_kpoints.split("\n")
 
             pts = {}
+            keys = []
             for kp in splt_kpts:
                 if "!" in kp:
                     tmp = kp.split("!")
                     name = tmp[1].replace(" ","")
                     if name not in pts.keys():
                         pts[name] = tmp[0]
+                        keys.append(name)
             print("Available k-points in this structure")
-            for key in pts.keys():
+            for key in keys:
                 print(key + " : " + pts[key])
             get_pts = raw_input("Choose k-points to use Band calculations (ex: \Gamma,M,K,L) \n:")
             get_pts = get_pts.replace(" ", "")
@@ -650,6 +652,7 @@ Reciprocal
         file_writer("INCAR",str(incar))
         file_writer("KPOINTS",str(line_kpoints))
         os.chdir("../")
+        print("\n Done !")
         
     
 
