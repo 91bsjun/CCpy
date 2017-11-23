@@ -52,7 +52,7 @@ def vasp(queue=None, divided=1):
         myJS = JS(each_input, queue, divided)
         myJS.vasp(band=band, dirpath=dirpath)
 
-def vasp_batch(queue=None, divided=1):
+def vasp_batch(queue=None, divided=1, scratch=False):
     dirs = []
     # --- Collect VASP inputs
     band = False
@@ -70,7 +70,7 @@ def vasp_batch(queue=None, divided=1):
             dirpath += "/Band-DOS"
         dirs.append(dirpath)
     myJS = JS(each_input, queue, divided)
-    myJS.vasp_batch(band=band, dirs=dirs)
+    myJS.vasp_batch(band=band, dirs=dirs, scratch=scratch)
 
 
 def qchem(queue=None, divided=1):
