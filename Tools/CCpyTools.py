@@ -331,7 +331,7 @@ def selectVASPOutputs(directory_path, ask=True):
     all_inputs = []
     for each_dir in all_dirs:
         files = os.listdir(each_dir)
-        if "CONTCAR" in files:
+        if "CONTCAR" in files or "OUTCAR" in files:
             all_inputs.append(each_dir)
     
     if ask == True:
