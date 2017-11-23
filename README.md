@@ -8,23 +8,11 @@ Python scripts for Computational Chemistry.
 [user@localhost shared]$ git clone https://github.com/91bsjun/CCpy.git
 </pre>
 
-## 1.2. Add the path of CCpy to environment
-#### Linux
+## 1.2. Build setup file
 <pre>
-[user@localhost shared]$ vi ~/.bashrc              # for an individual user
-[user@localhost shared]$ sudo vi /etc/bashrc       # for all users.
-
-....
-....
-export PYTHONPATH=/opt/shared:$PYTHONPATH          # for using CCpy in python
-export PATH=/opt/shared/bin:$PATH                  # enable excutable files of CCpy
-
-[user@localhost shared]$ source ~/.bashrc
-[user@localhost shared]$ sudo source /etc/bashrc   # update edited configurations
+[user@localhost shared]$ cd CCpy
+[user@localhost CCpy]$ python setup.py install
 </pre>
-#### Windows
-Control pannel -> System -> Advanced system -> Advanced tap -> Environment <br>
-New variable as "Name : PYTHONPATH, Path : Download path"
 #### Test
 <pre>
 [user@localhost ~]$ python
@@ -168,5 +156,69 @@ LiFeBO3
 LiMnBO3
 TiO
 </pre>
-### 2.1.2. Example II
+### 2.1.3. Example II
 Following arguments 
+
+### 2.1.4. Generate Inputs for Band Structure
+You can make inputs for calculating VASP band structure as <code> CCpyVASPInputGen.py 2 </code>
+<pre>
+[bsjun@cms test]$ CCpyVASPInputGen.py 2
+0 : All files
+1 : graphene_000001
+2 : graphene_000002
+3 : graphene_000003
+4 : graphene_000004
+5 : graphene_000005
+6 : graphene_000006
+7 : graphene_000007
+8 : graphene_000008
+9 : graphene_000009
+Choose file : 
+
+</pre>
+
+If you have line-mode KPOINTS file, put to current directory as <code>KPOINTSP</code>
+### example of line-mode KPOINTS file
+<pre>
+Line_mode KPOINTS file
+20
+Line_mode
+Reciprocal
+0.0 0.0 0.0 \Gamma
+0.5 0.0 0.0 M
+
+0.5 0.0 0.0 M
+0.333333333333 0.333333333333 0.0 K
+
+0.333333333333 0.333333333333 0.0 K
+0.0 0.0 0.0 \Gamma
+</pre>
+
+If you do not prepare it, the code will make new line-mode KPOINTS file
+Type <code> Enter </code> following question.
+<pre>
+* Line-mode KPOINTS file (KPOINSTP) is not detected.
+
+* Give line-mode KPOINTS file name, else Enter (make new)
+: 
+</pre>
+Then it will ask choose k-points to use in calculating band structure
+<pre>
+# -------------------------------------------------------- #
+#              Make new line-mode KPOINTS file             #
+# -------------------------------------------------------- #
+
+* Available k-points in this structure
+\Gamma : 0.0 0.0 0.0 
+M : 0.5 0.0 0.0 
+K : 0.333333333333 0.333333333333 0.0 
+A : 0.0 0.0 0.5 
+L : 0.5 0.0 0.5 
+H : 0.333333333333 0.333333333333 0.5 
+
+* Choose k-points to use Band calculations (ex: \Gamma,M,K,L) 
+: \Gamma,K
+</pre>
+
+When finished this process, the code will make <code>KPOINTSP</code> file in current directory.
+And it will use this file to other inputs.
