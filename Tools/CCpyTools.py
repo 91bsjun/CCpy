@@ -286,7 +286,7 @@ def selectVASPInputs(directory_path, ask=True, static=False, band=False):
             if "STATIC" in files:
                 all_inputs.append(each_dir)
         elif band:
-            if "Band-DOS" in files and "PreCalc" in files:
+            if "Band-DOS" in files:
                 all_inputs.append(each_dir)
         else:
             if "POSCAR" in files and "POTCAR" in files and "KPOINTS" in files and "INCAR" in files:
