@@ -167,7 +167,7 @@ cat $TMPDIR/machines
                 runs += "cd " + dir_path + "\n"                 # chg dir to /scratch/vasp
                 runs += each_run + "\n"                         # run vasp
                 runs += "cp " + dir_path + "/* " + d + "\n"     # copy finished job to original dir
-                runs += "rm -rf " + dir_path + "\n\n"             # remove finished job under /scratch/vasp
+                runs += "rm -rf " + dir_path + "\n\n"           # remove finished job under /scratch/vasp
             else:
                 runs += "cd " + d + "\n"
                 runs += each_run
