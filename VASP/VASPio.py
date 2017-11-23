@@ -20,76 +20,80 @@ if version[0] == '3':
     raw_input = input
 
 class VASPInput():
-    def __init__(self, filename, dirname=None):
-        if ".xsd" in filename:
-            ps = PS(filename)
-            ps.xsdFile()
-            ps.cifWrite(filename="tmpstructure.cif")
-            structure = pmgIS.from_file("tmpstructure.cif")
-            os.remove("tmpstructure.cif")
-            jobname = filename.replace(".xsd","")
-        elif ".cif" in filename: 
-            structure = pmgIS.from_file(filename)
-            jobname = filename.replace(".cif","")
-        elif "POSCAR" in filename or "CONTCAR" in filename:
-            structure = pmgIS.from_file(filename)
-            pwd = os.getcwd()
-            pwd = pwd.split("/")[-1]
-            jobname = pwd
+    def __init__(self, filename=None, dirname=None, additional=False):
+        # additional calc : Like band calculations from previous calc
+        if additional:
+            self.jobname = dirname
         else:
-            print("Not supported file format. (.xsd, .cif, POSCAR, CONTCAR)")
-            quit()
+            if ".xsd" in filename:
+                ps = PS(filename)
+                ps.xsdFile()
+                ps.cifWrite(filename="tmpstructure.cif")
+                structure = pmgIS.from_file("tmpstructure.cif")
+                os.remove("tmpstructure.cif")
+                jobname = filename.replace(".xsd","")
+            elif ".cif" in filename:
+                structure = pmgIS.from_file(filename)
+                jobname = filename.replace(".cif","")
+            elif "POSCAR" in filename or "CONTCAR" in filename:
+                structure = pmgIS.from_file(filename)
+                pwd = os.getcwd()
+                pwd = pwd.split("/")[-1]
+                jobname = pwd
+            else:
+                print("Not supported file format. (.xsd, .cif, POSCAR, CONTCAR)")
+                quit()
 
-        if not dirname:
-            dirname = jobname
+            if not dirname:
+                dirname = jobname
 
-        self.filename = filename
-        self.structure = structure
-        self.dirname = dirname
+            self.filename = filename
+            self.structure = structure
+            self.dirname = dirname
 
-        # ------------ Grimme's parameters ------------- #
-        vdw_C6, vdw_R0 = vasp_grimme_parameters()
-        # ------------ check preset config ------------- #
-        home = os.getenv("HOME")
-        self.home = home
-        if ".CCpy" not in os.listdir(home):
-            os.mkdir(home+"/.CCpy")
-            print("* Preset options will be saved under :" + home + "/.CCpy/")
-        configs = os.listdir(home+"/.CCpy")
-        # INCAR preset check
-        if "vasp_incar.json" in configs:
-            incar_dict = load_json(home + "/.CCpy/vasp_incar.json", ordered=True)
-        else:
-            jstring = vasp_incar_json()         # Generate new INCAR
-            incar_dict = json.loads(jstring, object_pairs_hook=OrderedDict)
-            save_json(incar_dict, home + "/.CCpy/vasp_incar.json")
-        # MAGMOM value preset check
-        if "vasp_MAGMOM.json" in configs:
-            magmom = load_json(home + "/.CCpy/vasp_MAGMOM.json")
-        else:
-            magmom = magmom_parameters()
-            save_json(magmom, home+"/.CCpy/vasp_MAGMOM.json")
-        # LDAUU value preset check
-        if "vasp_LDAUU.json" in configs:
-            LDAUU = load_json(home + "/.CCpy/vasp_LDAUU.json")
-        else:
-            LDAUU = ldauu_parameters()
-            save_json(LDAUU, home + "/.CCpy/vasp_LDAUU.json")
-        # LDAUL value preset check
-        if "vasp_LDAUL.json" in configs:
-            LDAUL = load_json(home + "/.CCpy/vasp_LDAUL.json")
-        else:
-            LDAUL = ldaul_parameters()
-            save_json(LDAUL, home + "/.CCpy/vasp_LDAUL.json")
-        # LDAUJ value preset check
-        if "vasp_LDAUJ.json" in configs:
-            LDAUJ = load_json(home + "/.CCpy/vasp_LDAUJ.json")
-        else:
-            LDAUJ = ldauj_parameters()
-            save_json(LDAUJ, home + "/.CCpy/vasp_LDAUJ.json")
+            # ------------ Grimme's parameters ------------- #
+            vdw_C6, vdw_R0 = vasp_grimme_parameters()
+            # ------------ check preset config ------------- #
+            home = os.getenv("HOME")
+            self.home = home
+            if ".CCpy" not in os.listdir(home):
+                os.mkdir(home+"/.CCpy")
+                print("* Preset options will be saved under :" + home + "/.CCpy/")
+            configs = os.listdir(home+"/.CCpy")
+            # INCAR preset check
+            if "vasp_incar.json" in configs:
+                incar_dict = load_json(home + "/.CCpy/vasp_incar.json", ordered=True)
+            else:
+                jstring = vasp_incar_json()         # Generate new INCAR
+                incar_dict = json.loads(jstring, object_pairs_hook=OrderedDict)
+                save_json(incar_dict, home + "/.CCpy/vasp_incar.json")
+            # MAGMOM value preset check
+            if "vasp_MAGMOM.json" in configs:
+                magmom = load_json(home + "/.CCpy/vasp_MAGMOM.json")
+            else:
+                magmom = magmom_parameters()
+                save_json(magmom, home+"/.CCpy/vasp_MAGMOM.json")
+            # LDAUU value preset check
+            if "vasp_LDAUU.json" in configs:
+                LDAUU = load_json(home + "/.CCpy/vasp_LDAUU.json")
+            else:
+                LDAUU = ldauu_parameters()
+                save_json(LDAUU, home + "/.CCpy/vasp_LDAUU.json")
+            # LDAUL value preset check
+            if "vasp_LDAUL.json" in configs:
+                LDAUL = load_json(home + "/.CCpy/vasp_LDAUL.json")
+            else:
+                LDAUL = ldaul_parameters()
+                save_json(LDAUL, home + "/.CCpy/vasp_LDAUL.json")
+            # LDAUJ value preset check
+            if "vasp_LDAUJ.json" in configs:
+                LDAUJ = load_json(home + "/.CCpy/vasp_LDAUJ.json")
+            else:
+                LDAUJ = ldauj_parameters()
+                save_json(LDAUJ, home + "/.CCpy/vasp_LDAUJ.json")
 
 
-        self.incar_dict, self.magmom, self.LDAUL, self.LDAUU, self.LDAUJ, self.vdw_C6, self.vdw_R0 = incar_dict, magmom, LDAUL, LDAUU, LDAUJ, vdw_C6, vdw_R0
+            self.incar_dict, self.magmom, self.LDAUL, self.LDAUU, self.LDAUJ, self.vdw_C6, self.vdw_R0 = incar_dict, magmom, LDAUL, LDAUU, LDAUJ, vdw_C6, vdw_R0
 
 
     # ------------------------------------------------------------------------------#
@@ -509,192 +513,143 @@ class VASPInput():
     # ------------------------------------------------------------------------------#
     #                     CMS band and DOS calc VASP input set                      #
     # ------------------------------------------------------------------------------#
-    def cms_band_set(self, vdw=False, spin=False, mag=False, kpoints=False, ldau=False, functional="PBE_54",
-                     input_incar=None, input_kpts=None, input_line_kpts=None):
-        structure = self.structure
-        dirname = self.dirname
+    def cms_band_set(self, input_line_kpts=None):
+        ## -------------------------- Copy previous Calc --------------------------- ##
+        try:
+            os.mkdir("Band-DOS")
+        except:
+            print("Band-DOS directory is exist already. All files wii be override.")
 
-        ## -------------------------------- POSCAR -------------------------------- ##
-        # -- Create POSCAR string from pymatgen structure object
-        poscar = structure.to(fmt="poscar")
+        os.chdir("Band-DOS")
+        linux_command("copy ../* ./")
+        os.rename("POSCAR", "POSCAR.orig")
+        os.rename("CONTCAR", "POSCAR")
 
-        # -- Parsing elements and its number for MAGMOM and LDA+U parameters
-        elements = []
-        for el in structure.species:
-            if str(el) not in elements:
-                elements.append(str(el))
-        lines = poscar.split("\n")
-        for i in range(len(lines)):
-            if i == 5:
-                elts = lines[i].split()
-            elif i == 6:
-                n_of_atoms = lines[i].split()
 
-        ## -------------------------------- INCAR -------------------------------- ##
-        incar_dict = {
-            "NWRITE":2,"LPETIM":"F","ISTART":0,"INIWAV":1,"IWAVPR":1,"ICHARG":2,"LWAVE":".FALSE.",
-            "ALGO":"NORMAL","NELM":100,"EDIFF":0.0001,"BMIX":3.00,"ENCUT":500,"GGA":"PE","ISYM":2,
-            "LDIAG":"T","LREAL":"auto","PREC":"Medium",
-            "NSW":0,"NBLOCK":1,"KBLOCK":10,"IBRION":2,"ISIF":3,"POTIM":0.5,"SMASS":3.0,
-            "ISMEAR":0,"SIGMA":0.05,"LORBIT":11,
-            "NPAR":8,"LPLANE":"T","ISPIN":1}
+        ## --------------------------------- INCAR --------------------------------- ##
+        f = open("INCAR", "r").read()
+        lines = f.split("\n")
+        key_val = []
+        for l in lines:
+            if len(l) == 0:
+                pass
+            elif l[0] == "#" and l[1].isdigit():
+                key_val.append((l, ""))
+            else:
+                tmp = l.split("=")
+                if "#" in tmp[0]:
+                    key = tmp[0].replace(" ","").replace("#","")
+                    key = "# " + key
+                else:
+                    key = tmp[0].replace(" ", "")
+                key_val.append((key, tmp[1]))
 
-        if spin:
-            incar_dict['ISPIN']=2
-        if mag:
-            mag_string = ""
-            for i in range(len(n_of_atoms)):
-                mag_string += str(n_of_atoms[i]) + "*" + str(magmom[elts[i]]) + " "
-            incar_dict['MAGMOM'] = mag_string
-        if ldau:
-            LDAUL_string = ""
-            for i in range(len(elts)):
-                LDAUL_string += str(LDAUL[elts[i]]) + " "
+        incar_dict = OrderedDict(key_val)
+        incar_keys = incar_dict.keys()
 
-            LDAUU_string = ""
-            for i in range(len(elts)):
-                LDAUU_string += str(LDAUU[elts[i]]) + " "
+        # -- Band-DOS INCAR
+        get_sets = "ICHARG=11,SIGMA=0.02,NSW=0,NEDOS=2001"
+        if get_sets != "n":
+            vals = get_sets.replace(", ", ",")
+            vals = vals.split(",")
+            for val in vals:
+                key = val.split("=")[0]
+                value = val.split("=")[1]
+                if "# " + key in incar_keys:
+                    incar_dict = change_dict_key(incar_dict, "# " + key, key, incar_dict["# " + key])
+                    original = incar_dict[key]
+                    try:
+                        description = original.split("!")[1]
+                    except:
+                        description = ""
+                    incar_dict[key] = value.ljust(22) + "!" + description
+                else:
+                    if key in incar_keys:
+                        original = incar_dict[key]
+                    else:
+                        original = ""
+                    try:
+                        description = original.split("!")[1]
+                    except:
+                        description = ""
+                    incar_dict[key] = value.ljust(22) + "!" + description
 
-            LDAUJ_string = ""
-            for i in range(len(elts)):
-                LDAUJ_string += str(LDAUJ[elts[i]]) + " "
 
-            incar_dict['LDAU'] = ".TRUE."
-            incar_dict['LMAXMIX'] = 4
-            incar_dict['LDAUTYPE'] = 2
-            incar_dict['LDAUL'] = LDAUL_string
-            incar_dict['LDAUU'] = LDAUU_string
-            incar_dict['LDAUJ'] = LDAUJ_string
-        if vdw:            
-            C6 = ""
-            R0 = ""
-            for el in elements:
-                C6+=str(vdw_C6[el])+" "
-                R0+=str(vdw_R0[el])+" "
-            incar_dict['LVDW']=".TRUE."
-            incar_dict['VDW_RADIUS']=30.0
-            incar_dict['VDW_SCALING']=0.75
-            incar_dict['VDW_D']=20.0
-            incar_dict['VDW_C6']=C6
-            incar_dict['VDW_R0']=R0
-
+        # -- make string
+        incar_keys = incar_dict.keys()
+        incar_string = ""
+        for key in incar_keys:
+            if key == "SYSTEM":
+                incar_string += key.ljust(16) + " = " + str(incar_dict[key]).ljust(30) + "\n"
+            elif key[0] == "#" and key[1].isdigit():
+                incar_string += "\n"
+                incar_string += key + str(incar_dict[key]) + "\n"
+            else:
+                val = str(incar_dict[key]).split("!")[0]
+                try:
+                    description = str(incar_dict[key]).split("!")[1]
+                except:
+                    description = ""
+                incar_string += key.ljust(16) + " = " + str(val).ljust(30) + "!" + description + "\n"
+        incar = incar_string
 
 
         ## -------------------------------- KPOINTS -------------------------------- ##
-        if kpoints:
-            kpts = kpoints
-        else:
-            lattice_vector = structure.lattice.matrix
-            lattice = latticeGen(lattice_vector[0],lattice_vector[1],lattice_vector[2])
-            length = [lattice['length'][0], lattice['length'][1], lattice['length'][2]]
-            kpts = []
-            for param in length:
-                if 20 // param == 0:
-                    kpts.append(2)
-                else:
-                    kpts.append(int(20 // param))
-        kpoints = dirname+"\n0\nMonkhorst-Pack\n"+str(kpts[0])+" "+str(kpts[1])+" "+str(kpts[2])+"\n0 0 0\n"
-
-        # -- Line mode Kpoints
-        from pymatgen.symmetry.bandstructure import HighSymmKpath
-        hsk = HighSymmKpath(structure)
-        line_kpoints = Kpoints.automatic_linemode(20, hsk)
-
-
-        ## -------------------------------- POTCAR --------------------------------- ##
-        linux_command("export VASP_PSP_DIR=/home/bsjun/bin/bsjunCODE/VASP_Potential")
-        potcar = Potcar(symbols=elements, functional=functional)
-
-
-        ## --------------------------- Confirm input values ---------------------- ##
-        # -- INCAR
-        print(dirname)
-        if not input_incar:  # This process is for avoiding multiple inputs generation.
-            get_sets = None
-            while get_sets != "n":
-                print("""
-Here are the INCAR options.
-NEDOS, PREC, SIGMA, LAECHG, ICHARG
-values will be modified when generate Precalc and Band-DOS input sets as :
-NEDOS=2001, PREC=accur, SIGMA=0.02, LAECHG=.True., ICHARG=11""")
-                for key in incar_dict.keys():
-                    print(str(key).ljust(8) + " = " + str(incar_dict[key]))
-                get_sets = raw_input(
-                    "* Anything want to modify or add? if not, enter \"n\" or (ex: ISPIN=2,ISYM=1,PREC=Accurate) \n: ")
-                if get_sets != "n":
-                    vals = get_sets.replace(" ", "")
-                    vals = vals.split(",")
-                    for val in vals:
-                        key = val.split("=")[0]
-                        value = val.split("=")[1]
-                        incar_dict[key] = value
-
-        # need to make module : INCAR string to INCAR dict
-
-        # -- KPOINTS
-        if not input_kpts:
-            get_kpts = None
-            while get_kpts != "n":
-                print("\n* Here are the current KPOINTS (PreCalc).")
-                print(kpoints)
-                get_kpts = raw_input("* Anything want to modify? if not, enter \"n\" or (ex: 4,4,2) \n: ")
-                if get_kpts != "n":
-                    vals = get_kpts.replace(" ", "")
-                    kpts = vals.split(",")
-                    kpoints = dirname + "\n0\nMonkhorst-Pack\n" + str(kpts[0]) + " " + str(kpts[1]) + " " + str(kpts[2]) + "\n0 0 0\n"
-        else:
-            kpoints = input_kpts
-
-        # -- Line mode KPOINTS
+        # -- Line mode KPOINTS is needed to calc band structure
+        print("\n# -------------------------------------------------------- #")
+        print("#              Make new line-mode KPOINTS file             #")
+        print("# -------------------------------------------------------- #")
         if not input_line_kpts:
-            get_line_kpts = None
-            while get_line_kpts != "n":
-                print("\n* Here are the current Line mode KPOINTS (Band-DOS).")
-                splt_kpts = line_kpoints.split("\n")
-                for i in range(len(splt_kpts)):
-                    print(str(i) + " : " + splt_kpts[i])
-                get_line_kpts = raw_input("* Anything want to remove line? if not, enter \"n\" or (ex: 1,2,4,5,6) \n: ")
-                if get_line_kpts != "n":
-                    vals = get_line_kpts.replace(" ", "")
-                    line_index = vals.split(",")
-                    for i in line_index:
-                        del splt_kpts[i]
-                    line_kpoints = ""
-                    for line in splt_kpts:
-                        line_kpoints += line+"\n"
+            from pymatgen.symmetry.bandstructure import HighSymmKpath
 
+            structure = pmgIS.from_file("POSCAR")
+            hsk = HighSymmKpath(structure)
+            line_kpoints = Kpoints.automatic_linemode(20, hsk)
+            line_kpoints = str(line_kpoints)
+            splt_kpts = line_kpoints.split("\n")
+
+            pts = {}
+            for kp in splt_kpts:
+                if "!" in kp:
+                    tmp = kp.split("!")
+                    name = tmp[1].replace(" ","")
+                    if name not in pts.keys():
+                        pts[name] = tmp[0]
+            print("Available k-points in this structure")
+            for key in pts.keys():
+                print(key + " : " + pts[key])
+            get_pts = raw_input("Choose k-points to use Band calculations (ex: \Gamma,M,K,L) \n:")
+            get_pts = get_pts.replace(" ", "")
+            get_pts = get_pts.split(",")
+
+            line_kpoints = """Line_mode KPOINTS file
+20
+Line_mode
+Reciprocal
+"""
+
+            for i in range(len(get_pts)):
+                try:
+                    ini = pts[get_pts[i]] + get_pts[i] + "\n"
+                    fin = pts[get_pts[i + 1]] + get_pts[i + 1] + "\n\n"
+                    line_kpoints += ini + fin
+                except:
+                    ini = pts[get_pts[i]] + get_pts[i] + "\n"
+                    fin = pts[get_pts[0]] + get_pts[0] + "\n\n"
+                    line_kpoints += ini + fin
+
+            file_writer("../../KPOINTSP", str(line_kpoints))
+            print("\n* Line-mode KPOINTS file has been saved : KPOINTSP")
+
+        # -- Read KPOINTS from user
         else:
             line_kpoints = input_line_kpts
 
 
         ## --------------------------- Write input files ---------------------- ##
-        # -- Precalc INCAR
-        incar_dict['NSW'] = 0
-        incar_dict['NEDOS'] = 2001
-        incar_dict['PREC'] = "accur"
-        incar_pre = Incar(incar_dict)
-        # -- Band-DOS INCAR
-        incar_dict['SIGMA'] = 0.02
-        incar_dict['LAECHG'] = ".True."
-        incar_dict['ICHARG'] = 11
-        incar_band_dos = Incar(incar_dict)
-
-        try:
-            os.mkdir("PreCalc")
-        except:
-            pass
-        file_writer("./PreCalc/POSCAR",str(poscar))
-        file_writer("./PreCalc/POTCAR",str(potcar))
-        file_writer("./PreCalc/INCAR",str(incar_pre))
-        file_writer("./PreCalc/KPOINTS",str(kpoints))
-        try:
-            os.mkdir("Band-DOS")
-        except:
-            pass
-        file_writer("./Band-DOS/POSCAR",str(poscar))
-        file_writer("./Band-DOS/POTCAR",str(potcar))
-        file_writer("./Band-DOS/INCAR",str(incar_band_dos))
-        file_writer("./Band-DOS/KPOINTS",str(line_kpoints))
+        file_writer("INCAR",str(incar))
+        file_writer("KPOINTS",str(line_kpoints))
+        os.chdir("../")
         
     
 

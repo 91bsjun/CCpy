@@ -7,6 +7,11 @@ from collections import OrderedDict
 from CCpy.VASP.VASPio import VASPInput
 from CCpy.Tools.CCpyTools import selectInputs, selectVASPInputs, selectVASPOutputs, linux_command
 
+version = sys.version
+if version[0] == '3':
+    raw_input = input
+
+
 try:
     chk = sys.argv[1]
 except:
@@ -110,9 +115,19 @@ if sys.argv[1] == "1":
 elif sys.argv[1] == "2":
     inputs = selectVASPOutputs("./")
     for each_input in inputs:
+        if "KPOINTSP" in os.listdir("./"):
+            print("\n* Line-mode KPOINTS file (KPOINTSP) has been detected.")
+            input_line_kpts = open("KPOINTSP", "r").read()
+        else:
+            use_kpts = raw_input("\n* Line-mode KPOINTS file (KPOINSTP) is not detected.\n\n* Give file name, else Enter (make new)\n:")
+            if len(use_kpts) >= 1:
+                input_line_kpts = use_kpts
+            else:
+                input_line_kpts = False
+        print(each_input)
         os.chdir(each_input)
-        VI = VASPInput("CONTCAR")
-        VI.cms_band_set(spin=spin,mag=mag,ldau=ldau)
+        VI = VASPInput(additional=True, dirname=each_input)
+        VI.cms_band_set(input_line_kpts=input_line_kpts)
         os.chdir("../")
 
 elif sys.argv[1] == "3":
