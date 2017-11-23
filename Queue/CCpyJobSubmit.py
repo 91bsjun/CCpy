@@ -187,8 +187,8 @@ if __name__=="__main__":
         chk = sys.argv[1]
         chk = sys.argv[2]
     except:
-        print("--------------------------------------------------------------------------------------")
-        print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [Option 1] [Option 2] [Suboptions]")
+        print("\n--------------------------------------------------------------------------------------")
+        print("     How to use : " + sys.argv[0].split("/")[-1] + " [Option 1] [Option 2] [Suboptions]")
         print('''--------------------------------------------------------------------------------------
 < Option 1. > Software
     1  : Gaussian09
@@ -259,7 +259,7 @@ if __name__=="__main__":
     ## ------ VASP
     elif sys.argv[1] == "2":
         if "-batch" in sys.argv:
-            vasp_batch(queue=queue, divided=divided)
+            vasp_batch(queue=queue, divided=divided, scratch=scratch)
         else:
             vasp(queue=queue, divided=divided)
 
