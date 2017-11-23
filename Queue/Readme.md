@@ -109,7 +109,7 @@ queue_info = {"xeon1":[16, 32, "xeon1.q"],
               "I5":[4, 16, "I5.q"],
               "aws":[36, 48, "all.q"]}
 </pre>
-- "arg" will be used in the run command <code>CCpyJobSubmit.py 2 <b>xeon1</b><code>
+- "arg" will be used in the run command <code>CCpyJobSubmit.py 2 <b>xeon1</b></code>
 - cpu, mem and queue name are up to your system.
 ### Common options
 <code>CCpyJobSubmit.py</code> run as
