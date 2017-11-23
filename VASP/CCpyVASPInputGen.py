@@ -108,11 +108,21 @@ if sys.argv[1] == "1":
     linux_command("rm current_options.json")
 
 elif sys.argv[1] == "2":
+    if "KPOINTSP" in os.listdir("./"):
+        use_kpts = raw_input("Line-mode KPOINTS file (KPOINTSP) has been detected.")
+        input_line_kpts = "KPOINTSP"
+    else:
+        use_kpts = raw_input("Line-mode KPOINTS file (KPOINSTP) is not detected.\nFile name (else Enter)\n:")
+        if len(use_kpts) >= 1:
+            input_line_kpts = use_kpts
+        else:
+            input_line_kpts = False
+
     inputs = selectVASPOutputs("./")
     for each_input in inputs:
         os.chdir(each_input)
-        VI = VASPInput("CONTCAR")
-        VI.cms_band_set(spin=spin,mag=mag,ldau=ldau)
+        VI = VASPInput(additional=True, dirname=each_input)
+        VI.cms_band_set(input_line_kpts=input_line_kpts)
         os.chdir("../")
 
 elif sys.argv[1] == "3":
