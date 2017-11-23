@@ -521,8 +521,8 @@ class VASPInput():
             print("Band-DOS directory is exist already. All files wii be override.")
 
         os.chdir("Band-DOS")
-        prev_files =["CHG, CHGCAR, CONTCAR, DOSCAR, EIGENVAL, IBZKPT, INCAR, KPOINTS,"
-                     "POSCAR, POTCAR, PROCAR, WAVECAR, XDATCAR"]
+        prev_files =["CHG", "CHGCAR", "CONTCAR", "DOSCAR", "EIGENVAL", "IBZKPT", "INCAR", "KPOINTS",
+                     "POSCAR", "POTCAR", "PROCAR", "WAVECAR", "XDATCAR"]
         for pf in prev_files:
             linux_command("cp ../" + pf + " ./")
         os.rename("POSCAR", "POSCAR.orig")
