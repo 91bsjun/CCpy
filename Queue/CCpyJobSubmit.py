@@ -22,10 +22,7 @@ if ip == "166.104.249.31":
     print("DO AT NODE00 !!")
     quit()
 
-# -- Select all inputs automatically
-ask = True
-if "a" in sys.argv:
-    ask = False
+
 
 def gaussian(queue=None, divided=1):
     # --- COLLECT INPUT FILES
@@ -40,7 +37,7 @@ def gaussian(queue=None, divided=1):
 def vasp(queue=None, divided=1):
     # --- Collect VASP inputs
     band = False
-    if "band" in sys.argv:
+    if "-band" in sys.argv:
         band = True
         inputs = selectVASPInputs("./", ask=ask, band=True)
     else:
@@ -59,7 +56,7 @@ def vasp_batch(queue=None, divided=1):
     dirs = []
     # --- Collect VASP inputs
     band = False
-    if "band" in sys.argv:
+    if "-band" in sys.argv:
         band = True
         inputs = selectVASPInputs("./", ask=ask, band=True)
     else:
@@ -186,35 +183,47 @@ def pbs_runner(queue=None, divided=1):
         myJS.pbs_runner()
 
 if __name__=="__main__":
-
     try:
         chk = sys.argv[1]
         chk = sys.argv[2]
     except:
-        print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [queue name] [divide]")
-        print('''--------------------------------------
-    [option]
+        print("--------------------------------------------------------------------------------------")
+        print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [Option 1] [Option 2] [Suboptions]")
+        print('''--------------------------------------------------------------------------------------
+< Option 1. > Software
     1  : Gaussian09
     2  : VASP
-    2b : VASP batch job (run multiple jobs in a single queue)
     3  : ATK
     4  : Q-chem
     6  : ATAT
     7  : LAMMPS
     8  : PBS job display
 
-    [queue name]
-    xeon1, xeon2, ...
+< Option 2. > Queue
+    xeon1, xeon2, xeon3, ...
 
-    [divide] (optional)
-    be integer value, which divide CPU numbers and memories
+[Suboptions] (optional)
+    -d=[integer]    : which divide CPU numbers and memories
+                      ex) CCpyJobSubmit.py 2 xeon2 -d=2
+                      --> will use half of CPU in xeon2
 
-    [suboption]
-    a : no check files, calculate all inputs
+    -band           : when perform VASP band calculation
+                      ex) CCpyJobSubmit.py 2 xeon5 -band
+                      ex) CCpyJobSubmit.py 2 xeon5 -band -d=2
+                      ex) CCpyJobSubmit.py 2 xeon5 -d=3 -band
 
-    [VASP band calculation]
-    Add an argument "band" at last.
-    ex) CCpyJobSubmit.py 2 xeon5 3 band'''
+    -batch          : run multiple jobs in a single queue
+                      (Only VASP supported yet)
+                      ex) CCpyJobSubmit.py 2 xeon5 -batch
+                      ex) CCpyJobSubmit.py 2 xeon5 -batch -band
+
+    -s              : use scratch directory when run batch jobs
+                      (When you calculate quick hundreds jobs, to reduce load in master node)
+                      (Only VASP supported yet)
+
+    -a : no check files, calculate all inputs
+
+    '''
               )
         quit()
 
@@ -229,23 +238,30 @@ if __name__=="__main__":
         print("Unvalid queue name")
         quit()
 
-    # --- Separate queue check
-    try:
-        divided = int(sys.argv[3])
-    except:
-        divided = 1
+
+    # --- Suboption parsing
+    # -- Select all inputs automatically
+    divided = 1
+    scratch = False
+    ask = True
+    for s in sys.argv:
+        if "-d" in s:
+            divided = int(s.split("=")[1])
+        if "-s" in s:
+            scratch = True
+        if "-a" in s:
+            ask = False
 
     ## ------ GAUSSIAN
     if sys.argv[1] == "1":
         gaussian(queue=queue, divided=divided)
 
-
     ## ------ VASP
     elif sys.argv[1] == "2":
-        vasp(queue=queue, divided=divided)
-
-    elif sys.argv[1] == "2b":
-        vasp_batch(queue=queue, divided=divided)
+        if "-batch" in sys.argv:
+            vasp_batch(queue=queue, divided=divided)
+        else:
+            vasp(queue=queue, divided=divided)
 
     ## ------ ATK
     elif sys.argv[1] == "3":
