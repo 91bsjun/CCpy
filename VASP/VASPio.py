@@ -521,7 +521,7 @@ class VASPInput():
             print("Band-DOS directory is exist already. All files wii be override.")
 
         os.chdir("Band-DOS")
-        linux_command("copy ../* ./")
+        linux_command("cp ../* ./")
         os.rename("POSCAR", "POSCAR.orig")
         os.rename("CONTCAR", "POSCAR")
 
