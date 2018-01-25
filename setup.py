@@ -1,5 +1,10 @@
 from distutils.core import setup
 
+install_requires = [
+    'pandas',
+    'numpy',
+    'pymatgen',
+]
 setup(
     name='CCpy',
     version='1.17',
