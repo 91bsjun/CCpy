@@ -1,3 +1,5 @@
+#!/bin/env python
+
 import re, sys
 import numpy as np
 import matplotlib.pyplot as plt
