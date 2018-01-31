@@ -1303,7 +1303,7 @@ class BSPlotterProjected(BSPlotter):
                             color[2] = tmp # editted
                         sign = '-'
                         if s == Spin.down:
-                            sign = '--'
+                            sign = '-'
                         plt.plot([data['distances'][b][j],
                                   data['distances'][b][j + 1]],
                                  [data['energy'][b][str(s)][i][j],
