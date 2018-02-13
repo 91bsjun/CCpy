@@ -24,17 +24,17 @@ if ip == "166.104.249.31":
 
 
 
-def gaussian(queue=None, divided=1):
+def gaussian(queue=None, n_of_cpu=None):
     # --- COLLECT INPUT FILES
     input_marker = [".com"]
     inputs = selectInputs(input_marker, "./", ask=ask)
 
     # --- SUBMIT QUEUE
     for each_input in inputs:
-        myJS = JS(each_input, queue, divided)
+        myJS = JS(each_input, queue, n_of_cpu)
         myJS.gaussian()
 
-def vasp(queue=None, divided=1):
+def vasp(queue=None, n_of_cpu=None):
     # --- Collect VASP inputs
     band = False
     if "-band" in sys.argv:
@@ -49,10 +49,10 @@ def vasp(queue=None, divided=1):
         dirpath = pwd + "/" + each_input
         if band:
             dirpath += "/Band-DOS"
-        myJS = JS(each_input, queue, divided)
+        myJS = JS(each_input, queue, n_of_cpu)
         myJS.vasp(band=band, dirpath=dirpath)
 
-def vasp_batch(queue=None, divided=1, scratch=False):
+def vasp_batch(queue=None, n_of_cpu=None, scratch=False):
     dirs = []
     # --- Collect VASP inputs
     band = False
@@ -69,43 +69,43 @@ def vasp_batch(queue=None, divided=1, scratch=False):
         if band:
             dirpath += "/Band-DOS"
         dirs.append(dirpath)
-    myJS = JS(each_input, queue, divided)
+    myJS = JS(each_input, queue, n_of_cpu)
     myJS.vasp_batch(band=band, dirs=dirs, scratch=scratch)
 
 
-def qchem(queue=None, divided=1):
+def qchem(queue=None, n_of_cpu=None):
     # --- Collect inputs
     input_marker = [".in"]
     inputs = selectInputs(input_marker, "./", ask=ask)
 
     # --- SUBMIT QUEUE
     for each_input in inputs:
-        myJS = JS(each_input, queue, divided)
+        myJS = JS(each_input, queue, n_of_cpu)
         myJS.qchem()
 
-def atk(queue=None, divided=1):
+def atk(queue=None, n_of_cpu=None):
     # --- COLLECT INPUT FILES
     input_marker = [".py"]
     inputs = selectInputs(input_marker, "./", ask=ask)
 
     # --- SUBMIT QUEUE
     for each_input in inputs:
-        myJS = JS(each_input, queue, divided)
+        myJS = JS(each_input, queue, n_of_cpu)
         myJS.ATK()
 
 
-def lammps(queue=None, divided=1):
+def lammps(queue=None, n_of_cpu=None):
     # --- COLLECT INPUT FILES
     input_marker = ["in."]
     inputs = selectInputs(input_marker, "./", ask=ask)
 
     # --- SUBMIT QUEUE
     for each_input in inputs:
-        myJS = JS(each_input, queue, divided)
+        myJS = JS(each_input, queue, n_of_cpu)
         myJS.lammps()
 
 
-def atat(queue=None, divided=1):
+def atat(queue=None, n_of_cpu=None):
     all_inputs = [int(d) for d in os.listdir("./") if os.path.isdir(d) if
                   "str.out" in os.listdir(d) and "wait" in os.listdir(d)]
     all_inputs.sort()
@@ -169,17 +169,17 @@ def atat(queue=None, divided=1):
     pwd = os.getcwd()
     for each_input in inputs:
         os.chdir(pwd)
-        myJS = JS(each_input, queue, divided)
+        myJS = JS(each_input, queue, n_of_cpu)
         myJS.atat()
 
-def pbs_runner(queue=None, divided=1):
+def pbs_runner(queue=None, n_of_cpu=None):
     # --- COLLECT INPUT FILES
     input_marker = [".py"]
     inputs = selectInputs(input_marker, "./", ask=ask)
 
     # --- SUBMIT QUEUE
     for each_input in inputs:
-        myJS = JS(each_input, queue, divided)
+        myJS = JS(each_input, queue, n_of_cpu)
         myJS.pbs_runner()
 
 if __name__=="__main__":
