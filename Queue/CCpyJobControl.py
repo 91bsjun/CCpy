@@ -38,7 +38,7 @@ class JobSubmit():
             self.n_of_cpu = n_of_cpu
         else:
             self.n_of_cpu = cpu
-        self.divided = cpu / n_of_cpu
+        self.divided = cpu / self.n_of_cpu
 
     def gaussian(self, cpu=None, mem=None, q=None):
         inputfile = self.inputfile
