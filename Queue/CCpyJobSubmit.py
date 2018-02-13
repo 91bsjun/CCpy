@@ -203,14 +203,14 @@ if __name__=="__main__":
     xeon1, xeon2, xeon3, ...
 
 [Suboptions] (optional)
-    -d=[integer]    : which divide CPU numbers and memories
-                      ex) CCpyJobSubmit.py 2 xeon2 -d=2
-                      --> will use half of CPU in xeon2
+    -n=[integer]    : the number of CPU to use
+                      ex) CCpyJobSubmit.py 2 xeon2 -n=8
+                      --> will use 8 CPUs in xeon2
 
     -band           : when perform VASP band calculation
                       ex) CCpyJobSubmit.py 2 xeon5 -band
-                      ex) CCpyJobSubmit.py 2 xeon5 -band -d=2
-                      ex) CCpyJobSubmit.py 2 xeon5 -d=3 -band
+                      ex) CCpyJobSubmit.py 2 xeon5 -band -n=8
+                      ex) CCpyJobSubmit.py 2 xeon5 -n=8 -band
 
     -batch          : run multiple jobs in a single queue
                       (Only VASP supported yet)
@@ -241,12 +241,12 @@ if __name__=="__main__":
 
     # --- Suboption parsing
     # -- Select all inputs automatically
-    divided = 1
     scratch = False
     ask = True
+    n_of_cpu=None
     for s in sys.argv:
-        if "-d" in s:
-            divided = int(s.split("=")[1])
+        if "-n" in s:
+            n_of_cpu = int(s.split("=")[1])
         if "-s" in s:
             scratch = True
         if "-a" in s:
@@ -254,32 +254,32 @@ if __name__=="__main__":
 
     ## ------ GAUSSIAN
     if sys.argv[1] == "1":
-        gaussian(queue=queue, divided=divided)
+        gaussian(queue=queue, n_of_cpu=n_of_cpu)
 
     ## ------ VASP
     elif sys.argv[1] == "2":
         if "-batch" in sys.argv:
-            vasp_batch(queue=queue, divided=divided, scratch=scratch)
+            vasp_batch(queue=queue, n_of_cpu=n_of_cpu, scratch=scratch)
         else:
-            vasp(queue=queue, divided=divided)
+            vasp(queue=queue, n_of_cpu=n_of_cpu)
 
     ## ------ ATK
     elif sys.argv[1] == "3":
-        atk(queue=queue, divided=divided)
+        atk(queue=queue, n_of_cpu=n_of_cpu)
 
     ## ------ Q-chem
     elif sys.argv[1] == "4":
-        qchem(queue=queue, divided=divided)
+        qchem(queue=queue, n_of_cpu=n_of_cpu)
 
 
     ## ------ ATAT
     elif sys.argv[1] == "6":
-        atat(queue=queue, divided=divided)
+        atat(queue=queue, n_of_cpu=n_of_cpu)
 
     ## ------ ATAT
     elif sys.argv[1] == "7":
-        lammps(queue=queue, divided=divided)
+        lammps(queue=queue, n_of_cpu=n_of_cpu)
 
     ## ------ PBS JOBS DISPLAYER
     elif sys.argv[1] == "8":
-        pbs_runner(queue=queue, divided=divided)
+        pbs_runner(queue=queue, n_of_cpu=n_of_cpu)

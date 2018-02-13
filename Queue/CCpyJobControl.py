@@ -26,7 +26,7 @@ queue_info = {"xeon1":[16, 32, "xeon1.q"],    # node01
               "aws":[36, 48, "all.q"]}
 
 class JobSubmit():
-    def __init__(self, inputfile, queue, divided):
+    def __init__(self, inputfile, queue, n_of_cpu):
         self.inputfile = inputfile
 
         cpu, mem, q = queue_info[queue][0], queue_info[queue][1], queue_info[queue][2]
@@ -34,15 +34,18 @@ class JobSubmit():
         self.cpu = cpu
         self.mem = mem
         self.q = q
-        self.divided = divided
+        if n_of_cpu:
+            self.n_of_cpu = n_of_cpu
+        else:
+            self.n_of_cpu = cpu
+        self.divided = cpu / n_of_cpu
 
     def gaussian(self, cpu=None, mem=None, q=None):
         inputfile = self.inputfile
         
-        cpu, mem, q = self.cpu, self.mem, self.q
+        cpu, mem, q = self.n_of_cpu, self.mem, self.q
         d = self.divided
-        
-        cpu = cpu / d
+
         mem = mem / d
 
         f = open(inputfile, "r")
@@ -99,10 +102,7 @@ cat $TMPDIR/machines
     def vasp(self, cpu=None, mem=None, q=None, band=False, dirpath=None):
         inputfile = self.inputfile
 
-        cpu, q = self.cpu, self.q
-        d = self.divided
-        
-        cpu = cpu / d        
+        cpu, q = self.n_of_cpu, self.q
 
         # -- Band calculation after previous calculation
         if band:
@@ -149,10 +149,7 @@ cat $TMPDIR/machines
 
     def vasp_batch(self, cpu=None, mem=None, q=None, band=False, dirs=None, scratch=False):
 
-        cpu, q = self.cpu, self.q
-        d = self.divided
-
-        cpu = cpu / d
+        cpu, q = self.n_of_cpu, self.q
 
         # -- Band calculation after previous calculation
         jobname = raw_input("Jobname for this job \n: ")
@@ -192,11 +189,7 @@ cat $TMPDIR/machines
         inputfile = self.inputfile
         outputfile = inputfile.replace(".in", ".out")
         
-        cpu, mem, q = self.cpu, self.mem, self.q
-        d = self.divided
-        
-        cpu = cpu / d
-        mem = mem / d
+        cpu, mem, q = self.n_of_cpu, self.mem, self.q
 
         jobname = "Q"+inputfile.replace(".in","")
         jobname = jobname.replace(".","_").replace("-","_")
@@ -244,11 +237,7 @@ qchem %s %s
     def ATK(self, cpu=None, mem=None, q=None):
         inputfile = self.inputfile
 
-        cpu, mem, q = self.cpu, self.mem, self.q
-        d = self.divided
-
-        cpu = cpu / d
-        mem = mem / d
+        cpu, mem, q = self.n_of_cpu, self.mem, self.q
 
         jobname = "A" + inputfile.replace(".py", "")
         jobname = jobname.replace(".", "_").replace("-", "_")
@@ -303,10 +292,7 @@ $MPI_EXEC -n %d %s %s > %s
 
         inputfile = self.inputfile
 
-        cpu, q = self.cpu, self.q
-        d = self.divided
-
-        cpu = cpu / d
+        cpu, q = self.n_of_cpu, self.q
 
         if "/" in inputfile and "p+" in inputfile:
             jobname = "AT_" + inputfile.split("/")[-1]
@@ -348,11 +334,7 @@ rm wait
     def pbs_runner(self, cpu=None, mem=None, q=None):
         inputfile = self.inputfile
 
-        cpu, mem, q = self.cpu, self.mem, self.q
-        d = self.divided
-
-        cpu = cpu / d
-        mem = mem / d
+        cpu, q = self.n_of_cpu, self.q
 
         jobname = inputfile.replace(".py","")
 
@@ -397,10 +379,9 @@ set  MPI_EXEC=$MPI_HOME/bin/mpirun
         inputfile = self.inputfile
         outputfile = inputfile.replace("in.", "out.")
 
-        cpu, q = self.cpu, self.q
+        cpu = self.n_of_cpu
+        q = self.q
         d = self.divided
-
-        cpu = cpu / d
 
         jobname = "L" + inputfile.replace("in.", "")
         jobname = jobname.replace(".", "_").replace("-", "_")
