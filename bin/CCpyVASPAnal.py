@@ -1,1 +1,0 @@
-../VASP/CCpyVASPAnal.py

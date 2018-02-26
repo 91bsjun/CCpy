@@ -1,1 +1,0 @@
-../ATAT/CCpyATATInputGen.py

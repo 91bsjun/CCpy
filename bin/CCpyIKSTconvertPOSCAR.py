@@ -1,1 +1,0 @@
-../IKST/CCpyIKSTconvertPOSCAR.py
