@@ -8,7 +8,8 @@ install_requires = [
 setup(
     name='CCpy',
     version='1.20',
-    packages=['', 'CCpy'],
+    packages=['CCpy/ATAT','CCpy/ATK','CCpy/bin','CCpy/CASM','CCpy/Gaussian',
+              'CCpy/IKST','CCpy/Package','CCpy/Qchem','CCpy/Queue','CCpy/Tools','CCpy/VASP'],
     url='https://github.com/91bsjun/CCpy',
     license='',
     author='Byeongsun Jun',
