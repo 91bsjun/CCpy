@@ -29,4 +29,53 @@ Type "help", "copyright", "credits" or "license" for more information.
 <pre>
 [user@localhost ~]$ pip install numpy pandas matplotlib pymatgen
 </pre>
+## 1.4. Export command path
+<pre>
+[user@localhost ~]$ vi /etc/bashrc
 
+...
+export PATH=/opt/shared/CCpy/CCpy/bin:$PATH
+...
+
+</pre>
+
+## 1.5. TEST
+<pre>
+[user@localhost ~]$ CCpyVASPInputGen.py 
+
+How to use : CCpyVASPInputGen.py [option] [sub_option1] [sub_option2..]
+--------------------------------------
+[options]
+1 : Relaxation calculation  (from initial structure files)
+2 : Band-DOS calculation    (after previous calculation)
+3 : Band-DOS calculation    (from initial structure files)
+4 : Static calculation      (after previous calculation)
+
+[sub_options]
+ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_sv, -pot=LDA_54...
+
+    < INCAR OPTION >
+    -sp      : Single point calculation      (DEFAULT : NSW = 200)
+    -isif=#  : ISIF value                    (DEFAULT : 3)
+    -spin    : Spin polarized calculation    (DEFAULT : unpolarized)
+    -mag     : Add magnetic monet parameters (values from Pymatgen)
+    -ldau    : Add LDA+U parameters          (values from Pymatgen)
+
+    van der Waals corrections                (DEFAULT : do not use)
+    -vdw=D2     : DFT-D2 method of Grimme                   (VASP.5.2.11)
+    -vdw=D3     : zero damping DFT-D3 method of Grimme      (VASP.5.3.4)
+    -vdw=D3damp : DFT-D3 method with Becke-Jonson damping   (VASP.5.3.4)
+    -vdw=dDsC   : dDsC dispersion correction method         (VASP.5.4.1)
+
+    < KPOINTS OPTION >
+    -kp=#,#,#                                (DEFAULT : reciprocal parameter as devided by 20)
+
+    < POTCAR OPTION>
+    -pot=PBE_54 : VASP potential setting     (DEFAULT : PBE_54)
+                  Possible potentials = PBE, PBE_52, PBE_54, LDA, LDA_52, LDA_54, PW91, LDA_US, PW91_US
+    -pseudo=    : Select pseudo potential    (DEFAULT : normal)
+                  ex) -pseudo=Nb_sv,Ti_sv    --> will use 'Nb_sv, Ti_sv' pseudo potential to 'Nb, Ti'
+
+[preset options]
+~/.CCpy/*.json
+</pre>
