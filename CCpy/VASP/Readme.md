@@ -187,5 +187,8 @@ H : 0.333333333333 0.333333333333 0.5
 : \Gamma,K
 </pre>
 
-When finished this process, the code will make <code>KPOINTSP</code> file in current directory.
+When finishels
+d this process, the code will make <code>KPOINTSP</code> file in current directory.
 And it will use this file to other inputs.
+
+\* POTCAR directory path in pymatgen/io/vasp/inputs.py PotcarSingle should be edited.
