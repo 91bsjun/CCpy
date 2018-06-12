@@ -3,16 +3,25 @@ from subprocess import call as shl
 
 
 # -------------------- Config ---------------------#
-queue_path = "/opt/sge/bin/lx24-amd64/"
+"""
+Up to own HPC system
+"""
+#queue_path = "/opt/sge/bin/lx24-amd64/"
+queue_path = "/opt/sge/bin/linux-x64/"
 
 mpi_run = "mpirun"            # default mpirun
 vasp_mpi_run = "mpirun"
-atk_mpi_run = "/opt/intel/mpi-rt/4.0.0/bin/mpirun"
+#atk_mpi_run = "/opt/intel/mpi-rt/4.0.0/bin/mpirun"
+atk_mpi_run = "/opt/intel/compilers_and_libraries_2018.1.163/linux/mpi/intel64/bin/mpirun"
 lammps_mpirun_path = "mpirun"
 
 vasp_path = "vasp"
+#vasp_path="/opt/vasp/vasp5.4.4-beef/bin/vasp_std"
 g09_path = "g09"
-atk_path = "/opt/QuantumWise/VNL-ATK/bin/atkpython"
+#atk_path = "/opt/QuantumWise/VNL-ATK/bin/atkpython"
+#atk_path = "/opt/QuantumWise/VNL-ATK-2016.3/bin/atkpython"
+#atk_path = "/opt/QuantumWise/VNL-ATK-2017.0/bin/atkpython"
+atk_path = "/opt/QuantumWise/VNL-ATK-2017.2/bin/atkpython"
 lammps_path = "lmp_g++"
 
 # -- Queues
@@ -22,8 +31,12 @@ queue_info = {"xeon1":[16, 32, "xeon1.q"],    # node01
               "xeon3":[24, 256, "xeon3.q"],   # node05, node06
               "xeon4":[36, 256, "xeon4.q"],   # node07
               "xeon5":[72, 512, "xeon5.q"],   # node08, node09, node10
+              "xeon6":[48, 512, "xeon6.q"],   # node12
+              "xeon7":[52, 192, "xeon7.q"],   # node13
+              "epyc":[64, 256, "epyc.q"],
               "I5":[4, 16, "I5.q"],
               "aws":[36, 48, "all.q"]}
+
 
 class JobSubmit():
     def __init__(self, inputfile, queue, n_of_cpu):
