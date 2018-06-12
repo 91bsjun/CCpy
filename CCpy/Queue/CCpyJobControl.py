@@ -17,6 +17,7 @@ lammps_mpirun_path = "mpirun"
 
 vasp_path = "vasp"
 #vasp_path="/opt/vasp/vasp5.4.4-beef/bin/vasp_std"
+
 g09_path = "g09"
 #atk_path = "/opt/QuantumWise/VNL-ATK/bin/atkpython"
 #atk_path = "/opt/QuantumWise/VNL-ATK-2016.3/bin/atkpython"
