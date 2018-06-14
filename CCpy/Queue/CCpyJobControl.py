@@ -5,9 +5,10 @@ from subprocess import call as shl
 # -------------------- Config ---------------------#
 """
 Up to own HPC system
+Only SGE queue system allowed
 """
-#queue_path = "/opt/sge/bin/lx24-amd64/"
-queue_path = "/opt/sge/bin/linux-x64/"
+# queue_path = "/opt/sge/bin/lx24-amd64/"
+# queue_path = "/opt/sge/bin/linux-x64/"
 
 mpi_run = "mpirun"            # default mpirun
 vasp_mpi_run = "mpirun"
