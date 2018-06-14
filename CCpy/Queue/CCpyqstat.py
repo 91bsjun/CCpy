@@ -5,7 +5,7 @@ import datetime
 from datetime import timedelta, date
 import getpass
 import pandas as pd
-queue_path = "/opt/sge/bin/lx24-amd64/"
+queue_path = ""
 
 def CCpyqstat(in_user="*",in_status=""):
     """
