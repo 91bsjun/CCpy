@@ -1,4 +1,5 @@
 from distutils.core import setup
+from setuptools import setup, find_packages
 import os
 
 bin_path = "./CCpy/bin/"
@@ -15,8 +16,9 @@ install_requires = [
 setup(
     name='CCpy',
     version='1.21',
-    packages=['CCpy','CCpy/ATAT','CCpy/ATK','CCpy/CASM','CCpy/Gaussian',
-              'CCpy/IKST','CCpy/Package','CCpy/Qchem','CCpy/Queue','CCpy/Tools','CCpy/VASP'],
+    #packages=['CCpy','CCpy/ATAT','CCpy/ATK','CCpy/CASM','CCpy/Gaussian', 'CCpy/Gaussian/myGausssum',
+    #          'CCpy/IKST','CCpy/Package','CCpy/Qchem','CCpy/Queue','CCpy/Tools','CCpy/VASP'],
+    packages=find_packages(),
     url='https://github.com/91bsjun/CCpy',
     license='',
     author='Byeongsun Jun',
