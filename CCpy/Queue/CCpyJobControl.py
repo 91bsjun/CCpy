@@ -1,6 +1,10 @@
 import os, sys
 from subprocess import call as shl
 
+# -- version chk
+version = sys.version
+if version[0] == '3':
+    raw_input = input
 
 # -------------------- Config ---------------------#
 """

@@ -4,6 +4,10 @@ import os, sys
 from CCpy.Tools.CCpyTools import get_ip, linux_command
 import getpass
 
+version = sys.version
+if version[0] == '3':
+    raw_input = input
+
 try:
     chk = sys.argv[1]
 except:
