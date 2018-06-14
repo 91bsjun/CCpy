@@ -4,7 +4,7 @@ import os,sys
 import matplotlib.pyplot as plt
 
 from pymatgen.io.vasp.outputs import Vasprun
-from pymatgen_plotter import DosPlotter
+from CCpy.VASP.pymatgen_plotter import DosPlotter
 
 from CCpy.Tools.CCpyTools import selectVASPBandOutputs
 

@@ -13,8 +13,7 @@ import numpy as np
 from monty.json import jsanitize
 from pymatgen.electronic_structure.core import Spin
 from pymatgen.electronic_structure.bandstructure import BandStructureSymmLine
-from pymatgen.util.plotting_utils import get_publication_quality_plot, \
-    add_fig_kwargs, get_ax3d_fig_plt
+from pymatgen.util.plotting import add_fig_kwargs, get_ax3d_fig_plt
 
 from pymatgen.core.units import Energy
 from pymatgen.electronic_structure.boltztrap import BoltztrapError

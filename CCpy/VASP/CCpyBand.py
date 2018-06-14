@@ -10,10 +10,7 @@ from pymatgen.io.vasp.outputs import BSVasprun
 # from pymatgen.electronic_structure.plotter import BSPlotter
 # from pymatgen.electronic_structure.plotter import BSPlotterProjected
 # from pymatgen.electronic_structure.plotter import DosPlotter
-from pymatgen_plotter import BSPlotter
-from pymatgen_plotter import BSPlotterProjected
-from pymatgen_plotter import DosPlotter
-
+from CCpy.VASP.pymatgen_plotter import BSPlotter, BSPlotterProjected, DosPlotter
 from CCpy.Tools.CCpyTools import selectVASPBandOutputs
 
 import pickle
