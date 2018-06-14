@@ -1,3 +1,8 @@
+from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer as DA
+from pymatgen_diffusion.aimd.van_hove import VanHoveAnalysis
+from pymatgen_diffusion.aimd.pathway import ProbabilityDensityAnalysis
+
+__author__ = "Hoijung Jung"
 
 
 def vanhove_use(DaDa,spe,where_a):
