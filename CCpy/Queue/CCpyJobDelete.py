@@ -21,7 +21,8 @@ if ip == "166.104.249.31":
     quit()
 
 # -- Queue command location
-queue_path = "/opt/sge/bin/lx24-amd64/"
+# queue_path = "/opt/sge/bin/lx24-amd64/"
+queue_path = ""
 
 li = os.popen('CCpyqstat.py').readlines()
 
