@@ -29,14 +29,33 @@ Type "help", "copyright", "credits" or "license" for more information.
 <pre>
 [user@localhost ~]$ pip install numpy pandas matplotlib pymatgen
 </pre>
-## 1.4. Export command path
+
+## 1.4. Set VASP potential path environment (If you use CCpyVASPInputGen.py)
+Functional directories of VASP in pymatgen is set to
 <pre>
-[user@localhost ~]$ vi /etc/bashrc
+    functional_dir = {"PBE": "POT_GGA_PAW_PBE",
+                      "PBE_52": "POT_GGA_PAW_PBE_52",
+                      "PBE_54": "POT_GGA_PAW_PBE_54",
+                      "LDA": "POT_LDA_PAW",
+                      "LDA_52": "POT_LDA_PAW_52",
+                      "LDA_54": "POT_LDA_PAW_54",
+                      "PW91": "POT_GGA_PAW_PW91",
+                      "LDA_US": "POT_LDA_US",
+                      "PW91_US": "POT_GGA_US_PW91"}
+</pre>
+So you have to modify directory names or add symbolic link as mentioned in above.
+<pre>
+[user@localhost VAPS_Potential]$ ls
+POT_GGA_PAW_PBE/     POT_GGA_PAW_PBE_54/  POT_LDA_PAW_52/     
+POT_GGA_PAW_PBE_52/  POT_LDA_PAW/         POT_LDA_PAW_54/  
+</pre>
+Now, add environment to your bashrc
+<pre>
+[user@localhost ~]$ sudo vi /etc/bashrc
 
 ...
-export PATH=/opt/shared/CCpy/CCpy/bin:$PATH
+export VASP_PSP_DIR=/opt/vasp/VASP_Potential
 ...
-
 </pre>
 
 ## 1.5. TEST
