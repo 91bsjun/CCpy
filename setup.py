@@ -4,7 +4,6 @@ import os
 bin_path = "./CCpy/bin/"
 script_files = [bin_path + f for f in os.listdir(bin_path)]
 script_files.sort()
-print(script_files)
 
 install_requires = [
     'matplotlib'
