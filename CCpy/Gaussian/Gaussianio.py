@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from CCpy.Tools.CCpyStructure import NonPeriodicCoordinates as npc
 from CCpy.Tools.CCpyTools import linux_command as lc
-from myGausssum import bsjunGausssum
+from CCpy.Gaussian.myGausssum import bsjunGausssum
 
 from pymatgen.io.gaussian import GaussianOutput as pGO
 

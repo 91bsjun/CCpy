@@ -1,0 +1,40 @@
+p {
+     font-size: 90%;
+         color: #333300;
+   line-height: 160%;
+   font-family: Verdana,Arial,Helvetica,Sans-Serif,MS Sans Serif, sans-serif;
+    text-align: justify;
+
+                       }
+
+a {
+     font-size: 100%;
+   line-height: 160%;
+   font-family: Verdana,Arial,Helvetica,Sans-Serif,MS Sans Serif, sans-serif;
+    text-align: justify
+                       }
+
+.application {
+         color: red;
+}
+
+.year {
+    font-weight: bold;
+}
+
+.journal {
+	font-style: italic;
+}
+
+.volume {
+	text-decoration: underline;
+}
+
+
+h2 {
+     font-size: 110%;
+         color: black;
+   font-family: Georgia, Verdana, sans-serif;
+    text-align: justify;
+line-height:50%;
+                       }          

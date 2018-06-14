@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Chapter 8. How can I automate spectra generation for multiple files? [Advanced]</title><link rel="stylesheet" type="text/css" href="style.css" /><meta name="generator" content="DocBook XSL Stylesheets V1.76.1" /><link rel="home" href="index.html" title="GaussSum Version 3.0" /><link rel="up" href="index.html" title="GaussSum Version 3.0" /><link rel="prev" href="ch07s03.html" title="The electron density difference map (EDDM) [Gaussian only]" /></head><body><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 8. How can I automate spectra generation for multiple files? [Advanced]</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch07s03.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> </td></tr></table><hr /></div><div class="chapter" title="Chapter 8. How can I automate spectra generation for multiple files? [Advanced]"><div class="titlepage"><div><div><h2 class="title"><a id="idp32373680"></a>Chapter 8. How can I automate spectra generation for multiple files? [Advanced]</h2></div></div></div><div class="toc"><p><strong>Table of Contents</strong></p><dl><dt><span class="section"><a href="ch08.html#idp32359776">Generate UV-Vis spectra for multiple files</a></span></dt></dl></div><p>If you have a large number of log files, you may find it slow to use <span class="application">GaussSum</span> to generate spectra for each file one-by-one. In order to speed things up, it is possible to write a Python script to automate this process. The following sections give example Python scripts that you could use. You should try to understand these before adapting them for your own purposes.
+		</p><div class="section" title="Generate UV-Vis spectra for multiple files"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="idp32359776"></a>Generate UV-Vis spectra for multiple files</h2></div></div></div><p>
+            This example script generates a UV-Vis spectrum for each ".out" file in the current directory. Before running, you should set the PYTHONPATH to the directory containing GaussSum.py and make sure that there is no existing GaussSum output folder present.
+            </p><pre class="programlisting">
+import os
+import sys
+import glob
+import logging
+
+from gausssum.electrontrans import ET
+from gausssum.cclib.parser import ccopen
+
+ver = "3.0"
+def gaussdir(filename):
+    return os.path.join(os.path.dirname(filename), "gausssum%s" % ver)
+
+if __name__ == "__main__":
+    start, end = 200, 500
+    numpts, fwhm = 500, 3000
+
+    filenames = glob.glob("*.out")
+    for filename in filenames:
+        log = ccopen(filename)
+        log.logger.setLevel(logging.ERROR)
+        data = log.parse(filename)
+
+        ET(None, sys.stdout, data, filename, start, end, numpts, fwhm, True,
+           False)
+        os.rename(gaussdir(filename), filename.split(".")[0] +"_gs")
+    </pre></div></div><div class="navfooter"><hr /><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch07s03.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> </td></tr><tr><td width="40%" align="left" valign="top">The electron density difference map (EDDM) [Gaussian only] </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div></body></html>
