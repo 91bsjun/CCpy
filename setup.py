@@ -14,5 +14,7 @@ setup(
     license='',
     author='Byeongsun Jun',
     author_email='bjun915@gmail.com',
-    description=''
+    description='',
+    scripts=['CCpy/bin/*']
+
 )
