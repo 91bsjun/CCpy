@@ -52,7 +52,7 @@ def vasp(queue=None, n_of_cpu=None):
         df = pd.read_csv("01_unconverged_jobs.csv")
         inputs = df['Directory'].tolist()
         print(df)
-        print("These jobs will be recalculated by")
+        print("These jobs will be recalculated and backup 3 original outputs")
         print(": CONTCAR -> POSCAR,  POSCAR -> POSCAR_0,  OUTCAR -> OUTCAR_0,  vasp.out -> vasp.out_0")
         proceed = input("Continue ? (y/n) ")
         if proceed != "y":
@@ -73,16 +73,25 @@ def vasp(queue=None, n_of_cpu=None):
                 filenamelen = len(originalfilename) + 1
                 trying = True
                 while trying:
-                    if backupfilename in os.listdir("./"):
+                    if originalfilename not in os.listdir("./"):
+                        trying = False
+                    elif os.path.getsize(originalfilename) == 0:
+                        trying = False
+                    elif backupfilename in os.listdir("./"):
                         backupfilename = backupfilename[:filenamelen] + str(int(backupfilename[filenamelen:]) + 1)
                     else:
                         trying = False
                         lc("mv " + originalfilename + " " + backupfilename)
-            backup("POSCAR") 
             backup("OUTCAR")
             backup("vasp.out")
-            lc("rm vasp.done")
-            lc("mv CONTCAR POSCAR")
+            if "vasp.done" in os.listdir("./"):
+                lc("rm vasp.done")
+            if "CONTCAR" in os.listdir("./"):
+                if os.path.getsize("CONTCAR") != 0:
+                    backup("POSCAR")
+                    lc("mv CONTCAR POSCAR")
+                else:
+                    lc("rm CONTCAR")
             os.chdir(pwd)
             each_input = each_input.split("/")[-1]
             myJS = JS(each_input, queue, n_of_cpu)
@@ -96,24 +105,75 @@ def vasp(queue=None, n_of_cpu=None):
             myJS.vasp(band=band, dirpath=dirpath)
 
 def vasp_batch(queue=None, n_of_cpu=None, scratch=False):
-    dirs = []
     # --- Collect VASP inputs
     band = False
     if "-band" in sys.argv:
         band = True
         inputs = selectVASPInputs("./", ask=ask, band=True)
+    elif "-r" in sys.argv:
+        recalc = True
+        if "01_unconverged_jobs.csv" not in os.listdir("./"):
+            print("01_unconverged_jobs.csv file is not located.")
+            print("Create it using: CCpyVASPAnal.py 0")
+            quit()
+        df = pd.read_csv("01_unconverged_jobs.csv")
+        inputs = df['Directory'].tolist()
+        print(df)
+        print("These jobs will be recalculated and backup 3 original outputs")
+        print(": CONTCAR -> POSCAR,  POSCAR -> POSCAR_0,  OUTCAR -> OUTCAR_0,  vasp.out -> vasp.out_0")
+        proceed = input("Continue ? (y/n) ")
+        if proceed != "y":
+            quit()
     else:
         inputs = selectVASPInputs("./", ask=ask)
 
     # --- SUBMIT QUEUE
+    dirs = []
     pwd = os.getcwd()
-    for each_input in inputs:
-        dirpath = pwd + "/" + each_input
-        if band:
-            dirpath += "/Band-DOS"
-        dirs.append(dirpath)
-    myJS = JS(each_input, queue, n_of_cpu)
-    myJS.vasp_batch(band=band, dirs=dirs, scratch=scratch)
+    if recalc:
+        for each_input in inputs:
+            dirpath = pwd + "/" + each_input.replace("./","")
+            os.chdir(dirpath)
+            def backup(originalfilename):
+                if originalfilename not in os.listdir("./"):
+                    return
+                backupfilename = originalfilename + "_0"
+                filenamelen = len(originalfilename) + 1
+                trying = True
+                while trying:
+                    if originalfilename not in os.listdir("./"):
+                        trying = False
+                    elif os.path.getsize(originalfilename) == 0:
+                        trying = False
+                    elif backupfilename in os.listdir("./"):
+                        backupfilename = backupfilename[:filenamelen] + str(int(backupfilename[filenamelen:]) + 1)
+                    else:
+                        trying = False
+                        lc("mv " + originalfilename + " " + backupfilename)
+            backup("OUTCAR")
+            backup("vasp.out")
+            if "vasp.done" in os.listdir("./"):
+                lc("rm vasp.done")
+            if "CONTCAR" in os.listdir("./"):
+                if os.path.getsize("CONTCAR") != 0:
+                    backup("POSCAR")
+                    lc("mv CONTCAR POSCAR")
+                else:
+                    lc("rm CONTCAR")
+            
+            each_input = each_input.split("/")[-1]
+            os.chdir(pwd)
+            dirs.append(dirpath)
+        myJS = JS(each_input, queue, n_of_cpu)
+        myJS.vasp_batch(band=band, dirs=dirs, scratch=scratch)
+    else:
+        for each_input in inputs:
+            dirpath = pwd + "/" + each_input
+            if band:
+                dirpath += "/Band-DOS"
+            dirs.append(dirpath)
+        myJS = JS(each_input, queue, n_of_cpu)
+        myJS.vasp_batch(band=band, dirs=dirs, scratch=scratch)
 
 
 def qchem(queue=None, n_of_cpu=None):
@@ -249,6 +309,10 @@ if __name__=="__main__":
     -n=[integer]    : the number of CPU to use
                       ex) CCpyJobSubmit.py 2 xeon2 -n=8
                       --> will use 8 CPUs in xeon2
+
+    -r              : re-calculation unconverged VASP jobs
+                      ex) CCpyJobSubmit.py 2 xeon3 -r
+                      --> This command require '01_unconverged_jobs.csv' generated by 'CCpyVASPAnaly.py 0'
 
     -band           : when perform VASP band calculation
                       ex) CCpyJobSubmit.py 2 xeon5 -band
