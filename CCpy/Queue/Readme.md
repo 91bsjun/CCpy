@@ -199,7 +199,7 @@ In the case of small jobs (eg. run-time less than 5 minutes), I suggest that use
 By adding <code> -scratch </code>
 <pre>
 [bsjun@node00 batch]$ CCpyJobSubmit.py 2 xeon2 -batch -scratch
-
+</pre>
 #### Recalculation with unconverged jobs
 Using suboption "-r"
 <pre>
