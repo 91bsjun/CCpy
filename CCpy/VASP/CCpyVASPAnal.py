@@ -9,6 +9,9 @@ try:
 except:
     print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [sub_option1] [sub_option2..]")
     print(""""--------------------------------------
+[suboptions]
+-a : deep in subdirectories
+
 [options]
 d : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
     ex) CCpyVASPAnal.py d
@@ -31,6 +34,10 @@ d : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
           )
     quit()
 
+sub = False
+if "-a" in sys.argv:
+    sub = True
+
 if sys.argv[1] == "d":
     inputfiles = ["INCAR","POSCAR","POTCAR","KPOINTS"]
     inputs = selectVASPOutputs("./")
@@ -52,16 +59,17 @@ if sys.argv[1] == "d":
         os.chdir("../")
 
 if sys.argv[1] == "0":
-    dirs = selectVASPInputs("./", ask=False)
+    dirs = selectVASPOutputs("./", ask=False, sub=sub)
     VO = VASPOutput()
     VO.check_terminated(dirs=dirs)
 
 elif sys.argv[1] == "1":
-    inputs = selectVASPOutputs("./")
+    inputs = selectVASPOutputs("./", sub=sub)
+    pwd = os.getcwd()
     for each_input in inputs:
         os.chdir(each_input)
         VO = VASPOutput()
-        VO.getFinalStructure()
+        VO.getFinalStructure(path=pwd+"/")
         os.chdir("../")
 
 elif sys.argv[1] == "2":
@@ -72,8 +80,9 @@ elif sys.argv[1] == "2":
             show_plot = False
     except:
         show_plot = True
+    dirs = selectVASPOutputs("./", ask=False, sub=sub)
     VO = VASPOutput()
-    VO.get_energy_list(show_plot=show_plot)
+    VO.get_energy_list(show_plot=show_plot, dirs=dirs)
 
 elif sys.argv[1] == "3":
     # -- Check show plot

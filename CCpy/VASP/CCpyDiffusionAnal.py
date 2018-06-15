@@ -1,6 +1,9 @@
 from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer as DA
 from pymatgen_diffusion.aimd.van_hove import VanHoveAnalysis
 from pymatgen_diffusion.aimd.pathway import ProbabilityDensityAnalysis
+import sys, os 
+import matplotlib
+
 
 __author__ = "Hoijung Jung"
 
@@ -34,9 +37,8 @@ vpvp=sys.argv[3]
 
 where_="_"+os.path.split(os.getcwd())[-1]+"_"
 
-
-
 matplotlib.use('Agg')
+
 
 a = DA.from_files(filepaths=["vasprun.xml"], specie=spe, step_skip=10, min_obs=25)
 

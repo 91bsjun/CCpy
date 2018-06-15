@@ -181,7 +181,7 @@ class VASPInput():
         # -- edit magmom parameters
         if mag and not flask_app and not magmom_dict:
             print("\n# ---------- Here are the current MAGMOM values ---------- #")
-            magmom_keys = magmom.keys()
+            magmom_keys = list(magmom.keys())
             magmom_keys.sort()
             for key in magmom_keys:
                 print(str(key).ljust(8) + " = " + str(magmom[key]))
@@ -769,14 +769,15 @@ class VASPOutput():
             plt.show()
 
 
-    def get_energy_list(self, show_plot=True):
-        dirs = [d for d in os.listdir("./") if os.path.isdir(d)]
+    def get_energy_list(self, show_plot=True, dirs=None):
+        # dirs = [d for d in os.listdir("./") if os.path.isdir(d)]
         out_dirs = [d for d in dirs if "OUTCAR" in os.listdir(d)]
         out_dirs.sort()
 
         x = range(len(out_dirs))
         energies = []
         converged = []
+        pwd = os.getcwd()
 
         for o in out_dirs:
             os.chdir(o)
@@ -821,7 +822,7 @@ class VASPOutput():
                 c = "Cannot find queue output file.."
             converged.append(c)
 
-            os.chdir("../")
+            os.chdir(pwd)
 
         energy_list = {}
         energy_list['Directory'] = out_dirs
@@ -833,7 +834,13 @@ class VASPOutput():
         print(df)
         pwd = os.getcwd()
         pwd = pwd.split("/")[-1]
+        csv_filename = pwd+"_FinalEnergies.csv"
+        txt_filename = pwd+"_FinalEnergies.txt"
         df.to_csv(pwd+"_FinalEnergies.csv")
+        f = open(txt_filename, "w")
+        f.write(df.to_string())
+        f.close()
+        print("Energy list files have been saved: " + csv_filename + ", " + txt_filename)
 
         if show_plot:
             fig = plt.figure(figsize=(8, 7))
@@ -846,7 +853,16 @@ class VASPOutput():
     def check_terminated(self, dirs=[]):
         status = []
         converged = []
+        finished = []
+        pwd = os.getcwd()
+        print("\n    Parsing....")
+        cnt = 0
         for d in dirs:
+            msg = "  [  " + str(cnt+1).rjust(6) + " / " + str(len(dirs)).rjust(6) + "  ]"
+            cnt += 1
+            sys.stdout.write(msg)
+            sys.stdout.flush()
+            sys.stdout.write("\b" * len(msg))
             os.chdir(d)
             s = ""
             c = ""
@@ -854,6 +870,10 @@ class VASPOutput():
             if len(os.listdir("./")) == 4 or "OUTCAR" not in os.listdir("./"):
                 s = "Not started"
             else:
+                if "vasp.done" in os.listdir("./"):
+                    d = "Finished" 
+                else:
+                    d = "Not finishied"
                 outcar = os.popen("tail OUTCAR").readlines()
                 # -- empty OUTCAR
                 if len(outcar) == 0:
@@ -886,17 +906,32 @@ class VASPOutput():
                             elif "ZBRENT:  accuracy reached" in vasp_out[-2]:
                                 c = "False"
                             else:
-                                c = "Not finished"
+                                c = "False"
                     else:
                         c = "Cannot find queue output file.."
             status.append(s)
             converged.append(c)
-            os.chdir("../")
+            finished.append(d) 
+            os.chdir(pwd)
 
-        df = pd.DataFrame({"Directory": dirs, "Status": status, "Converged": converged})
-        df = df[['Directory', 'Status', 'Converged']]
+        df = pd.DataFrame({"Directory": dirs, "Finished": finished, "Status": status, "Converged": converged})
+        df = df[['Directory', 'Status', 'Finished', 'Converged']]
+        unconverged_df = df[(df['Converged'] == "False")]
         pd.set_option('display.max_rows', None)
+
+        print("\n* Current Status")
         print(df)
+
+        print("\n* Unconverged jobs : " + str(len(unconverged_df)) + " (01_unconverged_jobs.csv)")
+        print(unconverged_df)
+        unconverged_df.to_csv("01_unconverged_jobs.csv")
+        print("You can recalculate using '01_unconverged_jobs.csv' file.")
+
+        filename = "job_status.txt"
+        f = open("job_status.txt", "w")
+        f.write(df.to_string())
+        
+        
 
         return
 
