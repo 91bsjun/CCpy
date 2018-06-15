@@ -30,18 +30,16 @@ g09_path = "g09"
 atk_path = "/opt/QuantumWise/VNL-ATK-2017.2/bin/atkpython"
 lammps_path = "lmp_g++"
 
-# -- Queues
-#            {"arg":[cpu, mem, queue name]
-queue_info = {"xeon1":[16, 32, "xeon1.q"],    # node01
-              "xeon2":[24, 64, "xeon2.q"],    # node02, node03, node04
-              "xeon3":[24, 256, "xeon3.q"],   # node05, node06
-              "xeon4":[36, 256, "xeon4.q"],   # node07
-              "xeon5":[72, 512, "xeon5.q"],   # node08, node09, node10
-              "xeon6":[48, 512, "xeon6.q"],   # node12
-              "xeon7":[52, 192, "xeon7.q"],   # node13
-              "epyc":[64, 256, "epyc.q"],
-              "I5":[4, 16, "I5.q"],
-              "aws":[36, 48, "all.q"]}
+# -- Queue and nodes settings
+#            {"arg":[cpu, mem, queue name, [hosts,]]
+queue_info = {"xeon1":[16, 32, "xeon1.q",['node01']],
+              "xeon2":[24, 64, "xeon2.q",['node02','node03','node04']],
+              "xeon3":[24, 256, "xeon3.q",['node05', 'node06']],
+              "xeon4":[36, 256, "xeon4.q",['node07']],
+              "xeon5":[72, 512, "xeon5.q",['node08','node09','node10']],
+              "xeon6":[48, 512, "xeon6.q",['node12']],
+              "xeon7":[52, 192, "xeon7.q",['node13']],
+              "epyc":[64, 256, "epyc.q",['node11']]}
 
 
 class JobSubmit():

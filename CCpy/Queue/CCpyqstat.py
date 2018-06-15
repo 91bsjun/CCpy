@@ -5,12 +5,16 @@ import datetime
 from datetime import timedelta, date
 import getpass
 import pandas as pd
-queue_path = ""
+from CCpy.Queue import CCpyJobControl
 
-def CCpyqstat(in_user="*",in_status=""):
+queue_path = ""
+queue_info = CCpyJobControl.queue_info
+
+def CCpyqstat(in_user="*", in_status="", node_check=False):
     """
     Modules to show SGE qstat more effectively
     """
+
     q = queue_path + "qstat -r -u '%s' %s" % (in_user, in_status)
     qstat = os.popen(q).read()
 
@@ -66,7 +70,81 @@ def CCpyqstat(in_user="*",in_status=""):
     df = pd.DataFrame(ps)
     df = df[['ID', 'JOBNAME', 'USER', '   STATUS', 'START-TIME', 'RUN-TIME', 'QUEUE-NODE', 'SLOTS']]
     pd.set_option('display.max_rows', None)
+    print(bcolors.OKBLUE + "# --- Queue status --- #" + bcolors.ENDC)
     print(df)
+
+     
+    # ------------------ Nodes checking ----------------- #
+    if node_check:
+        get_empty_nodes(df)
+        get_waiting_nodes(df)
+
+    
+def get_empty_nodes(df):
+    # ------------------ Nodes checking ----------------- #
+    for i in range(len(df)):
+        running_df = df[(df['   STATUS'] == 'r')]
+        
+    # -- make all nodes and slots info
+    keys = queue_info.keys()
+    queue_nodes = {'QUEUE-NODE':[], 'SLOTS':[]}
+    for k in keys:
+        for n in queue_info[k][3]:
+            queue_nodes['QUEUE-NODE'].append(queue_info[k][2] + "@" + n)
+            queue_nodes['SLOTS'].append(queue_info[k][0])
+    # -- make running nodes and slots info
+    runnings = {}
+    for i in range(len(running_df)):
+        if running_df['QUEUE-NODE'][i] in runnings.keys():
+            runnings[running_df['QUEUE-NODE'][i]]+= int(running_df['SLOTS'][i])
+        else:
+            runnings[running_df['QUEUE-NODE'][i]] = int(running_df['SLOTS'][i])
+    running_nodes = {'QUEUE-NODE':[], 'RUN-SLOTS':[]}
+    for key in runnings.keys():
+        running_nodes['QUEUE-NODE'].append(key)
+        running_nodes['RUN-SLOTS'].append(runnings[key])
+    # -- make pd.DataFrame for empty slots
+    all_nodes_df = pd.DataFrame(queue_nodes).set_index('QUEUE-NODE')
+    running_nodes_df = pd.DataFrame(running_nodes).set_index('QUEUE-NODE')
+    concat_df = pd.concat([all_nodes_df, running_nodes_df], axis=1, sort=True)
+    concat_df = concat_df.fillna(0)
+    concat_df['EMPTY-SLOTS'] = concat_df['SLOTS'] - concat_df['RUN-SLOTS']
+    empty_df = concat_df[(concat_df['EMPTY-SLOTS'] != 0)]
+    #empty_df[['SLOTS', 'RUN-SLOTS', 'EMPTY-SLOTS']] = empty_df[['SLOTS', 'RUN-SLOTS', 'EMPTY-SLOTS']].astype(int)
+    
+    print(bcolors.OKBLUE + "# ---- Empty Nodes ----- #" + bcolors.ENDC)
+    print(empty_df[['SLOTS', 'RUN-SLOTS', 'EMPTY-SLOTS']].astype(int))
+
+def get_waiting_nodes(df):
+    # -- make wating nodes and counting
+    waiting_df = df[(df['   STATUS'] == 'qw')].reset_index()
+    if len(waiting_df) == 0:
+        quit()
+    waitings = {}
+    for i in range(len(waiting_df)):
+        if waiting_df['QUEUE-NODE'][i] in waitings.keys():
+            waitings[waiting_df['QUEUE-NODE'][i]] += 1
+        else:
+            waitings[waiting_df['QUEUE-NODE'][i]] = 1
+    waiting_nodes = {'QUEUE':[], 'WAITING JOBS':[]}
+    for key in waitings.keys():
+        waiting_nodes['QUEUE'].append(key)
+        waiting_nodes['WAITING JOBS'].append(waitings[key])
+    waiting_nodes_df = pd.DataFrame(waiting_nodes)
+    print(bcolors.OKBLUE + "# ---- Pending Jobs ---- #" + bcolors.ENDC)
+    print(waiting_nodes_df)
+
+        
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 
 if __name__=="__main__":
     username = "*"
@@ -92,4 +170,8 @@ if __name__=="__main__":
                   )
             quit()
 
-    CCpyqstat(username,status)
+    if username == "*":
+        CCpyqstat(username, status, node_check=True)
+    else:
+        CCpyqstat(username, status)
+
