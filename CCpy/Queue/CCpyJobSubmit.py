@@ -5,6 +5,8 @@
 import os, sys
 from subprocess import call as shl
 
+import pandas as pd
+
 from CCpy.Queue.CCpyJobControl import JobSubmit as JS
 from CCpy.Tools.CCpyTools import selectInputs, selectVASPInputs
 from CCpy.Tools.CCpyTools import linux_command as lc
@@ -37,20 +39,61 @@ def gaussian(queue=None, n_of_cpu=None):
 def vasp(queue=None, n_of_cpu=None):
     # --- Collect VASP inputs
     band = False
+    recalc = False
     if "-band" in sys.argv:
         band = True
         inputs = selectVASPInputs("./", ask=ask, band=True)
+    elif "-r" in sys.argv:
+        recalc = True
+        if "01_unconverged_jobs.csv" not in os.listdir("./"):
+            print("01_unconverged_jobs.csv file is not located.")
+            print("Create it using: CCpyVASPAnal.py 0")
+            quit()
+        df = pd.read_csv("01_unconverged_jobs.csv")
+        inputs = df['Directory'].tolist()
+        print(df)
+        print("These jobs will be recalculated by")
+        print(": CONTCAR -> POSCAR,  POSCAR -> POSCAR_0,  OUTCAR -> OUTCAR_0,  vasp.out -> vasp.out_0")
+        proceed = input("Continue ? (y/n) ")
+        if proceed != "y":
+            quit()
     else:
         inputs = selectVASPInputs("./", ask=ask)
 
     # --- SUBMIT QUEUE
     pwd = os.getcwd()
-    for each_input in inputs:
-        dirpath = pwd + "/" + each_input
-        if band:
-            dirpath += "/Band-DOS"
-        myJS = JS(each_input, queue, n_of_cpu)
-        myJS.vasp(band=band, dirpath=dirpath)
+    if recalc:
+        for each_input in inputs:
+            dirpath = pwd + "/" + each_input.replace("./","")
+            os.chdir(dirpath)
+            def backup(originalfilename):
+                if originalfilename not in os.listdir("./"):
+                    return
+                backupfilename = originalfilename + "_0"
+                filenamelen = len(originalfilename) + 1
+                trying = True
+                while trying:
+                    if backupfilename in os.listdir("./"):
+                        backupfilename = backupfilename[:filenamelen] + str(int(backupfilename[filenamelen:]) + 1)
+                    else:
+                        trying = False
+                        lc("mv " + originalfilename + " " + backupfilename)
+            backup("POSCAR") 
+            backup("OUTCAR")
+            backup("vasp.out")
+            lc("rm vasp.done")
+            lc("mv CONTCAR POSCAR")
+            os.chdir(pwd)
+            each_input = each_input.split("/")[-1]
+            myJS = JS(each_input, queue, n_of_cpu)
+            myJS.vasp(band=band, dirpath=dirpath)
+    else:
+        for each_input in inputs:
+            dirpath = pwd + "/" + each_input
+            if band:
+                dirpath += "/Band-DOS"
+            myJS = JS(each_input, queue, n_of_cpu)
+            myJS.vasp(band=band, dirpath=dirpath)
 
 def vasp_batch(queue=None, n_of_cpu=None, scratch=False):
     dirs = []
