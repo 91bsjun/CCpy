@@ -208,8 +208,8 @@ Using suboption "-r"
 This command do recalculation of unconverged VASP jobs using "01_unconverged_jobs.csv".
 ("01_unconverged_jobs.csv" can be obtained by <code>CCpyVASPAnal.py 0</code>)
 
-And it will back up <code>POSCAR, OUTCAR, vasp.out</code> to <code>POSCAR_0, OUTCAR_0, vasp.out_0</code>
-_1 will be generated if _0 already exists.
+And it will back up <code>POSCAR, OUTCAR, vasp.out</code> to <code>POSCAR_0, OUTCAR_0, vasp.out_0</code><br>
+Index _0 will be replaced by _1, if _0 already exists.
 
 
 ### 2.3.3. ATK
