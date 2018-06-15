@@ -4,7 +4,7 @@ import os, sys
 from CCpy.VASP.VASPio import VASPOutput
 from CCpy.Tools.CCpyTools import selectVASPInputs, selectVASPOutputs, selectInputs, linux_command
 
-ersion = sys.version
+version = sys.version
 if version[0] == '3':
     raw_input = input
 
