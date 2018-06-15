@@ -1,4 +1,5 @@
 import os, sys
+import glob
 import json
 import numpy as np
 import pandas as pd
@@ -325,15 +326,31 @@ def selectVASPInputs(directory_path, ask=True, static=False, band=False):
 
     return inputs
 
-def selectVASPOutputs(directory_path, ask=True):
-    all_dirs = [each_dir for each_dir in os.listdir(directory_path) if os.path.isdir(each_dir)]
+def selectVASPOutputs(directory_path, ask=True, sub=False):
+    if sub:
+        def get_valid_paths(path):
+            (parent, subdirs, files) = path
+            if "Band-DOS" in subdirs:
+                return [parent]
+            if (not parent.endswith("/Band-DOS")) and (
+               len(glob.glob(os.path.join(parent, "vasprun.xml*"))) > 0 or (
+               len(glob.glob(os.path.join(parent, "POSCAR*"))) > 0 and
+               len(glob.glob(os.path.join(parent, "OSZICAR*"))) > 0)
+           ):
+                return [parent]
+            return []
+        all_dirs = []
+        for (parent, subdirs, files) in os.walk(directory_path):
+            all_dirs.extend(get_valid_paths((parent, subdirs,files)))
+
+    else:
+        all_dirs = [each_dir for each_dir in os.listdir(directory_path) if os.path.isdir(each_dir)] 
     all_dirs.sort()
     all_inputs = []
     for each_dir in all_dirs:
         files = os.listdir(each_dir)
         if "CONTCAR" in files or "OUTCAR" in files:
             all_inputs.append(each_dir)
-    
     if ask == True:
         print("0 : All files")
         for i in range(len(all_inputs)):

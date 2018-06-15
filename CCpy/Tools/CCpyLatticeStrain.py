@@ -1,10 +1,10 @@
 #!/usr/local/bin/python2.7
-import sys
+import sys,os
 from CCpy.Tools.CCpyTools import lattice_strain
 from CCpy.Tools.CCpyTools import selectInputs
 
 def main_run(filename=None):
-    sa, sb, sc, saa, sbb, scc = False, False, False, False, False, False
+    sa, sb, sc, saa, sbb, scc, cleaning = False, False, False, False, False, False, False
     for arg in sys.argv:
         if "a=" in arg and "gamma" not in arg:
             parse = arg.replace("a=","").replace(" ","")
@@ -30,9 +30,12 @@ def main_run(filename=None):
             parse = arg.replace("gamma=","").replace(" ","")
             parse = parse.split(",")
             scc = [float(parse[0]),float(parse[1]),float(parse[2])]
-
+        if "NN" in arg:
+            print("you select NN type")
+            cleaning = True
     lattice_strain(filename, sa=sa, sb=sb, sc=sc, saa=saa, sbb=sbb, scc=scc)
-
+    if cleaning:
+        os.system("NNDB.py")
 
 if __name__=="__main__":
     try:
