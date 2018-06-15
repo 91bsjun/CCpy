@@ -192,3 +192,69 @@ d this process, the code will make <code>KPOINTSP</code> file in current directo
 And it will use this file to other inputs.
 
 \* POTCAR directory path in pymatgen/io/vasp/inputs.py PotcarSingle should be edited.
+
+
+## 2.2. VASP Output Analysis
+<pre>
+[bsjun@cms PD]$ CCpyVASPAnal.py 
+
+How to use : CCpyVASPAnal.py [option] [sub_option1] [sub_option2..]
+"--------------------------------------
+[suboptions]
+-a : deep in subdirectories
+
+[options]
+d : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
+    ex) CCpyVASPAnal.py d
+
+0 : Check vasp job status.
+    ex) CCpyVASPAnal.py 0
+
+1 : Get final structures
+    ex) CCpyVASPAnal.py 1
+
+2 : Get final total energy list
+    ex) CCpyVASPAnal.py 2 n  : sub option n -> do not show plot
+
+3 : Energy & Cell volume convergence plot
+    ex) CCpyVASPAnal.py 3 n  : sub option n -> do not show plot
+
+4 : Generate cif file from POSCAR or CONTCAR
+    ex) CCpyVASPAnal.py 4
+</pre>
+Using suboption "-a"
+This command finds VASP jobs in all subdirectories.
+
+<pre>
+[bsjun@cms PD]$ CCpyVASPAnaly.py 2 n -a
+                         Directory  Total energy(eV)     Converged
+0         ./Li-P-S-Cl_cifs/Cl16_41        -28.834834          True
+1          ./Li-P-S-Cl_cifs/Cl4_39         -7.554547          True
+2          ./Li-P-S-Cl_cifs/Cl4_40         -7.350384          True
+3      ./Li-P-S-Cl_cifs/Li12P28_48       -188.843065          True
+4    ./Li-P-S-Cl_cifs/Li12P4S16_72       -140.544282          True
+5    ./Li-P-S-Cl_cifs/Li14P6S22_75       -185.313499          True
+6       ./Li-P-S-Cl_cifs/Li1Cl1_55         -7.375080          True
+7        ./Li-P-S-Cl_cifs/Li1S1_49         -7.227583          True
+8           ./Li-P-S-Cl_cifs/Li1_0         -1.804638          True
+9           ./Li-P-S-Cl_cifs/Li1_3         -1.625441          True
+10     ./Li-P-S-Cl_cifs/Li22S11_53       -133.024045          True
+11       ./Li-P-S-Cl_cifs/Li2P6_42        -32.814159          True
+12       ./Li-P-S-Cl_cifs/Li2S1_50        -11.961720          True
+13       ./Li-P-S-Cl_cifs/Li2S8_54        -39.150338          True
+14          ./Li-P-S-Cl_cifs/Li2_1         -3.735059          True
+15          ./Li-P-S-Cl_cifs/Li3_6         -5.840614          True
+</pre> <br>
+
+<pre>
+[bsjun@cms PD]$ CCpyVASPAnal.py 1 -a
+0 : All files
+1 : ./Li-P-S-Cl_cifs/Cl16_41
+2 : ./Li-P-S-Cl_cifs/Cl4_39
+3 : ./Li-P-S-Cl_cifs/Cl4_40
+4 : ./Li-P-S-Cl_cifs/Li12P28_48
+5 : ./Li-P-S-Cl_cifs/Li12P4S16_72
+6 : ./Li-P-S-Cl_cifs/Li14P6S22_75
+7 : ./Li-P-S-Cl_cifs/Li1Cl1_55
+Choose file :
+</pre>
