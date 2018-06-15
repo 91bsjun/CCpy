@@ -200,4 +200,16 @@ By adding <code> -scratch </code>
 <pre>
 [bsjun@node00 batch]$ CCpyJobSubmit.py 2 xeon2 -batch -scratch
 
+#### Recalculation with unconverged jobs
+Using suboption "-r"
+<pre>
+[bsjun@node00 batch]$ CCpyJobsubit.py 2 xeon3 -r
+</pre>
+This command do recalculation of unconverged VASP jobs using "01_unconverged_jobs.csv".
+("01_unconverged_jobs.csv" can be obtained by <code>CCpyVASPAnal.py 0</code>)
+
+And it will back up <code>POSCAR, OUTCAR, vasp.out</code> to <code>POSCAR_0, OUTCAR_0, vasp.out_0</code>
+_1 will be generated if _0 already exists.
+
+
 ### 2.3.3. ATK
