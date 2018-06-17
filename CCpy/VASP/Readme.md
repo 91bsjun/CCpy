@@ -321,6 +321,7 @@ Current directory: ./0.3/MoS2.H_FO       [       3 /      6  ]
 </pre>
 
 ##### <code> CCpyVASPAnal.py -zip -bg </code> option will excute loop every 30 minutes to find unverged VASP jobs and zip them.
+This option may be useful when you do many number of calculations.
 <pre>
 [bsjun@cms Li-P-S-Cl_cifs]$ CCpyVASPAnal.py -zip -bg
 Start loop..
@@ -347,11 +348,4 @@ loop 1
 Current directory: ./Li12P28_48    [     3/     3]
 Done.
 Rest 30 minutes..
-</pre>
-
-<pre>
-
-</pre>
-<pre>
-
 </pre>
