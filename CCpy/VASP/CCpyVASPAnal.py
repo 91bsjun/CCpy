@@ -153,9 +153,13 @@ elif sys.argv[1] == "-zip":
             linux_command("CCpyVASPAnal.py 0")
         df = pd.read_csv(".00_job_status.csv")
         df = df[(df['Converged'] == True)]
+        df = df[(df['Zipped'] == False)]
         dirs = df['Directory'].tolist()
-        print("\n\n# ----------- Zipping -------------- #")
-        VO.vasp_zip(dirs)
+        if len(dirs) == 0:
+            print("Cannot find unzipped VASP job.")
+        else:
+            print("\n\n# ----------- Zipping -------------- #")
+            VO.vasp_zip(dirs)
     else:
         dirs = selectVASPOutputs("./", sub=sub)
         print("\n\n# ----------- Zipping -------------- #")
