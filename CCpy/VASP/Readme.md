@@ -255,10 +255,10 @@ This command finds VASP jobs in all subdirectories.
 Choose file :
 </pre>
 
-#### Option 'd' <code> CCpyVASPAnal.py d </code>
+#### 2.2.1 Option 'd' <code> CCpyVASPAnal.py d </code>
 Delete output files except of POSCAR, INCAR, POTCAR, KPOINTS.
 
-#### Option '0'<code> CCpyVASPAnal.py 0 </code>
+#### 2.2.2 Option '0'<code> CCpyVASPAnal.py 0 </code>
 Monitoring job status.<br>
 This command may not be able to find unhandled error messages.
 <pre>
@@ -281,7 +281,12 @@ You can recalculate using '01_unconverged_jobs.csv' file.
 * Detail information saved in: 00_jobs_status.txt
 </pre>
 
-#### Option '-zip' <code> CCpyVASPAnal.py -zip </code>
+#### 2.2.3
+#### 2.2.4
+#### 2.2.5
+#### 2.2.6
+
+#### 2.2.7 Option '-zip' <code> CCpyVASPAnal.py -zip </code>
 Zip unnecessary VASP output files. (-sub option also can be used) <br>
 - Remove CHG.
 - Zip CHGCAR, DOSCAR, PROCAR and XDATCAR
