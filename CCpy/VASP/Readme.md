@@ -201,7 +201,7 @@ And it will use this file to other inputs.
 How to use : CCpyVASPAnal.py [option] [sub_option1] [sub_option2..]
 "--------------------------------------
 [suboptions]
--a : deep in subdirectories
+-sub : deep in subdirectories
 
 [options]
 d : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
@@ -221,40 +221,121 @@ d : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
 
 4 : Generate cif file from POSCAR or CONTCAR
     ex) CCpyVASPAnal.py 4
+
+-zip : zip unnecessary files (remove CHG, zip CHGCAR DOSCAR PROCAR XDATCAR)
+    ex) CCpyVASPAnal.py -zip      -> user choose directories
+    ex) CCpyVASPAnal.py -zip -sub -> user choose directories (include subdirectories)
+    ex) CCpyVASPAnal.py -zip -auto        -> automatically detect converged jobs
+    ex) CCpyVASPAnal.py -zip -auto -sub   ->               (include subdirectories)
+    ex) CCpyVASPAnal.py -zip -bg          -> detect and zip converged jobs every 30 minutes
+    ex) CCpyVASPAnal.py -zip -bg -sub     ->               (include sub directories)
 </pre>
-Using suboption "-a"
+Using suboption <code>-sub</code>
 This command finds VASP jobs in all subdirectories.
 
 <pre>
-[bsjun@cms PD]$ CCpyVASPAnaly.py 2 n -a
+[bsjun@cms PD]$ CCpyVASPAnaly.py 2 n -sub
                          Directory  Total energy(eV)     Converged
 0         ./Li-P-S-Cl_cifs/Cl16_41        -28.834834          True
 1          ./Li-P-S-Cl_cifs/Cl4_39         -7.554547          True
 2          ./Li-P-S-Cl_cifs/Cl4_40         -7.350384          True
 3      ./Li-P-S-Cl_cifs/Li12P28_48       -188.843065          True
-4    ./Li-P-S-Cl_cifs/Li12P4S16_72       -140.544282          True
-5    ./Li-P-S-Cl_cifs/Li14P6S22_75       -185.313499          True
-6       ./Li-P-S-Cl_cifs/Li1Cl1_55         -7.375080          True
-7        ./Li-P-S-Cl_cifs/Li1S1_49         -7.227583          True
-8           ./Li-P-S-Cl_cifs/Li1_0         -1.804638          True
-9           ./Li-P-S-Cl_cifs/Li1_3         -1.625441          True
-10     ./Li-P-S-Cl_cifs/Li22S11_53       -133.024045          True
-11       ./Li-P-S-Cl_cifs/Li2P6_42        -32.814159          True
-12       ./Li-P-S-Cl_cifs/Li2S1_50        -11.961720          True
-13       ./Li-P-S-Cl_cifs/Li2S8_54        -39.150338          True
-14          ./Li-P-S-Cl_cifs/Li2_1         -3.735059          True
-15          ./Li-P-S-Cl_cifs/Li3_6         -5.840614          True
+4                   ./Li12P4S16_72       -140.544282          True
+5                           ./FeO3       -185.313499          True
+
 </pre> <br>
 
 <pre>
-[bsjun@cms PD]$ CCpyVASPAnal.py 1 -a
-0 : All files
+[bsjun@cms PD]$ CCpyVASPAnal.py 1 -sub
 1 : ./Li-P-S-Cl_cifs/Cl16_41
 2 : ./Li-P-S-Cl_cifs/Cl4_39
 3 : ./Li-P-S-Cl_cifs/Cl4_40
 4 : ./Li-P-S-Cl_cifs/Li12P28_48
-5 : ./Li-P-S-Cl_cifs/Li12P4S16_72
-6 : ./Li-P-S-Cl_cifs/Li14P6S22_75
-7 : ./Li-P-S-Cl_cifs/Li1Cl1_55
+0 : All files
 Choose file :
+</pre>
+
+#### Option 'd' <code> CCpyVASPAnal.py d </code>
+Delete output files except of POSCAR, INCAR, POTCAR, KPOINTS.
+
+#### Option '0'<code> CCpyVASPAnal.py 0 </code>
+Monitoring job status.<br>
+This command may not be able to find unhandled error messages.
+<pre>
+[bsjun@node00 Rb-Cu-I-Cl]$ CCpyVASPAnal.py 0
+
+    Parsing VASP jobs....
+  [      68 /     68  ]
+
+* Current status :
+   Total      End of calculation  Converged  Unconverged  Zipped
+0     68                      68         65            3      65
+
+* Unconverged jobs : 3 (01_unconverged_jobs.csv)
+    Directory             Status     End of calculation Converged Zipped
+3  Cu13I15_39  Error termination                   True     False  False
+4  Cu14I19_35  Error termination                   True     False  False
+5  Cu16I19_34  Error termination                   True     False  False
+You can recalculate using '01_unconverged_jobs.csv' file.
+
+* Detail information saved in: 00_jobs_status.txt
+</pre>
+
+#### Option '-zip' <code> CCpyVASPAnal.py -zip </code>
+Zip unnecessary VASP output files. (-sub option also can be used) <br>
+- Remove CHG.
+- Zip CHGCAR, DOSCAR, PROCAR and XDATCAR
+
+##### User can choose directory to zip by <code> CCpyVASPAnal.py -zip </code>
+<pre>
+[bsjun@cms Li-P-S-Cl_cifs]$ CCpyVASPAnal.py -zip
+1 : Cl16_41
+2 : Cl4_39
+3 : Cl4_40
+4 : Li12P28_48
+5 : Li12P4S16_72
+6 : Li14P6S22_75
+7 : Li1Cl1_55
+0 : All files
+Choose file :
+</pre>
+##### <code> CCpyVASPAnal.py -zip -auto </code> option will automatically find VASP output directory and zip converged jobs.
+<pre>
+[bsjun@cms Li-P-S-Cl_cifs]$ CCpyVASPAnal.py -zip -auto
+</pre>
+
+##### <code> CCpyVASPAnal.py -zip -bg </code> option will excute loop every 30 minutes to find unverged VASP jobs and zip them.
+<pre>
+[bsjun@cms Li-P-S-Cl_cifs]$ CCpyVASPAnal.py -zip -bg
+Start loop..
+
+loop 1
+
+
+# ----------- Parsing -------------- #
+
+    Parsing VASP jobs....
+  [      78 /     78  ]
+
+* Current status :
+   Total      End of calculation  Converged  Unconverged  Zipped
+0     78                      75         75            3      72
+
+* Unconverged jobs : 0 (01_unconverged_jobs.csv)
+
+* Detail information saved in: 00_jobs_status.txt
+
+
+# ----------- Zipping -------------- #
+
+Current directory: ./Li12P28_48    [     3/     3]
+Done.
+Rest 30 minutes..
+</pre>
+
+<pre>
+
+</pre>
+<pre>
+
 </pre>
