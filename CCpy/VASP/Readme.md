@@ -301,7 +301,23 @@ Choose file :
 </pre>
 ##### <code> CCpyVASPAnal.py -zip -auto </code> option will automatically find VASP output directory and zip converged jobs.
 <pre>
-[bsjun@cms Li-P-S-Cl_cifs]$ CCpyVASPAnal.py -zip -auto
+[bsjun@cms 06_mechanism]$ CCpyVASPAnal.py -zip -auto -sub
+# ----------- Parsing -------------- #
+
+    Parsing VASP jobs....
+  [       6 /      6  ]
+
+* Current status :
+   Total      End of calculation  Converged  Unconverged  Zipped
+0      6                       6          6            0       0
+
+* Unconverged jobs : 0 (01_unconverged_jobs.csv)
+
+* Detail information saved in: 00_jobs_status.txt
+
+
+# ----------- Zipping -------------- #
+Current directory: ./0.3/MoS2.H_FO       [       3 /      6  ]
 </pre>
 
 ##### <code> CCpyVASPAnal.py -zip -bg </code> option will excute loop every 30 minutes to find unverged VASP jobs and zip them.
