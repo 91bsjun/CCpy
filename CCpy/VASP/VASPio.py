@@ -1,4 +1,5 @@
 import os, sys, re
+import time
 import matplotlib.pyplot as plt
 import pandas as pd
 import json
@@ -854,8 +855,9 @@ class VASPOutput():
         status = []
         converged = []
         finished = []
+        zipped = []
         pwd = os.getcwd()
-        print("\n    Parsing....")
+        print("\n    Parsing VASP jobs....")
         cnt = 0
         for d in dirs:
             msg = "  [  " + str(cnt+1).rjust(6) + " / " + str(len(dirs)).rjust(6) + "  ]"
@@ -871,17 +873,24 @@ class VASPOutput():
                 s = "Not started"
             else:
                 if "vasp.done" in os.listdir("./"):
-                    d = "Finished" 
+                    d = "True" 
                 else:
-                    d = "Not finishied"
-                outcar = os.popen("tail OUTCAR").readlines()
-                # -- empty OUTCAR
+                    d = " "
+                # -- zipped or not
+                if "data.tar.gz" in os.listdir("./"):
+                    z = "True"
+                else:
+                    z = "False"
+                # -- OUTCAR
+                outcar = os.popen("tail OUTCAR").read()
                 if len(outcar) == 0:
                     s = "Not calculated"
                 else:
                     # -- properly terminated
-                    if "User time (sec):" in outcar[0]:
+                    if "User time (sec):" in outcar:
                         s = "Properly terminated"
+                    elif "Error EDDDAV" in outcar:
+                        s = "Error termination"
                     else:
                         s = "Not properly terminated"
 
@@ -895,15 +904,15 @@ class VASPOutput():
                                 vasp_out = filename
                     # -- parsing queue output
                     if vasp_out:
-                        vasp_out = os.popen("tail " + vasp_out).readlines()
+                        vasp_out = os.popen("tail " + vasp_out).read()
                         if len(vasp_out) < 2:
                             c = "Something wrong in queue output file.."
                         else:
-                            if "please rerun with smaller EDIFF" in vasp_out[-2]:
+                            if "please rerun with smaller EDIFF" in vasp_out:
                                 c = "False"
-                            elif "reached required accuracy" in vasp_out[-1]:
+                            elif "reached required accuracy" in vasp_out:
                                 c = "True"
-                            elif "ZBRENT:  accuracy reached" in vasp_out[-2]:
+                            elif "ZBRENT:  accuracy reached" in vasp_out:
                                 c = "False"
                             else:
                                 c = "False"
@@ -912,30 +921,70 @@ class VASPOutput():
             status.append(s)
             converged.append(c)
             finished.append(d) 
+            zipped.append(z)
             os.chdir(pwd)
 
-        df = pd.DataFrame({"Directory": dirs, "Finished": finished, "Status": status, "Converged": converged})
-        df = df[['Directory', 'Status', 'Finished', 'Converged']]
-        unconverged_df = df[(df['Converged'] == "False")]
+        df = pd.DataFrame({"Directory": dirs, "    End of calculation": finished, "Status": status, "Converged": converged, "Zipped": zipped})
+        df = df[['Directory', 'Status', '    End of calculation', 'Converged', 'Zipped']]
         pd.set_option('display.max_rows', None)
 
-        print("\n* Current Status")
-        print(df)
 
-        print("\n* Unconverged jobs : " + str(len(unconverged_df)) + " (01_unconverged_jobs.csv)")
-        print(unconverged_df)
-        unconverged_df.to_csv("01_unconverged_jobs.csv")
-        print("You can recalculate using '01_unconverged_jobs.csv' file.")
+        # -- Show job infos
+        total = len(df)
+        done = len(df[(df['    End of calculation'] == "True")])
+        cvg_df = df[(df['Converged'] == "True")]
+        converged = len(cvg_df[(cvg_df['Status'] == "Properly terminated")])
+        not_cvg_df = df[(df['Converged'] == "False")]
+        not_cvg_df = not_cvg_df[(not_cvg_df['    End of calculation'] == "True")]
+        not_converged = len(not_cvg_df)
+        zipped = len(df[(df['Zipped'] == "True")])
 
-        filename = "job_status.txt"
-        f = open("job_status.txt", "w")
+        counts = {'Total':[total], '    End of calculation':[done], 'Zipped':[zipped], 'Converged':[converged], 'Unconverged':[not_converged]}
+
+        count_df = pd.DataFrame(counts)
+        count_df = count_df[['Total', '    End of calculation', 'Converged', 'Unconverged', 'Zipped']]
+        print("\n\n* Current status :")
+        print(count_df)
+
+        df.to_csv(".00_job_status.csv")
+        filename = "00_job_status.txt"
+        f = open("00_job_status.txt", "w")
         f.write(df.to_string())
+        print("\n* Unconverged jobs : " + str(len(not_cvg_df)) + " (01_unconverged_jobs.csv)")
+
+        if len(not_cvg_df) != 0:
+            print(not_cvg_df)
+            not_cvg_df.to_csv("01_unconverged_jobs.csv")
+            print("You can recalculate using '01_unconverged_jobs.csv' file.")
+        print("\n* Detail information saved in: 00_jobs_status.txt")
+
         
         
 
-        return
 
 
+    def vasp_zip(self, dirs):
+        cnt = 0
+        pwd = os.getcwd()
+        minimum_length = 8
+        for d in dirs:
+            if len(d) > minimum_length:
+                minimum_length = len(d)
+        for d in dirs:
+            os.chdir(d)
+            msg = "  [  " + str(cnt+1).rjust(6) + " / " + str(len(dirs)).rjust(6) + "  ]"
+            msg = "Current directory: " + d.ljust(minimum_length) + msg
+            sys.stdout.write(msg)
+            sys.stdout.flush()
+            sys.stdout.write("\b" * len(msg))
+            if "data.tar.gz" not in os.listdir("./"):
+                linux_command("rm CHG;tar -zcf data.tar.gz CHGCAR DOSCAR PROCAR XDATCAR")
+                linux_command("rm CHGCAR DOSCAR PROCAR XDATCAR")
+            else:
+                print("\nSkip: " + str(d) + "(zipped file already eixst)")
+            cnt+=1
+            os.chdir(pwd)
+        print("\nDone.")
 
 
 

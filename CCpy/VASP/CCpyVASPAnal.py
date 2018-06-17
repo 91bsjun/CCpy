@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 import os, sys
+import time
+import pandas as pd
 from CCpy.VASP.VASPio import VASPOutput
 from CCpy.Tools.CCpyTools import selectVASPInputs, selectVASPOutputs, selectInputs, linux_command
 
@@ -14,7 +16,7 @@ except:
     print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [sub_option1] [sub_option2..]")
     print(""""--------------------------------------
 [suboptions]
--a : deep in subdirectories
+-sub : deep in subdirectories
 
 [options]
 d : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
@@ -34,12 +36,22 @@ d : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
 
 4 : Generate cif file from POSCAR or CONTCAR
     ex) CCpyVASPAnal.py 4
+
+-zip : zip unnecessary files (remove CHG, zip CHGCAR DOSCAR PROCAR XDATCAR)
+    ex) CCpyVASPAnal.py -zip      -> user choose directories
+    ex) CCpyVASPAnal.py -zip -sub -> user choose directories (include subdirectories)
+    ex) CCpyVASPAnal.py -zip -auto        -> automatically detect converged jobs
+    ex) CCpyVASPAnal.py -zip -auto -sub   ->               (include subdirectories)
+    ex) CCpyVASPAnal.py -zip -bg          -> detect and zip converged jobs every 30 minutes
+    ex) CCpyVASPAnal.py -zip -bg -sub     ->               (include sub directories)
+   
+    
 """
           )
     quit()
 
 sub = False
-if "-a" in sys.argv:
+if "-sub" in sys.argv:
     sub = True
 
 if sys.argv[1] == "d":
@@ -72,9 +84,12 @@ elif sys.argv[1] == "1":
     pwd = os.getcwd()
     for each_input in inputs:
         os.chdir(each_input)
-        VO = VASPOutput()
-        VO.getFinalStructure(path=pwd+"/")
-        os.chdir("../")
+        if "CONTCAR" in os.listdir("./") and os.path.getsize("CONTCAR") != 0:
+            VO = VASPOutput()
+            VO.getFinalStructure(path=pwd+"/")
+            os.chdir("../")
+        else:
+            print(each_input + ": CONTCAR is empty!")
 
 elif sys.argv[1] == "2":
     show_plot = True
@@ -111,4 +126,51 @@ elif sys.argv[1] == "4":
     for each_input in inputs:
         VO = VASPOutput()
         VO.getFinalStructure(filename=each_input, path="./")
+
+elif sys.argv[1] == "-zip":
+    """
+    zipped status add
+    """
+    VO = VASPOutput()
+    if "-bg" in sys.argv:
+        print("Start loop..")
+        cnt = 1
+        while True:
+            print("\nloop " + str(cnt))
+            if sub:
+                linux_command("CCpyVASPAnal.py -zip -auto -sub")
+            else:
+                linux_command("CCpyVASPAnal.py -zip -auto")
+            print("Rest 30 minutes..")
+            time.sleep(1800)
+            cnt+=1
+    elif "-auto" in sys.argv:
+        if sub:
+            print("# ----------- Parsing -------------- #")
+            linux_command("CCpyVASPAnal.py 0 -sub")
+        else:
+            print("\n\n# ----------- Parsing -------------- #")
+            linux_command("CCpyVASPAnal.py 0")
+        df = pd.read_csv(".00_job_status.csv")
+        df = df[(df['Converged'] == True)]
+        dirs = df['Directory'].tolist()
+        print("\n\n# ----------- Zipping -------------- #")
+        VO.vasp_zip(dirs)
+    else:
+        dirs = selectVASPOutputs("./", sub=sub)
+        print("\n\n# ----------- Zipping -------------- #")
+        VO.vasp_zip(dirs)
+
+        
+    
+
+
+
+
+
+
+
+
+
+
 

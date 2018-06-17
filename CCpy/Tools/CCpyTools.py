@@ -241,9 +241,9 @@ def selectInputs(marker, directory_path, ask=True):
 
     # -- if ask == False : select all inputs
     if ask == True:
-        print("0 : All files")
         for i in range(len(all_inputs)):
             print(str(i+1) + " : " + all_inputs[i])
+        print("0 : All files")
         get_num = raw_input("Choose file : ")
     else:
         get_num = "0"
@@ -294,9 +294,9 @@ def selectVASPInputs(directory_path, ask=True, static=False, band=False):
                 all_inputs.append(each_dir)
     
     if ask == True:
-        print("0 : All files")
         for i in range(len(all_inputs)):
             print(str(i+1) + " : " + all_inputs[i])
+        print("0 : All files")
         get_num = raw_input("Choose file : ")
     else:
         get_num = "0"
@@ -346,15 +346,16 @@ def selectVASPOutputs(directory_path, ask=True, sub=False):
     else:
         all_dirs = [each_dir for each_dir in os.listdir(directory_path) if os.path.isdir(each_dir)] 
     all_dirs.sort()
+    all_inputs = all_dirs
     all_inputs = []
     for each_dir in all_dirs:
         files = os.listdir(each_dir)
-        if "CONTCAR" in files or "OUTCAR" in files:
+        if "vasprun.xml" in files or "POSCAR" in files or "CONTCAR" in files or "OUTCAR" in files:
             all_inputs.append(each_dir)
     if ask == True:
-        print("0 : All files")
         for i in range(len(all_inputs)):
             print(str(i+1) + " : " + all_inputs[i])
+        print("0 : All files")
         get_num = raw_input("Choose file : ")
     else:
         get_num = "0"
