@@ -120,8 +120,9 @@ def vasp_batch(queue=None, n_of_cpu=None, scratch=False):
         df = pd.read_csv("01_unconverged_jobs.csv")
         inputs = df['Directory'].tolist()
         print(df)
+        total_jobs = len(df)
         print("These jobs will be recalculated and backup 3 original outputs")
-        print(": CONTCAR -> POSCAR,  POSCAR -> POSCAR_0,  OUTCAR -> OUTCAR_0,  vasp.out -> vasp.out_0")
+        print(": " + str(total_jobs) + " jobs (POSCAR, OUTCAR, vasp.out -> POSCAR_0, OUTCAR_0, vasp.out_0)")
         proceed = input("Continue ? (y/n) ")
         if proceed != "y":
             quit()
