@@ -291,7 +291,8 @@ Zip unnecessary VASP output files. (-sub option also can be used) <br>
 - Remove CHG.
 - Zip CHGCAR, DOSCAR, PROCAR and XDATCAR
 
-##### User can choose directory to zip by <code> CCpyVASPAnal.py -zip </code>
+##### User can choose directory to zip by <code> CCpyVASPAnal.py -zip </code><br>
+<code> CCpyVASPAnal.py -zip -sub </code> also available.
 <pre>
 [bsjun@cms Li-P-S-Cl_cifs]$ CCpyVASPAnal.py -zip
 1 : Cl16_41
