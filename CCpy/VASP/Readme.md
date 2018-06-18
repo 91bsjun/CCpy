@@ -255,10 +255,10 @@ This command finds VASP jobs in all subdirectories.
 Choose file :
 </pre>
 
-#### Option 'd' <code> CCpyVASPAnal.py d </code>
+### 2.2.1. Option 'd' <code> CCpyVASPAnal.py d </code>
 Delete output files except of POSCAR, INCAR, POTCAR, KPOINTS.
 
-#### Option '0'<code> CCpyVASPAnal.py 0 </code>
+### 2.2.2. Option '0'<code> CCpyVASPAnal.py 0 </code>
 Monitoring job status.<br>
 This command may not be able to find unhandled error messages.
 <pre>
@@ -281,12 +281,18 @@ You can recalculate using '01_unconverged_jobs.csv' file.
 * Detail information saved in: 00_jobs_status.txt
 </pre>
 
-#### Option '-zip' <code> CCpyVASPAnal.py -zip </code>
+### 2.2.3.
+### 2.2.4.
+### 2.2.5.
+### 2.2.6.
+
+### 2.2.7. Option '-zip' <code> CCpyVASPAnal.py -zip </code>
 Zip unnecessary VASP output files. (-sub option also can be used) <br>
 - Remove CHG.
 - Zip CHGCAR, DOSCAR, PROCAR and XDATCAR
 
-##### User can choose directory to zip by <code> CCpyVASPAnal.py -zip </code>
+##### User can choose directory to zip by <code> CCpyVASPAnal.py -zip </code><br>
+<code> CCpyVASPAnal.py -zip -sub </code> also available.
 <pre>
 [bsjun@cms Li-P-S-Cl_cifs]$ CCpyVASPAnal.py -zip
 1 : Cl16_41
@@ -301,10 +307,27 @@ Choose file :
 </pre>
 ##### <code> CCpyVASPAnal.py -zip -auto </code> option will automatically find VASP output directory and zip converged jobs.
 <pre>
-[bsjun@cms Li-P-S-Cl_cifs]$ CCpyVASPAnal.py -zip -auto
+[bsjun@cms 06_mechanism]$ CCpyVASPAnal.py -zip -auto -sub
+# ----------- Parsing -------------- #
+
+    Parsing VASP jobs....
+  [       6 /      6  ]
+
+* Current status :
+   Total      End of calculation  Converged  Unconverged  Zipped
+0      6                       6          6            0       0
+
+* Unconverged jobs : 0 (01_unconverged_jobs.csv)
+
+* Detail information saved in: 00_jobs_status.txt
+
+
+# ----------- Zipping -------------- #
+Current directory: ./0.3/MoS2.H_FO       [       3 /      6  ]
 </pre>
 
 ##### <code> CCpyVASPAnal.py -zip -bg </code> option will excute loop every 30 minutes to find unverged VASP jobs and zip them.
+This option may be useful when you do many number of calculations.
 <pre>
 [bsjun@cms Li-P-S-Cl_cifs]$ CCpyVASPAnal.py -zip -bg
 Start loop..
@@ -331,11 +354,4 @@ loop 1
 Current directory: ./Li12P28_48    [     3/     3]
 Done.
 Rest 30 minutes..
-</pre>
-
-<pre>
-
-</pre>
-<pre>
-
 </pre>
