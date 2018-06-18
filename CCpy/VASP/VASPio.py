@@ -873,9 +873,9 @@ class VASPOutput():
                 s = "Not started"
             else:
                 if "vasp.done" in os.listdir("./"):
-                    d = "True" 
+                    done = "True" 
                 else:
-                    d = " "
+                    done = " "
                 # -- zipped or not
                 if "data.tar.gz" in os.listdir("./"):
                     z = "True"
@@ -920,7 +920,7 @@ class VASPOutput():
                         c = "Cannot find queue output file.."
             status.append(s)
             converged.append(c)
-            finished.append(d) 
+            finished.append(done) 
             zipped.append(z)
             os.chdir(pwd)
 

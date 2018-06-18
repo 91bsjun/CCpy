@@ -100,6 +100,7 @@ elif sys.argv[1] == "2":
     except:
         show_plot = True
     dirs = selectVASPOutputs("./", ask=False, sub=sub)
+    dirs = [d for d in dirs if "OUTCAR" in os.listdir(d)]
     VO = VASPOutput()
     VO.get_energy_list(show_plot=show_plot, dirs=dirs)
 
@@ -152,8 +153,9 @@ elif sys.argv[1] == "-zip":
             print("\n\n# ----------- Parsing -------------- #")
             linux_command("CCpyVASPAnal.py 0")
         df = pd.read_csv(".00_job_status.csv")
-        df = df[(df['Converged'] == True)]
-        df = df[(df['Zipped'] == False)]
+        df[['Converged', 'Zipped']] = df[['Converged', 'Zipped']].astype(str)
+        df = df[(df['Converged'] == 'True')]
+        df = df[(df['Zipped'] == 'False')]
         dirs = df['Directory'].tolist()
         if len(dirs) == 0:
             print("Cannot find unzipped VASP job.")

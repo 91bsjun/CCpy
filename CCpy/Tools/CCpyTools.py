@@ -335,7 +335,9 @@ def selectVASPOutputs(directory_path, ask=True, sub=False):
             if (not parent.endswith("/Band-DOS")) and (
                len(glob.glob(os.path.join(parent, "vasprun.xml*"))) > 0 or (
                len(glob.glob(os.path.join(parent, "POSCAR*"))) > 0 and
-               len(glob.glob(os.path.join(parent, "OSZICAR*"))) > 0)
+               len(glob.glob(os.path.join(parent, "INCAR*"))) > 0 and
+               len(glob.glob(os.path.join(parent, "KPOINTS*"))) > 0 and
+               len(glob.glob(os.path.join(parent, "POTCAR*"))) > 0)
            ):
                 return [parent]
             return []
