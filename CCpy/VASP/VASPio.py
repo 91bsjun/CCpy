@@ -914,6 +914,8 @@ class VASPOutput():
                                 c = "True"
                             elif "ZBRENT:  accuracy reached" in vasp_out:
                                 c = "False"
+                            elif done == "True" and "   1 F=" in vasp_out:
+                                c = "True"
                             else:
                                 c = "False"
                     else:
