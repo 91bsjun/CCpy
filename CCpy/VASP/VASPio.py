@@ -42,6 +42,7 @@ class VASPInput():
                 #pwd = pwd.split("/")[-1]
                 #jobname = pwd
                 jobname = filename
+                dirname = filename + "_vasp"
             else:
                 print("Not supported file format. (*.xsd, *.cif, *POSCAR*, *CONTCAR*)")
                 quit()
