@@ -38,11 +38,12 @@ class VASPInput():
                 jobname = filename.replace(".cif","")
             elif "POSCAR" in filename or "CONTCAR" in filename:
                 structure = pmgIS.from_file(filename)
-                pwd = os.getcwd()
-                pwd = pwd.split("/")[-1]
-                jobname = pwd
+                #pwd = os.getcwd()
+                #pwd = pwd.split("/")[-1]
+                #jobname = pwd
+                jobname = filename
             else:
-                print("Not supported file format. (.xsd, .cif, POSCAR, CONTCAR)")
+                print("Not supported file format. (*.xsd, *.cif, *POSCAR*, *CONTCAR*)")
                 quit()
 
             if not dirname:
