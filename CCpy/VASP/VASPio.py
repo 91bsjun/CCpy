@@ -780,6 +780,7 @@ class VASPOutput():
         x = range(len(out_dirs))
         energies = []
         converged = []
+        end_calc = []
         pwd = os.getcwd()
 
         for o in out_dirs:
@@ -798,32 +799,9 @@ class VASPOutput():
             else:
                 energies.append(e[-1])
 
-            # -- find convergence
-            c = ""
-            vasp_out = None
-            if "vasp.out" in os.listdir("./"):
-                vasp_out = "vasp.out"
-            else:
-                for filename in os.listdir("./"):
-                    if filename.split(".o")[-1].isdigit():
-                        vasp_out = filename
-            # -- parsing queue output
-            if vasp_out:
-                vasp_out = os.popen("tail " + vasp_out).readlines()
-                if len(vasp_out) < 2:
-                    c = "Something wrong in queue output file.."
-                else:
-                    if "please rerun with smaller EDIFF" in vasp_out[-2]:
-                        c = "False"
-                    elif "reached required accuracy" in vasp_out[-1]:
-                        c = "True"
-                    elif "ZBRENT:  accuracy reached" in vasp_out[-2]:
-                        c = "False"
-                    else:
-                        c = "Not finished"
-            else:
-                c = "Cannot find queue output file.."
+            s, c, done, z = self.vasp_status()
             converged.append(c)
+            end_calc.append(done)
 
             os.chdir(pwd)
 
@@ -831,9 +809,10 @@ class VASPOutput():
         energy_list['Directory'] = out_dirs
         energy_list['Total energy(eV)'] = energies
         energy_list['Converged'] = converged
+        energy_list['End of Calculation'] = end_calc
 
         df = pd.DataFrame(energy_list)
-        df = df[['Directory', 'Total energy(eV)', 'Converged']]
+        df = df[['Directory', 'Total energy(eV)', 'End of Calculation', 'Converged']]
         print(df)
         pwd = os.getcwd()
         pwd = pwd.split("/")[-1]
@@ -853,6 +832,73 @@ class VASPOutput():
             plt.grid()
             plt.show()
 
+    def vasp_status(self):
+        """
+        check VASP status in current directory
+
+        return Status, Convergence, Done, Zipped
+        """
+        s = " "
+        c = " "
+        done = " "
+        z = " "
+        # -- only inputs in dir or OUTCAR not in directory
+        if len(os.listdir("./")) == 4 or "OUTCAR" not in os.listdir("./"):
+            s = "Not started"
+        else:
+            if "vasp.done" in os.listdir("./"):
+                done = "True" 
+            else:
+                done = " "
+            # -- zipped or not
+            if "data.tar.gz" in os.listdir("./"):
+                z = "True"
+            else:
+                z = "False"
+            # -- OUTCAR
+            outcar = os.popen("tail OUTCAR").read()
+            if len(outcar) == 0:
+                s = "Not calculated"
+            else:
+                # -- properly terminated
+                if "User time (sec):" in outcar:
+                    s = "Properly terminated"
+                elif "Error EDDDAV" in outcar:
+                    s = "Error termination"
+                else:
+                    s = "Not properly terminated"
+
+                # -- check not converged
+                vasp_out = None
+                if "vasp.out" in os.listdir("./"):
+                    vasp_out = "vasp.out"
+                else:
+                    for filename in os.listdir("./"):
+                        if filename.split(".o")[-1].isdigit():
+                            vasp_out = filename
+                # -- parsing queue output
+                if vasp_out:
+                    vasp_out = os.popen("tail " + vasp_out).read()
+                    if len(vasp_out) < 2:
+                        c = "Something wrong in queue output file.."
+                    else:
+                        if "please rerun with smaller EDIFF" in vasp_out:
+                            c = "False"
+                        elif "reached required accuracy" in vasp_out:
+                            c = "True"
+                        elif "ZBRENT:  accuracy reached" in vasp_out:
+                            c = "False"
+                        elif done == "True" and "   1 F=" in vasp_out:
+                            c = "True"
+                        else:
+                            c = "False"
+                else:
+                    c = "Cannot find queue output file.."
+
+        return s, c, done, z
+
+
+
     def check_terminated(self, dirs=[]):
         status = []
         converged = []
@@ -868,60 +914,9 @@ class VASPOutput():
             sys.stdout.flush()
             sys.stdout.write("\b" * len(msg))
             os.chdir(d)
-            s = ""
-            c = ""
-            # -- only inputs in dir or OUTCAR not in directory
-            if len(os.listdir("./")) == 4 or "OUTCAR" not in os.listdir("./"):
-                s = "Not started"
-            else:
-                if "vasp.done" in os.listdir("./"):
-                    done = "True" 
-                else:
-                    done = " "
-                # -- zipped or not
-                if "data.tar.gz" in os.listdir("./"):
-                    z = "True"
-                else:
-                    z = "False"
-                # -- OUTCAR
-                outcar = os.popen("tail OUTCAR").read()
-                if len(outcar) == 0:
-                    s = "Not calculated"
-                else:
-                    # -- properly terminated
-                    if "User time (sec):" in outcar:
-                        s = "Properly terminated"
-                    elif "Error EDDDAV" in outcar:
-                        s = "Error termination"
-                    else:
-                        s = "Not properly terminated"
 
-                    # -- check not converged
-                    vasp_out = None
-                    if "vasp.out" in os.listdir("./"):
-                        vasp_out = "vasp.out"
-                    else:
-                        for filename in os.listdir("./"):
-                            if filename.split(".o")[-1].isdigit():
-                                vasp_out = filename
-                    # -- parsing queue output
-                    if vasp_out:
-                        vasp_out = os.popen("tail " + vasp_out).read()
-                        if len(vasp_out) < 2:
-                            c = "Something wrong in queue output file.."
-                        else:
-                            if "please rerun with smaller EDIFF" in vasp_out:
-                                c = "False"
-                            elif "reached required accuracy" in vasp_out:
-                                c = "True"
-                            elif "ZBRENT:  accuracy reached" in vasp_out:
-                                c = "False"
-                            elif done == "True" and "   1 F=" in vasp_out:
-                                c = "True"
-                            else:
-                                c = "False"
-                    else:
-                        c = "Cannot find queue output file.."
+            s, c, done, z = self.vasp_status()
+            
             status.append(s)
             converged.append(c)
             finished.append(done) 
