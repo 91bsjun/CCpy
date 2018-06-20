@@ -231,12 +231,12 @@ def get_final_energies():
     DB_df = pd.read_csv("00DB.csv")
     os.chdir(basename)
     os.system("CCpyVASPAnal.py 2 n")
-    os.chdir("../")
     energy_df = pd.read_csv(basename + "_FinalEnergies.csv")
     #energy_df = pd.read_csv("bilayer_scripts_FinalEnergies.csv")
     DB_df['final energy (eV)'] = energy_df['Total energy(eV)']
     DB_df['relative energy (eV)'] = DB_df['final energy (eV)'] - DB_df['final energy (eV)'].min()
     sorted_df = DB_df.sort_values(by='final energy (eV)')
+    os.chdir("../")
 
 
     # -- grouping by simiarl energy
