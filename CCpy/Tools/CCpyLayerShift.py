@@ -20,20 +20,32 @@ except:
 1: Generate shifted CIF files
 2: Make contour plot after calculations
 
-* Required options : [option] [filename] [basename]
+* Required options : [option] [structure filename] [basename]
     [basename] will be directory where the genereated files located.
-    ex) CCpyLayerShift.py Graphene.cif graphene_shift
+    ex) CCpyLayerShift.py 1 Graphene.cif graphene_shift
 
 * Sub options
+    <When Option 1 (CIF gen)
     -tol=0.1        : fractional coordinates tolerance for grouping layer (default: 0.01)
     -x=0.05         : fractional shift distance for x-axis. if=0, fix (default: 0.1)
     -y=0.05         : fractional shift distance for y-axis. if=0, fix (default: 0.1)
     -z=0.05         : fractional shift distance for z-axis. if=0, fix (default: set to 0.1 Angstrom (cartesian))
                       2.5 < interlayer distance < 5 (Angstrom)
 
-* Notice
+    <When Option 2 (plot)
+    -etol = 0.0001      : tolerance energy for grouping structures by similar energy
+
+* Notice before run
 - Set vacumm direction to z-axis (c-axis)
 - Interlayer distance will be properly calculated when gamma=90
+
+* Example)
+<option 1. Generate CIF files>
+[user@localhost work]$ CCpyLayerShift.py 1 Graphene.cif graphene_shift -x=0.05 z=0
+                       (z-axis will be fixed)
+
+<opiton 2. Analysis after calculation>
+[user@localhost work]$ CCpyLayerShift.py 2 Graphene.cif graphene_shift
   
     '''
           )
@@ -54,8 +66,8 @@ lat_param = read_structure.latticeGen()
 def cif_gen():
     # --------- Configurations
     layer_tol = 0.01
-    x_ratio = 0.05
-    y_ratio = 0.05
+    x_ratio = 0.1
+    y_ratio = 0.1
     z_ratio = round(0.1 / lat_param[2], 8)
     for s in sys.argv:
         if "-tol=" in s:
@@ -155,6 +167,7 @@ def cif_gen():
                 z_shift.append(total_z_shift)
             total_z_shift += z_ratio
 
+    print("Total number of structures: " + str(len(x_shift) * len(y_shift) * len(z_shift)))
 
     # ----- fractional coordiantes shift
     def get_shifted_structure(original_fcoords=None, layer_index=None, axis=None, shift_val=None):
@@ -187,7 +200,7 @@ def cif_gen():
             xy_shifted_fcoords = get_shifted_structure(original_fcoords=x_shifted_fcoords, layer_index=layer2_index, axis=1, shift_val=y)
             zcnt = 0
             for z in z_shift:
-                xyz_shifted_fcoords = get_shifted_structure(original_fcoords=xy_shifted_fcoords, layer_index=layer2_index, axis=1, shift_val=y)
+                xyz_shifted_fcoords = get_shifted_structure(original_fcoords=xy_shifted_fcoords, layer_index=layer2_index, axis=2, shift_val=z)
                 filename = (basename + "_x%3d" % xcnt + "y%3d" % ycnt + "z%3d" % zcnt).replace(" ","0") + ".cif"
                 pmg_structure = IStructure(lattice_v, atoms, xyz_shifted_fcoords)
                 pmg_structure.to(fmt="cif", filename=filename)
@@ -212,6 +225,44 @@ def cif_gen():
     df.to_csv("../00DB.csv")
     print("* DB information has been saved : '00DB.csv', DO NOT REMOVE THIS FILE.")
 
+
+def get_final_energies():
+    # concat original DB & energy DB
+    DB_df = pd.read_csv("00DB.csv")
+    os.chdir(basename)
+    os.system("CCpyVASPAnal.py 2 n")
+    os.chdir("../")
+    energy_df = pd.read_csv(basename + "_FinalEnergies.csv")
+    #energy_df = pd.read_csv("bilayer_scripts_FinalEnergies.csv")
+    DB_df['final energy (eV)'] = energy_df['Total energy(eV)']
+    DB_df['relative energy (eV)'] = DB_df['final energy (eV)'] - DB_df['final energy (eV)'].min()
+    sorted_df = DB_df.sort_values(by='final energy (eV)')
+
+
+    # -- grouping by simiarl energy
+    etol = 0.0001
+    for s in sys.argv:
+        if "-etol" in s:
+            etol = float(s.replace("-etol",""))
+    group_index = []
+    gi = 1
+    former_e = None
+    for e in sorted_df['relative energy (eV)']:
+        if not former_e:
+            former_e = e
+            group_index.append(gi)
+        else:
+            if e - former_e > etol:
+                gi += 1
+                former_e = e
+            group_index.append(gi)
+    sorted_df['group'] = group_index
+    sorted_df.to_csv("03DB_final.csv")
+    
+
+    return DB_df
+    
+
 def get_3d_plot(df):
     import matplotlib
     from matplotlib import rc
@@ -224,7 +275,7 @@ def get_3d_plot(df):
 
 
     # ------ make 3d data format
-    plot_df = fixed_axis_df.pivot('shifted frac y', 'shifted frac x', 'Energy (eV)')
+    plot_df = fixed_axis_df.pivot('shifted frac y', 'shifted frac x', 'final energy (eV)')
     
 
     # ------ make 3d plot
@@ -262,7 +313,7 @@ def get_2d_plot(df):
     fixed_axis_df = get_fixed_axis_df(fixed_axis_df, 'y')
 
     x = fixed_axis_df['stacking distance']
-    y = fixed_axis_df['Energy (eV)']
+    y = fixed_axis_df['final energy (eV)']
     x_label = r"$\Delta$ z"
     y_label = "Energy (eV)"
 
@@ -306,7 +357,7 @@ if __name__ == "__main__":
         if "00DB.csv" not in os.listdir("./"):
             print("Cannot find '00DB.csv' file.")
             quit()
-        df = pd.read_csv("00DB.csv")
+        df = get_final_energies()
         get_3d_plot(df)
     elif sys.argv[1] == "3":
         if "00DB.csv" not in os.listdir("./"):
