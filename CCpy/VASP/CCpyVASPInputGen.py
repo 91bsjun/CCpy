@@ -22,7 +22,7 @@ except:
 2 : Band-DOS calculation    (after previous calculation)
 3 : Band-DOS calculation    (from initial structure files)
 4 : Static calculation      (after previous calculation)
-5 : Relaxation for phonon   (after previous calculation
+5 : Relaxation for phonon   (after previous calculation)
 
 [sub_options]
 ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_sv, -pot=LDA_54...
@@ -33,6 +33,7 @@ ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_s
     -spin    : Spin polarized calculation    (DEFAULT : unpolarized)
     -mag     : Add magnetic monet parameters (values from Pymatgen)
     -ldau    : Add LDA+U parameters          (values from Pymatgen)
+    -phonon  : force sets for phonon         (EDIFF=1.0e-08,EDIFFG=-1.0e-08,LREAL=F,IALGO=38,PREC=accurate)
 
     van der Waals corrections                (DEFAULT : do not use)
     -vdw=D2     : DFT-D2 method of Grimme                   (VASP.5.2.11)
@@ -65,6 +66,7 @@ ldau=False
 isif=False
 kpoints=False
 pseudo=False
+phonon=False
 functional="PBE_54"
 
 for arg in sys.argv:
@@ -86,13 +88,16 @@ for arg in sys.argv:
         functional = arg.split("=")[1]
     elif "-pseudo" in arg:
         pseudo = arg.split("=")[1].split(",")
+    elif "-phonon" in arg:
+        phonon = True
+    
 
 if sys.argv[1] == "1":
     input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
     inputs = selectInputs(input_marker, "./")
     chk = True
     for each_input in inputs:
-        VI = VASPInput(each_input)
+        VI = VASPInput(each_input, phonon=phonon)
 
         # -- First process of edit INCAR, KPOINTS while create Inputs
         # -- If user want to use same options go to else

@@ -5,7 +5,7 @@ import pandas as pd
 import json
 from collections import OrderedDict
 
-from CCpy.VASP.VASPtools import vasp_incar_json, magmom_parameters, ldauu_parameters, ldauj_parameters, ldaul_parameters, vasp_grimme_parameters
+from CCpy.VASP.VASPtools import vasp_incar_json, vasp_phonon_incar_json, magmom_parameters, ldauu_parameters, ldauj_parameters, ldaul_parameters, vasp_grimme_parameters
 
 from CCpy.Tools.CCpyStructure import PeriodicStructure as PS
 from CCpy.Tools.CCpyStructure import latticeGen
@@ -21,7 +21,7 @@ if version[0] == '3':
     raw_input = input
 
 class VASPInput():
-    def __init__(self, filename=None, dirname=None, additional=False):
+    def __init__(self, filename=None, dirname=None, additional=False, phonon=False):
         # additional calc : Like band calculations from previous calc
         if additional:
             self.jobname = dirname
@@ -64,12 +64,20 @@ class VASPInput():
                 print("* Preset options will be saved under :" + home + "/.CCpy/")
             configs = os.listdir(home+"/.CCpy")
             # INCAR preset check
-            if "vasp_incar.json" in configs:
-                incar_dict = load_json(home + "/.CCpy/vasp_incar.json", ordered=True)
+            if phonon:
+                if "vasp_phonon_incar.json" in configs:
+                    incar_dict = load_json(home + "/.CCpy/vasp_phonon_incar.json", ordered=True)
+                else:
+                    jstring = vasp_phonon_incar_json()         # Generate new INCAR
+                    incar_dict = json.loads(jstring, object_pairs_hook=OrderedDict)
+                    save_json(incar_dict, home + "/.CCpy/vasp_phonon_incar.json")
             else:
-                jstring = vasp_incar_json()         # Generate new INCAR
-                incar_dict = json.loads(jstring, object_pairs_hook=OrderedDict)
-                save_json(incar_dict, home + "/.CCpy/vasp_incar.json")
+                if "vasp_incar.json" in configs:
+                    incar_dict = load_json(home + "/.CCpy/vasp_incar.json", ordered=True)
+                else:
+                    jstring = vasp_incar_json()         # Generate new INCAR
+                    incar_dict = json.loads(jstring, object_pairs_hook=OrderedDict)
+                    save_json(incar_dict, home + "/.CCpy/vasp_incar.json")
             # MAGMOM value preset check
             if "vasp_MAGMOM.json" in configs:
                 magmom = load_json(home + "/.CCpy/vasp_MAGMOM.json")
@@ -663,7 +671,7 @@ Reciprocal
 
 
     # ------------------------------------------------------------------------------#
-    #                     CMS Phonon calc VASP input set (opt)                      #
+    #             Accurate optimization for Phonon after relaxation                 #
     # ------------------------------------------------------------------------------#
     def cms_phonon_opt(self):
         """
@@ -706,8 +714,8 @@ Reciprocal
         incar_dict = OrderedDict(key_val)
         incar_keys = incar_dict.keys()
 
-        # -- Band-DOS INCAR
-        get_sets = "PREC=Accurate,IBRION=8,EDIFF=1.0E-08,EDIFFG=-1.0E-08,ISMEAR=0,SIGMA=0.01,IALGO=38,LREAL=.FALSE.,LWAVE=.FALSE.,LCHARG=.FALSE."
+        # -- Accurate opt INCAR
+        get_sets = "PREC=Accurate,EDIFF=1.0E-08,EDIFFG=-1.0E-08,ISMEAR=0,SIGMA=0.01,IALGO=38,LREAL=.FALSE.,LWAVE=.FALSE.,LCHARG=.FALSE."
         if get_sets != "n":
             vals = get_sets.replace(", ", ",")
             vals = vals.split(",")
