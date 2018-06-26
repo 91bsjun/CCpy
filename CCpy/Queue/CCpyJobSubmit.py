@@ -40,6 +40,7 @@ def vasp(queue=None, n_of_cpu=None):
     # --- Collect VASP inputs
     band = False
     recalc = False
+    phonon = False
     if "-band" in sys.argv:
         band = True
         inputs = selectVASPInputs("./", ask=ask, band=True)
@@ -57,6 +58,9 @@ def vasp(queue=None, n_of_cpu=None):
         proceed = input("Continue ? (y/n) ")
         if proceed != "y":
             quit()
+    elif "-phonon" in sys.argv:
+        phonon = True
+        inputs = selectVASPInputs("./", ask=ask, phonon=True)
     else:
         inputs = selectVASPInputs("./", ask=ask)
 
@@ -101,6 +105,8 @@ def vasp(queue=None, n_of_cpu=None):
             dirpath = pwd + "/" + each_input
             if band:
                 dirpath += "/Band-DOS"
+            elif phonon:
+                dirpath += "/Phonon_opt"
             myJS = JS(each_input, queue, n_of_cpu)
             myJS.vasp(band=band, dirpath=dirpath)
 
@@ -320,6 +326,8 @@ if __name__=="__main__":
                       ex) CCpyJobSubmit.py 2 xeon5 -band
                       ex) CCpyJobSubmit.py 2 xeon5 -band -n=8
                       ex) CCpyJobSubmit.py 2 xeon5 -n=8 -band
+
+    -phonon         : when perform optimize calculation for phonon (high accuracy)
 
     -batch          : run multiple jobs in a single queue
                       (Only VASP supported yet)

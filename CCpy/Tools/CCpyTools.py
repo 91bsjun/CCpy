@@ -274,7 +274,7 @@ def selectInputs(marker, directory_path, ask=True):
     return inputs
 
     
-def selectVASPInputs(directory_path, ask=True, static=False, band=False):
+def selectVASPInputs(directory_path, ask=True, static=False, band=False, phonon=False):
     """
     Needs edition -> pick <INCAR POSCAR KPOINTS POTCAR> included directories
     """
@@ -288,6 +288,9 @@ def selectVASPInputs(directory_path, ask=True, static=False, band=False):
                 all_inputs.append(each_dir)
         elif band:
             if "Band-DOS" in files:
+                all_inputs.append(each_dir)
+        elif phonon:
+            if "Phonon_opt" in files:
                 all_inputs.append(each_dir)
         else:
             if "POSCAR" in files and "POTCAR" in files and "KPOINTS" in files and "INCAR" in files:

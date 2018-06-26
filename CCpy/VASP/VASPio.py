@@ -660,6 +660,103 @@ Reciprocal
         file_writer("KPOINTS",str(line_kpoints))
         os.chdir("../")
         sys.stdout.write(" Done !\n")
+
+
+    # ------------------------------------------------------------------------------#
+    #                     CMS Phonon calc VASP input set (opt)                      #
+    # ------------------------------------------------------------------------------#
+    def cms_phonon_opt(self):
+        """
+        Very accurate geometry optimization is required for Phonon calculation.
+        This code is for increase accuracy after basic optimization.
+        """
+        ## -------------------------- Copy previous Calc --------------------------- ##
+        try:
+            os.mkdir("Phonon_opt")
+        except:
+            print("Phonon_opt directory is exist already. All files wii be override.")
+
+        os.chdir("Phonon_opt")
+        prev_files =["CONTCAR","INCAR", "KPOINTS", "POSCAR", "POTCAR"]
+        for pf in prev_files:
+            if pf in os.listdir("../"):
+                linux_command("cp ../" + pf + " ./")
+        os.rename("POSCAR", "POSCAR.orig")
+        os.rename("CONTCAR", "POSCAR")
+
+
+        ## --------------------------------- INCAR --------------------------------- ##
+        f = open("INCAR", "r").read()
+        lines = f.split("\n")
+        key_val = []
+        for l in lines:
+            if len(l) == 0:
+                pass
+            elif l[0] == "#" and l[1].isdigit():
+                key_val.append((l, ""))
+            else:
+                tmp = l.split("=")
+                if "#" in tmp[0]:
+                    key = tmp[0].replace(" ","").replace("#","")
+                    key = "# " + key
+                else:
+                    key = tmp[0].replace(" ", "")
+                key_val.append((key, tmp[1][1:]))
+
+        incar_dict = OrderedDict(key_val)
+        incar_keys = incar_dict.keys()
+
+        # -- Band-DOS INCAR
+        get_sets = "PREC=Accurate,IBRION=8,EDIFF=1.0E-08,EDIFFG=-1.0E-08,ISMEAR=0,SIGMA=0.01,IALGO=38,LREAL=.FALSE.,LWAVE=.FALSE.,LCHARG=.FALSE."
+        if get_sets != "n":
+            vals = get_sets.replace(", ", ",")
+            vals = vals.split(",")
+            for val in vals:
+                key = val.split("=")[0]
+                value = val.split("=")[1]
+                if "# " + key in incar_keys:
+                    incar_dict = change_dict_key(incar_dict, "# " + key, key, incar_dict["# " + key])
+                    original = incar_dict[key]
+                    try:
+                        description = original.split("!")[1]
+                    except:
+                        description = ""
+                    incar_dict[key] = value.ljust(22) + "!" + description
+                else:
+                    if key in incar_keys:
+                        original = incar_dict[key]
+                    else:
+                        original = ""
+                    try:
+                        description = original.split("!")[1]
+                    except:
+                        description = ""
+                    incar_dict[key] = value.ljust(22) + "!" + description
+
+
+        # -- make string
+        incar_keys = incar_dict.keys()
+        incar_string = ""
+        for key in incar_keys:
+            if key == "SYSTEM":
+                incar_string += key.ljust(16) + " = " + str(incar_dict[key]).ljust(30) + "\n"
+            elif key[0] == "#" and key[1].isdigit():
+                incar_string += "\n"
+                incar_string += key + str(incar_dict[key]) + "\n"
+            else:
+                val = str(incar_dict[key]).split("!")[0]
+                try:
+                    description = str(incar_dict[key]).split("!")[1]
+                except:
+                    description = ""
+                incar_string += key.ljust(16) + " = " + str(val).ljust(30) + "!" + description + "\n"
+        incar = incar_string
+
+
+        ## --------------------------- Write input files ---------------------- ##
+        file_writer("INCAR",str(incar))
+        os.chdir("../")
+        sys.stdout.write(" Done !\n")
         
     
 

@@ -116,7 +116,7 @@ cat $TMPDIR/machines
         shl("rm -rf ./mpi.sh", shell=True)
 
 
-    def vasp(self, cpu=None, mem=None, q=None, band=False, dirpath=None):
+    def vasp(self, cpu=None, mem=None, q=None, band=False, phonon=False, dirpath=None):
         inputfile = self.inputfile
 
         cpu, q = self.n_of_cpu, self.q
@@ -124,6 +124,8 @@ cat $TMPDIR/machines
         # -- Band calculation after previous calculation
         if band:
             jobname = "VB" + inputfile
+        elif phonon:
+            jobname = "VP" + inputfile
         else:
             jobname = "V" + inputfile
             jobname = jobname.replace(".","_").replace("-","_")
@@ -161,7 +163,7 @@ cat $TMPDIR/machines
         f.write(mpi)
         f.close()
         shl(queue_path+"qsub mpi.sh", shell=True)
-        shl("rm -rf ./mpi.sh", shell=True)
+        #shl("rm -rf ./mpi.sh", shell=True)
         os.chdir(pwd)
 
     def vasp_batch(self, cpu=None, mem=None, q=None, band=False, dirs=None, scratch=False):
@@ -280,8 +282,9 @@ qchem %s %s
 echo "Got $NSLOTS slots."
 cat $TMPDIR/machines
 
-set MPI_HOME=/opt/intel/mpi-rt/4.0.0
-set MPI_EXEC=$MPI_HOME/bin/mpirun
+#set MPI_HOME=/opt/intel/mpi-rt/4.0.0
+#set MPI_EXEC=$MPI_HOME/bin/mpirun
+set MPI_EXEC=%s
 
 setenv OMP_NUM_THREADS 1
 setenv OMP_DYNAMIC FALSE
@@ -294,7 +297,7 @@ cd $SGE_O_WORKDIR
 env | grep PRELOAD
 $MPI_EXEC -n %d %s %s > %s
 
-''' % (cpu, cpu, jobname, q, cpu, atk_path, inputfile, outputfile)
+''' % (cpu, cpu, jobname, q, atk_mpi_run, cpu, atk_path, inputfile, outputfile)
 
         f = open("mpi.sh", "w")
         f.write(mpi)

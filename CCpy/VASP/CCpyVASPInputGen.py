@@ -22,6 +22,7 @@ except:
 2 : Band-DOS calculation    (after previous calculation)
 3 : Band-DOS calculation    (from initial structure files)
 4 : Static calculation      (after previous calculation)
+5 : Relaxation for phonon   (after previous calculation
 
 [sub_options]
 ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_sv, -pot=LDA_54...
@@ -153,13 +154,23 @@ elif sys.argv[1] == "4":
         os.chdir("../")
 
 elif sys.argv[1] == "5":
+    inputs = selectVASPOutputs("./")
+    for each_input in inputs:
+        sys.stdout.write(each_input + "... ")
+        sys.stdout.flush()
+        os.chdir(each_input)
+        VI = VASPInput(additional=True, dirname=each_input)
+        VI.cms_phonon_opt()
+        os.chdir("../")
+
+elif sys.argv[1] == "0000":
     input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
     inputs = selectInputs(input_marker, "./")
     for each_input in inputs:
         MIT_relax_VI = VASPInput(each_input)
         MIT_relax_VI.MIT_relax_set()
 
-elif sys.argv[1] == "6":
+elif sys.argv[1] == "0001":
     input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
     inputs = selectInputs(input_marker, "./")
     for each_input in inputs:
