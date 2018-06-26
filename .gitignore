@@ -1,3 +1,6 @@
+./build
+./dist
+./CCpy.egg-info
 .idea/workspace.xml
 *.pyc
 .idea/workspace.xml
