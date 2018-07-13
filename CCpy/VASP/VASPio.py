@@ -237,7 +237,7 @@ class VASPInput():
             print("#          Here are the current LDAU+U parameters          #")
             print("# -------------------------------------------------------- #")
             LDAUU_keys = LDAUU.keys()
-            LDAUU_keys.sort()
+            #LDAUU_keys.sort()
             for key in LDAUU_keys:
                 print(str(key).ljust(8) + " = " + str(LDAUU[key]))
             print("Other atoms which not in here are = 0")
