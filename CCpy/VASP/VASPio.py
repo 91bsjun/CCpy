@@ -773,7 +773,12 @@ Reciprocal
         dirname = self.dirname
         mit_relax = MITRelaxSet(structure)
         mit_relax.write_input(dirname)
-        
+
+    def MP_relax_VI(self):
+        structure = self.structure
+        dirname = self.dirname
+        mit_relax = MPRelaxSet(structure)
+        mit_relax.write_input(dirname)
 
     def MP_HSE_relax_set(self):
         structure = self.structure

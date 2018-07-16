@@ -168,6 +168,13 @@ elif sys.argv[1] == "5":
         VI.cms_phonon_opt()
         os.chdir("../")
 
+elif sys.argv[1] == "MPRelax":
+    input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
+    inputs = selectInputs(input_marker, "./")
+    for each_input in inputs:
+        MP_relax_VI = VASPInput(each_input)
+        MP_relax_VI.MP_relax_set()
+
 elif sys.argv[1] == "0000":
     input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
     inputs = selectInputs(input_marker, "./")
