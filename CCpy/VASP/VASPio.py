@@ -934,9 +934,9 @@ class VASPOutput():
         print(df)
         pwd = os.getcwd()
         pwd = pwd.split("/")[-1]
-        csv_filename = pwd+"_FinalEnergies.csv"
-        txt_filename = pwd+"_FinalEnergies.txt"
-        df.to_csv(pwd+"_FinalEnergies.csv")
+        csv_filename = "03_"+pwd+"_FinalEnergies.csv"
+        txt_filename = "03_"+pwd+"_FinalEnergies.txt"
+        df.to_csv(csv_filename)
         f = open(txt_filename, "w")
         f.write(df.to_string())
         f.close()
