@@ -889,6 +889,7 @@ class VASPOutput():
 
         x = range(len(out_dirs))
         energies = []
+        energies_per_atom = []
         converged = []
         end_calc = []
         pwd = os.getcwd()
@@ -903,11 +904,15 @@ class VASPOutput():
             e = []
             for s in strings:
                 e.append(float(s.split()[4]))
-
+            # -- find number of atoms
+            st = pmgIS.from_file(self.filename)
+            atoms = [str(i) for i in st.species]
+            e_per_atom = float(e[-1]) / float(len(atoms))
             if len(e) == 0:
                 energies.append(0)
             else:
                 energies.append(e[-1])
+                energies_per_atom.append(e_per_atom)
 
             s, c, done, z = self.vasp_status()
             converged.append(c)
@@ -917,12 +922,15 @@ class VASPOutput():
 
         energy_list = {}
         energy_list['Directory'] = out_dirs
-        energy_list['Total energy(eV)'] = energies
+        energy_list['Total energy (eV)'] = energies
+        energy_list['Energy/atom (eV)'] = energies_per_atom
         energy_list['Converged'] = converged
         energy_list['End of Calculation'] = end_calc
 
         df = pd.DataFrame(energy_list)
-        df = df[['Directory', 'Total energy(eV)', 'End of Calculation', 'Converged']]
+        df = df[['Directory', 'Total energy (eV)', 'Energy/atom (eV)', 'End of Calculation', 'Converged']]
+        pd.set_option('display.max_rows', None)
+        pd.set_option('expand_frame_repr', False)
         print(df)
         pwd = os.getcwd()
         pwd = pwd.split("/")[-1]
