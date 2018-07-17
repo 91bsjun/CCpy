@@ -905,7 +905,7 @@ class VASPOutput():
             for s in strings:
                 e.append(float(s.split()[4]))
             # -- find number of atoms
-            st = pmgIS.from_file(self.filename)
+            st = pmgIS.from_file("POSCAR")
             atoms = [str(i) for i in st.species]
             e_per_atom = float(e[-1]) / float(len(atoms))
             if len(e) == 0:
