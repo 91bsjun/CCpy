@@ -171,20 +171,28 @@ elif sys.argv[1] == "-zip":
         VO.vasp_zip(dirs)
 
         
-elif sys.argv[2] == "-e":
+elif sys.argv[1] == "-e":
     """
     Handling errors based on Materials Project's custodian module.
     listed 01_unconverged_jobs.csv file
     """
     if "01_unconverged_jobs.csv" not in os.listdir("./"):
-        print("01_unconverged_jobs.csv was not found in this directory.")
+        print("\n01_unconverged_jobs.csv was not found in this directory.")
         print("Create it using: CCpyVASPAnal.py 0")
         quit()
     df = pd.read_csv("01_unconverged_jobs.csv")
+    try:
+        df = df.drop('Unnamed: 0', 1)
+    except:
+        pass
     dirs = df['Directory'].tolist()
-    VO = VASPOutput()
-    VO.vasp_error_handle(dirs)
-
+    print("\n* Following ERROR jobs will be handled.")
+    print(df)
+    
+    proceed = raw_input("\nContinue? (y/n) ")
+    if proceed == "y":
+        VO = VASPOutput()
+        VO.vasp_error_handle(dirs)
 
 
 

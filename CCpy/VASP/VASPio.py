@@ -1098,7 +1098,14 @@ class VASPOutput():
 
         pwd = os.getcwd()
         err_log = {}
+        cnt = 0
+        print("\n    Parsing ERROR jobs....")
         for d in dirs:
+            msg = "  [  " + str(cnt + 1).rjust(6) + " / " + str(len(dirs)).rjust(6) + "  ]"
+            cnt += 1
+            sys.stdout.write(msg)
+            sys.stdout.flush()
+            sys.stdout.write("\b" * len(msg))
             os.chdir(d)
             # -- 1. check error
             veh = VaspErrorHandler()
@@ -1118,6 +1125,7 @@ class VASPOutput():
         f.write(jstring)
         f.close()
         print("* Handled error log saved: 02_error_handle.json")
+        print("\nDone.")
 
     def vasp_zip(self, dirs):
         cnt = 0
