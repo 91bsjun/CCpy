@@ -2,7 +2,7 @@ import os, sys, re
 import time
 import matplotlib.pyplot as plt
 import pandas as pd
-import json
+import json, yaml
 from collections import OrderedDict
 
 from CCpy.VASP.VASPtools import vasp_incar_json, vasp_phonon_incar_json, magmom_parameters, ldauu_parameters, ldauj_parameters, ldaul_parameters, vasp_grimme_parameters
@@ -1120,11 +1120,15 @@ class VASPOutput():
                 err_action = ueh.correct()
             err_log[d] = err_action
             os.chdir(pwd)
-        jstring = json.dumps(err_log, indent=2)
-        f = open("02_error_handle.json", "w")
-        f.write(jstring)
+        err_log = OrderedDict(err_log)
+        # -- ordered dict encoding to yaml
+        def represent_dictionary_order(self, dict_data):
+            return self.represent_mapping('tag:yaml.org,2002:map', dict_data.items())
+        yaml.add_representer(OrderedDict, represent_dictionary_order)
+        f = open("02_error_handled.yaml", "w")
+        f.write(yaml.dump(dic, default_flow_style=False))
         f.close()
-        print("* Handled error log saved: 02_error_handle.json")
+        print("* Handled error log saved: 02_error_handled.yaml")
         print("\nDone.")
 
     def vasp_zip(self, dirs):
