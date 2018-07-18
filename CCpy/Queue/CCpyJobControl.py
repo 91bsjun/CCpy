@@ -63,7 +63,7 @@ class JobSubmit():
         cpu, mem, q = self.n_of_cpu, self.mem, self.q
         d = self.divided
 
-        mem = mem / d
+        mem = int(mem / d)
 
         f = open(inputfile, "r")
         lines = f.readlines()
@@ -163,7 +163,7 @@ cat $TMPDIR/machines
         f.write(mpi)
         f.close()
         shl(queue_path+"qsub mpi.sh", shell=True)
-        #shl("rm -rf ./mpi.sh", shell=True)
+        shl("rm -rf ./mpi.sh", shell=True)
         os.chdir(pwd)
 
     def vasp_batch(self, cpu=None, mem=None, q=None, band=False, dirs=None, scratch=False):

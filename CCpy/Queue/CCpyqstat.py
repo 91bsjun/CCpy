@@ -82,8 +82,11 @@ def CCpyqstat(in_user="*", in_status="", node_check=False):
     
 def get_empty_nodes(df):
     # ------------------ Nodes checking ----------------- #
-    for i in range(len(df)):
-        running_df = df[(df['   STATUS'] == 'r')]
+    if len(df) != 0:
+        for i in range(len(df)):
+            running_df = df[(df['   STATUS'] == 'r')]
+    else:
+        running_df = []
         
     # -- make all nodes and slots info
     keys = queue_info.keys()
@@ -117,9 +120,10 @@ def get_empty_nodes(df):
 
 def get_waiting_nodes(df):
     # -- make wating nodes and counting
-    waiting_df = df[(df['   STATUS'] == 'qw')].reset_index()
-    if len(waiting_df) == 0:
-        quit()
+    if len(df) != 0:
+        waiting_df = df[(df['   STATUS'] == 'qw')].reset_index()
+    else:
+        quit() 
     waitings = {}
     for i in range(len(waiting_df)):
         if waiting_df['QUEUE-NODE'][i] in waitings.keys():
