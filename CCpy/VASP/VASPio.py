@@ -13,6 +13,7 @@ from CCpy.Tools.CCpyTools import file_writer, linux_command, change_dict_key, sa
 
 
 from pymatgen.core import IStructure as pmgIS
+from pymatgen.io.vasp import Vasprun
 from pymatgen.io.vasp.inputs import Incar, Poscar, Potcar, Kpoints, Kpoints_supported_modes
 from pymatgen.io.vasp.sets import *
 
@@ -893,8 +894,14 @@ class VASPOutput():
         converged = []
         end_calc = []
         pwd = os.getcwd()
-
+        print("\n    Parsing VASP jobs....")
+        cnt = 0
         for o in out_dirs:
+            msg = "  [  " + str(cnt + 1).rjust(6) + " / " + str(len(dirs)).rjust(6) + "  ]"
+            cnt += 1
+            sys.stdout.write(msg)
+            sys.stdout.flush()
+            sys.stdout.write("\b" * len(msg))
             os.chdir(o)
 
             OUTCAR = open("OUTCAR", "r").read()
@@ -914,8 +921,8 @@ class VASPOutput():
                 energies.append(e[-1])
                 energies_per_atom.append(e_per_atom)
 
-            s, c, done, z = self.vasp_status()
-            converged.append(c)
+            stat, done, converged, electronic_converged, ionic_converged, zipped = self.vasp_status()
+            converged.append(converged)
             end_calc.append(done)
 
             os.chdir(pwd)
@@ -956,72 +963,56 @@ class VASPOutput():
 
         return Status, Convergence, Done, Zipped
         """
-        s = " "
-        c = " "
-        done = " "
-        z = " "
+        stat, converged, done, zipped = " ", " ", " ", " "
         # -- only inputs in dir or OUTCAR not in directory
-        if len(os.listdir("./")) == 4 or "OUTCAR" not in os.listdir("./"):
-            s = "Not started"
+        if "vasp.done" in os.listdir("./"):
+            done = "True"
         else:
-            if "vasp.done" in os.listdir("./"):
-                done = "True" 
+            done = " "
+        # -- zipped or not
+        if "data.tar.gz" in os.listdir("./"):
+            zipped = "True"
+        else:
+            zipped = "False"
+        # -- OUTCAR
+        outcar = os.popen("tail OUTCAR").read()
+        if len(outcar) == 0:
+            stat = "Not Started"
+        else:
+            # -- properly terminated
+            if "User time (sec):" in outcar:
+                stat = "Properly terminated"
             else:
-                done = " "
-            # -- zipped or not
-            if "data.tar.gz" in os.listdir("./"):
-                z = "True"
-            else:
-                z = "False"
-            # -- OUTCAR
-            outcar = os.popen("tail OUTCAR").read()
-            if len(outcar) == 0:
-                s = "Not calculated"
-            else:
-                # -- properly terminated
-                if "User time (sec):" in outcar:
-                    s = "Properly terminated"
-                elif "Error EDDDAV" in outcar:
-                    s = "Error termination"
-                else:
-                    s = "Not properly terminated"
+                stat = "Not properly terminated"
 
-                # -- check not converged
-                vasp_out = None
-                if "vasp.out" in os.listdir("./"):
-                    vasp_out = "vasp.out"
+            # -- check converged
+            try:
+                v = Vasprun("vasprun.xml")
+                converged = v.converged
+                if converged == "False":
+                    electronic_converged = v.converged_electronic
+                    ionic_converged = v.converged_ionic
                 else:
-                    for filename in os.listdir("./"):
-                        if filename.split(".o")[-1].isdigit():
-                            vasp_out = filename
-                # -- parsing queue output
-                if vasp_out:
-                    vasp_out = os.popen("tail " + vasp_out).read()
-                    if len(vasp_out) < 2:
-                        c = "Something wrong in queue output file.."
+                    electronic_converged, ionic_converged = "True", "True"
+            except:
+                try:
+                    v = Vasprun("vasprun.xml.gz")
+                    converged = v.converged
+                    if converged == "False":
+                        electronic_converged = v.converged_electronic
+                        ionic_converged = v.converged_ionic
                     else:
-                        if "please rerun with smaller EDIFF" in vasp_out:
-                            c = "False"
-                        elif "reached required accuracy" in vasp_out:
-                            c = "True"
-                        elif "ZBRENT:  accuracy reached" in vasp_out:
-                            c = "False"
-                        elif done == "True" and "   1 F=" in vasp_out:
-                            c = "True"
-                        else:
-                            c = "False"
-                else:
-                    c = "Cannot find queue output file.."
+                        electronic_converged, ionic_converged = "True", "True"
+                except:
+                    converged = "False"
 
-        return s, c, done, z
+
+        return stat, done, converged, electronic_converged, ionic_converged, zipped
 
 
 
     def check_terminated(self, dirs=[]):
-        status = []
-        converged = []
-        finished = []
-        zipped = []
+        tot_status, tot_converged, tot_e_converged, tot_i_converged, tot_finished, tot_zipped = [], [], [], [], [], []
         pwd = os.getcwd()
         print("\n    Parsing VASP jobs....")
         cnt = 0
@@ -1033,33 +1024,36 @@ class VASPOutput():
             sys.stdout.write("\b" * len(msg))
             os.chdir(d)
 
-            s, c, done, z = self.vasp_status()
-            
-            status.append(s)
-            converged.append(c)
-            finished.append(done) 
-            zipped.append(z)
+            stat, done, converged, electronic_converged, ionic_converged, zipped = self.vasp_status()
+
+            tot_status.append(stat)
+            tot_converged.append(converged)
+            tot_i_converged.append(electronic_converged)
+            tot_e_converged.append(ionic_converged)
+            tot_finished.append(done)
+            tot_zipped.append(zipped)
             os.chdir(pwd)
 
-        df = pd.DataFrame({"Directory": dirs, "    End of calculation": finished, "Status": status, "Converged": converged, "Zipped": zipped})
-        df = df[['Directory', 'Status', '    End of calculation', 'Converged', 'Zipped']]
+        df = pd.DataFrame({"Directory": dirs, "Job end": tot_finished, "Status": tot_status, "Converged": tot_converged,
+                           "Elec-converged": tot_e_converged, "Ion-converged": tot_i_converged, "Zipped": tot_zipped})
+        df = df[['Directory', 'Status', 'Job end', 'Converged', 'Elec-converged', 'Ion-converged', 'Zipped']]
         pd.set_option('display.max_rows', None)
 
 
         # -- Show job infos
         total = len(df)
-        done = len(df[(df['    End of calculation'] == "True")])
+        done = len(df[(df['Job end'] == "True")])
         cvg_df = df[(df['Converged'] == "True")]
-        converged = len(cvg_df[(cvg_df['Status'] == "Properly terminated")])
+        converged = len(cvg_df)
         not_cvg_df = df[(df['Converged'] == "False")]
-        not_cvg_df = not_cvg_df[(not_cvg_df['    End of calculation'] == "True")]
+        not_cvg_df = not_cvg_df[(not_cvg_df['Job end'] == "True")]
         not_converged = len(not_cvg_df)
         zipped = len(df[(df['Zipped'] == "True")])
 
-        counts = {'Total':[total], '    End of calculation':[done], 'Zipped':[zipped], 'Converged':[converged], 'Unconverged':[not_converged]}
+        counts = {'Total':[total], 'Job end':[done], 'Zipped':[zipped], 'Converged':[converged], 'Unconverged':[not_converged]}
 
         count_df = pd.DataFrame(counts)
-        count_df = count_df[['Total', '    End of calculation', 'Converged', 'Unconverged', 'Zipped']]
+        count_df = count_df[['Total', 'Job end', 'Converged', 'Unconverged', 'Zipped']]
         print("\n\n* Current status :")
         print(count_df)
 
@@ -1073,11 +1067,9 @@ class VASPOutput():
             print(not_cvg_df)
             not_cvg_df.to_csv("01_unconverged_jobs.csv")
             print("You can recalculate using '01_unconverged_jobs.csv' file.")
+        else:
+            print("All jobs are converged.")
         print("\n* Detail information saved in: 00_jobs_status.txt")
-
-        
-        
-
 
 
     def vasp_zip(self, dirs):
@@ -1095,7 +1087,7 @@ class VASPOutput():
             sys.stdout.flush()
             sys.stdout.write("\b" * len(msg))
             if "data.tar.gz" not in os.listdir("./"):
-                linux_command("rm CHG;tar -zcf data.tar.gz CHGCAR DOSCAR PROCAR XDATCAR")
+                linux_command("rm CHG;tar -zcf data.tar.gz CHGCAR DOSCAR PROCAR XDATCAR;gzip vasprun.xml")
                 linux_command("rm CHGCAR DOSCAR PROCAR XDATCAR")
             else:
                 print("\nSkip: " + str(d) + "(zipped file already eixst)")
