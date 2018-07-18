@@ -77,7 +77,7 @@ def vasp(queue=None, n_of_cpu=None):
         elif phonon:
             dirpath += "/Phonon_opt"
         myJS = JS(each_input, queue, n_of_cpu)
-        myJS.vasp(band=band, dirpath=dirpath)
+        myJS.vasp(band=band, dirpath=dirpath, phonon=phonon)
 
 def vasp_batch(queue=None, n_of_cpu=None, scratch=False):
     # --- Collect VASP inputs
@@ -86,6 +86,9 @@ def vasp_batch(queue=None, n_of_cpu=None, scratch=False):
     if "-band" in sys.argv:
         band = True
         inputs = selectVASPInputs("./", ask=ask, band=True)
+    elif "-phonon" in sys.argv:
+        phonon = True
+        inputs = selectVASPInputs("./", ask=ask, phonon=True)
     elif "-r" in sys.argv:
         recalc = True
         if "01_unconverged_jobs.csv" not in os.listdir("./"):
@@ -114,6 +117,8 @@ def vasp_batch(queue=None, n_of_cpu=None, scratch=False):
         dirpath = pwd + "/" + each_input
         if band:
             dirpath += "/Band-DOS"
+        elif phonon:
+            dirpath += "/Phonon_opt"
         dirs.append(dirpath)
     myJS = JS(each_input, queue, n_of_cpu)
     myJS.vasp_batch(band=band, dirs=dirs, scratch=scratch)
