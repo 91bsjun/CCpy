@@ -1118,15 +1118,16 @@ class VASPOutput():
                 ueh = UnconvergedErrorHandler()
                 ueh_check = ueh.check()
                 err_action = ueh.correct()
-            err_log[d] = err_action
+            err_log[d] = OrderedDict(err_action)
             os.chdir(pwd)
         err_log = OrderedDict(err_log)
         # -- ordered dict encoding to yaml
         def represent_dictionary_order(self, dict_data):
             return self.represent_mapping('tag:yaml.org,2002:map', dict_data.items())
         yaml.add_representer(OrderedDict, represent_dictionary_order)
+        # -- save error log as yaml file
         f = open("02_error_handled.yaml", "w")
-        f.write(yaml.dump(dic, default_flow_style=False))
+        f.write(yaml.dump(err_log, default_flow_style=False))
         f.close()
         print("* Handled error log saved: 02_error_handled.yaml")
         print("\nDone.")
