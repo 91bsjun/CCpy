@@ -82,6 +82,7 @@ def vasp(queue=None, n_of_cpu=None):
 def vasp_batch(queue=None, n_of_cpu=None, scratch=False):
     # --- Collect VASP inputs
     band = False
+    phonon = False
     recalc = False
     if "-band" in sys.argv:
         band = True
