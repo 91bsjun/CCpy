@@ -11,11 +11,13 @@ from CCpy.Tools.CCpyStructure import PeriodicStructure as PS
 from CCpy.Tools.CCpyStructure import latticeGen
 from CCpy.Tools.CCpyTools import file_writer, linux_command, change_dict_key, save_json, load_json
 
-
 from pymatgen.core import IStructure as pmgIS
 from pymatgen.io.vasp import Vasprun
 from pymatgen.io.vasp.inputs import Incar, Poscar, Potcar, Kpoints, Kpoints_supported_modes
 from pymatgen.io.vasp.sets import *
+
+import warnings
+warnings.filterwarnings("ignore")
 
 version = sys.version
 if version[0] == '3':
@@ -921,8 +923,8 @@ class VASPOutput():
                 energies.append(e[-1])
                 energies_per_atom.append(e_per_atom)
 
-            stat, done, converged, electronic_converged, ionic_converged, zipped = self.vasp_status()
-            converged.append(converged)
+            stat, done, cvgd, electronic_converged, ionic_converged, zipped = self.vasp_status()
+            converged.append(cvgd)
             end_calc.append(done)
 
             os.chdir(pwd)
@@ -931,11 +933,11 @@ class VASPOutput():
         energy_list['Directory'] = out_dirs
         energy_list['Total energy (eV)'] = energies
         energy_list['Energy/atom (eV)'] = energies_per_atom
-        energy_list['Converged'] = converged
-        energy_list['End of Calculation'] = end_calc
+        energy_list['  Converged'] = converged
+        energy_list['    Job end'] = end_calc
 
         df = pd.DataFrame(energy_list)
-        df = df[['Directory', 'Total energy (eV)', 'Energy/atom (eV)', 'End of Calculation', 'Converged']]
+        df = df[['Directory', 'Total energy (eV)', 'Energy/atom (eV)', '    Job end', '  Converged']]
         pd.set_option('display.max_rows', None)
         pd.set_option('expand_frame_repr', False)
         print(df)
@@ -963,7 +965,7 @@ class VASPOutput():
 
         return Status, Convergence, Done, Zipped
         """
-        stat, converged, done, zipped = " ", " ", " ", " "
+        stat, converged, electronic_converged, ionic_converged, done, zipped = " ", " ", " ", " ", " ", " "
         # -- only inputs in dir or OUTCAR not in directory
         if "vasp.done" in os.listdir("./"):
             done = "True"
@@ -975,20 +977,38 @@ class VASPOutput():
         else:
             zipped = "False"
         # -- OUTCAR
-        outcar = os.popen("tail OUTCAR").read()
-        if len(outcar) == 0:
+        if "OUTCAR" not in os.listdir("./"):
             stat = "Not Started"
         else:
+            outcar = os.popen("tail OUTCAR").read()
+            if len(outcar) == 0:
+                stat = "Not Started"
             # -- properly terminated
             if "User time (sec):" in outcar:
                 stat = "Properly terminated"
             else:
                 stat = "Not properly terminated"
 
+
             # -- check converged
+            # -- using vasp.out
+            from custodian.vasp.handlers import VaspErrorHandler
+            if "vasp.out" not in os.listdir("./"):
+                converged, electronic_converged, ionic_converged = "False", "False", "False"
+            else:
+                subset = VaspErrorHandler.error_msgs
+                incar = Incar.from_file("INCAR")
+                nsw = incar['NSW']
+                subset['max_ionic'] = ['%s F=' % (nsw)]
+                veh = VaspErrorHandler(errors_subset_to_catch=subset)
+                converged = str(not veh.check())
+                electronic_converged, ionic_converged = converged, converged           
+            
+            '''
+            # using vasprun.xml
             try:
-                v = Vasprun("vasprun.xml")
-                converged = v.converged
+                v = Vasprun("vasprun.xml", parse_dos=False, parse_eigen=False, parse_potcar_file=False)
+                converged = str(v.converged)
                 if converged == "False":
                     electronic_converged = v.converged_electronic
                     ionic_converged = v.converged_ionic
@@ -997,16 +1017,16 @@ class VASPOutput():
             except:
                 try:
                     v = Vasprun("vasprun.xml.gz")
-                    converged = v.converged
+                    converged = str(v.converged)
                     if converged == "False":
                         electronic_converged = v.converged_electronic
                         ionic_converged = v.converged_ionic
                     else:
                         electronic_converged, ionic_converged = "True", "True"
                 except:
-                    converged = "False"
-
-
+                    converged, electronic_converged, ionic_converged = "False", "False", "False"
+            
+            '''
         return stat, done, converged, electronic_converged, ionic_converged, zipped
 
 
@@ -1034,26 +1054,26 @@ class VASPOutput():
             tot_zipped.append(zipped)
             os.chdir(pwd)
 
-        df = pd.DataFrame({"Directory": dirs, "Job end": tot_finished, "Status": tot_status, "Converged": tot_converged,
-                           "Elec-converged": tot_e_converged, "Ion-converged": tot_i_converged, "Zipped": tot_zipped})
-        df = df[['Directory', 'Status', 'Job end', 'Converged', 'Elec-converged', 'Ion-converged', 'Zipped']]
+        df = pd.DataFrame({"Directory": dirs, "    Job end": tot_finished, "Status": tot_status, "  Converged": tot_converged,
+                           "  Elec-converged": tot_e_converged, "  Ion-converged": tot_i_converged, "Zipped": tot_zipped})
+        df = df[['Directory', 'Status', '    Job end', '  Converged', '  Elec-converged', '  Ion-converged', 'Zipped']]
         pd.set_option('display.max_rows', None)
 
 
         # -- Show job infos
         total = len(df)
-        done = len(df[(df['Job end'] == "True")])
-        cvg_df = df[(df['Converged'] == "True")]
+        done = len(df[(df['    Job end'] == "True")])
+        cvg_df = df[(df['  Converged'] == "True")]
         converged = len(cvg_df)
-        not_cvg_df = df[(df['Converged'] == "False")]
-        not_cvg_df = not_cvg_df[(not_cvg_df['Job end'] == "True")]
+        not_cvg_df = df[(df['  Converged'] == "False")]
+        not_cvg_df = not_cvg_df[(not_cvg_df['    Job end'] == "True")]
         not_converged = len(not_cvg_df)
         zipped = len(df[(df['Zipped'] == "True")])
 
-        counts = {'Total':[total], 'Job end':[done], 'Zipped':[zipped], 'Converged':[converged], 'Unconverged':[not_converged]}
+        counts = {'Total':[total], '    Job end':[done], 'Zipped':[zipped], '  Converged':[converged], 'Unconverged':[not_converged]}
 
         count_df = pd.DataFrame(counts)
-        count_df = count_df[['Total', 'Job end', 'Converged', 'Unconverged', 'Zipped']]
+        count_df = count_df[['Total', '    Job end', '  Converged', 'Unconverged', 'Zipped']]
         print("\n\n* Current status :")
         print(count_df)
 
@@ -1070,6 +1090,10 @@ class VASPOutput():
         else:
             print("All jobs are converged.")
         print("\n* Detail information saved in: 00_jobs_status.txt")
+
+   
+    def vasp_error_handle(self, dirs):
+         
 
 
     def vasp_zip(self, dirs):
