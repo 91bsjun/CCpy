@@ -1093,8 +1093,31 @@ class VASPOutput():
 
    
     def vasp_error_handle(self, dirs):
-         
+        from custodian.vasp.handlers import VaspErrorHandler, UnconvergedErrorHandler
+        import json
 
+        pwd = os.getcwd()
+        err_log = {}
+        for d in dirs:
+            os.chdir(d)
+            # -- 1. check error
+            veh = VaspErrorHandler()
+            err = veh.check()
+            err_action = " "
+            if err:
+                err_action = veh.correct()
+            # -- 2. check unconverged
+            else:
+                ueh = UnconvergedErrorHandler()
+                ueh_check = ueh.check()
+                err_action = ueh.correct()
+            err_log[d] = err_action
+            os.chdir(pwd)
+        jstring = json.dumps(err_log, indent=2)
+        f = open("02_error_handle.json", "w")
+        f.write(jstring)
+        f.close()
+        print("* Handled error log saved: 02_error_handle.json")
 
     def vasp_zip(self, dirs):
         cnt = 0

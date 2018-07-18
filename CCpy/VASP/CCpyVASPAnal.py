@@ -19,23 +19,26 @@ except:
 -sub : deep in subdirectories
 
 [options]
-d : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
+-d : Clear VASP output files (except of POSCAR, POTCAR, KPOINTS, INCAR)
     ex) CCpyVASPAnal.py d
 
-0 : Check vasp job status.
+ 0 : Check vasp job status.
     ex) CCpyVASPAnal.py 0
 
-1 : Get final structures
+ 1 : Get final structures
     ex) CCpyVASPAnal.py 1
 
-2 : Get final total energy list
+ 2 : Get final total energy list
     ex) CCpyVASPAnal.py 2 n  : sub option n -> do not show plot
 
-3 : Energy & Cell volume convergence plot
+ 3 : Energy & Cell volume convergence plot
     ex) CCpyVASPAnal.py 3 n  : sub option n -> do not show plot
 
-4 : Generate cif file from POSCAR or CONTCAR
+ 4 : Generate cif file from POSCAR or CONTCAR
     ex) CCpyVASPAnal.py 4
+
+-e : Handling errors listed '01_unconverged_jobs.csv' file 
+     based on Materials Project's custodian module.
 
 -zip : zip unnecessary files (remove CHG, zip CHGCAR DOSCAR PROCAR XDATCAR)
     ex) CCpyVASPAnal.py -zip      -> user choose directories
@@ -54,7 +57,7 @@ sub = False
 if "-sub" in sys.argv:
     sub = True
 
-if sys.argv[1] == "d":
+if sys.argv[1] == "-d":
     inputfiles = ["INCAR","POSCAR","POTCAR","KPOINTS"]
     inputs = selectVASPOutputs("./")
     for each_input in inputs:
@@ -168,8 +171,19 @@ elif sys.argv[1] == "-zip":
         VO.vasp_zip(dirs)
 
         
-    
-
+elif sys.argv[2] == "-e":
+    """
+    Handling errors based on Materials Project's custodian module.
+    listed 01_unconverged_jobs.csv file
+    """
+    if "01_unconverged_jobs.csv" not in os.listdir("./"):
+        print("01_unconverged_jobs.csv was not found in this directory.")
+        print("Create it using: CCpyVASPAnal.py 0")
+        quit()
+    df = pd.read_csv("01_unconverged_jobs.csv")
+    dirs = df['Directory'].tolist()
+    VO = VASPOutput()
+    VO.vasp_error_handle(dirs)
 
 
 
