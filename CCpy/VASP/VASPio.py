@@ -916,11 +916,11 @@ class VASPOutput():
             # -- find number of atoms
             st = pmgIS.from_file("POSCAR")
             atoms = [str(i) for i in st.species]
-            e_per_atom = float(e[-1]) / float(len(atoms))
             if len(e) == 0:
                 energies.append(0)
             else:
                 energies.append(e[-1])
+                e_per_atom = float(e[-1]) / float(len(atoms))
                 energies_per_atom.append(e_per_atom)
 
             stat, done, cvgd, electronic_converged, ionic_converged, zipped, err_msg = self.vasp_status()
