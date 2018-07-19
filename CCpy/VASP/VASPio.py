@@ -965,7 +965,7 @@ class VASPOutput():
 
         return Status, Convergence, Done, Zipped
         """
-        stat, converged, electronic_converged, ionic_converged, done, zipped = " ", " ", " ", " ", " ", " "
+        stat, converged, electronic_converged, ionic_converged, done, zipped, err_msg = " ", " ", " ", " ", " ", " ", " "
         # -- only inputs in dir or OUTCAR not in directory
         if "vasp.done" in os.listdir("./"):
             done = "True"
@@ -1003,6 +1003,8 @@ class VASPOutput():
                 veh = VaspErrorHandler(errors_subset_to_catch=subset)
                 converged = str(not veh.check())
                 electronic_converged, ionic_converged = converged, converged           
+                if converged == "False":
+                    err_msg = list(veh.errors)[0]
             
             '''
             # using vasprun.xml
@@ -1027,12 +1029,12 @@ class VASPOutput():
                     converged, electronic_converged, ionic_converged = "False", "False", "False"
             
             '''
-        return stat, done, converged, electronic_converged, ionic_converged, zipped
+        return stat, done, converged, electronic_converged, ionic_converged, zipped, err_msg
 
 
 
     def check_terminated(self, dirs=[]):
-        tot_status, tot_converged, tot_e_converged, tot_i_converged, tot_finished, tot_zipped = [], [], [], [], [], []
+        tot_status, tot_converged, tot_e_converged, tot_i_converged, tot_finished, tot_zipped, tot_err_msg = [], [], [], [], [], [], []
         pwd = os.getcwd()
         print("\n    Parsing VASP jobs....")
         cnt = 0
@@ -1044,7 +1046,7 @@ class VASPOutput():
             sys.stdout.write("\b" * len(msg))
             os.chdir(d)
 
-            stat, done, converged, electronic_converged, ionic_converged, zipped = self.vasp_status()
+            stat, done, converged, electronic_converged, ionic_converged, zipped, err_msg = self.vasp_status()
 
             tot_status.append(stat)
             tot_converged.append(converged)
@@ -1052,11 +1054,12 @@ class VASPOutput():
             tot_e_converged.append(ionic_converged)
             tot_finished.append(done)
             tot_zipped.append(zipped)
+            tot_err_msg.append(err_msg)
             os.chdir(pwd)
 
         df = pd.DataFrame({"Directory": dirs, "    Job end": tot_finished, "Status": tot_status, "  Converged": tot_converged,
-                           "  Elec-converged": tot_e_converged, "  Ion-converged": tot_i_converged, "Zipped": tot_zipped})
-        df = df[['Directory', 'Status', '    Job end', '  Converged', '  Elec-converged', '  Ion-converged', 'Zipped']]
+                           "  Elec-converged": tot_e_converged, "  Ion-converged": tot_i_converged, "Zipped": tot_zipped, "  Err msg": tot_err_msg})
+        df = df[['Directory', 'Status', '    Job end', '  Converged', '  Elec-converged', '  Ion-converged', 'Zipped', '  Err msg']]
         pd.set_option('display.max_rows', None)
 
 
