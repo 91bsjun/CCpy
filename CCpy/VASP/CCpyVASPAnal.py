@@ -30,6 +30,8 @@ except:
 
  2 : Get final total energy list
     ex) CCpyVASPAnal.py 2 n  : sub option n -> do not show plot
+    ex) CCpyVASPAnal.py 2 n -st  : sub option '-st' -> sort by total energy
+    ex) CCpyVASPAnal.py 2 n -sa  : sub option '-st' -> sort by energy/atom
 
  3 : Energy & Cell volume convergence plot
     ex) CCpyVASPAnal.py 3 n  : sub option n -> do not show plot
@@ -40,7 +42,7 @@ except:
 -e : Handling errors listed '01_unconverged_jobs.csv' file 
      based on Materials Project's custodian module.
 
--zip : zip unnecessary files (remove CHG, zip CHGCAR DOSCAR PROCAR XDATCAR)
+-zip : zip unnecessary files (remove CHG, zip CHGCAR DOSCAR PROCAR XDATCAR vasprun.xml)
     ex) CCpyVASPAnal.py -zip      -> user choose directories
     ex) CCpyVASPAnal.py -zip -sub -> user choose directories (include subdirectories)
     ex) CCpyVASPAnal.py -zip -auto        -> automatically detect converged jobs
