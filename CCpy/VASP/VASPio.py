@@ -885,7 +885,7 @@ class VASPOutput():
             plt.show()
 
 
-    def get_energy_list(self, show_plot=True, dirs=None):
+    def get_energy_list(self, show_plot=True, dirs=None, sort=False):
         # dirs = [d for d in os.listdir("./") if os.path.isdir(d)]
         out_dirs = [d for d in dirs if "OUTCAR" in os.listdir(d)]
         out_dirs.sort()
@@ -923,7 +923,7 @@ class VASPOutput():
                 energies.append(e[-1])
                 energies_per_atom.append(e_per_atom)
 
-            stat, done, cvgd, electronic_converged, ionic_converged, zipped = self.vasp_status()
+            stat, done, cvgd, electronic_converged, ionic_converged, zipped, err_msg = self.vasp_status()
             converged.append(cvgd)
             end_calc.append(done)
 
@@ -940,6 +940,10 @@ class VASPOutput():
         df = df[['Directory', 'Total energy (eV)', 'Energy/atom (eV)', '    Job end', '  Converged']]
         pd.set_option('display.max_rows', None)
         pd.set_option('expand_frame_repr', False)
+        if sort == "tot":
+            df = df.sort_values(by='Total energy (eV)')
+        elif sort == "atom":
+            df = df.sort_values(by='Energy/atom (eV)')
         print(df)
         pwd = os.getcwd()
         pwd = pwd.split("/")[-1]

@@ -96,6 +96,7 @@ elif sys.argv[1] == "1":
 
 elif sys.argv[1] == "2":
     show_plot = True
+    sort = False
     try:
         show_chk = sys.argv[2]
         if show_chk == "n":
@@ -105,7 +106,11 @@ elif sys.argv[1] == "2":
     dirs = selectVASPOutputs("./", ask=False, sub=sub)
     dirs = [d for d in dirs if "OUTCAR" in os.listdir(d)]
     VO = VASPOutput()
-    VO.get_energy_list(show_plot=show_plot, dirs=dirs)
+    if "-st" in sys.argv:
+        sort = "tot"
+    elif "-sa" in sys.argv:
+        sort = "atom"
+    VO.get_energy_list(show_plot=show_plot, dirs=dirs, sort=sort)
 
 elif sys.argv[1] == "3":
     # -- Check show plot
