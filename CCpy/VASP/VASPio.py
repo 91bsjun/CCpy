@@ -918,6 +918,7 @@ class VASPOutput():
             atoms = [str(i) for i in st.species]
             if len(e) == 0:
                 energies.append(0)
+                energies_per_atom.append(0)
             else:
                 energies.append(e[-1])
                 e_per_atom = float(e[-1]) / float(len(atoms))
