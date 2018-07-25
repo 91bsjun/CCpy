@@ -984,6 +984,8 @@ class VASPOutput():
         # -- OUTCAR
         if "OUTCAR" not in os.listdir("./"):
             stat = "Not Started"
+        elif "vasp.done" not in os.listdir("./"):
+            stat = "Not finished"
         else:
             outcar = os.popen("tail OUTCAR").read()
             if len(outcar) == 0:
