@@ -151,7 +151,7 @@ cat $TMPDIR/machines
 
 
  cd %s
-
+ rm vasp.done
  %s -np $NSLOTS %s < /dev/null > vasp.out
  touch vasp.done
 
@@ -174,7 +174,7 @@ cat $TMPDIR/machines
         jobname = raw_input("Jobname for this job \n: ")
 
         runs = ""
-        each_run = "%s -np $NSLOTS %s < /dev/null > vasp.out\ntouch vasp.done\n" % (vasp_mpi_run, vasp_path)
+        each_run = "rm vasp.done\n%s -np $NSLOTS %s < /dev/null > vasp.out\ntouch vasp.done\n" % (vasp_mpi_run, vasp_path)
         for d in dirs:
             if scratch:
                 dir_path = "/scratch/vasp" + d
