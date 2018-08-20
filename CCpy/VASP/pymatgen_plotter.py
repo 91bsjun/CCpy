@@ -1260,8 +1260,11 @@ class BSPlotterProjected(BSPlotter):
 
         band_linewidth = line_width # editted
 
-        if len(self._bs.structure.composition.elements) > 3:
-            raise ValueError
+#        if len(self._bs.structure.composition.elements) > 3:
+#            raise ValueError
+        if len(elt_ordered) > 3:
+             print("Maximum 3 elements available.")
+             quit()
         if elt_ordered is None:
             elt_ordered = self._bs.structure.composition.elements
 
