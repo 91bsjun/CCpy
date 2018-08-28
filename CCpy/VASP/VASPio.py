@@ -1149,6 +1149,12 @@ class VASPOutput():
         for d in dirs:
             if len(d) > minimum_length:
                 minimum_length = len(d)
+
+        def gzip(file_list):
+            for f in file_list:
+                if f in os.listdir("./"):
+                    os.system("gzip %s" % f)
+
         for d in dirs:
             os.chdir(d)
             msg = "  [  " + str(cnt+1).rjust(6) + " / " + str(len(dirs)).rjust(6) + "  ]"
@@ -1156,11 +1162,9 @@ class VASPOutput():
             sys.stdout.write(msg)
             sys.stdout.flush()
             sys.stdout.write("\b" * len(msg))
-            if "data.tar.gz" not in os.listdir("./"):
-                linux_command("rm CHG;tar -zcf data.tar.gz CHGCAR DOSCAR PROCAR XDATCAR;gzip vasprun.xml")
-                linux_command("rm CHGCAR DOSCAR PROCAR XDATCAR")
-            else:
-                print("\nSkip: " + str(d) + "(zipped file already eixst)")
+
+            gzip(['CHG', 'CHGCAR', 'DOSCAR', 'OUTCAR', 'PROCAR', 'vasprun.xml', 'XDATCAR'])
+
             cnt+=1
             os.chdir(pwd)
         print("\nDone.")
