@@ -977,10 +977,11 @@ class VASPOutput():
         else:
             done = " "
         # -- zipped or not
-        if "data.tar.gz" in os.listdir("./"):
-            zipped = "True"
-        else:
-            zipped = "False"
+        out_files = ['CHG', 'CHGCAR', 'DOSCAR', 'OUTCAR', 'PROCAR', 'vasprun.xml', 'XDATCAR']
+        zipped = "True"
+        for f in out_files:
+            if f in os.listdir("./"):
+                zipped = "False"
         # -- OUTCAR
         if "OUTCAR" not in os.listdir("./"):
             stat = "Not Started"
@@ -1065,8 +1066,8 @@ class VASPOutput():
             os.chdir(pwd)
 
         df = pd.DataFrame({"Directory": dirs, "    Job end": tot_finished, "Status": tot_status, "  Converged": tot_converged,
-                           "  Elec-converged": tot_e_converged, "  Ion-converged": tot_i_converged, "Zipped": tot_zipped, "  Err msg": tot_err_msg})
-        df = df[['Directory', 'Status', '    Job end', '  Converged', '  Elec-converged', '  Ion-converged', 'Zipped', '  Err msg']]
+                           "  Elec-converged": tot_e_converged, "  Ion-converged": tot_i_converged, "   Zipped": tot_zipped, "  Err msg": tot_err_msg})
+        df = df[['Directory', 'Status', '    Job end', '  Converged', '  Elec-converged', '  Ion-converged', '   Zipped', '  Err msg']]
         pd.set_option('display.max_rows', None)
 
 
@@ -1078,12 +1079,12 @@ class VASPOutput():
         not_cvg_df = df[(df['  Converged'] == "False")]
         not_cvg_df = not_cvg_df[(not_cvg_df['    Job end'] == "True")]
         not_converged = len(not_cvg_df)
-        zipped = len(df[(df['Zipped'] == "True")])
+        zipped = len(df[(df['   Zipped'] == "True")])
 
-        counts = {'Total':[total], '    Job end':[done], 'Zipped':[zipped], '  Converged':[converged], 'Unconverged':[not_converged]}
+        counts = {'Total':[total], '    Job end':[done], '   Zipped':[zipped], '  Converged':[converged], 'Unconverged':[not_converged]}
 
         count_df = pd.DataFrame(counts)
-        count_df = count_df[['Total', '    Job end', '  Converged', 'Unconverged', 'Zipped']]
+        count_df = count_df[['Total', '    Job end', '  Converged', 'Unconverged', '   Zipped']]
         print("\n\n* Current status :")
         print(count_df)
 
