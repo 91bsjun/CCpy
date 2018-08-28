@@ -988,14 +988,14 @@ class VASPOutput():
         elif "vasp.done" not in os.listdir("./"):
             stat = "Not finished"
         else:
-            outcar = os.popen("tail OUTCAR").read()
-            if len(outcar) == 0:
-                stat = "Not Started"
+            #outcar = os.popen("tail OUTCAR").read()
+            #if len(outcar) == 0:
+            #    stat = "Not Started"
             # -- properly terminated
-            if "User time (sec):" in outcar:
-                stat = "Properly terminated"
-            else:
-                stat = "Not properly terminated"
+            #if "User time (sec):" in outcar:
+            #    stat = "Properly terminated"
+            #else:
+            #    stat = "Not properly terminated"
 
 
             # -- check converged
@@ -1151,7 +1151,7 @@ class VASPOutput():
             if len(d) > minimum_length:
                 minimum_length = len(d)
 
-        def gzip(file_list):
+        def gzip_exec(file_list):
             for f in file_list:
                 if f in os.listdir("./"):
                     os.system("gzip %s" % f)
@@ -1164,7 +1164,7 @@ class VASPOutput():
             sys.stdout.flush()
             sys.stdout.write("\b" * len(msg))
 
-            gzip(['CHG', 'CHGCAR', 'DOSCAR', 'OUTCAR', 'PROCAR', 'vasprun.xml', 'XDATCAR'])
+            gzip_exec(['CHG', 'CHGCAR', 'DOSCAR', 'OUTCAR', 'PROCAR', 'vasprun.xml', 'XDATCAR'])
 
             cnt+=1
             os.chdir(pwd)
