@@ -983,7 +983,7 @@ class VASPOutput():
             if f in os.listdir("./"):
                 zipped = "False"
         # -- OUTCAR
-        if "OUTCAR" not in os.listdir("./") or "OUTCAR.gz" not in os.listdir("./"):
+        if "OUTCAR" not in os.listdir("./") and "OUTCAR.gz" not in os.listdir("./"):
             stat = "Not Started"
         elif "vasp.done" not in os.listdir("./"):
             stat = "Not finished"
