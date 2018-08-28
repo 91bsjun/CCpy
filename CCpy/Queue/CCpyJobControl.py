@@ -13,6 +13,7 @@ Only SGE queue system allowed
 """
 # queue_path = "/opt/sge/bin/lx24-amd64/"
 queue_path = ""
+qsub = "qsub"
 
 mpi_run = "mpirun"            # default mpirun
 vasp_mpi_run = "mpirun"
@@ -112,7 +113,7 @@ cat $TMPDIR/machines
         f.write(mpi)
         f.close()
 
-        shl(queue_path+"qsub mpi.sh", shell=True)
+        shl(queue_path + qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
 
@@ -162,7 +163,7 @@ cat $TMPDIR/machines
         f = open("mpi.sh", "w")
         f.write(mpi)
         f.close()
-        shl(queue_path+"qsub mpi.sh", shell=True)
+        shl(queue_path + qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
         os.chdir(pwd)
 
@@ -201,7 +202,7 @@ cat $TMPDIR/machines
         f = open("mpi.sh", "w")
         f.write(mpi)
         f.close()
-        shl(queue_path + "qsub mpi.sh", shell=True)
+        shl(queue_path + qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def qchem(self, cpu=None, mem=None, q=None):
@@ -250,7 +251,7 @@ qchem %s %s
         f.write(mpi)
         f.close()
 
-        shl(queue_path+"qsub mpi.sh", shell=True)
+        shl(queue_path + qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def ATK(self, cpu=None, mem=None, q=None):
@@ -303,7 +304,7 @@ $MPI_EXEC -n %d %s %s > %s
         f.write(mpi)
         f.close()
 
-        shl(queue_path + "qsub mpi.sh", shell=True)
+        shl(queue_path + qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def atat(self, cpu=None, mem=None, q=None):
@@ -347,7 +348,7 @@ rm wait
         f.write(mpi)
         f.close()
 
-        shl(queue_path + "qsub mpi.sh", shell=True)
+        shl(queue_path + qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     # -- To show SGE queue system that " I'm running now "
@@ -392,7 +393,7 @@ set  MPI_EXEC=$MPI_HOME/bin/mpirun
         f.write(mpi)
         f.close()
 
-        shl(queue_path+"qsub mpi.sh", shell=True)
+        shl(queue_path + qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def lammps(self, cpu=None, q=None):
@@ -433,5 +434,5 @@ set  MPI_EXEC=$MPI_HOME/bin/mpirun
         f.write(mpi)
         f.close()
 
-        shl(queue_path + "qsub mpi.sh", shell=True)
+        shl(queue_path + qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
