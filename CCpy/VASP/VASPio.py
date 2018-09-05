@@ -973,15 +973,8 @@ class VASPOutput():
         stat, converged, electronic_converged, ionic_converged, done, zipped, err_msg = " ", " ", " ", " ", " ", " ", " "
         # -- only inputs in dir or OUTCAR not in directory
         if "vasp.done" in os.listdir("./"):
-            done = "True"
-        else:
-            done = " "
-        # -- zipped or not
-        out_files = ['CHG', 'CHGCAR', 'DOSCAR', 'OUTCAR', 'PROCAR', 'vasprun.xml', 'XDATCAR']
-        zipped = "True"
-        for f in out_files:
-            if f in os.listdir("./"):
-                zipped = "False"
+            stat = "End"
+
         # -- OUTCAR
         if "OUTCAR" not in os.listdir("./") and "OUTCAR.gz" not in os.listdir("./"):
             stat = "Not Started"
@@ -1037,6 +1030,14 @@ class VASPOutput():
                     converged, electronic_converged, ionic_converged = "False", "False", "False"
             
             '''
+        # -- zipped or not
+        out_files = ['CHG', 'CHGCAR', 'DOSCAR', 'OUTCAR', 'PROCAR', 'vasprun.xml', 'XDATCAR']
+        if converged == "True":
+            zipped = "True"
+            for f in out_files:
+                if f in os.listdir("./"):
+                    zipped = "False"
+
         return stat, done, converged, electronic_converged, ionic_converged, zipped, err_msg
 
 
@@ -1065,19 +1066,24 @@ class VASPOutput():
             tot_err_msg.append(err_msg)
             os.chdir(pwd)
 
-        df = pd.DataFrame({"Directory": dirs, "    Job end": tot_finished, "Status": tot_status, "  Converged": tot_converged,
+        #df = pd.DataFrame({"Directory": dirs, "    Job end": tot_finished, "Status": tot_status, "  Converged": tot_converged,
+        #                   "  Elec-converged": tot_e_converged, "  Ion-converged": tot_i_converged, "  Zipped": tot_zipped, "  Err msg": tot_err_msg})
+        #df = df[['Directory', 'Status', '    Job end', '  Converged', '  Elec-converged', '  Ion-converged', '  Zipped', '  Err msg']]
+        df = pd.DataFrame({"Directory": dirs, "Status": tot_status, "  Converged": tot_converged,
                            "  Elec-converged": tot_e_converged, "  Ion-converged": tot_i_converged, "  Zipped": tot_zipped, "  Err msg": tot_err_msg})
-        df = df[['Directory', 'Status', '    Job end', '  Converged', '  Elec-converged', '  Ion-converged', '  Zipped', '  Err msg']]
+        df = df[['Directory', 'Status','  Converged', '  Elec-converged', '  Ion-converged', '  Zipped', '  Err msg']]
         pd.set_option('display.max_rows', None)
 
 
         # -- Show job infos
         total = len(df)
-        done = len(df[(df['    Job end'] == "True")])
+        #done = len(df[(df['    Job end'] == "True")])
+        done = len(df[(df['Status'] == "End")])
         cvg_df = df[(df['  Converged'] == "True")]
         converged = len(cvg_df)
         not_cvg_df = df[(df['  Converged'] == "False")]
-        not_cvg_df = not_cvg_df[(not_cvg_df['    Job end'] == "True")]
+        #not_cvg_df = not_cvg_df[(not_cvg_df['    Job end'] == "True")]
+        not_cvg_df = not_cvg_df[(not_cvg_df['Status'] == "End")]
         not_converged = len(not_cvg_df)
         zipped = len(df[(df['  Zipped'] == "True")])
 
@@ -1099,7 +1105,7 @@ class VASPOutput():
             not_cvg_df.to_csv("01_unconverged_jobs.csv")
             print("You can recalculate using '01_unconverged_jobs.csv' file.")
         else:
-            print("All jobs are converged.")
+            print("There are no jobs that have not been converged.")
         print("\n* Detail information saved in: 00_jobs_status.txt")
 
    
