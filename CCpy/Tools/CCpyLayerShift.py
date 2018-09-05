@@ -1,3 +1,4 @@
+#!/bin/env python
 import os, sys
 import numpy as np
 import pandas as pd
@@ -52,8 +53,13 @@ except:
     quit()
 
 
+if not sys.argv[1].isdigit():
+    print("First option must be as integer.")
+    quit()
 filename = sys.argv[2]
 basename = sys.argv[3]
+dbname = basename + "_DB.csv"
+final_dbname = basename + "_DB_final.csv"
 
 
 # ---------- Parsing structure file                   
@@ -121,6 +127,7 @@ def cif_gen():
         layer2_index = tmp_index
 
 
+
     # ---------- Shift range
     x_shift = []
     y_shift = []
@@ -156,15 +163,15 @@ def cif_gen():
         # -- closer
         while frac_layer_distance - total_z_shift > 2.5 / lat_param[2]:
             total_z_shift = round(total_z_shift, 8)
-            z_shift.append(-total_z_shift)
+            z_shift.append(total_z_shift)
             total_z_shift += z_ratio
         z_shift.reverse()
         total_z_shift = 0.0
         # -- farther
         while frac_layer_distance + total_z_shift < 5 / lat_param[2]:
             total_z_shift = round(total_z_shift, 8)
-            if total_z_shift not in z_shift:
-                z_shift.append(total_z_shift)
+            if -total_z_shift not in z_shift:
+                z_shift.append(-total_z_shift)
             total_z_shift += z_ratio
 
     print("Total number of structures: " + str(len(x_shift) * len(y_shift) * len(z_shift)))
@@ -214,7 +221,7 @@ def cif_gen():
 
                 # inter layer distance
                 shifted_layer_distance = round(np.dot(z, lattice_v)[2][2], 4)
-                stacking_distance = layer_distance + shifted_layer_distance
+                stacking_distance = layer_distance - shifted_layer_distance
                 db['stacking distance'].append(stacking_distance)
                 zcnt += 1
             ycnt += 1
@@ -222,13 +229,13 @@ def cif_gen():
 
     # ------ save db info
     df = pd.DataFrame(db)
-    df.to_csv("../00DB.csv")
-    print("* DB information has been saved : '00DB.csv', DO NOT REMOVE THIS FILE.")
+    df.to_csv("../" + dbname)
+    print("* DB information has been saved : '%s', DO NOT REMOVE THIS FILE." % dbname)
 
 
 def get_final_energies():
     # concat original DB & energy DB
-    DB_df = pd.read_csv("00DB.csv")
+    DB_df = pd.read_csv(dbname)
     os.chdir(basename)
     os.system("CCpyVASPAnal.py 2 n")
     energy_df = pd.read_csv(basename + "_FinalEnergies.csv")
@@ -240,7 +247,7 @@ def get_final_energies():
 
 
     # -- grouping by simiarl energy
-    etol = 0.0001
+    etol = 0.001
     for s in sys.argv:
         if "-etol" in s:
             etol = float(s.replace("-etol",""))
@@ -257,7 +264,7 @@ def get_final_energies():
                 former_e = e
             group_index.append(gi)
     sorted_df['group'] = group_index
-    sorted_df.to_csv("03DB_final.csv")
+    sorted_df.to_csv(final_dbname)
     
 
     return DB_df
@@ -273,9 +280,30 @@ def get_3d_plot(df):
     # ------ choose z-index to make 3d plot of x,y
     fixed_axis_df = get_fixed_axis_df(df, 'z')
 
+    # ------ lowest group
+    grp1_df = fixed_axis_df[(fixed_axis_df['group'] == 1)]
+    grp2_df = fixed_axis_df[(fixed_axis_df['group'] == 2)]
+    grp3_df = fixed_axis_df[(fixed_axis_df['group'] == 3)]
+    grp4_df = fixed_axis_df[(fixed_axis_df['group'] == 4)]
+    grp5_df = fixed_axis_df[(fixed_axis_df['group'] == 5)]
+    grp1_x = grp1_df['shifted frac x']
+    grp1_y = grp1_df['shifted frac y']
+    grp2_x = grp2_df['shifted frac x']
+    grp2_y = grp2_df['shifted frac y']
+    grp3_x = grp3_df['shifted frac x']
+    grp3_y = grp3_df['shifted frac y']
+    grp4_x = grp4_df['shifted frac x']
+    grp4_y = grp4_df['shifted frac y']
+    grp5_x = grp5_df['shifted frac x']
+    grp5_y = grp5_df['shifted frac y']
+
+
 
     # ------ make 3d data format
-    plot_df = fixed_axis_df.pivot('shifted frac y', 'shifted frac x', 'final energy (eV)')
+    fixed_axis_df['relative energy (meV)'] = fixed_axis_df['relative energy (eV)'] * 1000
+    plot_df = fixed_axis_df.pivot('shifted frac y', 'shifted frac x', 'relative energy (meV)')
+
+    plot_df.to_csv("plotdf.csv")
     
 
     # ------ make 3d plot
@@ -290,12 +318,19 @@ def get_3d_plot(df):
 
     plt.xlabel(x_label, fontsize=18)
     plt.ylabel(y_label, fontsize=18)
-    
-    # -- make levels
+
+    # x, y 
+    plt.plot(grp1_x, grp1_y, marker="o", color="w", lw=0)
+    plt.plot(grp2_x, grp2_y, marker="<", color="y", lw=0)
+    plt.plot(grp3_x, grp3_y, marker="s", color="c", lw=0)
+    plt.plot(grp4_x, grp4_y, marker="D", color="g", lw=0)
+    plt.plot(grp5_x, grp5_y, marker="x", color="r", lw=0)
+
+# -- make levels
     unit = (abs(Z.min() - Z.max())) / 50
     lev = []
     lev_val = Z.min()
-    while lev_val < Z.max():
+    while lev_val < Z.max() - 0.3:
         lev_val = round(lev_val, 2)
         lev.append(lev_val)
         lev_val += unit
@@ -328,7 +363,7 @@ def get_2d_plot(df):
 
 def get_fixed_axis_df(df, axis):
     """
-    df: 00DB.csv
+    df: dbname
     axis: "x" or "y" or "z"
     return fixed axis index
     """
@@ -354,16 +389,17 @@ if __name__ == "__main__":
     if sys.argv[1] == "1":
         cif_gen()
     elif sys.argv[1] == "2":
-        if "00DB.csv" not in os.listdir("./"):
-            print("Cannot find '00DB.csv' file.")
+        if dbname not in os.listdir("./"):
+            print("Cannot find '%s' file." % dbname)
             quit()
-        df = get_final_energies()
+        #df = get_final_energies()
+        df = pd.read_csv(final_dbname)
         get_3d_plot(df)
     elif sys.argv[1] == "3":
-        if "00DB.csv" not in os.listdir("./"):
-            print("Cannot find '00DB.csv' file.")
+        if dbname not in os.listdir("./"):
+            print("Cannot find '%s' file." % dbname)
             quit()
-        df = pd.read_csv("00DB.csv")
+        df = pd.read_csv(dbname)
         get_2d_plot(df)
 
 
