@@ -25,10 +25,13 @@ vasp_path = "vasp"
 #vasp_path="/opt/vasp/vasp5.4.4-beef/bin/vasp_std"
 
 g09_path = "g09"
+
 #atk_path = "/opt/QuantumWise/VNL-ATK/bin/atkpython"
 #atk_path = "/opt/QuantumWise/VNL-ATK-2016.3/bin/atkpython"
 #atk_path = "/opt/QuantumWise/VNL-ATK-2017.0/bin/atkpython"
-atk_path = "/opt/QuantumWise/VNL-ATK-2017.2/bin/atkpython"
+atk2017 = "/opt/QuantumWise/VNL-ATK-2017.2/bin/atkpython"
+atk2018 = "/opt/QuantumWise/VNL-ATK-2018.06/bin/atkpython"
+
 lammps_path = "lmp_g++"
 
 # -- Queue and nodes settings
@@ -254,7 +257,12 @@ qchem %s %s
         shl(queue_path + qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
-    def ATK(self, cpu=None, mem=None, q=None):
+    def ATK(self, cpu=None, mem=None, q=None, atk_version="atk2017"):
+        if atk_version == "atk2018":
+            atk_path = atk2018
+        else:
+            atk_path = atk2017
+
         inputfile = self.inputfile
 
         cpu, mem, q = self.n_of_cpu, self.mem, self.q
