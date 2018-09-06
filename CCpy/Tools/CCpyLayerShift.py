@@ -19,7 +19,8 @@ except:
     print('''--------------------------------------
 [Option]
 1: Generate shifted CIF files
-2: Make contour plot after calculations
+2: Update final DB with final energies and grouping similar energies
+3: Plotting
 
 * Required options : [option] [structure filename] [basename]
     [basename] will be directory where the genereated files located.
@@ -33,8 +34,12 @@ except:
     -z=0.05         : fractional shift distance for z-axis. if=0, fix (default: set to 0.1 Angstrom (cartesian))
                       2.5 < interlayer distance < 5 (Angstrom)
 
-    <When Option 2 (plot)
+    <When Option 2 
     -etol = 0.0001      : tolerance energy for grouping structures by similar energy
+
+    <When Option 3 (plot)
+    -3d : plot 3d surface
+    -2d : plot 2d (useful when check energy via stacking distance)
 
 * Notice before run
 - Set vacumm direction to z-axis (c-axis)
@@ -47,6 +52,10 @@ except:
 
 <opiton 2. Analysis after calculation>
 [user@localhost work]$ CCpyLayerShift.py 2 Graphene.cif graphene_shift
+
+<option 3. Plotting 3d or 2d>
+[user@localhost work]$ CCpyLayerShift.py 2 Graphene.cif graphene_shift -3d
+[user@localhost work]$ CCpyLayerShift.py 2 Graphene.cif graphene_shift -2d
   
     '''
           )
@@ -60,6 +69,7 @@ filename = sys.argv[2]
 basename = sys.argv[3]
 dbname = basename + "_DB.csv"
 final_dbname = basename + "_DB_final.csv"
+sorted_final_dbname = basename + "_DB_final_sorted.csv"
 
 
 # ---------- Parsing structure file                   
@@ -238,9 +248,9 @@ def get_final_energies():
     DB_df = pd.read_csv(dbname)
     os.chdir(basename)
     os.system("CCpyVASPAnal.py 2 n")
-    energy_df = pd.read_csv(basename + "_FinalEnergies.csv")
+    energy_df = pd.read_csv("03_%s_FinalEnergies.csv" % basename)
     #energy_df = pd.read_csv("bilayer_scripts_FinalEnergies.csv")
-    DB_df['final energy (eV)'] = energy_df['Total energy(eV)']
+    DB_df['final energy (eV)'] = energy_df['Total energy (eV)']
     DB_df['relative energy (eV)'] = DB_df['final energy (eV)'] - DB_df['final energy (eV)'].min()
     sorted_df = DB_df.sort_values(by='final energy (eV)')
     os.chdir("../")
@@ -264,10 +274,12 @@ def get_final_energies():
                 former_e = e
             group_index.append(gi)
     sorted_df['group'] = group_index
-    sorted_df.to_csv(final_dbname)
+
+    DB_df.to_csv(final_dbname)
+    sorted_df.to_csv(sorted_final_dbname)
     
 
-    return DB_df
+    return sorted_df
     
 
 def get_3d_plot(df):
@@ -277,6 +289,17 @@ def get_3d_plot(df):
     from matplotlib import colors, ticker, cm, rc
     from mpl_toolkits.mplot3d import Axes3D
     
+    xy = ['x', 'y']
+    for axis in xy:
+        index_name = axis + " index"
+        index = []
+        for v in df[index_name]:
+            if v not in index:
+                index.append(v)
+        if len(index) == 1:
+            print("Not proper data to plot 3d surface")
+            quit()
+
     # ------ choose z-index to make 3d plot of x,y
     fixed_axis_df = get_fixed_axis_df(df, 'z')
 
@@ -303,7 +326,7 @@ def get_3d_plot(df):
     fixed_axis_df['relative energy (meV)'] = fixed_axis_df['relative energy (eV)'] * 1000
     plot_df = fixed_axis_df.pivot('shifted frac y', 'shifted frac x', 'relative energy (meV)')
 
-    plot_df.to_csv("plotdf.csv")
+    plot_df.to_csv("%s_3dplot.csv" % basename)
     
 
     # ------ make 3d plot
@@ -326,7 +349,7 @@ def get_3d_plot(df):
     plt.plot(grp4_x, grp4_y, marker="D", color="g", lw=0)
     plt.plot(grp5_x, grp5_y, marker="x", color="r", lw=0)
 
-# -- make levels
+    # -- make levels
     unit = (abs(Z.min() - Z.max())) / 50
     lev = []
     lev_val = Z.min()
@@ -343,13 +366,15 @@ def get_3d_plot(df):
 
 
 def get_2d_plot(df):
+    import matplotlib.pyplot as plt
     # ------ choose z-index to make 3d plot of x,y
     fixed_axis_df = get_fixed_axis_df(df, 'x')
     fixed_axis_df = get_fixed_axis_df(fixed_axis_df, 'y')
 
     x = fixed_axis_df['stacking distance']
     y = fixed_axis_df['final energy (eV)']
-    x_label = r"$\Delta$ z"
+    #x_label = r"$\Delta$ z"
+    x_label = r"Stacking distance ($\mathrm{\AA}$)"
     y_label = "Energy (eV)"
 
     plt.xlabel(x_label, fontsize=19)
@@ -367,7 +392,7 @@ def get_fixed_axis_df(df, axis):
     axis: "x" or "y" or "z"
     return fixed axis index
     """
-    # ------ choose z-index to make 3d plot of x,y
+    # -- ex) choose z-index to make 3d plot of x,y
     index_name = axis + " index"
     index = []
     for v in df[index_name]:
@@ -392,18 +417,24 @@ if __name__ == "__main__":
         if dbname not in os.listdir("./"):
             print("Cannot find '%s' file." % dbname)
             quit()
-        try:
-            df = pd.read_csv(final_dbname)
-            print("Read data from %s" % final_dbname)
-        except:
+        elif final_dbname in os.listdir("./"):
+            print("%s file already exist. If you want to re-anlayze, remove it and try again." % final_dbname)
+        else:
             df = get_final_energies()
-        get_3d_plot(df)
     elif sys.argv[1] == "3":
-        if dbname not in os.listdir("./"):
-            print("Cannot find '%s' file." % dbname)
-            quit()
-        df = pd.read_csv(dbname)
-        get_2d_plot(df)
+        if sys.argv[4] == "-3d":
+            if sorted_final_dbname in os.listdir("./"):
+                df = pd.read_csv(sorted_final_dbname)
+            else:
+                df = get_final_energies()
+            get_3d_plot(df)
+        elif sys.argv[4] == "-2d":
+            if final_dbname not in os.listdir("./"):
+                df = get_final_energies()
+            else:
+                df = pd.read_csv(final_dbname)
+            df = df.sort_values(by='stacking distance')            
+            get_2d_plot(df)
 
 
 
