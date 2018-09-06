@@ -935,10 +935,11 @@ class VASPOutput():
         energy_list['Total energy (eV)'] = energies
         energy_list['Energy/atom (eV)'] = energies_per_atom
         energy_list['  Converged'] = converged
-        energy_list['    Job end'] = end_calc
+        energy_list['  Job Status'] = stat
 
         df = pd.DataFrame(energy_list)
-        df = df[['Directory', 'Total energy (eV)', 'Energy/atom (eV)', '    Job end', '  Converged']]
+        #df = df[['Directory', 'Total energy (eV)', 'Energy/atom (eV)', '    Job end', '  Converged']]
+        df = df[['Directory', 'Total energy (eV)', 'Energy/atom (eV)','  Converged', '  Job Status']]
         pd.set_option('display.max_rows', None)
         pd.set_option('expand_frame_repr', False)
         if sort == "tot":
