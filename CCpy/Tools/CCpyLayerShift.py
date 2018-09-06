@@ -392,8 +392,11 @@ if __name__ == "__main__":
         if dbname not in os.listdir("./"):
             print("Cannot find '%s' file." % dbname)
             quit()
-        #df = get_final_energies()
-        df = pd.read_csv(final_dbname)
+        try:
+            df = pd.read_csv(final_dbname)
+            print("Read data from %s" % final_dbname)
+        except:
+            df = get_final_energies()
         get_3d_plot(df)
     elif sys.argv[1] == "3":
         if dbname not in os.listdir("./"):
