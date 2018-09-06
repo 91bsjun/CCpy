@@ -894,7 +894,7 @@ class VASPOutput():
         energies = []
         energies_per_atom = []
         converged = []
-        end_calc = []
+        status = []
         pwd = os.getcwd()
         print("\n    Parsing VASP jobs....")
         cnt = 0
@@ -926,7 +926,7 @@ class VASPOutput():
 
             stat, done, cvgd, electronic_converged, ionic_converged, zipped, err_msg = self.vasp_status()
             converged.append(cvgd)
-            end_calc.append(done)
+            status.append(stat)
 
             os.chdir(pwd)
 
@@ -935,7 +935,7 @@ class VASPOutput():
         energy_list['Total energy (eV)'] = energies
         energy_list['Energy/atom (eV)'] = energies_per_atom
         energy_list['  Converged'] = converged
-        energy_list['  Job Status'] = stat
+        energy_list['  Job Status'] = status
 
         df = pd.DataFrame(energy_list)
         #df = df[['Directory', 'Total energy (eV)', 'Energy/atom (eV)', '    Job end', '  Converged']]
