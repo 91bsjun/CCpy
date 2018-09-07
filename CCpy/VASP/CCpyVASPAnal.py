@@ -106,7 +106,7 @@ elif sys.argv[1] == "2":
     except:
         show_plot = True
     dirs = selectVASPOutputs("./", ask=False, sub=sub)
-    dirs = [d for d in dirs if "OUTCAR" in os.listdir(d)]
+    # dirs = [d for d in dirs if "OUTCAR" in os.listdir(d)]    # duplicated work
     VO = VASPOutput()
     if "-st" in sys.argv:
         sort = "tot"
