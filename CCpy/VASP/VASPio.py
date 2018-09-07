@@ -3,6 +3,7 @@ import time
 import matplotlib.pyplot as plt
 import pandas as pd
 import json, yaml
+import gzip
 from collections import OrderedDict
 
 from CCpy.VASP.VASPtools import vasp_incar_json, vasp_phonon_incar_json, magmom_parameters, ldauu_parameters, ldauj_parameters, ldaul_parameters, vasp_grimme_parameters
@@ -841,8 +842,10 @@ class VASPOutput():
             linux_command("mv "+target_name+" "+path)
 
     def getConvergence(self, show_plot=True):
-
-        OUTCAR = open("OUTCAR", "r").read()
+        try:
+            OUTCAR = open("OUTCAR", "r").read()
+        except:
+            OUTCAR = gzip.open("OUTCAR", "rb").read()
 
         # -- energy parsing
         findE = re.compile("free  energy   TOTEN  =\s+\S+", re.M)
@@ -887,7 +890,7 @@ class VASPOutput():
 
     def get_energy_list(self, show_plot=True, dirs=None, sort=False):
         # dirs = [d for d in os.listdir("./") if os.path.isdir(d)]
-        out_dirs = [d for d in dirs if "OUTCAR" in os.listdir(d)]
+        out_dirs = [d for d in dirs if "OUTCAR" in os.listdir(d) or if "OUTCAR.gz" in os.listdir(d)]
         out_dirs.sort()
 
         x = range(len(out_dirs))
@@ -905,8 +908,10 @@ class VASPOutput():
             sys.stdout.flush()
             sys.stdout.write("\b" * len(msg))
             os.chdir(o)
-
-            OUTCAR = open("OUTCAR", "r").read()
+            try:
+                OUTCAR = open("OUTCAR", "r").read()
+            except:
+                OUTCAR = gzip.open("OUTCAR.gz", "rb").read()
             # -- energy parsing
             findE = re.compile("free  energy   TOTEN  =\s+\S+", re.M)
             strings = findE.findall(OUTCAR)
