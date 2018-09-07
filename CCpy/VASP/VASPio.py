@@ -845,7 +845,7 @@ class VASPOutput():
         if "OUTCAR.gz" in os.listdir("./"):
             OUTCAR = gzip.open("OUTCAR", "rb").read()
             OUTCAR = str(OUTCAR)
-        else "OUTCAR" in os.listdir("./"):
+        else:
             OUTCAR = open("OUTCAR", "r").read()
 
         # -- energy parsing
