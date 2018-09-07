@@ -890,7 +890,7 @@ class VASPOutput():
 
     def get_energy_list(self, show_plot=True, dirs=None, sort=False):
         # dirs = [d for d in os.listdir("./") if os.path.isdir(d)]
-        out_dirs = [d for d in dirs if "OUTCAR" in os.listdir(d) or if "OUTCAR.gz" in os.listdir(d)]
+        out_dirs = [d for d in dirs if "OUTCAR" in os.listdir(d) or "OUTCAR.gz" in os.listdir(d)]
         out_dirs.sort()
 
         x = range(len(out_dirs))
