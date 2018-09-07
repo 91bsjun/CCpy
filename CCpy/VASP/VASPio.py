@@ -842,10 +842,11 @@ class VASPOutput():
             linux_command("mv "+target_name+" "+path)
 
     def getConvergence(self, show_plot=True):
-        try:
-            OUTCAR = open("OUTCAR", "r").read()
-        except:
+        if "OUTCAR.gz" in os.listdir("./"):
             OUTCAR = gzip.open("OUTCAR", "rb").read()
+            OUTCAR = str(OUTCAR)
+        else "OUTCAR" in os.listdir("./"):
+            OUTCAR = open("OUTCAR", "r").read()
 
         # -- energy parsing
         findE = re.compile("free  energy   TOTEN  =\s+\S+", re.M)
@@ -908,10 +909,11 @@ class VASPOutput():
             sys.stdout.flush()
             sys.stdout.write("\b" * len(msg))
             os.chdir(o)
-            try:
-                OUTCAR = open("OUTCAR", "r").read()
-            except:
+            if "OUTCAR.gz" in os.listdir("./"):
                 OUTCAR = gzip.open("OUTCAR.gz", "rb").read()
+                OUTCAR = str(OUTCAR)
+            else:
+                OUTCAR = open("OUTCAR", "r").read()
             # -- energy parsing
             findE = re.compile("free  energy   TOTEN  =\s+\S+", re.M)
             strings = findE.findall(OUTCAR)
