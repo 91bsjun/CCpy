@@ -36,7 +36,7 @@ except:
 
 for arg in sys.argv:
     if "-m=" in arg:
-        mode = arg.split("=")[2]
+        mode = arg.split("=")[1]
 
 files = sys.argv[3:]
 

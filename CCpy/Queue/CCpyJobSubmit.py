@@ -263,6 +263,7 @@ if __name__=="__main__":
     6  : ATAT
     7  : LAMMPS
     8  : PBS job display
+    9  : NVT MD Loop
 
 < Option 2. > Queue
     xeon1, xeon2, xeon3, ...
@@ -295,6 +296,7 @@ if __name__=="__main__":
     -a              : no check files, calculate all inputs
     
     -T              : Assign temperature when NVT MD simulation in VASP
+                      ex) CCpyJobSubmit.py 9 xeon6 -n=24 -T=1000
     
     
     <Options for ATK version handling>
@@ -371,4 +373,7 @@ if __name__=="__main__":
 
     ## ------ VASP NVT LOOP
     elif sys.argv[1] == "9":
+        if not temp:
+            print("Temperature must be assigned. (ex: -T=1000)")
+            quit()
         AIMD_NVT_Loop(queue=queue, n_of_cpu=n_of_cpu, temp=temp)

@@ -450,7 +450,8 @@ set  MPI_EXEC=$MPI_HOME/bin/mpirun
         # -- load loop queue script
         from CCpy.Package.NVTLoopQueScript import NVTLoopQueScriptString
         script_string = NVTLoopQueScriptString()
-        f = open("./.AIMDLoop.py", "w")
+        script_filename = ".AIMDLoop.py"
+        f = open(script_filename, "w")
         f.write(script_string)
         f.close()
 
@@ -474,7 +475,7 @@ set  MPI_EXEC=$MPI_HOME/bin/mpirun
 
 
 %s %s %s %s
-rm ./.AIMDLoop.py''' % (cpu, cpu, jobname, q, python_path, script_filename, structure_filename, temp)
+rm %s''' % (cpu, cpu, jobname, q, python_path, script_filename, structure_filename, temp, script_filename)
 
         f = open("mpi.sh", "w")
         f.write(mpi)
