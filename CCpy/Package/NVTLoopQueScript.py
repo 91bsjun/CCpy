@@ -1,5 +1,5 @@
 def NVTLoopQueScriptString():
-    string = """"#!/bin/env python
+    string = """
 import os, sys
 import re
 import time
@@ -46,7 +46,7 @@ def prev_check():
     if len(runs) == 0:
         run_step = 0
     else:
-        tail_oszicar = os.popen("tail %s/OSZICAR | grep \"T=\"" % runs[-1]).readlines()
+        tail_oszicar = os.popen("tail %s/OSZICAR | grep T=" % runs[-1]).readlines()
         # -- when empty OSZICAR
         if len(tail_oszicar) == 0:
             run_step = len(runs) - 1
@@ -121,7 +121,7 @@ def write_data(crt):
             f = open("data_%sK.csv" % temp, "a")
             line = "%.10f,%.4f," % (diffusivity, conductivity)
             f.write(line)
-        f.write("\n")
+        f.write("\\n")
         f.close()
 
 
@@ -136,8 +136,7 @@ if __name__ == "__main__":
         if "data_%sK.csv" % temp in os.listdir("./"):
             os.rename("data_%sK.csv" % temp, "data_%sK.csv~" % temp)
         f = open("data_%sK.csv" % temp, "w")
-        f.write(
-            "run step,timestep,diffusivity(F),conductivity(F),diffusivity(c),conductivity(c),diffusivity(m),conductivity(m)\n")
+        f.write("run step,timestep,diffusivity(F),conductivity(F),diffusivity(c),conductivity(c),diffusivity(m),conductivity(m)\\n")
         f.close()
     while "loop.done" not in os.listdir("./"):
         pre_step = crt_step - 1
