@@ -15,7 +15,6 @@ Only SGE queue system allowed
 queue_path = ""
 qsub = "qsub"
 
-python_path = "/home/shared/anaconda3/envs/CCpy/bin/python"
 mpi_run = "mpirun"            # default mpirun
 vasp_mpi_run = "mpirun"
 #atk_mpi_run = "/opt/intel/mpi-rt/4.0.0/bin/mpirun"
@@ -438,43 +437,6 @@ set  MPI_EXEC=$MPI_HOME/bin/mpirun
  %s -np %d %s < %s | tee %s
 
     ''' % (cpu, cpu, jobname, q, lammps_mpirun_path, cpu, lammps_path, inputfile, outputfile)
-
-        f = open("mpi.sh", "w")
-        f.write(mpi)
-        f.close()
-
-        shl(queue_path + qsub + " mpi.sh", shell=True)
-        shl("rm -rf ./mpi.sh", shell=True)
-
-    def AIMD_NVT_Loop(self, cpu=None, mem=None, q=None, structure_filename=None, temp=None):
-        # -- load loop queue script
-        from CCpy.Package.NVTLoopQueScript import NVTLoopQueScriptString
-        script_string = NVTLoopQueScriptString()
-        f = open("./.AIMDLoop.py", "w")
-        f.write(script_string)
-        f.close()
-
-        cpu, q = self.n_of_cpu, self.q
-
-        jobname = "NVT%s%dK" % (structure_filename.replace(".cif",""), temp)
-
-        mpi = '''#!/bin/csh
-# pe request
-
-#$ -pe mpi_%d %d
-
-# our Job name 
-#$ -N %s
-
-#$ -q %s
-
-#$ -V
-
-#$ -cwd
-
-
-%s %s %s %s
-rm ./.AIMDLoop.py''' % (cpu, cpu, jobname, q, python_path, script_filename, structure_filename, temp)
 
         f = open("mpi.sh", "w")
         f.write(mpi)

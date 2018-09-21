@@ -9,18 +9,15 @@ import matplotlib.pyplot as plt
 from CCpy.Tools.CCpyTools import find_convex_hull
 from CCpy.VASP.VASPio import VASPOutput
 
-from pymatgen.core.structure import IStructure
-from pymatgen.core.periodic_table import Element
 
-
-version = sys.version
-if version[0] == '3':
-    raw_input = input
-
-class CASMhull():
-    def __init__(self, base=None, tot_base=None):
+class IKSThull():
+    def __init__(self, dirname=None, base=None, tot_base=None):
         pwd = os.getcwd()  # current directory
+        self.root = dirname  # working directory
+
         self.pwd, self.base, self.tot_base = pwd, base, tot_base
+
+        os.chdir(dirname)
         if "Data" not in os.listdir("./"):
             os.mkdir("Data")
 
@@ -28,72 +25,86 @@ class CASMhull():
         pwd = self.pwd
         base, tot_base, = self.base, self.tot_base
 
-        # -- supercell info
-        scel = open("SCEL", "r").read()
-        scel = scel.split("\n")
-        supcell = []
-        for i in range(len(scel)):
-            if "volume" in scel[i]:
-                supcell.append(float(scel[i].split()[-1]))
-
-        self.supcell = supcell
-
         cons = []  # Concentrations
         energies = []  # Energies
-        energies_fu = [] # Energies / f.u.
+        energies_fu = []
         dirnames = []  # Directory names
         base_atoms = []  # number of base atom
         supercells = []  # supercell
         con0_energy = None  # 0.0 Concentration energy (for calculating formation energy)
         con1_energy = None  # 1.0 Concentration energy (for calculating formation energy)
 
-        sub_ds = [sd for sd in os.listdir("./") if os.path.isdir(sd) and "con" in sd]
-        sub_ds.sort()
+        dirs = [d for d in os.listdir("./") if os.path.isdir(d)]
+        # -- scel_dirs = [1-1-1, 1-2-1, ...]
+        scel_dirs = []
+        for d in dirs:
+            if len(d.split("-")) == 3:
+                scel_dirs.append(d)
+        scel_dirs.sort()
+        # -- scel_dirs = [1-1-1, 1-2-1, ...]
+        for scd in scel_dirs:
+            os.chdir(scd)
+            scel = scd.split("-")
+            scel = float(scel[0]) * float(scel[1]) * float(scel[2])
+            # -- dirs = [Co3Mn3Ni3O18Vac9, ...]
+            dirs = [d for d in os.listdir("./") if os.path.isdir(d)]
+            dirs.sort()
+            print("\n Start parsing ...\n")
+            for d in dirs:
+                os.chdir(d)
+                print(os.getcwd())
+                sub_ds = [sd for sd in os.listdir("./") if os.path.isdir(sd)]
+                # -- sub_ds = [c0001, ..]
+                for sd in sub_ds:
+                    os.chdir(sd)
 
-        # -- sub_ds = [cons0.0, cons1.0, ..]
-        for sd in sub_ds:
-            os.chdir(sd)
-            scel_index = int(sd.split(".")[0].replace("con", ""))  # con[index].xx
-            vol = supcell[scel_index]  # supcell:[1, 2, 2, 3, 4, ..]
-            supercells.append(vol)
+                    # -- find elements
+                    f = open("POSCAR", "r")
+                    lines = f.readlines()
+                    f.close()
 
-            poscar = IStructure.from_file("POSCAR")
-            species = poscar.species            # [Element Ag, Element Ag, Element Ag, ...]
-            elts_dict = {}               # key: element name, value: number of element
-            for sp in poscar.types_of_specie:
-                elts_dict[str(sp)] = species.count(sp)
-            elts = elts_dict.keys()
+                    for i in range(len(lines)):
+                        if i == 5:
+                            elts = lines[i].split()
+                        elif i == 6:
+                            n_of_atoms = lines[i].split()
 
-            if base in elts:
-                n_of_base = float(elts_dict[base])
-                con = round(n_of_base / (tot_base * vol), 6)
-                cons.append(con)
-                base_atoms.append(float(elts_dict[base]))
-            else:
-                con = 0.0
-                cons.append(con)
-                base_atoms.append(0)
+                    if base in elts:
+                        index = elts.index(base)
+                        n_of_base = float(n_of_atoms[index])
+                        con = round(n_of_base / tot_base, 6)
+                        cons.append(con)
+                        base_atoms.append(n_of_base)
+                    else:
+                        con = 0.0
+                        cons.append(con)
+                        base_atoms.append(0)
 
-            # -- find energy
-            popen = os.popen("grep \"free  energy   TOTEN\" OUTCAR").readlines()
-            e = float(popen[-1].split()[-2])
-            e_fu = e / vol
-            energies.append(e)
-            energies_fu.append(e_fu)
+                    # -- find energy
+                    popen = os.popen("grep \"free  energy   TOTEN\" OUTCAR").readlines()
+                    e = float(popen[-1].split()[-2])
+                    e_fu = e / scel
+                    energies.append(e)
+                    energies_fu.append(e_fu)
 
-            if con == 0.0:
-                con0_energy = e_fu
-            elif con == 1.0:
-                con1_energy = e_fu
+                    if con == 0.0:
+                        con0_energy = e_fu
+                    elif con == 1.0:
+                        con1_energy = e_fu
 
-            # -- dirname
-            crr_dir = os.getcwd().split("/")[-1]
+                    # -- dirname
+                    spl_dir = os.getcwd().split("/")
+                    crr_dir = spl_dir[-3] + "/" + spl_dir[-2] + "/" + spl_dir[-1]
+                    dirnames.append(crr_dir)
 
-            dirnames.append(crr_dir)
+                    supercells.append(scel)
+
+                    os.chdir("../")
+                os.chdir("../")
             os.chdir("../")
 
         data = {"Concentration": cons, "Directory": dirnames, "Energy": energies, "Energy/f.u.": energies_fu,
-                "Supercell": supercells, "Number of base atom": base_atoms}
+                "Supercell": supercells, "Number of atom": base_atoms}
         df = pd.DataFrame(data)
 
         self.df = df
@@ -138,7 +149,7 @@ class CASMhull():
         hull_df = pd.concat(concat)
         hull_df = hull_df.sort_values('Concentration')
         hull_df = hull_df[
-            ['Concentration', 'Formation energy', 'Energy', 'Energy/f.u.', 'Supercell', 'Number of base atom', 'Directory']]
+            ['Concentration', 'Formation energy', 'Energy', 'Energy/f.u.', 'Supercell', 'Number of atom', 'Directory']]
 
         hull_df.to_csv("./Data/02_convex_hull_points.csv")
         print("Data saved : ./Data/02_convex_hull_points.csv")
@@ -156,13 +167,9 @@ class CASMhull():
         plt.scatter(df['Concentration'], df['Formation energy'], marker="D", color='b', s=10)
         plt.plot(hull_df['Concentration'], hull_df['Formation energy'], marker='o', color="r", alpha=0.7, ms=8)
 
-        plt.axhline(y=0, color='gray', lw=1, ls='--')
-
         plt.xlim(0.0, 1.0)
         plt.xlabel(base + " Concentration", fontsize=20)
         plt.ylabel("Formation energy (eV/f.u.)", fontsize=20)
-
-        plt.tight_layout()
 
         os.chdir("./Data/")
         figname = "03_convexhull.png"
@@ -180,21 +187,27 @@ class CASMhull():
     def getHullPointStructures(self):
         hull_df = self.hull_df
         hull_point_dirs = hull_df['Directory'].tolist()
-
-        if len(hull_point_dirs) != 0:
-            print("Hull point structures")
+        crr_dir = os.getcwd()
         for d in hull_point_dirs:
             os.chdir(d)
             VO = VASPOutput()
-            VO.getFinalStructure(path="../Data/")
-            os.chdir("../")
+            VO.getFinalStructure(path=crr_dir + "/Data/")
+
+            spl_dir = os.getcwd().split("/")
+            filename = spl_dir[-1] + "_contcar.cif"
+
+            new_filename = spl_dir[-3] + "_" + spl_dir[-2] + "_" + spl_dir[-1] + "_contcar.cif"
+
+            os.chdir(crr_dir)
+            mv = "mv ./Data/" + filename + " ./Data/" + new_filename
+            subprocess.call(mv, shell=True)
 
     def getVoltageProfile(self):
         df = self.hull_df
         cons = df['Concentration'].tolist()
         energies = df['Energy'].tolist()
         supercells = df['Supercell'].tolist()
-        n_of_atoms = df['Number of base atom'].tolist()
+        n_of_atoms = df['Number of atom'].tolist()
 
         x = []
         y = []
@@ -248,21 +261,25 @@ class CASMhull():
         self.makeHull()
         self.plotHull()
         self.getHullPointStructures()
-        if self.base == "Li":
-            self.getVoltageProfile()
+        self.getVoltageProfile()
 
 
 if __name__ == "__main__":
+    # -- Get working directory
+    try:
+        root = sys.argv[1]
+    except:
+        root = raw_input("* Directory name : ")
+        print("* Notice : You can start by '" + sys.argv[0].split("/")[-1] + " " + root + "'")
+    root = root.replace("/", "")
+
     # -- Get info ------------
-    base = raw_input("\n* Element name which be changed (ex: Li) : ")  # base atom
-    tot_base = raw_input(
-        "* Number of " + base + " when full (ex: 9) in the primitive cell: ")  # the number of base atoms in unit cell
+    base = raw_input("\n* Element name (ex: Li) : ")  # base atom
+    tot_base = raw_input("* Number of " + base + " when full (ex: 9) : ")  # the number of base atoms in cell
     tot_base = float(tot_base)
 
-    ch = CASMhull(base=base, tot_base=tot_base)
-    ch.mainFlow()
-
-
+    ih = IKSThull(dirname=root, base=base, tot_base=tot_base)
+    ih.mainFlow()
 
 
 

@@ -234,19 +234,6 @@ def pbs_runner(queue=None, n_of_cpu=None):
         myJS = JS(each_input, queue, n_of_cpu)
         myJS.pbs_runner()
 
-def AIMD_NVT_Loop(queue=None, n_of_cpu=None, temp=None):
-    # --- COLLECT INPUT FILES
-    input_marker = [".cif", "POSCAR", "CONTCAR"]
-    inputs = selectInputs(input_marker, "./", ask=ask)
-    if len(inputs) != 1:
-        print("Only single file available.")
-        quit()
-
-    myJS = JS(inputs[0], queue, n_of_cpu)
-    myJS.AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp)
-
-
-
 if __name__=="__main__":
     try:
         chk = sys.argv[1]
@@ -292,9 +279,7 @@ if __name__=="__main__":
                       (When you calculate quick hundreds jobs, to reduce load in master node)
                       (Only VASP supported yet)
 
-    -a              : no check files, calculate all inputs
-    
-    -T              : Assign temperature when NVT MD simulation in VASP
+    -a : no check files, calculate all inputs
     
     
     <Options for ATK version handling>
@@ -323,9 +308,8 @@ if __name__=="__main__":
     # -- Select all inputs automatically
     scratch = False
     ask = True
-    n_of_cpu = None
-    atk_version = 'atk2017'
-    temp = None
+    n_of_cpu=None
+    atk_version='atk2017'
     for s in sys.argv:
         if "-n" in s:
             n_of_cpu = int(s.split("=")[1])
@@ -335,8 +319,6 @@ if __name__=="__main__":
             ask = False
         if '-atk2018' in s:
             atk_version='atk2018'
-        if '-T' in s:
-            temp = int(s.split("=")[1])
 
     ## ------ GAUSSIAN
     if sys.argv[1] == "1":
@@ -357,18 +339,15 @@ if __name__=="__main__":
     elif sys.argv[1] == "4":
         qchem(queue=queue, n_of_cpu=n_of_cpu)
 
+
     ## ------ ATAT
     elif sys.argv[1] == "6":
         atat(queue=queue, n_of_cpu=n_of_cpu)
 
-    ## ------ LAMMPS
+    ## ------ ATAT
     elif sys.argv[1] == "7":
         lammps(queue=queue, n_of_cpu=n_of_cpu)
 
     ## ------ PBS JOBS DISPLAYER
     elif sys.argv[1] == "8":
         pbs_runner(queue=queue, n_of_cpu=n_of_cpu)
-
-    ## ------ VASP NVT LOOP
-    elif sys.argv[1] == "9":
-        AIMD_NVT_Loop(queue=queue, n_of_cpu=n_of_cpu, temp=temp)
