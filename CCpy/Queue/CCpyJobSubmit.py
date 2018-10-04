@@ -36,14 +36,14 @@ def gaussian(queue=None, n_of_cpu=None):
         myJS = JS(each_input, queue, n_of_cpu)
         myJS.gaussian()
 
-def vasp(queue=None, n_of_cpu=None):
+def vasp(queue=None, n_of_cpu=None, sub=None):
     # --- Collect VASP inputs
     band = False
     recalc = False
     phonon = False
     if "-band" in sys.argv:
         band = True
-        inputs = selectVASPInputs("./", ask=ask, band=True)
+        inputs = selectVASPInputs("./", ask=ask, band=True, sub=sub)
     elif "-r" in sys.argv:
         recalc = True
         if "01_unconverged_jobs.csv" not in os.listdir("./"):
@@ -64,9 +64,9 @@ def vasp(queue=None, n_of_cpu=None):
 
     elif "-phonon" in sys.argv:
         phonon = True
-        inputs = selectVASPInputs("./", ask=ask, phonon=True)
+        inputs = selectVASPInputs("./", ask=ask, phonon=True, sub=sub)
     else:
-        inputs = selectVASPInputs("./", ask=ask)
+        inputs = selectVASPInputs("./", ask=ask, sub=sub)
 
     # --- SUBMIT QUEUE
     pwd = os.getcwd()
@@ -86,10 +86,10 @@ def vasp_batch(queue=None, n_of_cpu=None, scratch=False):
     recalc = False
     if "-band" in sys.argv:
         band = True
-        inputs = selectVASPInputs("./", ask=ask, band=True)
+        inputs = selectVASPInputs("./", ask=ask, band=True, sub=sub)
     elif "-phonon" in sys.argv:
         phonon = True
-        inputs = selectVASPInputs("./", ask=ask, phonon=True)
+        inputs = selectVASPInputs("./", ask=ask, phonon=True, sub=sub)
     elif "-r" in sys.argv:
         recalc = True
         if "01_unconverged_jobs.csv" not in os.listdir("./"):
@@ -108,7 +108,7 @@ def vasp_batch(queue=None, n_of_cpu=None, scratch=False):
             quit()
         inputs = df['Directory'].tolist()
     else:
-        inputs = selectVASPInputs("./", ask=ask)
+        inputs = selectVASPInputs("./", ask=ask, sub=sub)
 
     # --- SUBMIT QUEUE
     dirs = []
