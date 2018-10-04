@@ -288,5 +288,6 @@ if __name__ == "__main__":
     plt.tick_params(labelsize=15)
     plt.ylim(miny,maxy)
     plt.tight_layout()
-    plt.savefig("site_band_"+str(sites)+".png", dpi=200)
+    site_index = [s-1 for s in sites]
+    plt.savefig("site_band_"+str(site_index)+".png", dpi=200)
     plt.show()
