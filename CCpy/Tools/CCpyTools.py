@@ -278,6 +278,7 @@ def selectVASPInputs(directory_path, ask=True, static=False, band=False, phonon=
     """
     Needs edition -> pick <INCAR POSCAR KPOINTS POTCAR> included directories
     """
+    print(sub)
     if sub:
         def get_valid_paths(path):
             (parent, subdirs, files) = path

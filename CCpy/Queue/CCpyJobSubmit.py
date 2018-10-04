@@ -79,7 +79,7 @@ def vasp(queue=None, n_of_cpu=None, sub=None):
         myJS = JS(each_input, queue, n_of_cpu)
         myJS.vasp(band=band, dirpath=dirpath, phonon=phonon)
 
-def vasp_batch(queue=None, n_of_cpu=None, scratch=False):
+def vasp_batch(queue=None, n_of_cpu=None, scratch=False, sub=None):
     # --- Collect VASP inputs
     band = False
     phonon = False
