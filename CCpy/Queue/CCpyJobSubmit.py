@@ -328,6 +328,7 @@ if __name__=="__main__":
     n_of_cpu = None
     atk_version = 'atk2017'
     temp = None
+    sub = False
     for s in sys.argv:
         if "-n" in s:
             n_of_cpu = int(s.split("=")[1])
@@ -339,6 +340,8 @@ if __name__=="__main__":
             atk_version='atk2018'
         if '-T' in s:
             temp = int(s.split("=")[1])
+        if '-sub' in s:
+            sub = True
 
     ## ------ GAUSSIAN
     if sys.argv[1] == "1":
