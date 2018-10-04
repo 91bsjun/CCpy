@@ -350,9 +350,9 @@ if __name__=="__main__":
     ## ------ VASP
     elif sys.argv[1] == "2":
         if "-batch" in sys.argv:
-            vasp_batch(queue=queue, n_of_cpu=n_of_cpu, scratch=scratch)
+            vasp_batch(queue=queue, n_of_cpu=n_of_cpu, scratch=scratch, sub=sub)
         else:
-            vasp(queue=queue, n_of_cpu=n_of_cpu)
+            vasp(queue=queue, n_of_cpu=n_of_cpu, sub=sub)
 
     ## ------ ATK
     elif sys.argv[1] == "3":
