@@ -349,7 +349,6 @@ if __name__=="__main__":
 
     ## ------ VASP
     elif sys.argv[1] == "2":
-        prnt("AAAAAAAAAAAA")
         if "-batch" in sys.argv:
             vasp_batch(queue=queue, n_of_cpu=n_of_cpu, scratch=scratch, sub=sub)
         else:
