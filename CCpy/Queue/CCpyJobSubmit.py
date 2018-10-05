@@ -272,6 +272,10 @@ if __name__=="__main__":
     -n=[integer]    : the number of CPU to use
                       ex) CCpyJobSubmit.py 2 xeon2 -n=8
                       --> will use 8 CPUs in xeon2
+                      
+    -sub            : find vasp jobs under sub directories (only support for vasp)
+                      ex) CCpyJobSubmit.py 2 xeon4 -sub
+                      ex) CCpyJobSubmit.py 2 xeon5 -batch -sub
 
     -r              : re-calculate unconverged VASP jobs from '01_unconverged_jobs.csv'
                       ex) CCpyJobSubmit.py 2 xeon3 -r
@@ -284,14 +288,15 @@ if __name__=="__main__":
 
     -phonon         : when perform optimize calculation for phonon (high accuracy VASP)
 
-    -batch          : run multiple jobs in a single queue
-                      (Only VASP supported yet)
+    -batch          : run multiple jobs in a single queue (only support for vasp)
                       ex) CCpyJobSubmit.py 2 xeon5 -batch
                       ex) CCpyJobSubmit.py 2 xeon5 -batch -band
 
-    -s              : use scratch directory when run batch jobs
+    -scratch        : use scratch directory when run batch jobs
                       (When you calculate quick hundreds jobs, to reduce load in master node)
                       (Only VASP supported yet)
+                      ex) CCpyJobSubmit.py 2 xeon5 -batch -scratch
+                      ex) CCpyJobSubmit.py 2 xeon5 -batch -sub -scratch
 
     -a              : no check files, calculate all inputs
     
@@ -332,7 +337,7 @@ if __name__=="__main__":
     for s in sys.argv:
         if "-n" in s:
             n_of_cpu = int(s.split("=")[1])
-        if "-s" in s:
+        if "-scratch" in s:
             scratch = True
         if "-a" in s:
             ask = False
