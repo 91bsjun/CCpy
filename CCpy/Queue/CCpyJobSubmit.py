@@ -36,14 +36,14 @@ def gaussian(queue=None, n_of_cpu=None):
         myJS = JS(each_input, queue, n_of_cpu)
         myJS.gaussian()
 
-def vasp(queue=None, n_of_cpu=None):
+def vasp(queue=None, n_of_cpu=None, sub=None):
     # --- Collect VASP inputs
     band = False
     recalc = False
     phonon = False
     if "-band" in sys.argv:
         band = True
-        inputs = selectVASPInputs("./", ask=ask, band=True)
+        inputs = selectVASPInputs("./", ask=ask, band=True, sub=sub)
     elif "-r" in sys.argv:
         recalc = True
         if "01_unconverged_jobs.csv" not in os.listdir("./"):
@@ -64,9 +64,9 @@ def vasp(queue=None, n_of_cpu=None):
 
     elif "-phonon" in sys.argv:
         phonon = True
-        inputs = selectVASPInputs("./", ask=ask, phonon=True)
+        inputs = selectVASPInputs("./", ask=ask, phonon=True, sub=sub)
     else:
-        inputs = selectVASPInputs("./", ask=ask)
+        inputs = selectVASPInputs("./", ask=ask, sub=sub)
 
     # --- SUBMIT QUEUE
     pwd = os.getcwd()
@@ -79,17 +79,17 @@ def vasp(queue=None, n_of_cpu=None):
         myJS = JS(each_input, queue, n_of_cpu)
         myJS.vasp(band=band, dirpath=dirpath, phonon=phonon)
 
-def vasp_batch(queue=None, n_of_cpu=None, scratch=False):
+def vasp_batch(queue=None, n_of_cpu=None, scratch=False, sub=None):
     # --- Collect VASP inputs
     band = False
     phonon = False
     recalc = False
     if "-band" in sys.argv:
         band = True
-        inputs = selectVASPInputs("./", ask=ask, band=True)
+        inputs = selectVASPInputs("./", ask=ask, band=True, sub=sub)
     elif "-phonon" in sys.argv:
         phonon = True
-        inputs = selectVASPInputs("./", ask=ask, phonon=True)
+        inputs = selectVASPInputs("./", ask=ask, phonon=True, sub=sub)
     elif "-r" in sys.argv:
         recalc = True
         if "01_unconverged_jobs.csv" not in os.listdir("./"):
@@ -108,7 +108,7 @@ def vasp_batch(queue=None, n_of_cpu=None, scratch=False):
             quit()
         inputs = df['Directory'].tolist()
     else:
-        inputs = selectVASPInputs("./", ask=ask)
+        inputs = selectVASPInputs("./", ask=ask, sub=sub)
 
     # --- SUBMIT QUEUE
     dirs = []
@@ -272,6 +272,10 @@ if __name__=="__main__":
     -n=[integer]    : the number of CPU to use
                       ex) CCpyJobSubmit.py 2 xeon2 -n=8
                       --> will use 8 CPUs in xeon2
+                      
+    -sub            : find vasp jobs under sub directories (only support for vasp)
+                      ex) CCpyJobSubmit.py 2 xeon4 -sub
+                      ex) CCpyJobSubmit.py 2 xeon5 -batch -sub
 
     -r              : re-calculate unconverged VASP jobs from '01_unconverged_jobs.csv'
                       ex) CCpyJobSubmit.py 2 xeon3 -r
@@ -284,14 +288,15 @@ if __name__=="__main__":
 
     -phonon         : when perform optimize calculation for phonon (high accuracy VASP)
 
-    -batch          : run multiple jobs in a single queue
-                      (Only VASP supported yet)
+    -batch          : run multiple jobs in a single queue (only support for vasp)
                       ex) CCpyJobSubmit.py 2 xeon5 -batch
                       ex) CCpyJobSubmit.py 2 xeon5 -batch -band
 
-    -s              : use scratch directory when run batch jobs
+    -scratch        : use scratch directory when run batch jobs
                       (When you calculate quick hundreds jobs, to reduce load in master node)
                       (Only VASP supported yet)
+                      ex) CCpyJobSubmit.py 2 xeon5 -batch -scratch
+                      ex) CCpyJobSubmit.py 2 xeon5 -batch -sub -scratch
 
     -a              : no check files, calculate all inputs
     
@@ -328,10 +333,11 @@ if __name__=="__main__":
     n_of_cpu = None
     atk_version = 'atk2017'
     temp = None
+    sub = False
     for s in sys.argv:
         if "-n" in s:
             n_of_cpu = int(s.split("=")[1])
-        if "-s" in s:
+        if "-scratch" in s:
             scratch = True
         if "-a" in s:
             ask = False
@@ -339,6 +345,8 @@ if __name__=="__main__":
             atk_version='atk2018'
         if '-T' in s:
             temp = int(s.split("=")[1])
+        if '-sub' in s:
+            sub = True
 
     ## ------ GAUSSIAN
     if sys.argv[1] == "1":
@@ -347,9 +355,9 @@ if __name__=="__main__":
     ## ------ VASP
     elif sys.argv[1] == "2":
         if "-batch" in sys.argv:
-            vasp_batch(queue=queue, n_of_cpu=n_of_cpu, scratch=scratch)
+            vasp_batch(queue=queue, n_of_cpu=n_of_cpu, scratch=scratch, sub=sub)
         else:
-            vasp(queue=queue, n_of_cpu=n_of_cpu)
+            vasp(queue=queue, n_of_cpu=n_of_cpu, sub=sub)
 
     ## ------ ATK
     elif sys.argv[1] == "3":
