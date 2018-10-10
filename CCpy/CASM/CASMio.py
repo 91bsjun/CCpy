@@ -1,5 +1,7 @@
 import os, sys
-
+version = sys.version
+if version[0] == '3':
+    raw_input = input
 from math import acos,radians,degrees
 
 import numpy as np
