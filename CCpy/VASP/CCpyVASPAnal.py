@@ -192,6 +192,7 @@ elif sys.argv[1] == "-e":
         df = df.drop('Unnamed: 0', 1)
     except:
         pass
+    print("\n* Handle error or unconverged job(s)")
     print("Unconverged job list in 01_unconverged_jobs.csv")
 
     dirs = df['Directory'].tolist()
