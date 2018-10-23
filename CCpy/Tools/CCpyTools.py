@@ -348,8 +348,10 @@ def selectVASPInputs(directory_path, dir_list=None, ask=True, static=False, band
 
     return inputs
 
-def selectVASPOutputs(directory_path, ask=True, sub=False):
-    if sub:
+def selectVASPOutputs(directory_path, dir_list=None, ask=True, sub=False):
+    if dir_list:
+        all_dirs = dir_list
+    elif sub:
         def get_valid_paths(path):
             (parent, subdirs, files) = path
             if "Band-DOS" in subdirs:
