@@ -17,8 +17,9 @@ def get_vasp_status():
     # -- 2. check unconverged
     else:
         ueh = UnconvergedErrorHandler()
-        ueh_check = ueh.check()
-        err_action = ueh.correct()
+        err = ueh.check()
+        if err:
+            err_action = ueh.correct()
 
     if err_action:
         write_log(str(err_action))
