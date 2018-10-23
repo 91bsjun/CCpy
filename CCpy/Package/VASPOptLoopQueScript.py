@@ -42,7 +42,6 @@ def get_final_energy():
         e.append(float(s.split()[4]))
 
     if len(e) == 0:
-        write_log("Cannot find total energy in OUTCAR.")
         return "err", "err"
 
     return round(e[0], 8), round(e[-1], 8)
@@ -92,17 +91,17 @@ if __name__ == "__main__":
     write_log("Start first relaxation")
     
     loop = 0
-    write_log("Loop: " + str(loop))
+    write_log("\\nLoop: " + str(loop))
     os.system("mpirun -np $NSLOTS vasp < /dev/null > vasp.out")
 
     # -- parsing output
     c = get_vasp_status()
     init_e, final_e = get_final_energy()
     if init_e == "err":
-        write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %s\\n" % (str(c), str(init_e), str(final_e), "err"))
+        write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %sn" % (str(c), str(init_e), str(final_e), "err"))
         write_log("Final structure.  ERR")
     else:
-        write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %s\\n" % (str(c), str(init_e), str(final_e), str(final_e - init_e)))
+        write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %sn" % (str(c), str(init_e), str(final_e), str(final_e - init_e)))
         lat = get_structure_info("CONTCAR")
         write_log("Final structure.  a: %.2f  b: %.2f  c: %2.f  alpha: %.2f  beta: %.2f  gamma: %.2f  volume: %.2f" % (lat[0], lat[1], lat[2], lat[3], lat[4], lat[5], lat[6]))
     write_energy(loop, final_e)
@@ -111,14 +110,14 @@ if __name__ == "__main__":
         loop += 1
         os.system("rm vasp.done")
         os.system("mpirun -np $NSLOTS vasp < /dev/null > vasp.out")
+        write_log("\\nLoop: " + str(loop))
         c = get_vasp_status()
-        init_e, final_e = get_final_energy()
-        write_log("Loop: " + str(loop))
+        init_e, final_e = get_final_energy()        
         if init_e == "err":
-            write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %s\\n" % (str(c), str(init_e), str(final_e), "err"))
+            write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %sn" % (str(c), str(init_e), str(final_e), "err"))
             write_log("Final structure.  ERR")
         else:
-            write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %s\\n" % (str(c), str(init_e), str(final_e), str(final_e - init_e)))
+            write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %sn" % (str(c), str(init_e), str(final_e), str(final_e - init_e)))
             lat = get_structure_info("CONTCAR")
             write_log("Final structure.  a: %.2f  b: %.2f  c: %2.f  alpha: %.2f  beta: %.2f  gamma: %.2f  volume: %.2f" % (lat[0], lat[1], lat[2], lat[3], lat[4], lat[5], lat[6]))
         write_energy(loop, final_e)

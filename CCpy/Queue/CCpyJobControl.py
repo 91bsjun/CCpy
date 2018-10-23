@@ -140,7 +140,7 @@ cat $TMPDIR/machines
             f.write(script_string)
             f.close()
             script_path = os.getcwd() + "/" + script_filename
-            vasp_run = "%s %s" % (python_path, script_path)
+            vasp_run = "%s %s\nrm %s" % (python_path, script_path, script_path)
         else:
             jobname = "VL" + inputfile
         jobname = jobname.replace(".","_").replace("-","_")
@@ -189,6 +189,7 @@ cat $TMPDIR/machines
         jobname = raw_input("Jobname for this job \n: ")
 
         runs = ""
+        script_path = None
         if loop:
             from CCpy.Package.VASPOptLoopQueScript import VASPOptLoopQueScriptString
             script_string = VASPOptLoopQueScriptString()
@@ -212,6 +213,8 @@ cat $TMPDIR/machines
             else:
                 runs += "cd " + d + "\n"
                 runs += each_run
+        if loop:
+            runs += "rm %s" % script_path
         mpi = '''#!/bin/csh
 #$ -pe mpi_%d %d
 #$ -N %s
