@@ -778,10 +778,10 @@ Reciprocal
         mit_relax = MITRelaxSet(structure)
         mit_relax.write_input(dirname)
 
-    def MP_relax_set(self):
+    def MP_relax_set(self, user_incar):
         structure = self.structure
         dirname = self.dirname
-        mit_relax = MPRelaxSet(structure)
+        mit_relax = MPRelaxSet(structure, user_incar_settings=user_incar)
         mit_relax.write_input(dirname)
 
     def MP_HSE_relax_set(self):

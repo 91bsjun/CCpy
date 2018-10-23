@@ -122,6 +122,7 @@ cat $TMPDIR/machines
 
 
     def vasp(self, cpu=None, mem=None, q=None, band=False, phonon=False, dirpath=None, loop=False):
+        global vasp_run
         inputfile = self.inputfile
 
         cpu, q = self.n_of_cpu, self.q
@@ -132,7 +133,7 @@ cat $TMPDIR/machines
         elif phonon:
             jobname = "VP" + inputfile
         elif loop:
-            jobname = "VP" + inputfile
+            jobname = "VL" + inputfile
             from CCpy.Package.VASPOptLoopQueScript import VASPOptLoopQueScriptString
             script_string = VASPOptLoopQueScriptString()
             script_filename = ".VASPOptLoop.py"
@@ -142,7 +143,7 @@ cat $TMPDIR/machines
             script_path = os.getcwd() + "/" + script_filename
             vasp_run = "%s %s\nrm %s" % (python_path, script_path, script_path)
         else:
-            jobname = "VL" + inputfile
+            jobname = "V" + inputfile
         jobname = jobname.replace(".","_").replace("-","_")
         mpi = '''#!/bin/csh
 
@@ -178,11 +179,11 @@ cat $TMPDIR/machines
         f.write(mpi)
         f.close()
         shl(queue_path + qsub + " mpi.sh", shell=True)
-        shl("rm -rf ./mpi.sh", shell=True)
+        #shl("rm -rf ./mpi.sh", shell=True)
         os.chdir(pwd)
 
     def vasp_batch(self, cpu=None, mem=None, q=None, band=False, dirs=None, scratch=False, loop=False):
-
+        global vasp_run
         cpu, q = self.n_of_cpu, self.q
 
         # -- Band calculation after previous calculation
