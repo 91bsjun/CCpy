@@ -55,7 +55,7 @@ def vasp(queue=None, n_of_cpu=None, sub=None, loop=None):
             df = df.drop('Unnamed: 0', 1)
         except:
             pass
-
+        print("Unconverged job list in 01_unconverged_jobs.csv")
         inputs = selectVASPInputs("./", dir_list=df['Directory'].tolist())
 
     elif "-phonon" in sys.argv:
