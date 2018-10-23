@@ -55,7 +55,7 @@ def vasp(queue=None, n_of_cpu=None, sub=None, loop=None):
             df = df.drop('Unnamed: 0', 1)
         except:
             pass
-        print("Unconverged job list in 01_unconverged_jobs.csv")
+        print("\n* Unconverged job list in 01_unconverged_jobs.csv")
         inputs = selectVASPInputs("./", dir_list=df['Directory'].tolist())
 
     elif "-phonon" in sys.argv:
@@ -97,12 +97,8 @@ def vasp_batch(queue=None, n_of_cpu=None, scratch=False, sub=None, loop=None):
             df = df.drop('Unnamed: 0', 1)
         except:
             pass
-        print("\n* Following jobs will be submitted.")
-        print(df)
-        proceed = input("Continue ? (y/n) ")
-        if proceed != "y":
-            quit()
-        inputs = df['Directory'].tolist()
+        print("\n* Unconverged job list in 01_unconverged_jobs.csv")
+        inputs = selectVASPInputs("./", dir_list=df['Directory'].tolist())
     else:
         inputs = selectVASPInputs("./", ask=ask, sub=sub)
 
