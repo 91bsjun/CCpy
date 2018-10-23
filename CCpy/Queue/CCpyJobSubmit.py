@@ -55,12 +55,8 @@ def vasp(queue=None, n_of_cpu=None, sub=None, loop=None):
             df = df.drop('Unnamed: 0', 1)
         except:
             pass
-        print("\n* Following jobs will be submitted.")
-        print(df)
-        proceed = input("Continue ? (y/n) ")
-        if proceed != "y":
-            quit()
-        inputs = df['Directory'].tolist()
+
+        inputs = selectVASPInputs("./", dir_list=df['Directory'].tolist())
 
     elif "-phonon" in sys.argv:
         phonon = True
