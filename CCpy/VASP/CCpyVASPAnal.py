@@ -192,14 +192,17 @@ elif sys.argv[1] == "-e":
         df = df.drop('Unnamed: 0', 1)
     except:
         pass
+    print("\n* Handle error or unconverged job(s)")
+    print("Unconverged job list in 01_unconverged_jobs.csv")
+
     dirs = df['Directory'].tolist()
-    print("\n* Following ERROR jobs will be handled.")
-    print(df)
+    outputs = selectVASPOutputs("./", dir_list=dirs)
+
     
     proceed = raw_input("\nContinue? (y/n) ")
     if proceed == "y":
         VO = VASPOutput()
-        VO.vasp_error_handle(dirs)
+        VO.vasp_error_handle(outputs)
 
 
 

@@ -22,7 +22,7 @@ vasp_mpi_run = "mpirun"
 atk_mpi_run = "/opt/intel/compilers_and_libraries_2018.1.163/linux/mpi/intel64/bin/mpirun"
 lammps_mpirun_path = "mpirun"
 
-vasp_path = "vasp"
+vasp_run = "mpirun -np $NSLOTS vasp < /dev/null > vasp.out"
 #vasp_path="/opt/vasp/vasp5.4.4-beef/bin/vasp_std"
 
 g09_path = "g09"
@@ -121,7 +121,8 @@ cat $TMPDIR/machines
         shl("rm -rf ./mpi.sh", shell=True)
 
 
-    def vasp(self, cpu=None, mem=None, q=None, band=False, phonon=False, dirpath=None):
+    def vasp(self, cpu=None, mem=None, q=None, band=False, phonon=False, dirpath=None, loop=False):
+        global vasp_run
         inputfile = self.inputfile
 
         cpu, q = self.n_of_cpu, self.q
@@ -131,9 +132,19 @@ cat $TMPDIR/machines
             jobname = "VB" + inputfile
         elif phonon:
             jobname = "VP" + inputfile
+        elif loop:
+            jobname = "VL" + inputfile
+            from CCpy.Package.VASPOptLoopQueScript import VASPOptLoopQueScriptString
+            script_string = VASPOptLoopQueScriptString()
+            script_filename = ".VASPOptLoop.py"
+            f = open(script_filename, "w")
+            f.write(script_string)
+            f.close()
+            script_path = os.getcwd() + "/" + script_filename
+            vasp_run = "%s %s\nrm %s" % (python_path, script_path, script_path)
         else:
             jobname = "V" + inputfile
-            jobname = jobname.replace(".","_").replace("-","_")
+        jobname = jobname.replace(".","_").replace("-","_")
         mpi = '''#!/bin/csh
 
 # pe request
@@ -157,10 +168,10 @@ cat $TMPDIR/machines
 
  cd %s
  rm vasp.done
- %s -np $NSLOTS %s < /dev/null > vasp.out
+ %s
  touch vasp.done
 
- '''%(cpu, cpu, jobname, q, dirpath, vasp_mpi_run, vasp_path)
+ '''%(cpu, cpu, jobname, q, dirpath, vasp_run)
 
         pwd = os.getcwd()
         os.chdir(dirpath)
@@ -168,18 +179,29 @@ cat $TMPDIR/machines
         f.write(mpi)
         f.close()
         shl(queue_path + qsub + " mpi.sh", shell=True)
-        shl("rm -rf ./mpi.sh", shell=True)
+        #shl("rm -rf ./mpi.sh", shell=True)
         os.chdir(pwd)
 
-    def vasp_batch(self, cpu=None, mem=None, q=None, band=False, dirs=None, scratch=False):
-
+    def vasp_batch(self, cpu=None, mem=None, q=None, band=False, dirs=None, scratch=False, loop=False):
+        global vasp_run
         cpu, q = self.n_of_cpu, self.q
 
         # -- Band calculation after previous calculation
         jobname = raw_input("Jobname for this job \n: ")
 
         runs = ""
-        each_run = "rm vasp.done\n%s -np $NSLOTS %s < /dev/null > vasp.out\ntouch vasp.done\n" % (vasp_mpi_run, vasp_path)
+        script_path = None
+        if loop:
+            from CCpy.Package.VASPOptLoopQueScript import VASPOptLoopQueScriptString
+            script_string = VASPOptLoopQueScriptString()
+            script_filename = ".VASPOptLoop.py"
+            f = open(script_filename, "w")
+            f.write(script_string)
+            f.close()
+            script_path = os.getcwd() + "/" + script_filename
+            each_run = "rm vasp.done\n%s %s\ntouch vasp.done\n" % (python_path, script_path)
+        else:
+            each_run = "rm vasp.done\n%s\ntouch vasp.done\n" % vasp_run
         for d in dirs:
             if scratch:
                 dir_path = "/scratch/vasp" + d
@@ -192,6 +214,8 @@ cat $TMPDIR/machines
             else:
                 runs += "cd " + d + "\n"
                 runs += each_run
+        if loop:
+            runs += "rm %s" % script_path
         mpi = '''#!/bin/csh
 #$ -pe mpi_%d %d
 #$ -N %s

@@ -36,7 +36,7 @@ def gaussian(queue=None, n_of_cpu=None):
         myJS = JS(each_input, queue, n_of_cpu)
         myJS.gaussian()
 
-def vasp(queue=None, n_of_cpu=None, sub=None):
+def vasp(queue=None, n_of_cpu=None, sub=None, loop=None):
     # --- Collect VASP inputs
     band = False
     recalc = False
@@ -55,12 +55,8 @@ def vasp(queue=None, n_of_cpu=None, sub=None):
             df = df.drop('Unnamed: 0', 1)
         except:
             pass
-        print("\n* Following jobs will be submitted.")
-        print(df)
-        proceed = input("Continue ? (y/n) ")
-        if proceed != "y":
-            quit()
-        inputs = df['Directory'].tolist()
+        print("\n* Unconverged job list in 01_unconverged_jobs.csv")
+        inputs = selectVASPInputs("./", dir_list=df['Directory'].tolist())
 
     elif "-phonon" in sys.argv:
         phonon = True
@@ -77,9 +73,9 @@ def vasp(queue=None, n_of_cpu=None, sub=None):
         elif phonon:
             dirpath += "/Phonon_opt"
         myJS = JS(each_input, queue, n_of_cpu)
-        myJS.vasp(band=band, dirpath=dirpath, phonon=phonon)
+        myJS.vasp(band=band, dirpath=dirpath, phonon=phonon, loop=loop)
 
-def vasp_batch(queue=None, n_of_cpu=None, scratch=False, sub=None):
+def vasp_batch(queue=None, n_of_cpu=None, scratch=False, sub=None, loop=None):
     # --- Collect VASP inputs
     band = False
     phonon = False
@@ -101,12 +97,8 @@ def vasp_batch(queue=None, n_of_cpu=None, scratch=False, sub=None):
             df = df.drop('Unnamed: 0', 1)
         except:
             pass
-        print("\n* Following jobs will be submitted.")
-        print(df)
-        proceed = input("Continue ? (y/n) ")
-        if proceed != "y":
-            quit()
-        inputs = df['Directory'].tolist()
+        print("\n* Unconverged job list in 01_unconverged_jobs.csv")
+        inputs = selectVASPInputs("./", dir_list=df['Directory'].tolist())
     else:
         inputs = selectVASPInputs("./", ask=ask, sub=sub)
 
@@ -122,7 +114,7 @@ def vasp_batch(queue=None, n_of_cpu=None, scratch=False, sub=None):
             dirpath += "/Phonon_opt"
         dirs.append(dirpath)
     myJS = JS(each_input, queue, n_of_cpu)
-    myJS.vasp_batch(band=band, dirs=dirs, scratch=scratch)
+    myJS.vasp_batch(band=band, dirs=dirs, scratch=scratch, loop=loop)
 
 
 def qchem(queue=None, n_of_cpu=None):
@@ -272,7 +264,8 @@ if __name__=="__main__":
     -n=[integer]    : the number of CPU to use
                       ex) CCpyJobSubmit.py 2 xeon2 -n=8
                       --> will use 8 CPUs in xeon2
-                      
+                
+    <Support for VASP only>
     -sub            : find vasp jobs under sub directories (only support for vasp)
                       ex) CCpyJobSubmit.py 2 xeon4 -sub
                       ex) CCpyJobSubmit.py 2 xeon5 -batch -sub
@@ -303,6 +296,8 @@ if __name__=="__main__":
     -T              : Assign temperature when NVT MD simulation in VASP
                       ex) CCpyJobSubmit.py 9 xeon6 -n=24 -T=1000
     
+    -loop           : run VASP jobs until converged. (error will be handled using custodian library in pymatgen)
+                      ex) CCpyJobSubmit.py 2 xeon5 -loop
     
     <Options for ATK version handling>
     -atk2018        : ex) CCpyJobSubmit.py 3 xeon4 -atk2018  
@@ -334,6 +329,7 @@ if __name__=="__main__":
     atk_version = 'atk2017'
     temp = None
     sub = False
+    loop = False
     for s in sys.argv:
         if "-n" in s:
             n_of_cpu = int(s.split("=")[1])
@@ -347,6 +343,8 @@ if __name__=="__main__":
             temp = int(s.split("=")[1])
         if '-sub' in s:
             sub = True
+        if '-loop' in s:
+            loop = True
 
     ## ------ GAUSSIAN
     if sys.argv[1] == "1":
@@ -355,9 +353,9 @@ if __name__=="__main__":
     ## ------ VASP
     elif sys.argv[1] == "2":
         if "-batch" in sys.argv:
-            vasp_batch(queue=queue, n_of_cpu=n_of_cpu, scratch=scratch, sub=sub)
+            vasp_batch(queue=queue, n_of_cpu=n_of_cpu, scratch=scratch, sub=sub, loop=loop)
         else:
-            vasp(queue=queue, n_of_cpu=n_of_cpu, sub=sub)
+            vasp(queue=queue, n_of_cpu=n_of_cpu, sub=sub, loop=loop)
 
     ## ------ ATK
     elif sys.argv[1] == "3":

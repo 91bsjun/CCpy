@@ -778,10 +778,10 @@ Reciprocal
         mit_relax = MITRelaxSet(structure)
         mit_relax.write_input(dirname)
 
-    def MP_relax_set(self):
+    def MP_relax_set(self, user_incar):
         structure = self.structure
         dirname = self.dirname
-        mit_relax = MPRelaxSet(structure)
+        mit_relax = MPRelaxSet(structure, user_incar_settings=user_incar)
         mit_relax.write_input(dirname)
 
     def MP_HSE_relax_set(self):
@@ -1007,7 +1007,11 @@ class VASPOutput():
             else:
                 subset = VaspErrorHandler.error_msgs
                 incar = Incar.from_file("INCAR")
-                nsw = incar['NSW']
+                try:
+                    # if NSW not mentioned in INCAR file, default NSW=0
+                    nsw = incar['NSW']
+                except:
+                    nsw = 0
                 subset['max_ionic'] = ['%s F=' % (nsw)]
                 veh = VaspErrorHandler(errors_subset_to_catch=subset)
                 converged = str(not veh.check())

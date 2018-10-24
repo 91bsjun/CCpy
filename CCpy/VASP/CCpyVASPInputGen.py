@@ -171,11 +171,16 @@ elif sys.argv[1] == "5":
 elif sys.argv[1] == "MPRelax":
     input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
     inputs = selectInputs(input_marker, "./")
+    if spin:
+        ispin = 2
+    else:
+        ispin = 1
+    user_incar = {"ISPIN": ispin}
     for each_input in inputs:
         MP_relax_VI = VASPInput(each_input)
-        MP_relax_VI.MP_relax_set()
+        MP_relax_VI.MP_relax_set(user_incar=user_incar)
 
-elif sys.argv[1] == "0000":
+elif sys.argv[1] == "MITRelax":
     input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
     inputs = selectInputs(input_marker, "./")
     for each_input in inputs:
