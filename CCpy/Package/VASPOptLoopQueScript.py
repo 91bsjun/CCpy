@@ -9,7 +9,17 @@ def get_vasp_status():
     converged = False
 
     # -- 1. check error
-    veh = VaspErrorHandler()
+    # create max ionic termination
+    subset = VaspErrorHandler.error_msgs
+    incar = Incar.from_file("INCAR")
+    try:
+        # if NSW not mentioned in INCAR file, default NSW=0
+        nsw = incar['NSW']
+    except:
+        nsw = 0
+    subset['max_ionic'] = ['%s F=' % (nsw)]
+    
+    veh = VaspErrorHandler(errors_subset_to_catch=subset)
     err = veh.check()
     err_action = None
     if err:
