@@ -198,11 +198,8 @@ elif sys.argv[1] == "-e":
     dirs = df['Directory'].tolist()
     outputs = selectVASPOutputs("./", dir_list=dirs)
 
-    
-    proceed = raw_input("\nContinue? (y/n) ")
-    if proceed == "y":
-        VO = VASPOutput()
-        VO.vasp_error_handle(outputs)
+    VO = VASPOutput()
+    VO.vasp_error_handle(outputs)
 
 
 

@@ -179,7 +179,7 @@ cat $TMPDIR/machines
         f.write(mpi)
         f.close()
         shl(queue_path + qsub + " mpi.sh", shell=True)
-        #shl("rm -rf ./mpi.sh", shell=True)
+        shl("rm -rf ./mpi.sh", shell=True)
         os.chdir(pwd)
 
     def vasp_batch(self, cpu=None, mem=None, q=None, band=False, dirs=None, scratch=False, loop=False):
