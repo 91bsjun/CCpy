@@ -99,10 +99,10 @@ if __name__ == "__main__":
     c = get_vasp_status()
     init_e, final_e = get_final_energy()
     if init_e == "err":
-        write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %sn" % (str(c), str(init_e), str(final_e), "err"))
+        write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %s" % (str(c), str(init_e), str(final_e), "err"))
         write_log("Final structure.  ERR")
     else:
-        write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %sn" % (str(c), str(init_e), str(final_e), str(final_e - init_e)))
+        write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %s" % (str(c), str(init_e), str(final_e), str(final_e - init_e)))
         lat = get_structure_info("CONTCAR")
         write_log("Final structure.  a: %.2f  b: %.2f  c: %2.f  alpha: %.2f  beta: %.2f  gamma: %.2f  volume: %.2f" % (lat[0], lat[1], lat[2], lat[3], lat[4], lat[5], lat[6]))
     write_energy(loop, final_e)
@@ -115,10 +115,10 @@ if __name__ == "__main__":
         c = get_vasp_status()
         init_e, final_e = get_final_energy()        
         if init_e == "err":
-            write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %sn" % (str(c), str(init_e), str(final_e), "err"))
+            write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %s" % (str(c), str(init_e), str(final_e), "err"))
             write_log("Final structure.  ERR")
         else:
-            write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %sn" % (str(c), str(init_e), str(final_e), str(final_e - init_e)))
+            write_log("Convergence: %s  Initial energy: %s    Final energy: %s    dE: %s" % (str(c), str(init_e), str(final_e), str(final_e - init_e)))
             lat = get_structure_info("CONTCAR")
             write_log("Final structure.  a: %.2f  b: %.2f  c: %2.f  alpha: %.2f  beta: %.2f  gamma: %.2f  volume: %.2f" % (lat[0], lat[1], lat[2], lat[3], lat[4], lat[5], lat[6]))
         write_energy(loop, final_e)
