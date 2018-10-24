@@ -474,7 +474,7 @@ Usage : cms_band [option] [sub_option1] [sub_option2]...
 
 -c=          : assign color order when plot color band (default: gbr)
               (ex: CCpyBand.py 2 -c=brg)
-              (ex: CCpyBand.py 2 -c=gb)
+              (ex: CCpyBand.py 2 -c=gb -e=C,N)
       
 -dlim=       : Set DOS x-axis limitation (default: 0,20)
               (ex: CCpyBand.py 3 -dlim=0,5)
