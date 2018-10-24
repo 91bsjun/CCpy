@@ -64,6 +64,11 @@ def vasp(queue=None, n_of_cpu=None, sub=None, loop=None):
     else:
         inputs = selectVASPInputs("./", ask=ask, sub=sub)
 
+    # -- Clean vasp.done if exists
+    for each_input in inputs:
+        if 'vasp.done' in os.listdir(inputs):
+            os.remove(inputs + '/vasp.done')
+
     # --- SUBMIT QUEUE
     pwd = os.getcwd()
     for each_input in inputs:
@@ -101,6 +106,11 @@ def vasp_batch(queue=None, n_of_cpu=None, scratch=False, sub=None, loop=None):
         inputs = selectVASPInputs("./", dir_list=df['Directory'].tolist())
     else:
         inputs = selectVASPInputs("./", ask=ask, sub=sub)
+
+    # -- Clean vasp.done if exists
+    for each_input in inputs:
+        if 'vasp.done' in os.listdir(inputs):
+            os.remove(inputs + '/vasp.done')
 
     # --- SUBMIT QUEUE
     dirs = []

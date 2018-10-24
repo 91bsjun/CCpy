@@ -44,7 +44,8 @@ queue_info = {"xeon1":[16, 32, "xeon1.q",['node01']],
               "xeon5":[72, 512, "xeon5.q",['node08','node09','node10']],
               "xeon6":[48, 512, "xeon6.q",['node12']],
               "xeon7":[52, 192, "xeon7.q",['node13']],
-              "epyc":[64, 256, "epyc.q",['node11']]}
+              "epyc":[64, 256, "epyc.q",['node11']],
+              "aws":[36, 64, "all.q",['']]}
 
 
 class JobSubmit():
@@ -199,9 +200,9 @@ cat $TMPDIR/machines
             f.write(script_string)
             f.close()
             script_path = os.getcwd() + "/" + script_filename
-            each_run = "rm vasp.done\n%s %s\ntouch vasp.done\n" % (python_path, script_path)
+            each_run = "rm vasp.done\n%s %s\ntouch vasp.done\nsleep 30\n" % (python_path, script_path)
         else:
-            each_run = "rm vasp.done\n%s\ntouch vasp.done\n" % vasp_run
+            each_run = "rm vasp.done\n%s\ntouch vasp.done\nsleep 30\n" % vasp_run
         for d in dirs:
             if scratch:
                 dir_path = "/scratch/vasp" + d
