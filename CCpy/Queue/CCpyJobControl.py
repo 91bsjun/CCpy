@@ -44,7 +44,8 @@ queue_info = {"xeon1":[16, 32, "xeon1.q",['node01']],
               "xeon5":[72, 512, "xeon5.q",['node08','node09','node10']],
               "xeon6":[48, 512, "xeon6.q",['node12']],
               "xeon7":[52, 192, "xeon7.q",['node13']],
-              "epyc":[64, 256, "epyc.q",['node11']]}
+              "epyc":[64, 256, "epyc.q",['node11']],
+              "aws":[36, 64, "all.q",['']]}
 
 
 class JobSubmit():
