@@ -200,9 +200,9 @@ cat $TMPDIR/machines
             f.write(script_string)
             f.close()
             script_path = os.getcwd() + "/" + script_filename
-            each_run = "rm vasp.done\n%s %s\ntouch vasp.done\n" % (python_path, script_path)
+            each_run = "rm vasp.done\n%s %s\ntouch vasp.done\nsleep 30\n" % (python_path, script_path)
         else:
-            each_run = "rm vasp.done\n%s\ntouch vasp.done\n" % vasp_run
+            each_run = "rm vasp.done\n%s\ntouch vasp.done\nsleep 30\n" % vasp_run
         for d in dirs:
             if scratch:
                 dir_path = "/scratch/vasp" + d
