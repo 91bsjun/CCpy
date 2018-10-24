@@ -1007,7 +1007,11 @@ class VASPOutput():
             else:
                 subset = VaspErrorHandler.error_msgs
                 incar = Incar.from_file("INCAR")
-                nsw = incar['NSW']
+                try:
+                    # if NSW not mentioned in INCAR file, default NSW=0
+                    nsw = incar['NSW']
+                except:
+                    nsw = 0
                 subset['max_ionic'] = ['%s F=' % (nsw)]
                 veh = VaspErrorHandler(errors_subset_to_catch=subset)
                 converged = str(not veh.check())
