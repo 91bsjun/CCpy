@@ -97,7 +97,7 @@ class CMSBand():
                
         return plt
 
-    def colorBand(self, miny=None,maxy=None,elt_ordered=None,line_width=3):
+    def colorBand(self, miny=None, maxy=None, elt_ordered=None, color_order=['g','b','r'], line_width=3):
         bands = self.bands
         plotter = BSPlotterProjected(bands)
         self.plotter = plotter
@@ -120,22 +120,24 @@ class CMSBand():
         else:
             self.elt_ordered = elt_ordered
             import matplotlib.pyplot as plt
-            plotter.get_elt_projected_plots_color(zero_to_efermi=True, elt_ordered=elt_ordered, line_width=line_width)
+            plotter.get_elt_projected_plots_color(zero_to_efermi=True, elt_ordered=elt_ordered, line_width=line_width, color_order=color_order)
             plt.axhline(y=0, lw=1, ls=':', color='gray')
             plt.tick_params(labelsize=15)
 
-            if len(elt_ordered) == 3:
-                colors = ["r","#1DDB16","b"]
-            elif len(elt_ordered) == 2:
-                colors = ["b","r"]
+            colors = color_order
+            # change vivid green to normal green
+            for i, val in enumerate(color_order):
+                if val == 'g':
+                    color_order[i] = '#1DDB16'
+                    
             for i in range(len(elt_ordered)):
-                plt.plot(0,0,color=colors[i],label=elt_ordered[i],linewidth=2)
-            plt.legend(fancybox=True,shadow=True,prop={'size':18}, loc='upper right')
-            plt.ylim(miny,maxy)
+                plt.plot(0, 0, color=colors[i], label=elt_ordered[i], linewidth=2)
+            plt.legend(fancybox=True, shadow=True, prop={'size':18}, loc='upper right')
+            plt.ylim(miny, maxy)
 
             return plt
 
-    def colorBand_spin(self, miny=None,maxy=None,elt_ordered=None,line_width=3,spin="up"):
+    def colorBand_spin(self, miny=None, maxy=None, elt_ordered=None, color_order=['g','b','r'], line_width=3, spin="up"):
         bands = self.bands
         plotter = BSPlotterProjected(bands)
         self.plotter = plotter
@@ -158,14 +160,15 @@ class CMSBand():
         else:
             self.elt_ordered = elt_ordered
             import matplotlib.pyplot as plt
-            plotter.get_elt_projected_plots_color_spin(zero_to_efermi=True, elt_ordered=elt_ordered, line_width=line_width, spin=spin)
+            plotter.get_elt_projected_plots_color_spin(zero_to_efermi=True, elt_ordered=elt_ordered, color_order=color_order, line_width=line_width, spin=spin)
             plt.axhline(y=0, lw=1, ls=':', color='gray')
             plt.tick_params(labelsize=15)
 
-            if len(elt_ordered) == 3:
-                colors = ["r","#1DDB16","b"]
-            elif len(elt_ordered) == 2:
-                colors = ["b","r"]
+            colors = color_order
+            # change vivid green to normal green
+            for i, val in enumerate(color_order):
+                if val == 'g':
+                    color_order[i] = '#1DDB16'
             for i in range(len(elt_ordered)):
                 plt.plot(0,0,color=colors[i],label=elt_ordered[i],linewidth=2)
             plt.legend(fancybox=True,shadow=True,prop={'size':18}, loc='upper right')
@@ -174,7 +177,7 @@ class CMSBand():
             return plt
 
 
-    def element_DOS(self, miny=None,maxy=None, minx=None, maxx=None, elt_ordered=None,with_band=False):
+    def element_DOS(self, miny=None,maxy=None, minx=None, maxx=None, elt_ordered=None, color_order=['g', 'b', 'r'], with_band=False):
         from pymatgen.core.periodic_table import Element
         
         cdos = self.cdos
@@ -191,11 +194,11 @@ class CMSBand():
         else:
             plotter.add_dos_dict(elt_dos)
 
-        plt = plotter.get_rotate_plot()
+        plt = plotter.get_rotate_plot(color_order=color_order)
         
         plt.axhline(y=0, lw=1, ls=':', color='gray')
         plt.tick_params(labelsize=15)
-        plt.legend(fancybox=True,shadow=True,prop={'size':18})
+        plt.legend(fancybox=True, shadow=True, prop={'size':18}, loc='upper right')
         plt.ylim(miny,maxy)
         plt.xlim(minx,maxx)
 
@@ -285,25 +288,56 @@ def load_pickle_data(name=None):
     return loaded
 
 def main_run():
+    # -- parsing options
+    ylim = [-5, 5]
+    miny = min(ylim)
+    maxy = max(ylim)
+    elt_ordered = None
+    color_order = ['g', 'b', 'r']
+    line_width = 3
+    doslim = [0, 20]
+    dosmin = min(doslim)
+    dosmax = max(doslim)
+    for argv in sys.argv:
+        if '-ylim=' in argv:
+            ylim = argv.replace("-ylim=", "")
+            ylim = ylim.split(",")
+            ylim = [float(ylim[0]), float(ylim[1])]
+            miny = min(ylim)
+            maxy = max(ylim)
+        elif '-e=' in argv:
+            elt = argv.replace("-e=", "")
+            elt_ordered = elt.split(",")
+        elif '-c=' in argv:
+            rgb = argv.replace("-c=", "")
+            if len(rgb) == 2:
+                full_rgb = ['r', 'g', 'b']
+                full_rgb.remove(rgb[0])
+                full_rgb.remove(rgb[1])
+                rgb += full_rgb[0]
+            color_order = [rgb[0], rgb[1], rgb[2]]
+        elif '-lw=' in argv:
+            line_width = float(argv.replace("-lw=", ""))
+        elif '-dlim=' in argv:
+            doslim = argv.replace("-dlim=", "")
+            doslim = doslim.split(",")
+            doslim = [float(doslim[0]), float(doslim[1])]
+            dosmin = min(doslim)
+            dosmax = max(doslim)
+
+        """
+        old version method to get elt order
+        else:
+            get_atoms = raw_input("* Input the elements order to plot band (ex : C,N) : ")
+            get_atoms = get_atoms.replace(" ", "")
+            elt_ordered = get_atoms.split(',')
+            if len(elt_ordered) > 3:
+                get_atoms = raw_input("* Maximum 3 elements available : ")
+                elt_ordered = get_atoms.split(',')
+            elt_ordered = elt_ordered
+        """
     if sys.argv[1] != "0":
         import matplotlib.pyplot as plt
-        try:
-            lims = [float(sys.argv[2]), float(sys.argv[3])]
-            miny = min(lims)
-            maxy = max(lims)
-        except:
-            get_lim = raw_input("** Set y-limitaion (ex: -5,5) : ")
-            lims = get_lim.split(",")
-            miny = float(min(lims))
-            maxy = float(max(lims))
-
-        line_width = [argv for argv in sys.argv if "-lw" in argv]
-        if len(line_width) > 0:
-            line_width = line_width[0]
-            line_width = line_width.replace("-lw", "")
-            line_width = float(line_width)
-        else:
-            line_width = 3
 
     if sys.argv[1] == "0":
         cms_band = CMSBand()
@@ -318,6 +352,7 @@ def main_run():
         plt.tight_layout()
 
         cms_band.save_band_data(color=False)
+        
         if "n" not in sys.argv:
             plt.show()
 
@@ -326,33 +361,11 @@ def main_run():
         fig = plt.figure(figsize=(6, 10))
 
         cms_band = CMSBand(elt_projected=True, fig=fig)
-
-        elt_argv = [argv for argv in sys.argv if "-e" in argv]
-        if len(elt_argv) > 0:
-            elt = True
-            elt_argv = elt_argv[0]
-            elt_argv = elt_argv.replace("-e", "")
-        else:
-            elt = False
-
-        if "ed" in sys.argv:
-            elt_ordered = None
-        elif elt:
-            elt_ordered = elt_argv.split(",")
-            elt_ordered = elt_ordered
-        else:
-            get_atoms = raw_input("* Input the elements order to plot band (ex : C,N) : ")
-            get_atoms = get_atoms.replace(" ", "")
-            elt_ordered = get_atoms.split(',')
-            if len(elt_ordered) > 3:
-                get_atoms = raw_input("* Maximum 3 elements available : ")
-                elt_ordered = get_atoms.split(',')
-            elt_ordered = elt_ordered
-
-        plt = cms_band.colorBand(miny=miny, maxy=maxy, elt_ordered=elt_ordered, line_width=line_width)
+        plt = cms_band.colorBand(miny=miny, maxy=maxy, elt_ordered=elt_ordered, line_width=line_width, color_order=color_order)
         plt.tight_layout()
 
         cms_band.save_band_data(color=True)
+        
         if "n" not in sys.argv:
             plt.show()
 
@@ -360,41 +373,6 @@ def main_run():
     elif sys.argv[1] == "3":
         fig = plt.figure(figsize=(12, 10))
 
-        ## setting element order
-        elt_argv = [argv for argv in sys.argv if "-e" in argv]
-        if len(elt_argv) > 0:
-            elt = True
-            elt_argv = elt_argv[0]
-            elt_argv = elt_argv.replace("-e", "")
-        else:
-            elt = False
-
-        if "ed" in sys.argv:
-            elt_ordered = None
-        elif elt:
-            elt_ordered = elt_argv.split(",")
-            elt_ordered = elt_ordered
-        else:
-            get_atoms = raw_input("* Input the elements order to plot band (ex : C,N) : ")
-            get_atoms = get_atoms.replace(" ", "")
-            elt_ordered = get_atoms.split(',')
-            if len(elt_ordered) > 3:
-                get_atoms = raw_input("* Maximum 3 elements available : ")
-                elt_ordered = get_atoms.split(',')
-            elt_ordered = elt_ordered
-
-        ## setting DOS x-lim
-        doslim = [argv for argv in sys.argv if "-d" in argv]
-        if len(doslim) > 0:
-            doslim = doslim[0]
-            doslim = doslim.replace("-d", "")
-            doslim = doslim.split(",")
-            doslim = [float(doslim[0]), float(doslim[1])]
-            dosmin = min(doslim)
-            dosmax = max(doslim)
-        else:
-            dosmin = None
-            dosmax = None
 
         plt.subplot(121)
         cms_band = CMSBand(elt_projected=True, dos=True, fig=fig)
@@ -403,7 +381,7 @@ def main_run():
         cms_band.save_band_data(color=False, savefig=False)
 
         plt.subplot(122)
-        plt = cms_band.element_DOS(miny=miny, maxy=maxy, minx=dosmin, maxx=dosmax, elt_ordered=elt_ordered,
+        plt = cms_band.element_DOS(miny=miny, maxy=maxy, minx=dosmin, maxx=dosmax, elt_ordered=elt_ordered, color_order=color_order,
                                    with_band=True)
         plt.tight_layout()
 
@@ -424,48 +402,12 @@ def main_run():
 
         cms_band = CMSBand(elt_projected=True, dos=True, fig=fig)
 
-        ## setting element order
-        elt_argv = [argv for argv in sys.argv if "-e" in argv]
-        if len(elt_argv) > 0:
-            elt = True
-            elt_argv = elt_argv[0]
-            elt_argv = elt_argv.replace("-e", "")
-        else:
-            elt = False
-
-        if "ed" in sys.argv:
-            elt_ordered = None
-        elif elt:
-            elt_ordered = elt_argv.split(",")
-            elt_ordered = elt_ordered
-        else:
-            get_atoms = raw_input("* Input the elements order to plot band (ex : C,N) : ")
-            get_atoms = get_atoms.replace(" ", "")
-            elt_ordered = get_atoms.split(',')
-            if len(elt_ordered) > 3:
-                get_atoms = raw_input("* Maximum 3 elements available : ")
-                elt_ordered = get_atoms.split(',')
-            elt_ordered = elt_ordered
-
-        ## setting DOS x-lim
-        doslim = [argv for argv in sys.argv if "-d" in argv]
-        if len(doslim) > 0:
-            doslim = doslim[0]
-            doslim = doslim.replace("-d", "")
-            doslim = doslim.split(",")
-            doslim = [float(doslim[0]), float(doslim[1])]
-            dosmin = min(doslim)
-            dosmax = max(doslim)
-        else:
-            dosmin = None
-            dosmax = None
-
         plt.subplot(121)
-        plt = cms_band.colorBand(miny=miny, maxy=maxy, elt_ordered=elt_ordered, line_width=line_width)
+        plt = cms_band.colorBand(miny=miny, maxy=maxy, elt_ordered=elt_ordered, color_order=color_order, line_width=line_width)
         cms_band.save_band_data(color=True, savefig=False)
 
         plt.subplot(122)
-        plt = cms_band.element_DOS(miny=miny, maxy=maxy, minx=dosmin, maxx=dosmax, elt_ordered=cms_band.elt_ordered,
+        plt = cms_band.element_DOS(miny=miny, maxy=maxy, minx=dosmin, maxx=dosmax, elt_ordered=cms_band.elt_ordered, color_order=color_order,
                                    with_band=True)
         plt.tight_layout()
 
@@ -487,34 +429,12 @@ def main_run():
 
         cms_band = CMSBand(elt_projected=True, fig=fig)
 
-        elt_argv = [argv for argv in sys.argv if "-e" in argv]
-        if len(elt_argv) > 0:
-            elt = True
-            elt_argv = elt_argv[0]
-            elt_argv = elt_argv.replace("-e", "")
-        else:
-            elt = False
-
-        if "ed" in sys.argv:
-            elt_ordered = None
-        elif elt:
-            elt_ordered = elt_argv.split(",")
-            elt_ordered = elt_ordered
-        else:
-            get_atoms = raw_input("* Input the elements order to plot band (ex : C,N) : ")
-            get_atoms = get_atoms.replace(" ", "")
-            elt_ordered = get_atoms.split(',')
-            if len(elt_ordered) > 3:
-                get_atoms = raw_input("* Maximum 3 elements available : ")
-                elt_ordered = get_atoms.split(',')
-            elt_ordered = elt_ordered
-
         if "up" in sys.argv:
             spin = "up"
         elif "down" in sys.argv:
             spin = "down"
 
-        plt = cms_band.colorBand_spin(miny=miny, maxy=maxy, elt_ordered=elt_ordered, line_width=line_width, spin=spin)
+        plt = cms_band.colorBand_spin(miny=miny, maxy=maxy, elt_ordered=elt_ordered, color_order=color_order, line_width=line_width, spin=spin)
         plt.tight_layout()
 
         pwd = os.getcwd()
@@ -535,7 +455,7 @@ if __name__=="__main__":
         sys.argv[1]
     except:
         print("""-------------------------------------
-Usage : cms_band [option] [miny] [maxy] [sub_option1] [sub_option2]...
+Usage : cms_band [option] [sub_option1] [sub_option2]...
 -------------------------------------
 [option]
 0   : save band data only (band gap, cbm, vbm)
@@ -544,22 +464,33 @@ Usage : cms_band [option] [miny] [maxy] [sub_option1] [sub_option2]...
 3   : blue band & element DOS
 4   : color band & element DOS
 5   : color band spin UP or DOWN
+
 [sub_options]
-a   : Select all possible directories
-      (ex : CCpyBand.py 1 -3 3 a)
-n   : Do not show figure, just save figure and band.dat
-      (ex : CCpyBand.py 1 -3 3 n)
-ed  : Make element order as default
-      (ex : CCpyBand.py 2 -3 3 ed)
--e  : Make element order
-      (ex : CCpyBand.py 2 -3 3 -eCo,Ni)
--d  : Set DOS x-axis limitation
-      (ex : CCpyBand.py 3 -3 3 -d0,5)
-      (ex : CCpyBand.py 3 -3 3 -eC,N -d0,5)
--lw : Set line width of figure
-      (ex : CCpyBand.py 3 -3 3 -lw5) // default = 3
-up/down  : if spin polarized calculation / option 5
-      (ex : CCpyBand.py 5 -3 3 -eC,N down)
+-ylim=       : set y-axis limitation (default: -5,5)
+              (ex: CCpyBand.py 1 -ylim=-3,3)
+
+-e=          : assign element order when plot color band (maximum 3 elements available, default: in vasprun.xml)
+              (ex: CCpyBand.py 2 -e=Co,Ni)
+
+-c=          : assign color order when plot color band (default: gbr)
+              (ex: CCpyBand.py 2 -c=brg)
+              (ex: CCpyBand.py 2 -c=gb -e=C,N)
+      
+-dlim=       : Set DOS x-axis limitation (default: 0,20)
+              (ex: CCpyBand.py 3 -dlim=0,5)
+              (ex: CCpyBand.py 4 -e=Co,Ni -c=br -dlim=0,15)
+      
+-lw=         : Set line width of figure (default: 3)
+              (ex: CCpyBand.py 2 -lw=5)
+              
+up/down      : if spin polarized calculation / option 5
+              (ex: CCpyBand.py 5 -ylim=4,4 down)
+
+a            : Select all possible directories
+              (ex: CCpyBand.py 1 a)
+              
+n            : Do not show figure, just save figure and band.dat
+              (ex: CCpyBand.py 1 n)
 -------------------------------------"""
               )
         quit()

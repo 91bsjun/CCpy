@@ -224,7 +224,7 @@ class DosPlotter(object):
         #plt.tight_layout()
         return plt
 
-    def get_rotate_plot(self, xlim=None, ylim=None):
+    def get_rotate_plot(self, xlim=None, ylim=None, elt_orders=None, color_order=None):
         """
         Get a matplotlib plot showing the DOS.
 
@@ -241,13 +241,8 @@ class DosPlotter(object):
 
         import palettable
 
-        if len(self._doses) == 2:
-            colors = ["b", "r"]
-        elif len(self._doses) == 3:
-            colors = ["r", "#1DDB16", "b"]
-        elif 4 <= len(self._doses) <= 5:
-            colors = ["r", "#1DDB16", "b", "#FFBB00", "#000000"]
-        else:
+        colors = color_order
+        if not colors:
             colors = palettable.colorbrewer.qualitative.Set1_9.mpl_colors
 
         y = None
@@ -1237,7 +1232,7 @@ class BSPlotterProjected(BSPlotter):
         return plt
 
     def get_elt_projected_plots_color(self, zero_to_efermi=True, line_width=3,
-                                      elt_ordered=None):
+                                      elt_ordered=None, color_order=['g','b','r']):
         """
         returns a pylab plot object with one plot where the band structure
         line color depends on the character of the band (along different
@@ -1297,15 +1292,57 @@ class BSPlotterProjected(BSPlotter):
                                      / sum_e
                                      for el in elt_ordered]
                         if len(color) == 2:
+                            '''
+                            # original..
                             color.append(0.0)
                             color[2] = color[1]
                             color[1] = 0.0
                             tmp = color[0] # editted
                             color[0] = color[2] # editted
                             color[2] = tmp # editted
+
+                            '''
+                            # color = [r, g, b]
+                            # >>  [ranking 0, 1, 2]
+                            # ex) color_order = ['g', 'b', 'r']
+                            #     color_ranking = {'g': 0, 'b': 1, 'r': 2}
+                            color.append(0.0)
+                            
+                            color_ranking = {}                            
+                            for ci, val in enumerate(color_order):
+                                color_ranking[val] = ci
+
+                            new_color = [color[color_ranking['r']], color[color_ranking['g']], color[color_ranking['b']]]
+                            color = new_color                            
+                            
+                            # details..
+                            '''
+                            if color_order == ['r','g','b']:
+                                new_color = [color[0], color[1], color[2]]
+                            elif color_order == 'rbg':
+                                new_color = [color[0], color[2], color[1]]
+                            elif color_order == 'grb':
+                                new_color = [color[1], color[0], color[2]]
+                            elif color_order == ['g','b','r']:
+                                new_color = [color[2], color[0], color[1]]
+                            elif color_order == 'brg':
+                                new_color = [color[1], color[2], color[0]]
+                            elif color_order == 'bgr':
+                                new_color = [color[2], color[1], color[0]]
+                            '''
+                            
+                        else:
+                            color_ranking = {}                            
+                            for ci, val in enumerate(color_order):
+                                color_ranking[val] = ci
+
+                            new_color = [color[color_ranking['r']], color[color_ranking['g']], color[color_ranking['b']]]
+                            color = new_color  
+                        
                         sign = '-'
                         if s == Spin.down:
                             sign = '-'
+
                         plt.plot([data['distances'][b][j],
                                   data['distances'][b][j + 1]],
                                  [data['energy'][b][str(s)][i][j],
@@ -1322,7 +1359,7 @@ class BSPlotterProjected(BSPlotter):
         return plt
 
     def get_elt_projected_plots_color_spin(self, zero_to_efermi=True, line_width=3,
-                                           elt_ordered=None, spin="up"):
+                                           elt_ordered=None, spin="up", color_order=['g', 'b', 'r']):
         """
         returns a pylab plot object with one plot where the band structure
         line color depends on the character of the band (along different
@@ -1380,11 +1417,19 @@ class BSPlotterProjected(BSPlotter):
                                      for el in elt_ordered]
                         if len(color) == 2:
                             color.append(0.0)
-                            color[2] = color[1]
-                            color[1] = 0.0
-                            tmp = color[0] # editted
-                            color[0] = color[2] # editted
-                            color[2] = tmp # editted
+                            color_ranking = {}                            
+                            for ci, val in enumerate(color_order):
+                                color_ranking[val] = ci
+
+                            new_color = [color[color_ranking['r']], color[color_ranking['g']], color[color_ranking['b']]]
+                            color = new_color  
+                        else:
+                            color_ranking = {}                            
+                            for ci, val in enumerate(color_order):
+                                color_ranking[val] = ci
+
+                            new_color = [color[color_ranking['r']], color[color_ranking['g']], color[color_ranking['b']]]
+                            color = new_color  
                         sign = '-'
                         plt.plot([data['distances'][b][j],
                                   data['distances'][b][j + 1]],
