@@ -66,8 +66,8 @@ def vasp(queue=None, n_of_cpu=None, sub=None, loop=None):
 
     # -- Clean vasp.done if exists
     for each_input in inputs:
-        if 'vasp.done' in os.listdir(inputs):
-            os.remove(inputs + '/vasp.done')
+        if 'vasp.done' in os.listdir(each_input):
+            os.remove(each_input + '/vasp.done')
 
     # --- SUBMIT QUEUE
     pwd = os.getcwd()
@@ -109,8 +109,8 @@ def vasp_batch(queue=None, n_of_cpu=None, scratch=False, sub=None, loop=None):
 
     # -- Clean vasp.done if exists
     for each_input in inputs:
-        if 'vasp.done' in os.listdir(inputs):
-            os.remove(inputs + '/vasp.done')
+        if 'vasp.done' in os.listdir(each_input):
+            os.remove(each_input + '/vasp.done')
 
     # --- SUBMIT QUEUE
     dirs = []
