@@ -1018,6 +1018,8 @@ class VASPOutput():
                 electronic_converged, ionic_converged = converged, converged           
                 if converged == "False":
                     err_msg = list(veh.errors)[0]
+                    if err_msg == "max_ionic":
+                        electronic_converged = "True"
             
             '''
             # using vasprun.xml
@@ -1084,6 +1086,8 @@ class VASPOutput():
         df = pd.DataFrame({"Directory": dirs, "Status": tot_status, "  Converged": tot_converged,
                            "  Elec-converged": tot_e_converged, "  Ion-converged": tot_i_converged, "  Zipped": tot_zipped, "  Err msg": tot_err_msg})
         df = df[['Directory', 'Status','  Converged', '  Elec-converged', '  Ion-converged', '  Zipped', '  Err msg']]
+        #df = df[['Directory', 'Status','  Converged', '  Zipped', '  Err msg']]
+
         pd.set_option('display.max_rows', None)
 
 
