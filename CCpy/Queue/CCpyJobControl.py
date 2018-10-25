@@ -59,8 +59,8 @@ class JobSubmit():
         self.lammps_path = "lmp_g++"
 
         # -- queue settings
-        self.pe_request = "#$ -pe mpi_%d %d" % (n_of_cpu, n_of_cpu)
-        self.queue_name = "#$ -q %s" % q
+        self.pe_request = "#$ -pe mpi_%d %d" % (self.n_of_cpu, self.n_of_cpu)
+        self.queue_name = "#$ -q %s" % self.q
 
 
 
@@ -113,7 +113,7 @@ cd $SGE_O_WORKDIR
         f.write(mpi)
         f.close()
 
-        shl(queue_path + qsub + " mpi.sh", shell=True)
+        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
 
@@ -135,7 +135,7 @@ cd $SGE_O_WORKDIR
             f.write(script_string)
             f.close()
             script_path = os.getcwd() + "/" + script_filename
-            vasp_run = "%s %s\nrm %s" % (python_path, script_path, script_path)
+            vasp_run = "%s %s\nrm %s" % (self.python_path, script_path, script_path)
         else:
             jobname = "V" + inputfile
         jobname = jobname.replace(".","_").replace("-","_")
@@ -164,7 +164,7 @@ touch vasp.done
         f = open("mpi.sh", "w")
         f.write(mpi)
         f.close()
-        shl(queue_path + qsub + " mpi.sh", shell=True)
+        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
         os.chdir(pwd)
 
@@ -184,7 +184,7 @@ touch vasp.done
             f.write(script_string)
             f.close()
             script_path = os.getcwd() + "/" + script_filename
-            each_run = "rm vasp.done\n%s %s\ntouch vasp.done\nsleep 30\n" % (python_path, script_path)
+            each_run = "rm vasp.done\n%s %s\ntouch vasp.done\nsleep 30\n" % (self.python_path, script_path)
         else:
             each_run = "rm vasp.done\n%s\ntouch vasp.done\nsleep 30\n" % self.vasp_run
         for d in dirs:
@@ -225,7 +225,7 @@ touch vasp.done
         f = open("mpi.sh", "w")
         f.write(mpi)
         f.close()
-        shl(queue_path + qsub + " mpi.sh", shell=True)
+        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def qchem(self, cpu=None, mem=None, q=None):
@@ -265,14 +265,14 @@ qchem %s %s
         f.write(mpi)
         f.close()
 
-        shl(queue_path + qsub + " mpi.sh", shell=True)
+        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def ATK(self, cpu=None, mem=None, q=None, atk_version="atk2017"):
         if atk_version == "atk2018":
-            atk_path = atk2018
+            atk_path = self.atk2018
         else:
-            atk_path = atk2017
+            atk_path = self.atk2017
 
         inputfile = self.inputfile
 
@@ -311,13 +311,13 @@ cd $SGE_O_WORKDIR
 env | grep PRELOAD
 $MPI_EXEC -n %d %s %s > %s
 
-''' % (jobname, self.pe_request, self.queue_name, atk_mpi_run, self.n_of_cpu, atk_path, inputfile, outputfile)
+''' % (jobname, self.pe_request, self.queue_name, self.atk_mpi_run, self.n_of_cpu, atk_path, inputfile, outputfile)
 
         f = open("mpi.sh", "w")
         f.write(mpi)
         f.close()
 
-        shl(queue_path + qsub + " mpi.sh", shell=True)
+        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def atat(self, cpu=None, mem=None, q=None):
@@ -359,7 +359,7 @@ rm wait
         f.write(mpi)
         f.close()
 
-        shl(queue_path + qsub + " mpi.sh", shell=True)
+        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     # -- To show SGE queue system that " I'm running now "
@@ -393,7 +393,7 @@ python %s
         f.write(mpi)
         f.close()
 
-        shl(queue_path + qsub + " mpi.sh", shell=True)
+        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def lammps(self, cpu=None, q=None):
@@ -427,7 +427,7 @@ cd $SGE_O_WORKDIR
         f.write(mpi)
         f.close()
 
-        shl(queue_path + qsub + " mpi.sh", shell=True)
+        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def AIMD_NVT_Loop(self, cpu=None, mem=None, q=None, structure_filename=None, temp=None):
@@ -465,5 +465,5 @@ rm %s''' % (jobname, self.pe_request, self.queue_name, self.python_path,
         f.write(mpi)
         f.close()
 
-        shl(queue_path + qsub + " mpi.sh", shell=True)
+        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
