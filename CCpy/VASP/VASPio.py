@@ -719,7 +719,7 @@ Reciprocal
         incar_keys = incar_dict.keys()
 
         # -- Accurate opt INCAR
-        get_sets = "PREC=Accurate,EDIFF=1.0E-08,EDIFFG=-1.0E-08,ISMEAR=0,SIGMA=0.01,IALGO=38,LREAL=.FALSE.,LWAVE=.FALSE.,LCHARG=.FALSE."
+        get_sets = "PREC=Accurate,IBRION=2,EDIFF=1.0E-08,EDIFFG=-1.0E-06,ISMEAR=0,SIGMA=0.1,IALGO=38,ADDGRID=.True.,LREAL=.FALSE.,LWAVE=.FALSE.,LCHARG=.FALSE."
         if get_sets != "n":
             vals = get_sets.replace(", ", ",")
             vals = vals.split(",")
