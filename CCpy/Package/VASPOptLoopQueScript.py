@@ -2,7 +2,9 @@ def VASPOptLoopQueScriptString():
     string="""
 import os, sys
 import re
+import time
 from pymatgen.core.structure import IStructure
+from pymatgen.io.vasp.inputs import Incar
 
 def get_vasp_status():
     from custodian.vasp.handlers import VaspErrorHandler, UnconvergedErrorHandler
@@ -104,6 +106,7 @@ if __name__ == "__main__":
     loop = 0
     write_log("\\nLoop: " + str(loop))
     os.system("mpirun -np $NSLOTS vasp < /dev/null > vasp.out")
+    time.sleep(30)
 
     # -- parsing output
     c = get_vasp_status()
@@ -121,6 +124,7 @@ if __name__ == "__main__":
         loop += 1
         os.system("rm vasp.done")
         os.system("mpirun -np $NSLOTS vasp < /dev/null > vasp.out")
+        time.sleep(30)
         write_log("\\nLoop: " + str(loop))
         c = get_vasp_status()
         init_e, final_e = get_final_energy()        
