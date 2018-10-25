@@ -118,7 +118,6 @@ cd $SGE_O_WORKDIR
 
 
     def vasp(self, cpu=None, mem=None, q=None, band=False, phonon=False, dirpath=None, loop=False):
-        global vasp_run
         inputfile = self.inputfile
 
         # -- Band calculation after previous calculation
@@ -135,7 +134,7 @@ cd $SGE_O_WORKDIR
             f.write(script_string)
             f.close()
             script_path = os.getcwd() + "/" + script_filename
-            vasp_run = "%s %s\nrm %s" % (self.python_path, script_path, script_path)
+            self.vasp_run = "%s %s\nrm %s" % (self.python_path, script_path, script_path)
         else:
             jobname = "V" + inputfile
         jobname = jobname.replace(".","_").replace("-","_")
