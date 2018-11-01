@@ -102,20 +102,20 @@ def vasp_phonon_incar_json():
 
     "#2 ":"Electronic Relaxation 1",
     "NELM":"100                   ! number of iterations",
-    "EDIFF":"1.0e-08              ! stopping-criterion for ELM",
+    "EDIFF":"1.0E-08              ! stopping-criterion for ELM",
     "ENCUT":"520                  ! Cut-Off Energy",
 
     "#3 ":"Electronic Relaxation 1",
-    "IALGO":"38                   ! algorithm for the e-relax",
+    "# IALGO":"38                   ! algorithm for the e-relax",
     "LREAL":".FALSE.              ! real-space projection",
     "PREC":"Accurate              ! accuracy",
 
     "#4 ":"Ionic Relaxation",
-    "NSW":"1                      ! number of steps for IOM",
+    "NSW":"0                      ! number of steps for IOM",
     "IBRION":"-1                  ! ionic relax: 0-MD 1-quasi-New 2-CG",
     "ISIF":"3                     ! ion&cell relax: 0-MD 2-ion&stress 3-ion&cell&stress",
-    "ISYM":"2                     ! switch symmetry stuff ON (1 or 2) or OFF (0)",
-    "EDIFFG":"-1.0e-08            ! Criterion for geom opt (eV/Ang)",
+    "ISYM":"0                     ! switch symmetry stuff ON (1 or 2) or OFF (0)",
+    "EDIFFG":"-1.0E-06            ! Criterion for geom opt (eV/Ang)",
     "SMASS":"0.01                 ! Nose mass-parameter (am)",
 
     "#5 DOS":" related values",
