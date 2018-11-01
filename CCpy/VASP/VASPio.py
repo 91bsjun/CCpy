@@ -695,10 +695,11 @@ Reciprocal
                 linux_command("cp ../" + pf + " ./")
         os.rename("POSCAR", "POSCAR.orig")
         os.rename("CONTCAR", "POSCAR")
-
+        os.rename("INCAR", "INCAR.orig")
+        os.rename("KPOINTS", "KPOINTS.orig")
 
         ## --------------------------------- INCAR --------------------------------- ##
-        f = open("INCAR", "r").read()
+        f = open("INCAR.orig", "r").read()
         lines = f.split("\n")
         key_val = []
         for l in lines:
@@ -719,7 +720,16 @@ Reciprocal
         incar_keys = incar_dict.keys()
 
         # -- Accurate opt INCAR
-        get_sets = "PREC=Accurate,EDIFF=1.0E-08,EDIFFG=-1.0E-06,IALGO=38,ADDGRID=.True.,LREAL=.FALSE.,LWAVE=.FALSE.,LCHARG=.FALSE."
+        # make encut to ENMAX * 1.5
+        potcar = open("POTCAR").read()
+        enmax_flag = re.compile("ENMAX\s*=\s*(\d*[.]\d*);", re.M)
+        enmaxs = enmax_flag.findall(potcar)
+        import numpy as np
+        enmaxs = np.array(enmaxs, dtype='float32')
+        encut = int((max(enmaxs) * 1.5 + 5) // 10 * 10)
+        encut = max(encut, 520)
+
+        get_sets = "PREC=Accurate,EDIFF=1.0E-08,EDIFFG=-1.0E-06,ADDGRID=.True.,LREAL=.FALSE.,LWAVE=.FALSE.,LCHARG=.FALSE.,ENCUT=%d" % encut
         if get_sets != "n":
             vals = get_sets.replace(", ", ",")
             vals = vals.split(",")
@@ -765,8 +775,22 @@ Reciprocal
         incar = incar_string
 
 
+        ## -------------------------------- KPOINTS -------------------------------- ##
+        # -- if user input the k-points in command
+        structure = pmgIS.from_file("POSCAR")
+        lat = structure.lattice
+        length = [lat.a, lat.b, lat.c]
+        kpts = []
+        for param in length:
+            if param >= 19:
+                kpts.append(1)
+            else:
+                kpts.append(int(60 // param))
+        kpoints = "High Kpoints\n0\nMonkhorst-Pack\n"+str(kpts[0])+" "+str(kpts[1])+" "+str(kpts[2])+"\n0 0 0\n"
+
         ## --------------------------- Write input files ---------------------- ##
         file_writer("INCAR",str(incar))
+        file_writer("KPOINTS",str(kpoints))
         os.chdir("../")
         sys.stdout.write(" Done !\n")
         
