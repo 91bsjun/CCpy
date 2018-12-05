@@ -457,7 +457,11 @@ def transmission_3D(item):
 
     plt.plot([0, max_bias/2], [0, max_bias], color='w', ls='--', lw=2.0)
     plt.plot([0, -max_bias/2], [0, max_bias], color='w', ls='--', lw=2.0)
-    plt.contourf(df.index, df.keys(), convert_mat, cmap=cm.jet, levels=lev, extend="both")
+
+    own_cmap = cusmtom_cmap() 
+
+    # plt.contourf(df.index, df.keys(), convert_mat, cmap=cm.jet, levels=lev, extend="both")
+    plt.contourf(df.index, df.keys(), convert_mat, cmap=own_cmap, levels=lev, extend="both")
     plt.colorbar()
     plt.xlabel("Energy (eV)", fontsize=14)
     plt.ylabel("Applied Voltage(V)", fontsize=14)
@@ -467,6 +471,13 @@ def transmission_3D(item):
 
     plt.show()
 
+def cusmtom_cmap():
+    import pickle
+    with open("/home/shared/GitHub/CCpy/CCpy/Tools/ATK_transmission_cmap.pkl", "rb") as mydata:
+        custom_cmap = pickle.load(mydata)
+
+    cm = matplotlib.colors.ListedColormap(custom_cmap/255.0)
+    return cm
 
 #--------------------------------------------------------------------------------
 
