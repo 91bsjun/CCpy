@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/home/bsjun/.conda/envs/bjun/bin/python
 
 import os, sys, re
 import datetime
@@ -76,15 +76,18 @@ def CCpyqstat(in_user="*", in_status="", node_check=False):
      
     # ------------------ Nodes checking ----------------- #
     if node_check:
-        get_empty_nodes(df)
         get_waiting_nodes(df)
+        get_empty_nodes(df)
+
+    # ------------------ Nodes checking ----------------- #
+    chk_load()
+
 
     
 def get_empty_nodes(df):
     # ------------------ Nodes checking ----------------- #
     if len(df) != 0:
         for i in range(len(df)):
-            # running_df = df[(df['   STATUS'] == 'r')]
             running_df = df[(df['   STATUS'] == 'r') | (df['   STATUS'] == 'dr')]
     else:
         running_df = []
@@ -138,6 +141,42 @@ def get_waiting_nodes(df):
     waiting_nodes_df = pd.DataFrame(waiting_nodes)
     print(bcolors.OKBLUE + "# ---- Pending Jobs ---- #" + bcolors.ENDC)
     print(waiting_nodes_df)
+
+def chk_load():
+    qhost = os.popen('qhost').readlines()
+    qhost = [l.replace("\n","") for l in qhost]
+
+    info = {'NODE': [], 'NCPU': [], 'LOAD': [], 'CPU USE (%)': []} 
+    for l in qhost:
+        spl = l.split()
+        if spl[0][:4] == 'node':
+            node = spl[0]
+            info['NODE'].append(node)
+            ncpu = float(spl[2])
+            info['NCPU'].append(ncpu)
+            load = spl[3]
+            info['LOAD'].append(load)
+            if load == '-':
+                load = -1
+            load = float(load)
+            cpu_use = round(load / ncpu * 100, 1)
+            if cpu_use < 0:
+                cpu_use = -1
+            info['CPU USE (%)'].append(cpu_use)
+
+    df = pd.DataFrame(info)
+    down_df = df[(df['CPU USE (%)'] == -1 )]
+    ex_df = df[(df['CPU USE (%)'] > 105)]
+
+    if len(down_df) > 0:
+        print(bcolors.OKBLUE + "# ------ DOWN node ----- #" + bcolors.ENDC)
+        down_nodes = down_df['NODE'].tolist()
+        for down_node in down_nodes:
+            print(down_node)
+    if len(ex_df) > 0:
+        print(bcolors.OKBLUE + "# --- Exceeding 100% cpu use node --- #" + bcolors.ENDC)
+        print(ex_df.set_index('NODE'))
+
 
         
 class bcolors:
