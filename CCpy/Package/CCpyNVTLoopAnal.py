@@ -51,7 +51,8 @@ def plot_diffusivity(mode, files):
         print("Smoothing mode is not defined. (-m=option)")
 
     plt.figure(figsize=(10, 7))
-    for filename in files:
+    colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
+    for i, filename in enumerate(files):
         df = pd.read_csv(filename, index_col=False)
         print(filename)
         print(df)
@@ -62,14 +63,14 @@ def plot_diffusivity(mode, files):
         y = df[xlabel]
 
         label = filename.split("/")[-1].replace("data_","").replace(".csv","")
-        plt.plot(x, y, marker='o', label=label)
+        plt.plot(x, y, marker='o', color=colors[i], label=label)
 
     plt.xlabel("Run step", fontsize=24)
     #plt.xlabel("Time step (ps)", fontsize=24)
     plt.ylabel(r"Diffusivity (cm$^2$/s)", fontsize=24)
-    plt.tick_params(axis='both', which='major', labelsize=14)
+    plt.tick_params(axis='both', which='major', labelsize=16)
     plt.grid()
-    plt.legend(prop={'size': 16})
+    plt.legend(prop={'size': 18})
     plt.tight_layout()
     plt.savefig("Diffusivity_%s.png" % mode)
     plt.show()
@@ -83,7 +84,7 @@ def plot_msd(mode, vaspruns):
         mode = False
     analyzer = DiffusionAnalyzer.from_files(vaspruns, specie="Li", smoothed=mode)
     plt = analyzer.get_msd_plot()
-    plt.savefig("msd.png")
+    plt.savefig("msd_%.png" % str(mode))
     plt.show()
 
     print("Diffusivity : %.10f" % analyzer.diffusivity)
