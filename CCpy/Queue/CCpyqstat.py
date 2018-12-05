@@ -73,15 +73,11 @@ def CCpyqstat(in_user="*", in_status="", node_check=False):
     print(bcolors.OKBLUE + "# --- Queue status --- #" + bcolors.ENDC)
     print(df)
 
-     
     # ------------------ Nodes checking ----------------- #
     if node_check:
         get_waiting_nodes(df)
         get_empty_nodes(df)
-
-    # ------------------ Nodes checking ----------------- #
-    chk_load()
-
+        chk_load()
 
     
 def get_empty_nodes(df):
