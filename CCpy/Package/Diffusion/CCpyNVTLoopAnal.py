@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import pickle
 import collections
 
-from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer, get_arrhenius_plot, get_extrapolated_conductivity, get_extrapolated_diffusivity
+from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer, fit_arrhenius, get_arrhenius_plot, get_extrapolated_conductivity, get_extrapolated_diffusivity
 
 version = sys.version
 if version[0] == '3':
@@ -230,6 +230,78 @@ def analysis():
     df300 = df[(df['Temp (K)'] == 300)]
     print(df300)
 
+def arrhenius_plotter(datafiles):
+    total_temps = []
+    total_diffusivities = []
+    labels = []
+    for datafile in datafiles:
+        df = pd.read_csv(datafile)
+        keys = df.keys()
+        temps = df['T'].tolist()
+        for key in keys:
+            if key != 'T':
+                total_temps.append(temps)
+                total_diffusivities.append(df[key].tolist())
+                labels.append(key)
+
+    plt = get_arrhenius_plot(total_temps, total_diffusivities, labels)
+    plt.show()
+
+
+
+
+def get_arrhenius_plot(total_temps, total_diffusivities, labels, diffusivity_errors=None,
+                       **kwargs):
+    """
+    Returns an Arrhenius plot.
+
+    Args:
+        temps ([float]): A sequence of temperatures.
+        diffusivities ([float]): A sequence of diffusivities (e.g.,
+            from DiffusionAnalyzer.diffusivity).
+        diffusivity_errors ([float]): A sequence of errors for the
+            diffusivities. If None, no error bar is plotted.
+        \\*\\*kwargs:
+            Any keyword args supported by matplotlib.pyplot.plot.
+
+    Returns:
+        A matplotlib.pyplot object. Do plt.show() to show the plot.
+    """
+    colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
+    from pymatgen.util.plotting import pretty_plot
+    plt = pretty_plot(12, 8)
+    for i in range(len(total_temps)):
+        temps = total_temps[i]
+        diffusivities = total_diffusivities[i]
+        label = labels[i]
+
+        Ea, c, _ = fit_arrhenius(temps, diffusivities)
+
+        # log10 of the arrhenius fit
+        arr = c * np.exp(-Ea / (const.k / const.e * np.array(temps)))
+
+        t_1 = 1000 / np.array(temps)
+
+        plt.scatter(t_1, diffusivities, marker='o', size=30, label=label)
+        plt.plot(t_1, arr, ls='--')
+
+        if diffusivity_errors is not None:
+            n = len(diffusivity_errors)
+            plt.errorbar(t_1[0:n], diffusivities[0:n], yerr=diffusivity_errors,
+                         fmt='ko', ecolor='k', capthick=2, linewidth=2)
+        ax = plt.axes()
+        ax.set_yscale('log')
+        # plt.text(0.6, 0.85, "E$_a$ = {:.0f} meV".format(Ea * 1000),
+        #          fontsize=30, transform=plt.axes().transAxes)
+        plt.ylabel("D (cm$^2$/s)")
+        plt.xlabel("1000/T (K$^{-1}$)")
+        plt.legend()
+        plt.tight_layout()
+
+    return plt
+
+
+
 if __name__ == "__main__":
     # --- Parsing sub options
     mode = "max"
@@ -251,3 +323,6 @@ if __name__ == "__main__":
         plot_msd(mode, vaspruns)
     elif sys.argv[1] == "3":
         analysis()
+    elif sys.argv[1] == "4":
+        files = get_csvfiles()
+        arrhenius_plotter(files)
