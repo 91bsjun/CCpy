@@ -1,5 +1,7 @@
 #!/bin/env python
 import os, sys
+import numpy as np
+import scipy.constants as const
 import pandas as pd
 import matplotlib.pyplot as plt
 import pickle
@@ -258,13 +260,13 @@ def arrhenius_plotter(datafiles):
                 total_diffusivities.append(df[key].tolist())
                 labels.append(key)
 
-    plt = get_arrhenius_plot(total_temps, total_diffusivities, labels)
+    plt = custom_arrhenius_plot(total_temps, total_diffusivities, labels)
     plt.show()
 
 
 
 
-def get_arrhenius_plot(total_temps, total_diffusivities, labels, diffusivity_errors=None,
+def custom_arrhenius_plot(total_temps, total_diffusivities, labels, diffusivity_errors=None,
                        **kwargs):
     """
     Returns an Arrhenius plot.
@@ -283,7 +285,7 @@ def get_arrhenius_plot(total_temps, total_diffusivities, labels, diffusivity_err
     """
     colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
     from pymatgen.util.plotting import pretty_plot
-    plt = pretty_plot(12, 8)
+    plt.figure(figsize=(9, 6))
     for i in range(len(total_temps)):
         temps = total_temps[i]
         diffusivities = total_diffusivities[i]
@@ -293,11 +295,13 @@ def get_arrhenius_plot(total_temps, total_diffusivities, labels, diffusivity_err
 
         # log10 of the arrhenius fit
         arr = c * np.exp(-Ea / (const.k / const.e * np.array(temps)))
+        d_2000 = c * np.exp(-Ea / (const.k / const.e * 2000.0))
+        d_300 = c * np.exp(-Ea / (const.k / const.e * 300.0))
 
         t_1 = 1000 / np.array(temps)
 
-        plt.scatter(t_1, diffusivities, marker='o', size=30, label=label)
-        plt.plot(t_1, arr, ls='--')
+        plt.scatter(t_1, diffusivities, marker='o', s=150, linewidths=2, facecolors='none', edgecolors=colors[i], label=label)
+        plt.plot([1000./2000., 1000./300.], [d_2000, d_300], ls='--', color=colors[i])
 
         if diffusivity_errors is not None:
             n = len(diffusivity_errors)
@@ -307,9 +311,12 @@ def get_arrhenius_plot(total_temps, total_diffusivities, labels, diffusivity_err
         ax.set_yscale('log')
         # plt.text(0.6, 0.85, "E$_a$ = {:.0f} meV".format(Ea * 1000),
         #          fontsize=30, transform=plt.axes().transAxes)
-        plt.ylabel("D (cm$^2$/s)")
-        plt.xlabel("1000/T (K$^{-1}$)")
-        plt.legend()
+        plt.xlim(0.5, 3)
+        plt.ylabel("D (cm$^2$/s)", fontsize=24)
+        plt.xlabel("1000/T (K$^{-1}$)", fontsize=24)
+
+        plt.tick_params(axis='both', which='major', labelsize=16)
+        plt.legend(loc=1, prop={'size': 18})
         plt.tight_layout()
 
     return plt
