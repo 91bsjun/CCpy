@@ -82,13 +82,17 @@ def get_csvfiles():
     for arg in sys.argv:
         if ".csv" in arg:
             csvfiles.append(arg)
+    if len(csvfiles) == 0:
+        print("no input csv files.")
+        print("Try: " + sys.argv[0].split("/")[-1] + " 600K/data.csv")
+        quit()
 
     return csvfiles
 
 
 def plot_diffusivity(mode, files, xaxis):
     ylabel = "diffusivity(m)"
-    if mode == "False":
+    if mode == False:
         ylabel = "diffusivity(F)"
     elif mode == "constant":
         ylabel = "diffusivity(c)"
@@ -140,16 +144,26 @@ def plot_msd(mode, vaspruns):
     print("Conductivity: %.4f" % analyzer.conductivity)
 
 def analysis():
-    modes = raw_input("1. Smoothing modes (ex: False,max)\n: ")
+    import matplotlib.pyplot as plt
+    modes = raw_input("1. Smoothing modes (ex: False,max // Default: all)\n:(enter: default) ")
     modes = modes.replace(" ","").split(",")
-    temperatures = raw_input("2. Temperatrue (ex: 600,800,1000,1200)\n: ")
+    if len(modes) < 2:
+        modes = ["False", "constant", "max"]
+    temperatures = raw_input("2. Temperatrue (ex: 600,700,800,1000,1200 // Default: 600,800,1000,1200)\n:(enter: default) ")
     temperatures = temperatures.replace(" ", "").split(",")
+    if len(temperatures) < 2:
+        temperatures = [600, 800, 1000, 1200]
+    else:
+        temperatures = [int(t) for t in temperatures]
     runstep = raw_input("3. Run step for each temperature (ex: 7,11,5,4)\n: ")
     runstep = runstep.replace(" ", "").split(",")
+    runstep = [int(r) for r in runstep]
 
     use_pickle = True
 
     def get_analyzer(temp, step, mode, use_pickle=False):
+        if mode == "False":
+            mode = False
         print("%d K" % temp)
         if use_pickle:
             pickle_name = ("%dK/analyzer%2d.pkl" % (temp, step)).replace(" ", "0")
