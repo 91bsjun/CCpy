@@ -4,14 +4,17 @@ import os, sys
 import re
 import time
 import pickle
+from pymatgen.io.vasp import Vasprun
 from pymatgen.io.vasp.sets import MITMDSet
 from pymatgen.core.structure import IStructure
 from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer
 
 # ---------- CONFIGURATIONS ------------ #
 NCORE = 4
-nsw = 25000
-user_incar = {"MDALGO": 2, "NCORE": NCORE, "ENCUT": 280}
+nsw = 10000
+#user_incar = {"NCORE": NCORE, "ENCUT": 280, "LREAL": "Auto", "PREC": "Normal", "EDIFF": 1E-05, "ALGO": "Fast", "IALGO": 48, "ICHARG": 0}
+user_incar = {"NCORE": NCORE, "ENCUT": 400, "LREAL": "Auto", "PREC": "Normal", "EDIFF": 1E-05, "ALGO": "Fast", "IALGO": 48, "ICHARG": 0}
+
 structure_filename = sys.argv[1]
 temp = int(sys.argv[2])
 vasp = "vasp"
@@ -75,13 +78,18 @@ def running(temp, pre, crt):
     if crt == 0:
         structure = IStructure.from_file("../" + structure_filename)
         heating_nsw = 5000
-        inputset = MITMDSet(structure, float(temp), float(temp), heating_nsw, user_incar_settings=user_incar)
+        user_incar["SMASS"] = -1
+        inputset = MITMDSet(structure, 100.0, float(temp), heating_nsw, user_incar_settings=user_incar)
         inputset.write_input(crt_dir)
     # -- run
     else:
-        structure = IStructure.from_file("%s/CONTCAR" % pre_dir)
+        run = Vasprun("%s/vasprun.xml" % pre_dir, parse_dos=False, parse_eigen=False)
+        structure = run.final_structure
+        #structure = IStructure.from_file("%s/CONTCAR" % pre_dir)
+        user_incar["SMASS"] = 0
         inputset = MITMDSet(structure, float(temp), float(temp), nsw, user_incar_settings=user_incar)
         inputset.write_input(crt_dir)
+        #os.system("cp %s/WAVECAR %s" % (pre_dir, crt_dir))
     os.chdir(crt_dir)
     os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
     os.system("touch vasp.done")
@@ -103,7 +111,10 @@ def write_data(crt):
         # -- collect all smoothing modes of analyzer
         analyzers = {}
         for mode in [False, 'constant', 'max']:
-            analyzers[mode] = DiffusionAnalyzer.from_files(vaspruns, specie="Li", smoothed=mode, min_obs=60)
+            try:
+                analyzers[mode] = DiffusionAnalyzer.from_files(vaspruns, specie="Li", smoothed=mode, min_obs=60)
+            except:
+                analyzers[mode] = None
 
         # -- save DiffusionAnalzyer as pickle to plot msd quickly
         with open(("analyzer%2d.pkl" % crt).replace(" ", "0"), 'wb') as save_data:
@@ -115,9 +126,12 @@ def write_data(crt):
         step_info = "%d,%d," % (crt, timestep)
         f.write(step_info)
         for mode in [False, 'constant', 'max']:
-            sd = analyzers[mode].get_summary_dict()
-            diffusivity = sd['D']
-            conductivity = sd['S']
+            if analyzers[mode] == None:
+                diffusivity, conductivity = 0.0, 0.0
+            else:
+                sd = analyzers[mode].get_summary_dict()
+                diffusivity = sd['D']
+                conductivity = sd['S']
             f = open("data_%sK.csv" % temp, "a")
             line = "%.10f,%.4f," % (diffusivity, conductivity)
             f.write(line)
