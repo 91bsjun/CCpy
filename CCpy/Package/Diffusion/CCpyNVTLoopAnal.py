@@ -23,10 +23,10 @@ except:
 1   : Plot diffusivity(ies) written in *K/data.csv
       ex) CCpyNVTLoopAnal.py 1 -m=constant 600K/data_600K.csv
           CCpyNVTLoopAnal.py 1 -m=max *K/data*    (multiple files also available)
-          CCpyNVTLoopAnal.py 1 -m=max -x=r 600K/data_600K.csv 800K/data_800K.csv    (use x-axis as runstep)          
           
 2   : Plot MSD/2dt
-      ex) CCpyNVTLoopAnal.py 2 -m=False 
+      ex) CCpyNVTLoopAnal.py 2 -m=False 600K/run01/vasprun.xml
+          CCpyNVTLoopAnal.py 2 -m=False 600K/run01/vasprun.xml 600K/run02/vasprun.xml   (multiple files also available)
           
 3   : Analysis data
 
@@ -86,7 +86,7 @@ def get_csvfiles():
     return csvfiles
 
 
-def plot_diffusivity(mode, files, xaxis):
+def plot_diffusivity(mode, files):
     ylabel = "diffusivity(m)"
     if mode == "False":
         ylabel = "diffusivity(F)"
@@ -233,7 +233,6 @@ def analysis():
 if __name__ == "__main__":
     # --- Parsing sub options
     mode = "max"
-    xaxis = "t"
     for arg in sys.argv:
         if "-m=" in arg:
             mode = arg.split("=")[1]
@@ -245,7 +244,7 @@ if __name__ == "__main__":
     # --- Go to main option
     if sys.argv[1] == "1":
         files = get_csvfiles()
-        plot_diffusivity(mode, files, xaxis)
+        plot_diffusivity(mode, files)
     elif sys.argv[1] == "2":
         vaspruns = get_vaspruns()
         plot_msd(mode, vaspruns)
