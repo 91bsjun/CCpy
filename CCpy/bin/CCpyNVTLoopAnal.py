@@ -1,1 +1,1 @@
-../Package/CCpyNVTLoopAnal.py
+../Package/Diffusion/CCpyNVTLoopAnal.py
