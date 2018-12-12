@@ -458,8 +458,8 @@ cd $SGE_O_WORKDIR
 
 
 %s %s %s %s
-rm %s''' % (jobname, self.pe_request, self.queue_name, self.python_path,
-            script_filename, structure_filename, temp, script_filename)
+''' % (jobname, self.pe_request, self.queue_name, self.python_path,
+            script_filename, structure_filename, temp)
 
         f = open("mpi.sh", "w")
         f.write(mpi)
