@@ -11,32 +11,51 @@ from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer
 
 # ---------- CONFIGURATIONS ------------ #
 NCORE = 4
-nsw = 10000
-#user_incar = {"NCORE": NCORE, "ENCUT": 280, "LREAL": "Auto", "PREC": "Normal", "EDIFF": 1E-05, "ALGO": "Fast", "IALGO": 48, "ICHARG": 0}
-user_incar = {"NCORE": NCORE, "ENCUT": 400, "LREAL": "Auto", "PREC": "Normal", "EDIFF": 1E-05, "ALGO": "Fast", "IALGO": 48, "ICHARG": 0}
-
+nsw = 1000
+user_incar = {"NCORE": NCORE, "ENCUT": 400, "LREAL": "Auto", "PREC": "Normal", "ALGO": "Fast", "EDIFF": 1E-05, "ICHARG": 0 "IALGO": 48}
 structure_filename = sys.argv[1]
 temp = int(sys.argv[2])
 vasp = "vasp"
 # -------------------------------------- #
 
-#INCAR
-#defaults = {'TEBEG': start_temp, 'TEEND': end_temp, 'NSW': nsteps,
-#            'EDIFF_PER_ATOM': 0.000001, 'LSCALU': False,
-#            'LCHARG': False,
-#            'LPLANE': False, 'LWAVE': True, 'ISMEAR': 0,
-#            'NELMIN': 4, 'LREAL': True, 'BMIX': 1,
-#            'MAXMIX': 20, 'NELM': 500, 'NSIM': 4, 'ISYM': 0,
-#            'ISIF': 0, 'IBRION': 0, 'NBLOCK': 1, 'KBLOCK': 100,
-#            'SMASS': 0, 'POTIM': time_step, 'PREC': 'Low',
-#            'ISPIN': 2 if spin_polarized else 1,
-#            "LDAU": False}
-
+# INCAR
+# defaults = {'TEBEG': start_temp, 'TEEND': end_temp, 'NSW': nsteps,
+#             'EDIFF_PER_ATOM': 0.000001, 'LSCALU': False,
+#             'LCHARG': False,
+#             'LPLANE': False, 'LWAVE': True, 'ISMEAR': 0,
+#             'NELMIN': 4, 'LREAL': True, 'BMIX': 1,
+#             'MAXMIX': 20, 'NELM': 500, 'NSIM': 4, 'ISYM': 0,
+#             'ISIF': 0, 'IBRION': 0, 'NBLOCK': 1, 'KBLOCK': 100,
+#             'SMASS': 0, 'POTIM': time_step, 'PREC': 'Low',
+#             'ISPIN': 2 if spin_polarized else 1,
+#             "LDAU": False}
 
 
 def mkdir(dirname):
     if dirname not in os.listdir("./"):
         os.mkdir(dirname)
+
+
+def write_log(msg):
+    f = open("log", "a")
+    f.write(msg + "\\n")
+    f.close()
+
+
+def terminated_check():
+    tail_oszicar = os.popen("tail OSZICAR | grep T=").readlines()
+    # -- when empty OSZICAR
+    if len(tail_oszicar) == 0:
+        return False
+    else:
+        oszicar = tail_oszicar[-1]
+        crt_step = int(oszicar.split()[0])
+        # -- when previous run was completed
+        if crt_step == nsw:
+            return True
+        # -- when previous run was stopped
+        else:
+            return False
 
 
 def prev_check():
@@ -71,7 +90,7 @@ def prev_check():
 def running(temp, pre, crt):
     # -- Run AIMD at (run00, run01, ...)
     # -- First step is heat-up.
-
+    total_try = 1
     pre_dir = ("run%2d" % pre).replace(" ", "0")
     crt_dir = ("run%2d" % crt).replace(" ", "0")
     # -- initiating
@@ -89,11 +108,19 @@ def running(temp, pre, crt):
         user_incar["SMASS"] = 0
         inputset = MITMDSet(structure, float(temp), float(temp), nsw, user_incar_settings=user_incar)
         inputset.write_input(crt_dir)
-        #os.system("cp %s/WAVECAR %s" % (pre_dir, crt_dir))
-    os.chdir(crt_dir)
+        os.system("cp %s/WAVECAR %s" % (pre_dir, crt_dir))
+    os.chdir(crt_dir)    
     os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
-    os.system("touch vasp.done")
     time.sleep(10)
+    write_log("try: %d" % total_try)
+    properly_terminated = terminated_check()
+    while not properly_terminated:
+        total_try += 1
+        os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
+        time.sleep(10)
+        write_log("try: %d" % total_try)
+        properly_terminated = terminated_check()        
+    os.system("touch vasp.done")    
     os.chdir("../")
 
 
@@ -157,7 +184,5 @@ if __name__ == "__main__":
         running(temp, pre_step, crt_step)
         write_data(crt_step)
         crt_step += 1
-
-
 """
     return string

@@ -432,7 +432,7 @@ cd $SGE_O_WORKDIR
 
     def AIMD_NVT_Loop(self, cpu=None, mem=None, q=None, structure_filename=None, temp=None):
         # -- load loop queue script
-        from CCpy.Package.NVTLoopQueScript import NVTLoopQueScriptString
+        from CCpy.Package.Diffusion.NVTLoopQueScript import NVTLoopQueScriptString
         script_string = NVTLoopQueScriptString()
         script_filename = ".AIMDLoop.py"
         f = open(script_filename, "w")
