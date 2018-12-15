@@ -12,7 +12,7 @@ from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer
 # ---------- CONFIGURATIONS ------------ #
 NCORE = 4
 nsw = 1000
-user_incar = {"NCORE": NCORE, "ENCUT": 400, "LREAL": "Auto", "PREC": "Normal", "ALGO": "Fast", "EDIFF": 1E-05, "ICHARG": 0 "IALGO": 48}
+user_incar = {"NCORE": NCORE, "ENCUT": 400, "LREAL": "Auto", "PREC": "Normal", "ALGO": "Fast", "EDIFF": 1E-05, "ICHARG": 0, "IALGO": 48}
 structure_filename = sys.argv[1]
 temp = int(sys.argv[2])
 vasp = "vasp"
@@ -42,7 +42,7 @@ def write_log(msg):
     f.close()
 
 
-def terminated_check():
+def terminated_check(nsw):
     tail_oszicar = os.popen("tail OSZICAR | grep T=").readlines()
     # -- when empty OSZICAR
     if len(tail_oszicar) == 0:
@@ -97,6 +97,7 @@ def running(temp, pre, crt):
     if crt == 0:
         structure = IStructure.from_file("../" + structure_filename)
         heating_nsw = 5000
+        crt_nsw = heating_nsw
         user_incar["SMASS"] = -1
         inputset = MITMDSet(structure, 100.0, float(temp), heating_nsw, user_incar_settings=user_incar)
         inputset.write_input(crt_dir)
@@ -104,6 +105,7 @@ def running(temp, pre, crt):
     else:
         run = Vasprun("%s/vasprun.xml" % pre_dir, parse_dos=False, parse_eigen=False)
         structure = run.final_structure
+        crt_nsw = nsw
         #structure = IStructure.from_file("%s/CONTCAR" % pre_dir)
         user_incar["SMASS"] = 0
         inputset = MITMDSet(structure, float(temp), float(temp), nsw, user_incar_settings=user_incar)
@@ -113,13 +115,13 @@ def running(temp, pre, crt):
     os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
     time.sleep(10)
     write_log("try: %d" % total_try)
-    properly_terminated = terminated_check()
+    properly_terminated = terminated_check(crt_nsw)
     while not properly_terminated:
         total_try += 1
         os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
         time.sleep(10)
         write_log("try: %d" % total_try)
-        properly_terminated = terminated_check()        
+        properly_terminated = terminated_check(crt_nsw)        
     os.system("touch vasp.done")    
     os.chdir("../")
 
