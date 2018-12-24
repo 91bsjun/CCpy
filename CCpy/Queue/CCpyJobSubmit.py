@@ -12,7 +12,6 @@ from CCpy.Tools.CCpyTools import selectInputs, selectVASPInputs
 from CCpy.Tools.CCpyTools import linux_command as lc
 from CCpy.Tools.CCpyTools import get_ip
 
-
 # -- version chk
 version = sys.version
 if version[0] == '3':
@@ -25,231 +24,227 @@ if ip == "166.104.249.31":
     quit()
 
 
+class JobInitiator:
+    def __init__(self, queue, node=None, n_of_cpu=None):
+        self.queue = queue
+        self.node = node
+        self.n_of_cpu = n_of_cpu
 
-def gaussian(queue=None, n_of_cpu=None):
-    # --- COLLECT INPUT FILES
-    input_marker = [".com"]
-    inputs = selectInputs(input_marker, "./", ask=ask)
+    def gaussian(self):
+        # --- COLLECT INPUT FILES
+        input_marker = [".com"]
+        inputs = selectInputs(input_marker, "./", ask=ask)
 
-    # --- SUBMIT QUEUE
-    for each_input in inputs:
-        myJS = JS(each_input, queue, n_of_cpu)
-        myJS.gaussian()
+        # --- SUBMIT QUEUE
+        for each_input in inputs:
+            myJS = JS(each_input, self.q, self.n_of_cpu, node=self.node)
+            myJS.gaussian()
 
-def vasp(queue=None, n_of_cpu=None, sub=None, loop=None):
-    # --- Collect VASP inputs
-    band = False
-    recalc = False
-    phonon = False
-    if "-band" in sys.argv:
-        band = True
-        inputs = selectVASPInputs("./", ask=ask, band=True, sub=sub)
-    elif "-r" in sys.argv:
-        recalc = True
-        if "01_unconverged_jobs.csv" not in os.listdir("./"):
-            print("\n01_unconverged_jobs.csv was not found in this directory.")
-            print("Create it using: CCpyVASPAnal.py 0")
-            quit()
-        df = pd.read_csv("01_unconverged_jobs.csv")
-        try:
-            df = df.drop('Unnamed: 0', 1)
-        except:
-            pass
-        print("\n* Unconverged job list in 01_unconverged_jobs.csv")
-        inputs = selectVASPInputs("./", dir_list=df['Directory'].tolist())
+    def vasp(self, sub=None, loop=None):
+        # --- Collect VASP inputs
+        band = False
+        phonon = False
+        if "-band" in sys.argv:
+            band = True
+            inputs = selectVASPInputs("./", ask=ask, band=True, sub=sub)
+        elif "-r" in sys.argv:
+            if "01_unconverged_jobs.csv" not in os.listdir("./"):
+                print("\n01_unconverged_jobs.csv was not found in this directory.")
+                print("Create it using: CCpyVASPAnal.py 0")
+                quit()
+            df = pd.read_csv("01_unconverged_jobs.csv")
+            try:
+                df = df.drop('Unnamed: 0', 1)
+            except:
+                pass
+            print("\n* Unconverged job list in 01_unconverged_jobs.csv")
+            inputs = selectVASPInputs("./", dir_list=df['Directory'].tolist())
+        elif "-phonon" in sys.argv:
+            phonon = True
+            inputs = selectVASPInputs("./", ask=ask, phonon=True, sub=sub)
+        else:
+            inputs = selectVASPInputs("./", ask=ask, sub=sub)
 
-    elif "-phonon" in sys.argv:
-        phonon = True
-        inputs = selectVASPInputs("./", ask=ask, phonon=True, sub=sub)
-    else:
-        inputs = selectVASPInputs("./", ask=ask, sub=sub)
+        # -- Clean vasp.done if exists
+        for each_input in inputs:
+            if 'vasp.done' in os.listdir(each_input):
+                os.remove(each_input + '/vasp.done')
 
-    # -- Clean vasp.done if exists
-    for each_input in inputs:
-        if 'vasp.done' in os.listdir(each_input):
-            os.remove(each_input + '/vasp.done')
-
-    # --- SUBMIT QUEUE
-    pwd = os.getcwd()
-    for each_input in inputs:
-        dirpath = pwd + "/" + each_input
-        if band:
-            dirpath += "/Band-DOS"
-        elif phonon:
-            dirpath += "/Phonon_opt"
-        myJS = JS(each_input, queue, n_of_cpu)
-        myJS.vasp(band=band, dirpath=dirpath, phonon=phonon, loop=loop)
-
-def vasp_batch(queue=None, n_of_cpu=None, scratch=False, sub=None, loop=None):
-    # --- Collect VASP inputs
-    band = False
-    phonon = False
-    recalc = False
-    if "-band" in sys.argv:
-        band = True
-        inputs = selectVASPInputs("./", ask=ask, band=True, sub=sub)
-    elif "-phonon" in sys.argv:
-        phonon = True
-        inputs = selectVASPInputs("./", ask=ask, phonon=True, sub=sub)
-    elif "-r" in sys.argv:
-        recalc = True
-        if "01_unconverged_jobs.csv" not in os.listdir("./"):
-            print("\n01_unconverged_jobs.csv was not found in this directory.")
-            print("Create it using: CCpyVASPAnal.py 0")
-            quit()
-        df = pd.read_csv("01_unconverged_jobs.csv")
-        try:
-            df = df.drop('Unnamed: 0', 1)
-        except:
-            pass
-        print("\n* Unconverged job list in 01_unconverged_jobs.csv")
-        inputs = selectVASPInputs("./", dir_list=df['Directory'].tolist())
-    else:
-        inputs = selectVASPInputs("./", ask=ask, sub=sub)
-
-    # -- Clean vasp.done if exists
-    for each_input in inputs:
-        if 'vasp.done' in os.listdir(each_input):
-            os.remove(each_input + '/vasp.done')
-
-    # --- SUBMIT QUEUE
-    dirs = []
-    pwd = os.getcwd()
-
-    for each_input in inputs:
-        dirpath = pwd + "/" + each_input
-        if band:
-            dirpath += "/Band-DOS"
-        elif phonon:
-            dirpath += "/Phonon_opt"
-        dirs.append(dirpath)
-    myJS = JS(each_input, queue, n_of_cpu)
-    myJS.vasp_batch(band=band, dirs=dirs, scratch=scratch, loop=loop)
-
-
-def qchem(queue=None, n_of_cpu=None):
-    # --- Collect inputs
-    input_marker = [".in"]
-    inputs = selectInputs(input_marker, "./", ask=ask)
-
-    # --- SUBMIT QUEUE
-    for each_input in inputs:
-        myJS = JS(each_input, queue, n_of_cpu)
-        myJS.qchem()
-
-def atk(queue=None, n_of_cpu=None, atk_version="atk2017"):
-    # --- COLLECT INPUT FILES
-    input_marker = [".py"]
-    inputs = selectInputs(input_marker, "./", ask=ask)
-
-    # --- SUBMIT QUEUE
-    for each_input in inputs:
-        myJS = JS(each_input, queue, n_of_cpu)
-        myJS.ATK(atk_version=atk_version)
-
-
-def lammps(queue=None, n_of_cpu=None):
-    # --- COLLECT INPUT FILES
-    input_marker = ["in."]
-    inputs = selectInputs(input_marker, "./", ask=ask)
-
-    # --- SUBMIT QUEUE
-    for each_input in inputs:
-        myJS = JS(each_input, queue, n_of_cpu)
-        myJS.lammps()
-
-
-def atat(queue=None, n_of_cpu=None):
-    all_inputs = [int(d) for d in os.listdir("./") if os.path.isdir(d) if
-                  "str.out" in os.listdir(d) and "wait" in os.listdir(d)]
-    all_inputs.sort()
-
-    # fitsvl calc
-    if "f" in sys.argv:
-        inputs = []
-        f = open("strname.in", "r")
-        dirs = f.read()
-        f.close()
-        dirs = dirs.split()
-
-        f = open("fitsvl_list", "w")
+        # --- SUBMIT QUEUE
         pwd = os.getcwd()
-        # strname.in dirs
-        for d in dirs:
-            os.chdir(d)
-            sub_d = [a for a in os.listdir("./") if os.path.isdir(a) if "vol_" in a]
-            # vol_0, vol_1.5 ...
-            for sd in sub_d:
-                os.chdir(sd)
-                ssub_d = [a for a in os.listdir("./") if os.path.isdir(a) if "p+" in a]
-                # p+0.2_8.7_0 ...
-                for ssd in ssub_d:
-                    os.chdir(ssd)
-                    f.write(os.getcwd())
-                    f.write("\n")
-                    inputs.append(os.getcwd())
+        for each_input in inputs:
+            dirpath = pwd + "/" + each_input
+            if band:
+                dirpath += "/Band-DOS"
+            elif phonon:
+                dirpath += "/Phonon_opt"
+            myJS = JS(each_input, self.q, self.n_of_cpu, node=self.node)
+            myJS.vasp(band=band, dirpath=dirpath, phonon=phonon, loop=loop)
+
+    def vasp_batch(self, scratch=False, sub=False, loop=False):
+        # --- Collect VASP inputs
+        band = False
+        phonon = False
+        if "-band" in sys.argv:
+            band = True
+            inputs = selectVASPInputs("./", ask=ask, band=True, sub=sub)
+        elif "-phonon" in sys.argv:
+            phonon = True
+            inputs = selectVASPInputs("./", ask=ask, phonon=True, sub=sub)
+        elif "-r" in sys.argv:
+            if "01_unconverged_jobs.csv" not in os.listdir("./"):
+                print("\n01_unconverged_jobs.csv was not found in this directory.")
+                print("Create it using: CCpyVASPAnal.py 0")
+                quit()
+            df = pd.read_csv("01_unconverged_jobs.csv")
+            try:
+                df = df.drop('Unnamed: 0', 1)
+            except:
+                pass
+            print("\n* Unconverged job list in 01_unconverged_jobs.csv")
+            inputs = selectVASPInputs("./", dir_list=df['Directory'].tolist())
+        else:
+            inputs = selectVASPInputs("./", ask=ask, sub=sub)
+
+        # -- Clean vasp.done if exists
+        for each_input in inputs:
+            if 'vasp.done' in os.listdir(each_input):
+                os.remove(each_input + '/vasp.done')
+
+        # --- SUBMIT QUEUE
+        dirs = []
+        pwd = os.getcwd()
+
+        for each_input in inputs:
+            dirpath = pwd + "/" + each_input
+            if band:
+                dirpath += "/Band-DOS"
+            elif phonon:
+                dirpath += "/Phonon_opt"
+            dirs.append(dirpath)
+        myJS = JS("batch_job", self.q, self.n_of_cpu, node=self.node)
+        myJS.vasp_batch(dirs=dirs, scratch=scratch, loop=loop)
+
+    def qchem(self):
+        # --- Collect inputs
+        input_marker = [".in"]
+        inputs = selectInputs(input_marker, "./", ask=ask)
+
+        # --- SUBMIT QUEUE
+        for each_input in inputs:
+            myJS = JS(each_input, self.q, self.n_of_cpu, node=self.node)
+            myJS.qchem()
+
+    def atk(self, atk_version="atk2017"):
+        # --- COLLECT INPUT FILES
+        input_marker = [".py"]
+        inputs = selectInputs(input_marker, "./", ask=ask)
+
+        # --- SUBMIT QUEUE
+        for each_input in inputs:
+            myJS = JS(each_input, self.q, self.n_of_cpu, node=self.node)
+            myJS.ATK(atk_version=atk_version)
+
+    def lammps(self):
+        # --- COLLECT INPUT FILES
+        input_marker = ["in."]
+        inputs = selectInputs(input_marker, "./", ask=ask)
+
+        # --- SUBMIT QUEUE
+        for each_input in inputs:
+            myJS = JS(each_input, self.q, self.n_of_cpu, node=self.node)
+            myJS.lammps()
+
+    def atat(self):
+        all_inputs = [int(d) for d in os.listdir("./") if os.path.isdir(d) if
+                      "str.out" in os.listdir(d) and "wait" in os.listdir(d)]
+        all_inputs.sort()
+
+        # fitsvl calc
+        if "f" in sys.argv:
+            inputs = []
+            f = open("strname.in", "r")
+            dirs = f.read()
+            f.close()
+            dirs = dirs.split()
+
+            f = open("fitsvl_list", "w")
+            pwd = os.getcwd()
+            # strname.in dirs
+            for d in dirs:
+                os.chdir(d)
+                sub_d = [a for a in os.listdir("./") if os.path.isdir(a) if "vol_" in a]
+                # vol_0, vol_1.5 ...
+                for sd in sub_d:
+                    os.chdir(sd)
+                    ssub_d = [a for a in os.listdir("./") if os.path.isdir(a) if "p+" in a]
+                    # p+0.2_8.7_0 ...
+                    for ssd in ssub_d:
+                        os.chdir(ssd)
+                        f.write(os.getcwd())
+                        f.write("\n")
+                        inputs.append(os.getcwd())
+                        os.chdir("../")
                     os.chdir("../")
                 os.chdir("../")
-            os.chdir("../")
-        f.close()
+            f.close()
 
-    # maps calc
-    else:
-        print("0 : All files")
-        for i in range(len(all_inputs)):
-            print(str(i + 1) + " : " + str(all_inputs[i]) + " , running or calculated.")
-        get_num = raw_input("Choose file : ")
-        all_inputs = [str(d) for d in all_inputs]
-        try:
-            if get_num == "0":
-                inputs = all_inputs
-            else:
-                inputs = []
-                get_num = get_num.split(",")  # 1-4,6-10,11,12
-                for i in get_num:
-                    if "-" in i:
-                        r = i.split("-")
-                        for j in range(int(r[0]), int(r[1]) + 1):
-                            inputs.append(all_inputs[j - 1])
-                    else:
-                        i = int(i)
-                        inputs.append(all_inputs[i - 1])
-        except:
-            print("Unvalid input type.")
-            print("ex : 1-3,5-10,11,12,13")
+        # maps calc
+        else:
+            print("0 : All files")
+            for i in range(len(all_inputs)):
+                print(str(i + 1) + " : " + str(all_inputs[i]) + " , running or calculated.")
+            get_num = raw_input("Choose file : ")
+            all_inputs = [str(d) for d in all_inputs]
+            try:
+                if get_num == "0":
+                    inputs = all_inputs
+                else:
+                    inputs = []
+                    get_num = get_num.split(",")  # 1-4,6-10,11,12
+                    for i in get_num:
+                        if "-" in i:
+                            r = i.split("-")
+                            for j in range(int(r[0]), int(r[1]) + 1):
+                                inputs.append(all_inputs[j - 1])
+                        else:
+                            i = int(i)
+                            inputs.append(all_inputs[i - 1])
+            except:
+                print("Unvalid input type.")
+                print("ex : 1-3,5-10,11,12,13")
+                quit()
+
+        ### SUBMIT QUEUE #############################################
+        pwd = os.getcwd()
+        for each_input in inputs:
+            os.chdir(pwd)
+            myJS = JS(each_input, self.q, self.n_of_cpu, node=self.node)
+            myJS.atat()
+
+    def pbs_runner(self):
+        # --- COLLECT INPUT FILES
+        input_marker = [".py"]
+        inputs = selectInputs(input_marker, "./", ask=ask)
+
+        # --- SUBMIT QUEUE
+        for each_input in inputs:
+            myJS = JS(each_input, self.q, self.n_of_cpu, node=self.node)
+            myJS.pbs_runner()
+
+    def AIMD_NVT_Loop(self, temp=None):
+        # --- COLLECT INPUT FILES
+        input_marker = [".cif", "POSCAR", "CONTCAR"]
+        inputs = selectInputs(input_marker, "./", ask=ask)
+        if len(inputs) != 1:
+            print("Only single file available.")
             quit()
 
-    ### SUBMIT QUEUE #############################################
-    pwd = os.getcwd()
-    for each_input in inputs:
-        os.chdir(pwd)
-        myJS = JS(each_input, queue, n_of_cpu)
-        myJS.atat()
-
-def pbs_runner(queue=None, n_of_cpu=None):
-    # --- COLLECT INPUT FILES
-    input_marker = [".py"]
-    inputs = selectInputs(input_marker, "./", ask=ask)
-
-    # --- SUBMIT QUEUE
-    for each_input in inputs:
-        myJS = JS(each_input, queue, n_of_cpu)
-        myJS.pbs_runner()
-
-def AIMD_NVT_Loop(queue=None, n_of_cpu=None, temp=None):
-    # --- COLLECT INPUT FILES
-    input_marker = [".cif", "POSCAR", "CONTCAR"]
-    inputs = selectInputs(input_marker, "./", ask=ask)
-    if len(inputs) != 1:
-        print("Only single file available.")
-        quit()
-
-    myJS = JS(inputs[0], queue, n_of_cpu)
-    myJS.AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp)
+        myJS = JS(inputs[0], self.q, self.n_of_cpu)
+        myJS.AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp)
 
 
-
-if __name__=="__main__":
+if __name__ == "__main__":
     try:
         chk = sys.argv[1]
         chk = sys.argv[2]
@@ -274,7 +269,10 @@ if __name__=="__main__":
     -n=[integer]    : the number of CPU to use
                       ex) CCpyJobSubmit.py 2 xeon2 -n=8
                       --> will use 8 CPUs in xeon2
-                
+
+    -node=[nodename]: assign specific node to submit
+                      ex) CCpyJobSubmit.py 2 xeon2 -node=node03
+
     <Support for VASP only>
     -sub            : find vasp jobs under sub directories (only support for vasp)
                       ex) CCpyJobSubmit.py 2 xeon4 -sub
@@ -302,23 +300,22 @@ if __name__=="__main__":
                       ex) CCpyJobSubmit.py 2 xeon5 -batch -sub -scratch
 
     -a              : no check files, calculate all inputs
-    
+
     -T              : Assign temperature when NVT MD simulation in VASP
                       ex) CCpyJobSubmit.py 9 xeon6 -n=24 -T=1000
-    
+
     -loop           : run VASP jobs until converged. (error will be handled using custodian library in pymatgen)
                       ex) CCpyJobSubmit.py 2 xeon5 -loop
-    
+
     <Options for ATK version handling>
     -atk2018        : ex) CCpyJobSubmit.py 3 xeon4 -atk2018  
-      
+
     Since the default version is 2017, you do not need to mention it when you want to use the 2017 version.
 
 
     '''
               )
         quit()
-
 
     # --- Queue name check
     queues = ["xeon1", "xeon2", "xeon3", "xeon4", "xeon5", "xeon6", "xeon7", "I5", "epyc", "aws"]
@@ -330,7 +327,6 @@ if __name__=="__main__":
         print("Unvalid queue name")
         quit()
 
-
     # --- Suboption parsing
     # -- Select all inputs automatically
     scratch = False
@@ -340,56 +336,61 @@ if __name__=="__main__":
     temp = None
     sub = False
     loop = False
+    node = None
     for s in sys.argv:
-        if "-n" in s:
+        if "-n=" in s:
             n_of_cpu = int(s.split("=")[1])
         if "-scratch" in s:
             scratch = True
         if "-a" in s:
             ask = False
         if '-atk2018' in s:
-            atk_version='atk2018'
-        if '-T' in s:
+            atk_version = 'atk2018'
+        if '-T=' in s:
             temp = int(s.split("=")[1])
         if '-sub' in s:
             sub = True
         if '-loop' in s:
             loop = True
+        if '-node=' in s:
+            node = s.split("=")[1]
+
+    job_init = JobInitiator(queue=queue, node=node, n_of_cpu=n_of_cpu)
 
     ## ------ GAUSSIAN
     if sys.argv[1] == "1":
-        gaussian(queue=queue, n_of_cpu=n_of_cpu)
+        job_init.gaussian()
 
     ## ------ VASP
     elif sys.argv[1] == "2":
         if "-batch" in sys.argv:
-            vasp_batch(queue=queue, n_of_cpu=n_of_cpu, scratch=scratch, sub=sub, loop=loop)
+            job_init.vasp_batch(scratch=scratch, sub=sub, loop=loop)
         else:
-            vasp(queue=queue, n_of_cpu=n_of_cpu, sub=sub, loop=loop)
+            job_init.vasp(sub=sub, loop=loop)
 
     ## ------ ATK
     elif sys.argv[1] == "3":
-        atk(queue=queue, n_of_cpu=n_of_cpu, atk_version=atk_version)
+        job_init.atk(atk_version=atk_version)
 
     ## ------ Q-chem
     elif sys.argv[1] == "4":
-        qchem(queue=queue, n_of_cpu=n_of_cpu)
+        job_init.qchem()
 
     ## ------ ATAT
     elif sys.argv[1] == "6":
-        atat(queue=queue, n_of_cpu=n_of_cpu)
+        job_init.atat()
 
     ## ------ LAMMPS
     elif sys.argv[1] == "7":
-        lammps(queue=queue, n_of_cpu=n_of_cpu)
+        job_init.lammps()
 
     ## ------ PBS JOBS DISPLAYER
     elif sys.argv[1] == "8":
-        pbs_runner(queue=queue, n_of_cpu=n_of_cpu)
+        job_init.pbs_runner()
 
     ## ------ VASP NVT LOOP
     elif sys.argv[1] == "9":
         if not temp:
             print("Temperature must be assigned. (ex: -T=1000)")
             quit()
-        AIMD_NVT_Loop(queue=queue, n_of_cpu=n_of_cpu, temp=temp)
+        job_init.AIMD_NVT_Loop(temp=temp)
