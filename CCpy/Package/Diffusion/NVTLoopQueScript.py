@@ -135,7 +135,7 @@ def write_data(crt):
     if crt >= start_num:
         vaspruns = []
         for i in range(start_num, crt + 1):
-            dirname = ("run%2d" % i).replace(" ", "0")
+            dirname = "run%03d" % i
             vasprun = dirname + "/vasprun.xml"
             vaspruns.append(vasprun)
 
