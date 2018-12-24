@@ -31,6 +31,9 @@ def CCpyqstat(in_user="*", in_status="", node_check=False):
     requeue_patt = re.compile("Hard requested queues:\s+\S+")
     requeue = requeue_patt.findall(qstat)
 
+    renode_patt = re.compile("Hard Resources:\s+.*")
+    renode = renode_patt.findall(qstat)
+
     user = []
     job_id = []
     status = []
@@ -54,7 +57,10 @@ def CCpyqstat(in_user="*", in_status="", node_check=False):
         if i in range(len(queue)):
             queues.append(queue[i].split()[2])
         else:
-            queues.append(requeue[i].split()[3])
+            if 'hostname' in renode[i]:
+                queues.append(requeue[i].split()[3] + "@" + renode[i].split("=")[1].split(" ")[0])
+            else:
+                queues.append(requeue[i].split()[3])
 
     run_time = []
     for t in start_time:

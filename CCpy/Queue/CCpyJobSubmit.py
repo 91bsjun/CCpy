@@ -37,7 +37,7 @@ class JobInitiator:
 
         # --- SUBMIT QUEUE
         for each_input in inputs:
-            myJS = JS(each_input, self.q, self.n_of_cpu, node=self.node)
+            myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.gaussian()
 
     def vasp(self, sub=None, loop=None):
@@ -78,7 +78,7 @@ class JobInitiator:
                 dirpath += "/Band-DOS"
             elif phonon:
                 dirpath += "/Phonon_opt"
-            myJS = JS(each_input, self.q, self.n_of_cpu, node=self.node)
+            myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.vasp(band=band, dirpath=dirpath, phonon=phonon, loop=loop)
 
     def vasp_batch(self, scratch=False, sub=False, loop=False):
@@ -122,7 +122,7 @@ class JobInitiator:
             elif phonon:
                 dirpath += "/Phonon_opt"
             dirs.append(dirpath)
-        myJS = JS("batch_job", self.q, self.n_of_cpu, node=self.node)
+        myJS = JS("batch_job", self.queue, self.n_of_cpu, node=self.node)
         myJS.vasp_batch(dirs=dirs, scratch=scratch, loop=loop)
 
     def qchem(self):
@@ -132,7 +132,7 @@ class JobInitiator:
 
         # --- SUBMIT QUEUE
         for each_input in inputs:
-            myJS = JS(each_input, self.q, self.n_of_cpu, node=self.node)
+            myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.qchem()
 
     def atk(self, atk_version="atk2017"):
@@ -142,7 +142,7 @@ class JobInitiator:
 
         # --- SUBMIT QUEUE
         for each_input in inputs:
-            myJS = JS(each_input, self.q, self.n_of_cpu, node=self.node)
+            myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.ATK(atk_version=atk_version)
 
     def lammps(self):
@@ -152,7 +152,7 @@ class JobInitiator:
 
         # --- SUBMIT QUEUE
         for each_input in inputs:
-            myJS = JS(each_input, self.q, self.n_of_cpu, node=self.node)
+            myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.lammps()
 
     def atat(self):
@@ -219,7 +219,7 @@ class JobInitiator:
         pwd = os.getcwd()
         for each_input in inputs:
             os.chdir(pwd)
-            myJS = JS(each_input, self.q, self.n_of_cpu, node=self.node)
+            myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.atat()
 
     def pbs_runner(self):
@@ -229,7 +229,7 @@ class JobInitiator:
 
         # --- SUBMIT QUEUE
         for each_input in inputs:
-            myJS = JS(each_input, self.q, self.n_of_cpu, node=self.node)
+            myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.pbs_runner()
 
     def AIMD_NVT_Loop(self, temp=None):
@@ -240,7 +240,7 @@ class JobInitiator:
             print("Only single file available.")
             quit()
 
-        myJS = JS(inputs[0], self.q, self.n_of_cpu)
+        myJS = JS(inputs[0], self.queue, self.n_of_cpu)
         myJS.AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp)
 
 
