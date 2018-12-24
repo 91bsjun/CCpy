@@ -25,7 +25,8 @@ except:
 
 [options]
 1   : Plot diffusivity(ies) written in *K/data.csv
-      ex) CCpyNVTLoopAnal.py 1 -m=constant 600K/data_600K.csv
+      ex) CCpyNVTLoopAnal.py 1 -m=constant 600K/data_600K.csv (default smoothing: constant)
+          CCpyNVTLoopAnal.py 1 -m=False 600K/data_600K.csv
           CCpyNVTLoopAnal.py 1 -m=max *K/data*    (multiple files also available)
           CCpyNVTLoopAnal.py 1 -m=max -x=r 600K/data_600K.csv 800K/data_800K.csv    (use x-axis as runstep)          
           
@@ -342,7 +343,7 @@ def custom_arrhenius_plot(total_temps, total_diffusivities, names, cifs, diffusi
 
 if __name__ == "__main__":
     # --- Parsing sub options
-    mode = "max"
+    mode = "constant"
     xaxis = "t"
     for arg in sys.argv:
         if "-m=" in arg:
