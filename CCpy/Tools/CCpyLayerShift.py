@@ -97,6 +97,8 @@ def cif_gen():
 
 
     # ---------- Distinct layer
+    '''
+    # Old version..
     layer1_index = []               # indice of 1st layer
     layer2_index = []               # indice of 2nd layer
     layer1_z = None                 # z-coordinate of 1st layer
@@ -104,6 +106,7 @@ def cif_gen():
 
     sum_layer1_z = 0
     sum_layer2_z = 0
+
     for i in range(len(fcoords)):
         if i == 0:
             layer1_z = fcoords[i][2]        # set z-coordinate of first line atom to layer1
@@ -124,6 +127,25 @@ def cif_gen():
                 print("ERROR:: Cannot distinct 2-layered system.")
                 print("Try again with increase tolerance. Or set slab direction to z-axis(c dierction).")
                 quit()
+    avg_layer1_z = sum_layer1_z / len(layer1_index)
+    avg_layer2_z = sum_layer2_z / len(layer2_index)
+    layer_distance = round(np.dot((avg_layer1_z - avg_layer2_z), lattice_v)[2][2], 4)
+    layer_distance = abs(layer_distance)
+    '''
+    # New version
+    layer1_index = []               # indice of 1st layer
+    layer2_index = []               # indice of 2nd layer
+
+    sum_layer1_z = 0
+    sum_layer2_z = 0
+    criteria_z = float(raw_input("Criterial fractional coordinate of z- (ex: 0.5)\n:"))
+    for i in range(len(fcoords)):
+        if fcoords[i][2] >= criteria_z:
+            layer1_index.append(i)
+            sum_layer1_z += fcoords[i][2]
+        else:
+            layer2_index.append(i)
+            sum_layer2_z += fcoords[i][2]
     avg_layer1_z = sum_layer1_z / len(layer1_index)
     avg_layer2_z = sum_layer2_z / len(layer2_index)
     layer_distance = round(np.dot((avg_layer1_z - avg_layer2_z), lattice_v)[2][2], 4)
