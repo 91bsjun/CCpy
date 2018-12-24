@@ -6,6 +6,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import pickle
 import collections
+import warnings
+warnings.filterwarnings("ignore")
 
 from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer, fit_arrhenius, get_arrhenius_plot, get_extrapolated_conductivity, get_extrapolated_diffusivity
 
@@ -115,14 +117,20 @@ def plot_diffusivity(mode, files, xaxis):
         else:
             x = df['timestep']
         y = df[ylabel]
+        y_val = np.array([val for val in y.tolist() if val != 0.0])
+        #y_avg = (y_val.max() + y_val.min()) / 2.0
+        y_avg = y_val.mean()
 
         label = filename.split("/")[-1].replace("data_","").replace(".csv","")
         plt.plot(x, y, marker='o', color=colors[i], label=label)
+        plt.plot(0, y_avg, marker='d', ms=10, color=colors[i])
 
     if xaxis == 'r':
         plt.xlabel("Run step", fontsize=24)
     else:
         plt.xlabel("Time step (ps)", fontsize=24)
+    ax = plt.axes()
+    ax.set_yscale('log')
     plt.ylabel(r"Diffusivity (cm$^2$/s)", fontsize=24)
     plt.tick_params(axis='both', which='major', labelsize=16)
     plt.grid()
@@ -249,7 +257,9 @@ def analysis():
 def arrhenius_plotter(datafiles):
     total_temps = []
     total_diffusivities = []
-    labels = []
+#    labels = []
+    names = [datafile.replace(".csv","") for datafile in datafiles]
+    cifs = [name + ".cif" for name in names]
     for datafile in datafiles:
         df = pd.read_csv(datafile)
         keys = df.keys()
@@ -258,15 +268,15 @@ def arrhenius_plotter(datafiles):
             if key != 'T':
                 total_temps.append(temps)
                 total_diffusivities.append(df[key].tolist())
-                labels.append(key)
+#                labels.append(key)
 
-    plt = custom_arrhenius_plot(total_temps, total_diffusivities, labels)
+    plt = custom_arrhenius_plot(total_temps, total_diffusivities, names, cifs)
     plt.show()
 
 
 
 
-def custom_arrhenius_plot(total_temps, total_diffusivities, labels, diffusivity_errors=None,
+def custom_arrhenius_plot(total_temps, total_diffusivities, names, cifs, diffusivity_errors=None,
                        **kwargs):
     """
     Returns an Arrhenius plot.
@@ -283,15 +293,18 @@ def custom_arrhenius_plot(total_temps, total_diffusivities, labels, diffusivity_
     Returns:
         A matplotlib.pyplot object. Do plt.show() to show the plot.
     """
+    from pymatgen.core.structure import IStructure
     colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
     from pymatgen.util.plotting import pretty_plot
     plt.figure(figsize=(9, 6))
     for i in range(len(total_temps)):
         temps = total_temps[i]
         diffusivities = total_diffusivities[i]
-        label = labels[i]
+        label = names[i]
+        print(label)
 
-        Ea, c, _ = fit_arrhenius(temps, diffusivities)
+        Ea, c, std = fit_arrhenius(temps, diffusivities)
+        print("std: ", std)
 
         # log10 of the arrhenius fit
         arr = c * np.exp(-Ea / (const.k / const.e * np.array(temps)))
@@ -300,7 +313,7 @@ def custom_arrhenius_plot(total_temps, total_diffusivities, labels, diffusivity_
 
         t_1 = 1000 / np.array(temps)
 
-        plt.scatter(t_1, diffusivities, marker='o', s=150, linewidths=2, facecolors='none', edgecolors=colors[i], label=label)
+        plt.scatter(t_1, diffusivities, marker='o', s=100, linewidths=3, facecolors='none', edgecolors=colors[i], label=label)
         plt.plot([1000./2000., 1000./300.], [d_2000, d_300], ls='--', color=colors[i])
 
         if diffusivity_errors is not None:
@@ -318,6 +331,10 @@ def custom_arrhenius_plot(total_temps, total_diffusivities, labels, diffusivity_
         plt.tick_params(axis='both', which='major', labelsize=16)
         plt.legend(loc=1, prop={'size': 18})
         plt.tight_layout()
+
+        structure = IStructure.from_file(cifs[i])
+        ext_c = get_extrapolated_conductivity(temps, diffusivities, new_temp=300, structure=structure, species="Li")
+        print("Conductivity at 300K: %.10f" % ext_c)
 
     return plt
 

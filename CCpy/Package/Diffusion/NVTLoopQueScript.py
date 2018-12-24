@@ -91,8 +91,10 @@ def running(temp, pre, crt):
     # -- Run AIMD at (run00, run01, ...)
     # -- First step is heat-up.
     total_try = 1
-    pre_dir = ("run%2d" % pre).replace(" ", "0")
-    crt_dir = ("run%2d" % crt).replace(" ", "0")
+    #pre_dir = ("run%2d" % pre).replace(" ", "0")
+    #crt_dir = ("run%2d" % crt).replace(" ", "0")
+    pre_dir = ("run%03d" % pre)
+    crt_dir = ("run%03d" % crt)
     # -- initiating
     if crt == 0:
         structure = IStructure.from_file("../" + structure_filename)
