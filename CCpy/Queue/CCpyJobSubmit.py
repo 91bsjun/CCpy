@@ -303,6 +303,9 @@ if __name__ == "__main__":
 
     -T              : Assign temperature when NVT MD simulation in VASP
                       ex) CCpyJobSubmit.py 9 xeon6 -n=24 -T=1000
+    
+    -specie=        : Assign diffusion element when NVT MD simulation in VASP (optional, default: Li)
+                      ex) CCpyJobSubmit.py 9 xeon6 -n=24 -T=1000 -specie=Na
 
     -loop           : run VASP jobs until converged. (error will be handled using custodian library in pymatgen)
                       ex) CCpyJobSubmit.py 2 xeon5 -loop
