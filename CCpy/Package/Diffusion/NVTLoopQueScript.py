@@ -11,6 +11,7 @@ from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer
 
 # ---------- CONFIGURATIONS ------------ #
 NCORE = 4
+heating_nsw = 5000
 nsw = 1000
 user_incar = {"NCORE": NCORE, "ENCUT": 400, "LREAL": "Auto", "PREC": "Normal", "ALGO": "Fast", "EDIFF": 1E-05, "ICHARG": 0, "IALGO": 48}
 structure_filename = sys.argv[1]
@@ -75,11 +76,15 @@ def prev_check():
             run_step = len(runs) - 1
 
         else:
+            if len(runs) == 1:
+                crt_nsw = heating_nsw
+            else:
+                crt_nsw = nsw
             oszicar = tail_oszicar[-1]
             crt_step = int(oszicar.split()[0])
 
             # -- when previous run was completed
-            if crt_step == nsw:
+            if crt_step == crt_nsw:
                 run_step = len(runs)
             # -- when previous run was stopped
             else:
