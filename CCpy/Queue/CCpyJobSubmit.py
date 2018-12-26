@@ -232,7 +232,7 @@ class JobInitiator:
             myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.pbs_runner()
 
-    def AIMD_NVT_Loop(self, temp=None):
+    def AIMD_NVT_Loop(self, temp=None, specie="Li"):
         # --- COLLECT INPUT FILES
         input_marker = [".cif", "POSCAR", "CONTCAR"]
         inputs = selectInputs(input_marker, "./", ask=ask)
@@ -241,7 +241,7 @@ class JobInitiator:
             quit()
 
         myJS = JS(inputs[0], self.queue, self.n_of_cpu)
-        myJS.AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp)
+        myJS.AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp, specie=specie)
 
 
 if __name__ == "__main__":
@@ -337,6 +337,7 @@ if __name__ == "__main__":
     sub = False
     loop = False
     node = None
+    specie = "Li"
     for s in sys.argv:
         if "-n=" in s:
             n_of_cpu = int(s.split("=")[1])
@@ -354,6 +355,8 @@ if __name__ == "__main__":
             loop = True
         if '-node=' in s:
             node = s.split("=")[1]
+        if '-specie=' in s:
+            specie = s.split("=")[1]
 
     job_init = JobInitiator(queue=queue, node=node, n_of_cpu=n_of_cpu)
 
@@ -393,4 +396,4 @@ if __name__ == "__main__":
         if not temp:
             print("Temperature must be assigned. (ex: -T=1000)")
             quit()
-        job_init.AIMD_NVT_Loop(temp=temp)
+        job_init.AIMD_NVT_Loop(temp=temp, specie=specie)

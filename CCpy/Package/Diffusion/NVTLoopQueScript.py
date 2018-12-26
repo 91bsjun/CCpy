@@ -16,6 +16,7 @@ user_incar = {"NCORE": NCORE, "ENCUT": 400, "LREAL": "Auto", "PREC": "Normal", "
 structure_filename = sys.argv[1]
 temp = int(sys.argv[2])
 vasp = "vasp"
+specie = sys.argv[3]
 # -------------------------------------- #
 
 # INCAR
@@ -143,7 +144,7 @@ def write_data(crt):
         analyzers = {}
         for mode in [False, 'constant', 'max']:
             try:
-                analyzers[mode] = DiffusionAnalyzer.from_files(vaspruns, specie="Li", smoothed=mode, min_obs=60)
+                analyzers[mode] = DiffusionAnalyzer.from_files(vaspruns, specie=specie, smoothed=mode, min_obs=60)
             except:
                 analyzers[mode] = None
 

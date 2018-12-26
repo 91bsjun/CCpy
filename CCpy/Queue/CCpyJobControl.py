@@ -453,7 +453,7 @@ cd $SGE_O_WORKDIR
         shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
-    def AIMD_NVT_Loop(self, structure_filename=None, temp=None):
+    def AIMD_NVT_Loop(self, structure_filename=None, temp=None, specie="Li"):
         # -- load loop queue script
         from CCpy.Package.Diffusion.NVTLoopQueScript import NVTLoopQueScriptString
         script_string = NVTLoopQueScriptString()
@@ -481,9 +481,9 @@ cd $SGE_O_WORKDIR
 #$ -cwd
 
 
-%s %s %s %s
+%s %s %s %s %s
 ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.python_path,
-       script_filename, structure_filename, temp)
+       script_filename, structure_filename, temp, specie)
 
         f = open("mpi.sh", "w")
         f.write(mpi)
