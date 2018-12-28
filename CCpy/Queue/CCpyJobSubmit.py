@@ -240,7 +240,7 @@ class JobInitiator:
             print("Only single file available.")
             quit()
 
-        myJS = JS(inputs[0], self.queue, self.n_of_cpu)
+        myJS = JS(inputs[0], self.queue, self.n_of_cpu, node=self.node)
         myJS.AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp, specie=specie)
 
 
