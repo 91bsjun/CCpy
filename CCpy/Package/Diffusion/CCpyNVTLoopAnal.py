@@ -272,6 +272,7 @@ def arrhenius_plotter(datafiles):
 #                labels.append(key)
 
     plt = custom_arrhenius_plot(total_temps, total_diffusivities, names, cifs)
+    plt.tight_layout()
     plt.show()
 
 
@@ -296,6 +297,7 @@ def custom_arrhenius_plot(total_temps, total_diffusivities, names, cifs, diffusi
     """
     from pymatgen.core.structure import IStructure
     colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
+    markers = ['o', 's', 'D', '^', 'v']
     from pymatgen.util.plotting import pretty_plot
     plt.figure(figsize=(9, 6))
     for i in range(len(total_temps)):
@@ -306,6 +308,7 @@ def custom_arrhenius_plot(total_temps, total_diffusivities, names, cifs, diffusi
 
         Ea, c, std = fit_arrhenius(temps, diffusivities)
         print("std: ", std)
+        print("Ea : ", Ea)
 
         # log10 of the arrhenius fit
         arr = c * np.exp(-Ea / (const.k / const.e * np.array(temps)))
@@ -314,7 +317,7 @@ def custom_arrhenius_plot(total_temps, total_diffusivities, names, cifs, diffusi
 
         t_1 = 1000 / np.array(temps)
 
-        plt.scatter(t_1, diffusivities, marker='o', s=100, linewidths=3, facecolors='none', edgecolors=colors[i], label=label)
+        plt.scatter(t_1, diffusivities, marker='o', s=150, linewidths=3, facecolors='none', edgecolors=colors[i], label=label)
         plt.plot([1000./2000., 1000./300.], [d_2000, d_300], ls='--', color=colors[i])
 
         if diffusivity_errors is not None:
