@@ -13,7 +13,8 @@ from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer
 NCORE = 4
 heating_nsw = 5000
 nsw = 1000
-user_incar = {"NCORE": NCORE, "ENCUT": 400, "LREAL": "Auto", "PREC": "Normal", "ALGO": "Fast", "EDIFF": 1E-05, "ICHARG": 0, "IALGO": 48}
+#user_incar = {"NCORE": NCORE, "ENCUT": 400, "LREAL": "Auto", "PREC": "Normal", "ALGO": "Fast", "EDIFF": 1E-05, "ICHARG": 0, "IALGO": 48}
+user_incar = {"NCORE": NCORE, "PREC": "Normal", "ALGO": "Fast", "ICHARG": 0}
 structure_filename = sys.argv[1]
 temp = int(sys.argv[2])
 vasp = "vasp"
