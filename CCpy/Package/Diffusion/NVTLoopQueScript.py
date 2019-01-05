@@ -113,7 +113,7 @@ def running(temp, pre, crt):
         inputset.write_input(crt_dir)
     # -- run
     else:
-        run = Vasprun("%s/vasprun.xml" % pre_dir, parse_dos=False, parse_eigen=False)
+        run = Vasprun("%s/vasprun.xml.gz" % pre_dir, parse_dos=False, parse_eigen=False)
         structure = run.final_structure
         crt_nsw = nsw
         #structure = IStructure.from_file("%s/CONTCAR" % pre_dir)
