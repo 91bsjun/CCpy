@@ -180,11 +180,11 @@ def write_data(crt):
         f.write("\\n")
         f.close()
 
-def write_data_Mo(crt, specie, specie_distance):
+def write_data_Mo(crt, specie, specie_distance, temp):
     start_num = 1
     chg_data = {"Li": "+", "Na": "+", "K": "+", "Rb": "+", "Cu": "2+"}
     if crt >= start_num:
-        os.system("analyze_aimd diffusivity %s%s run 1 %d %.2f >> Mo_anal.log" % (specie, chg_data[specie], crt, specie_distance))
+        os.system("analyze_aimd diffusivity %s%s run 1 %d %.2f -msd msd_%dK.csv>> Mo_anal.log" % (specie, chg_data[specie], crt, specie_distance, temp))
 
 if __name__ == "__main__":
     structure = IStructure.from_file(structure_filename)
@@ -216,7 +216,7 @@ if __name__ == "__main__":
         pre_step = crt_step - 1
         running(temp, pre_step, crt_step)
         write_data(crt_step)
-        write_data_Mo(crt_step, specie, avg_specie_distance)
+        write_data_Mo(crt_step, specie, avg_specie_distance, temp)
         crt_step += 1
 """
     return string
