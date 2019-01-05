@@ -122,13 +122,15 @@ def running(temp, pre, crt):
         os.system("cp %s/WAVECAR %s" % (pre_dir, crt_dir))
     os.chdir(crt_dir)    
     os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
-    time.sleep(10)
+    time.sleep(5)
+    os.system("gzip OUTCAR vasprun.xml")
     write_log("try: %d" % total_try)
     properly_terminated = terminated_check(crt_nsw)
     while not properly_terminated:
         total_try += 1
         os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
-        time.sleep(10)
+        time.sleep(5)
+        os.system("gzip OUTCAR vasprun.xml")
         write_log("try: %d" % total_try)
         properly_terminated = terminated_check(crt_nsw)        
     os.system("touch vasp.done")    
@@ -143,7 +145,7 @@ def write_data(crt):
         vaspruns = []
         for i in range(start_num, crt + 1):
             dirname = "run%03d" % i
-            vasprun = dirname + "/vasprun.xml"
+            vasprun = dirname + "/vasprun.xml.gz"
             vaspruns.append(vasprun)
 
         # -- collect all smoothing modes of analyzer
@@ -155,8 +157,9 @@ def write_data(crt):
                 analyzers[mode] = None
 
         # -- save DiffusionAnalzyer as pickle to plot msd quickly
-        with open(("analyzer%2d.pkl" % crt).replace(" ", "0"), 'wb') as save_data:
-            pickle.dump(analyzers, save_data)
+        if crt % 10 == 0:
+            with open("analyzer%03d.pkl" % crt, 'wb') as save_data:
+                pickle.dump(analyzers, save_data)
 
         # -- write data
         f = open("data_%sK.csv" % temp, "a")
@@ -176,8 +179,26 @@ def write_data(crt):
         f.write("\\n")
         f.close()
 
+def write_data_Mo(crt, specie, specie_distance):
+    start_num = 1
+    chg_data = {"Li": "+", "Na": "+", "K": "+", "Rb": "+", "Cu": "2+"}
+    if crt >= start_num:
+        os.system("analyze_aimd diffusivity %s%s run 1 %d %.2f >> Mo_anal.log" % (specie, chg_data[specie], crt, specie_distance))
 
 if __name__ == "__main__":
+    structure = IStructure.from_file(structure_filename)
+    # -- Find neighboring specie distance
+    sites = structure.sites
+    specie_sites = [s for s in sites if str(s.specie) == specie]
+    distance = []
+    for specie_site in specie_sites:    
+        nbrs = structure.get_neighbors(specie_site, 5)
+        nbrs = [nbr for nbr in nbrs if str(nbr[0].specie) == specie]
+        for nbr in nbrs:
+            distance.append(nbr[1])
+    distance = np.array(distance)
+    avg_specie_distance = distance.mean()
+    
     working_dir = "%dK" % temp
     mkdir(working_dir)
     os.chdir(working_dir)
@@ -194,6 +215,7 @@ if __name__ == "__main__":
         pre_step = crt_step - 1
         running(temp, pre_step, crt_step)
         write_data(crt_step)
+        write_data_Mo(crt_step, specie, avg_specie_distance)
         crt_step += 1
 """
     return string
