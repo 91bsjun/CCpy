@@ -4,6 +4,7 @@ import os, sys
 import re
 import time
 import pickle
+import numpy as np
 from pymatgen.io.vasp import Vasprun
 from pymatgen.io.vasp.sets import MITMDSet
 from pymatgen.core.structure import IStructure
