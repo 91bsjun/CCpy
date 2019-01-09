@@ -184,7 +184,12 @@ def write_data_Mo(crt, specie, specie_distance, temp):
     start_num = 1
     chg_data = {"Li": "+", "Na": "+", "K": "+", "Rb": "+", "Cu": "2+"}
     if crt >= start_num:
-        os.system("analyze_aimd diffusivity %s%s run 1 %d %.2f -msd msd_%dK.csv>> Mo_anal.log" % (specie, chg_data[specie], crt, specie_distance, temp))
+        os.system("analyze_aimd diffusivity %s%s run 1 %d %.2f -msd msd_%dK.csv >> Mo_anal.log" % (specie, chg_data[specie], crt, specie_distance, temp))
+    datafilename = "Mo_%dK_data.csv" % temp
+    df = pd.read_csv(datafilename)
+    RSD = df['std'].tolist()[-1]
+
+    return float(RSD)
 
 if __name__ == "__main__":
     structure = IStructure.from_file(structure_filename)
@@ -216,7 +221,13 @@ if __name__ == "__main__":
         pre_step = crt_step - 1
         running(temp, pre_step, crt_step)
         write_data(crt_step)
-        write_data_Mo(crt_step, specie, avg_specie_distance, temp)
+        RSD = write_data_Mo(crt_step, specie, avg_specie_distance, temp)
+        if RSD <= 0.25:
+            write_log("Terminated by reached RSD")
+            os.system("touch loop.done")
+        if crt_step == 300:
+            write_log("Maximum running step")
+            os.system("touch loop.done")
         crt_step += 1
 """
     return string
