@@ -483,9 +483,9 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
         total_Ea.append(Ea)
         total_Ea_err.append(Ea_err)
         total_ext_diffusivity.append(ext_diffusivity)
-        total_rng_diffusivity.append(str(rng_diffusivity))
+        total_rng_diffusivity.append(str((round(rng_diffusivity[0], 12), round(rng_diffusivity[1], 12))))
         total_ext_conductivity.append(ext_conductivity)
-        total_rng_conductivity.append(str(rng_conductivity))
+        total_rng_conductivity.append(str((round(rng_conductivity[0], 12), round(rng_conductivity[1], 12))))
 
 
         plt.figure(figsize=(8, 6))
