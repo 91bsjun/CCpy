@@ -227,7 +227,7 @@ if __name__ == "__main__":
         running(temp, pre_step, crt_step)
         write_data(crt_step)
         RSD = write_data_Mo(crt_step, specie, avg_specie_distance, temp)
-        if RSD <= 0.25 and crt >= 50:
+        if RSD <= 0.25 and crt_step >= 50:
             write_log("Terminated by reached RSD and least run step (100 ps)")
             os.system("touch loop.done")
         if crt_step == 300:
