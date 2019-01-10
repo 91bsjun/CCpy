@@ -5,6 +5,7 @@ import re
 import time
 import pickle
 import numpy as np
+import pandas as pd
 from pymatgen.io.vasp import Vasprun
 from pymatgen.io.vasp.sets import MITMDSet
 from pymatgen.core.structure import IStructure
@@ -187,7 +188,11 @@ def write_data_Mo(crt, specie, specie_distance, temp):
         os.system("analyze_aimd diffusivity %s%s run 1 %d %.2f -msd msd_%dK.csv >> anal.log" % (specie, chg_data[specie], crt, specie_distance, temp))
     datafilename = "Mo_%dK_data.csv" % temp
     df = pd.read_csv(datafilename)
-    RSD = df['std'].tolist()[-1]
+    std_list = df['std'].tolist()
+    if len(std_list) == 0:
+        RSD = 1
+    else:
+        RSD = std_list[-1]
 
     return float(RSD)
 
