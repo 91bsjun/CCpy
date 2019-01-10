@@ -112,6 +112,10 @@ def get_csvfiles():
 
     return csvfiles
 
+def mkdir(dirname):
+    if dirname not in os.listdir("./"):
+       os.mkdir(dirname)
+
 
 def plot_diffusivity(mode, files, xaxis):
     ylabel = "diffusivity(m)"
@@ -409,7 +413,7 @@ def diffusivity_plotter(csv_files, xaxis):
     plt.grid()
     plt.legend(loc=1, prop={'size': 16})
     plt.tight_layout()
-    plt.savefig("final_data.png")
+    plt.savefig("diffusivity_data.png")
     plt.show()
 
     data = {'T': T, 'D': total_d, 'D_error': total_d_err, 'RSD': total_std}
@@ -418,8 +422,8 @@ def diffusivity_plotter(csv_files, xaxis):
     tab = tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", "", ".12f", ".12f", ".4f"))
     print(tab)
 
-    df.to_csv("final_data.csv")
-    f = open("final_data.txt", "w")
+    df.to_csv("diffusivity_data.csv")
+    f = open("diffusivity_data.txt", "w")
     f.write(str(tab))
     f.close()
 
@@ -516,6 +520,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
     plt.tick_params(axis='both', which='major', labelsize=16)
     plt.legend(loc=1, prop={'size': 16})
     plt.tight_layout()
+    plt.savefig("arrhenius_fit.png")
     plt.show()
 
     data = {'Name': total_label, 'Ea (eV)': total_Ea, 'Ea_err (+/-)': total_Ea_err,
