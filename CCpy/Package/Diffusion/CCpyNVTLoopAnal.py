@@ -3,6 +3,7 @@ import os, sys
 import numpy as np
 import scipy.constants as const
 import pandas as pd
+from tabulate import tabulate
 import matplotlib.pyplot as plt
 import pickle
 import collections
@@ -414,7 +415,7 @@ def diffusivity_plotter(csv_files, xaxis):
     data = {'T': T, 'D': total_d, 'D_error': total_d_err, 'RSD': total_std}
     df = pd.DataFrame(data)
     print("Final steps at each T")
-    print(df)
+    print(tabulate(df, headers='keys', tablefmt='fancy_grid'))
     df.to_csv("final_data.csv")
 
 def msd_plotter(csv_files, log):
@@ -513,7 +514,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
             'ext_c (mS/cm)': total_ext_conductivity, 'c_err': total_rng_conductivity}
 
     df = pd.DataFrame(data)
-    print(df)
+    print(tabulate(df, headers='keys', tablefmt='fancy_grid'))
     df.to_csv("arrhenius_fit.csv")
 
 if __name__ == "__main__":
