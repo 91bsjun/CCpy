@@ -367,6 +367,7 @@ def diffusivity_plotter(csv_files, xaxis):
     T = []
     total_d = []
     total_d_err = []
+    total_std = []
 
     colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
     plt.figure(figsize=(8, 6))
@@ -385,6 +386,8 @@ def diffusivity_plotter(csv_files, xaxis):
         d_err = np.array(df['diffusivity_err'].tolist())
         d_err_up = d + d_err
         d_err_dn = d - d_err
+        RSD = np.array(df['std'].tolist())
+        total_std.append(RSD)
 
         T.append(temp)
         total_d.append(d[-1])
@@ -408,7 +411,7 @@ def diffusivity_plotter(csv_files, xaxis):
     plt.savefig("final_data.png")
     plt.show()
 
-    data = {'T': T, 'D': total_d, 'D_error': total_d_err}
+    data = {'T': T, 'D': total_d, 'D_error': total_d_err, 'RSD': total_std}
     df = pd.DataFrame(data)
     print("Final steps at each T")
     print(df)
