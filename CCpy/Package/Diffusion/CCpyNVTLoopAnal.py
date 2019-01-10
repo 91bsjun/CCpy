@@ -458,7 +458,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
     markers = ['o', 's', 'D', '^', 'v']
     for i in range(len(csv_files)):
         aa = ArreheniusAnalyzer.from_csv(csv_files[i])
-        structure = IStructure.from_file(csv_files[i].replace(".csv", ".csv"))
+        structure = IStructure.from_file(csv_files[i].replace(".csv", ".cif"))
         label = csv_files[i].replace(".csv", "")
 
         Ea = aa.Ea
