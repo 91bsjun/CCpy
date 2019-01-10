@@ -482,7 +482,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
         total_label.append(label)
         total_Ea.append(Ea)
         total_Ea_err.append(Ea_err)
-        total_ext_diffusivity.append(ext_diffusivity)
+        total_ext_diffusivity.append("%.12f" % ext_diffusivity)
         total_rng_diffusivity.append("(%.12f, %.12f)" % (rng_diffusivity[0], rng_diffusivity[1]))
         total_ext_conductivity.append(ext_conductivity)
         total_rng_conductivity.append("(%.12f, %.12f)" % (rng_conductivity[0], rng_conductivity[1]))
