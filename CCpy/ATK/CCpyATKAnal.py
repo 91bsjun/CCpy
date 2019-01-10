@@ -434,8 +434,8 @@ def transmission_3D(item):
     lev=[]
     val=0.0
 
-    for i in range(int(round(float(trans_max), 0)) * 5):
-        val = i * 0.2
+    for i in range(int(round(float(trans_max), 0)) * 20):
+        val = i * 0.05
         lev.append(val)
 
     max_bias=float(bias[-1])
