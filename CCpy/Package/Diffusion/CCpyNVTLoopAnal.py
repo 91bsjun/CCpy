@@ -518,7 +518,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
             'ext_c (mS/cm)': total_ext_conductivity, 'c_err_from': total_rng_conductivity_from, 'c_err_to': total_rng_conductivity_to}
 
     df = pd.DataFrame(data)
-    print(tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", ".4f", ".6f", ".12f", ".12f", ".12f", ".6f", ".6f", ".6f")))
+    print(tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", "", ".6f", ".6f", ".12f", ".12f", ".12f", ".6f", ".6f", ".6f")))
     df.to_csv("arrhenius_fit.csv")
 
 if __name__ == "__main__":
