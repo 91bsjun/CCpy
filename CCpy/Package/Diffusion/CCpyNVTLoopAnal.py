@@ -387,11 +387,11 @@ def diffusivity_plotter(csv_files, xaxis):
         d_err_up = d + d_err
         d_err_dn = d - d_err
         RSD = np.array(df['std'].tolist())
-        total_std.append(RSD)
 
         T.append(temp)
         total_d.append(d[-1])
         total_d_err.append(d_err[-1])
+        total_std.append(RSD[-1])
 
         #plt.plot(runstep, d, marker='o', ms='3', color=colors[i], label=label)
         plt.plot(runstep, d, color=colors[i], lw=2, label=label)
