@@ -415,8 +415,13 @@ def diffusivity_plotter(csv_files, xaxis):
     data = {'T': T, 'D': total_d, 'D_error': total_d_err, 'RSD': total_std}
     df = pd.DataFrame(data)
     print("Final steps at each T")
-    print(tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", "", ".12f", ".12f", ".4f")))
+    tab = tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", "", ".12f", ".12f", ".4f"))
+    print(tab)
+
     df.to_csv("final_data.csv")
+    f = open("final_data.txt", "w")
+    f.write(str(tab))
+    f.close()
 
 def msd_plotter(csv_files, log):
     T = []
@@ -447,7 +452,7 @@ def msd_plotter(csv_files, log):
     plt.grid()
     plt.legend(loc=1, prop={'size': 16})
     plt.tight_layout()
-    plt.savefig("final_msd.png")
+    plt.savefig("msd.png")
     plt.show()
 
 def arrhenius_plotter(csv_files, specie="Li", temp=300):
@@ -518,8 +523,12 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
             'ext_c (mS/cm)': total_ext_conductivity, 'c_err_from': total_rng_conductivity_from, 'c_err_to': total_rng_conductivity_to}
 
     df = pd.DataFrame(data)
-    print(tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", "", ".6f", ".6f", ".12f", ".12f", ".12f", ".6f", ".6f", ".6f")))
+    tab = tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", "", ".6f", ".6f", ".12f", ".12f", ".12f", ".6f", ".6f", ".6f"))
+    print(tab)
     df.to_csv("arrhenius_fit.csv")
+    f = open("arrhenius_fit.txt", "w")
+    f.write(str(tab))
+    f.close()
 
 if __name__ == "__main__":
     # --- Parsing sub options
