@@ -461,9 +461,11 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
     total_Ea = []
     total_Ea_err = []
     total_ext_diffusivity = []
-    total_rng_diffusivity = []
+    total_rng_diffusivity_from = []
+    total_rng_diffusivity_to = []
     total_ext_conductivity = []
-    total_rng_conductivity = []
+    total_rng_conductivity_from = []
+    total_rng_conductivity_to = []
     for i in range(len(csv_files)):
         aa = ArreheniusAnalyzer.from_csv(csv_files[i])
         structure = IStructure.from_file(csv_files[i].replace(".csv", ".cif"))
@@ -484,9 +486,11 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
         total_Ea.append(Ea)
         total_Ea_err.append(Ea_err)
         total_ext_diffusivity.append(ext_diffusivity)
-        total_rng_diffusivity.append("(%.12f, %.12f)" % (rng_diffusivity[0], rng_diffusivity[1]))
+        total_rng_diffusivity_from.append(rng_diffusivity[0])
+        total_rng_diffusivity_to.append(rng_diffusivity[1])
         total_ext_conductivity.append(ext_conductivity)
-        total_rng_conductivity.append("(%.12f, %.12f)" % (rng_conductivity[0], rng_conductivity[1]))
+        total_rng_conductivity_from.append(rng_conductivity[0])
+        total_rng_conductivity_to.append(rng_conductivity[1])
 
 
         plt.figure(figsize=(8, 6))
@@ -509,12 +513,12 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
     plt.tight_layout()
     plt.show()
 
-    data = {'Name': total_label, 'Ea (eV)': total_Ea, 'Ea_err': total_Ea_err,
-            'ext_D (cm^2/s)': total_ext_diffusivity, 'D_err': total_rng_diffusivity,
-            'ext_c (mS/cm)': total_ext_conductivity, 'c_err': total_rng_conductivity}
+    data = {'Name': total_label, 'Ea (eV)': total_Ea, 'Ea_err (+/-)': total_Ea_err,
+            'ext_D (cm^2/s)': total_ext_diffusivity, 'D_err_from': total_rng_diffusivity_from, 'D_err_to': total_rng_diffusivity_to,
+            'ext_c (mS/cm)': total_ext_conductivity, 'c_err_from': total_rng_conductivity_from, 'c_err_to': total_rng_conductivity_to}
 
     df = pd.DataFrame(data)
-    print(tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", ".4f", ".6f", ".12f", ".12f", ".6f", ".6f")))
+    print(tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", ".4f", ".6f", ".12f", ".12f", ".12f", ".6f", ".6f", ".6f")))
     df.to_csv("arrhenius_fit.csv")
 
 if __name__ == "__main__":
