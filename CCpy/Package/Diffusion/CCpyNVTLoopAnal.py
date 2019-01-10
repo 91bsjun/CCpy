@@ -508,9 +508,9 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
     plt.tight_layout()
     plt.show()
 
-    data = {'Name': total_label, 'Ea': total_Ea, 'Ea_err': total_Ea_err,
-            'ext_D': total_ext_diffusivity, 'D_err': total_rng_diffusivity,
-            'ext_c': total_ext_conductivity, 'c_err': total_rng_conductivity}
+    data = {'Name': total_label, 'Ea (eV)': total_Ea, 'Ea_err': total_Ea_err,
+            'ext_D (cm^2/s)': total_ext_diffusivity, 'D_err': total_rng_diffusivity,
+            'ext_c (mS/cm)': total_ext_conductivity, 'c_err': total_rng_conductivity}
 
     df = pd.DataFrame(data)
     print(df)
