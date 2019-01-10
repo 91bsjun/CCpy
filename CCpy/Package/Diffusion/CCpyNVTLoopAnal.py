@@ -451,6 +451,7 @@ def msd_plotter(csv_files, log):
 
 def arrhenius_plotter(csv_files, specie="Li", temp=300):
     from aimd.diffusion import ArreheniusAnalyzer
+    from pymatgen.core.structure import IStructure
     crt_ymin = 9999
     crt_ymax = -9999
     colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
