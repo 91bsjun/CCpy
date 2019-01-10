@@ -187,7 +187,7 @@ elif sys.argv[1] == "MITRelax":
         MIT_relax_VI = VASPInput(each_input)
         MIT_relax_VI.MIT_relax_set()
 
-elif sys.argv[1] == "0001":
+elif sys.argv[1] == "MPHSEBand":
     input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
     inputs = selectInputs(input_marker, "./")
     for each_input in inputs:
