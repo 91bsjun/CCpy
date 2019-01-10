@@ -456,6 +456,13 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
     crt_ymax = -9999
     colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
     markers = ['o', 's', 'D', '^', 'v']
+    total_label = []
+    total_Ea = []
+    total_Ea_err = []
+    total_ext_diffusivity = []
+    total_rng_diffusivity = []
+    total_ext_conductivity = []
+    total_rng_conductivity = []
     for i in range(len(csv_files)):
         aa = ArreheniusAnalyzer.from_csv(csv_files[i])
         structure = IStructure.from_file(csv_files[i].replace(".csv", ".cif"))
@@ -471,6 +478,15 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
         prd_conductivity = aa.predict_conductivity(temp, structure, specie)
         ext_conductivity = prd_conductivity[0]
         rng_conductivity = prd_conductivity[1]
+
+        total_label.append(label)
+        total_Ea.append(Ea)
+        total_Ea_err.append(Ea_err)
+        total_ext_diffusivity.append(ext_diffusivity)
+        total_rng_diffusivity.append(str(rng_diffusivity))
+        total_ext_conductivity.append(ext_conductivity)
+        total_rng_conductivity.append(str(rng_conductivity))
+
 
         plt.figure(figsize=(8, 6))
         plt.errorbar([1000./temp], [ext_diffusivity], yerr=[rng_diffusivity], fmt='none', color='blue')
@@ -491,6 +507,14 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
     plt.legend(loc=1, prop={'size': 16})
     plt.tight_layout()
     plt.show()
+
+    data = {'Name': total_label, 'Ea': total_Ea, 'Ea_err': total_Ea_err,
+            'ext_D': total_ext_diffusivity, 'D_err': total_rng_diffusivity,
+            'ext_c': total_ext_conductivity, 'c_err': total_rng_conductivity}
+
+    df = pd.DataFrame(data)
+    print(df)
+    df.to_csv("arrhenius_fit.csv")
 
 if __name__ == "__main__":
     # --- Parsing sub options
