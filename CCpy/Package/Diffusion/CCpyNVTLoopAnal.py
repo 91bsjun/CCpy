@@ -415,7 +415,7 @@ def diffusivity_plotter(csv_files, xaxis):
     data = {'T': T, 'D': total_d, 'D_error': total_d_err, 'RSD': total_std}
     df = pd.DataFrame(data)
     print("Final steps at each T")
-    print(tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", ".12f", ".12f", ".4f")))
+    print(tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", "", ".12f", ".12f", ".4f")))
     df.to_csv("final_data.csv")
 
 def msd_plotter(csv_files, log):
