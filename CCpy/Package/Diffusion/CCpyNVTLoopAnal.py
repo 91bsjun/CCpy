@@ -390,8 +390,8 @@ def diffusivity_plotter(csv_files, xaxis):
         RSD = np.array(df['std'].tolist())
 
         T.append(temp)
-        total_d.append(str("%.14f" % d[-1]))
-        total_d_err.append(str("%.14f" % d_err[-1]))
+        total_d.append(str("%.12f" % d[-1]))
+        total_d_err.append(str("%.12f" % d_err[-1]))
         total_std.append(str("%.4f" % RSD[-1]))
 
         #plt.plot(runstep, d, marker='o', ms='3', color=colors[i], label=label)
@@ -415,7 +415,7 @@ def diffusivity_plotter(csv_files, xaxis):
     data = {'T': T, 'D': total_d, 'D_error': total_d_err, 'RSD': total_std}
     df = pd.DataFrame(data)
     print("Final steps at each T")
-    print(tabulate(df, headers='keys', tablefmt='fancy_grid'))
+    print(tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", ".12f", ".12f", ".4f")))
     df.to_csv("final_data.csv")
 
 def msd_plotter(csv_files, log):
@@ -483,7 +483,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
         total_label.append(label)
         total_Ea.append(Ea)
         total_Ea_err.append(Ea_err)
-        total_ext_diffusivity.append("%.12f" % ext_diffusivity)
+        total_ext_diffusivity.append(ext_diffusivity)
         total_rng_diffusivity.append("(%.12f, %.12f)" % (rng_diffusivity[0], rng_diffusivity[1]))
         total_ext_conductivity.append(ext_conductivity)
         total_rng_conductivity.append("(%.12f, %.12f)" % (rng_conductivity[0], rng_conductivity[1]))
@@ -514,7 +514,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
             'ext_c (mS/cm)': total_ext_conductivity, 'c_err': total_rng_conductivity}
 
     df = pd.DataFrame(data)
-    print(tabulate(df, headers='keys', tablefmt='fancy_grid'))
+    print(tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", ".4f", ".6f", ".12f", ".12f", ".6f", ".6f")))
     df.to_csv("arrhenius_fit.csv")
 
 if __name__ == "__main__":
