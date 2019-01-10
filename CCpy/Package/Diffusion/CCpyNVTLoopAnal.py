@@ -20,34 +20,51 @@ try:
 except:
     print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [sub_option1] [sub_option2..]")
     print(""""--------------------------------------
-[suboptions]
--sub : deep in subdirectories
-
 [options]
-1   : Plot diffusivity(ies) written in *K/data.csv
+1   : Plot diffusivity(ies) written in *K/Mo_*K_data.csv
+      ex) CCpyNVTLoopAnal.py 1 600K/Mo_600K_data.csv
+          CCpyNVTLoopAnal.py 1 600K/Mo_600K_data.csv 800K/Mo_800K_data.csv 1000K/Mo_1000K_data.csv
+          
+    [suboption]
+    -x=r  : use x-axis as runstep (default -x=t)
+            ex) CCpyNVTLoopAnal.py 1 -x=r 600K/Mo_600K_data.csv (use x-axis as runstep)
+          
+          
+2   : Plot MSD/dt
+      ex) CCpyNVTLoopAnal.py 2 msd_600K.csv
+          CCpyNVTLoopAnal.py 2 msd_600K.csv msd_800K.csv
+               
+    [suboption]
+    -log=False  : Do not plot as log scale
+                  CCpyNVTLoopAnal.py 2 msd_600K.csv -log=False
+                  
+                  
+3   : Plot arrhenius fitting      
+      ex) CCpyNVTLoopAnal.py 3 LiGePS.csv
+          CCpyNVTLoopAnal.py 3 LiGePS.csv LiAlPS.csv
+      NOTE. csv file format same with output of [option 1]
+            structure file name must identical with csv filename (ex. LGPS.csv, LGPS.cif)
+            
+    [suboption]
+    -specie=Li  : Set specie (default: Li)
+                  ex) CCpyNVTLoopAnal.py 3 NaPS.csv -specie=Na
+    -T=300      : Set temperature to extrapolate
+                  
+
+4   : Plot diffusivity(ies) written by Pymatgen (old version)
       ex) CCpyNVTLoopAnal.py 1 -m=constant 600K/data_600K.csv (default smoothing: constant)
           CCpyNVTLoopAnal.py 1 -m=False 600K/data_600K.csv
           CCpyNVTLoopAnal.py 1 -m=max *K/data*    (multiple files also available)
-          CCpyNVTLoopAnal.py 1 -m=max -x=r 600K/data_600K.csv 800K/data_800K.csv    (use x-axis as runstep)          
+          CCpyNVTLoopAnal.py 1 -m=max -x=r 600K/data_600K.csv 800K/data_800K.csv    (use x-axis as runstep)
           
-2   : Plot MSD/2dt
-      ex) CCpyNVTLoopAnal.py 2 -m=False 
-          
-3   : Analysis data
-
-
-[suboptions]
--m=[mode]    : Define smoothing mode of MSD/2dt (False, constant, max / Default: max)
-               ex) CCpyNVTLoopAnal.py 1 -m=False 600K/data_600K.csv
-                   CCpyNVTLoopAnal.py 2 -m=max 600K/run01/vasprun.xml
-
--x=[t or r]  : Define x-axis label type when plot diffusivity vs run
-               t for timestep, r for runstep (Default: t)
-               ex) CCpyNVTLoopAnal.py 1 -m=False -x=r
 """
           )
     quit()
 
+"""
+future things
+: msd
+"""
 
 def get_vaspruns():
     all_inputs1 = [d + "/vasprun.xml" for d in os.listdir("./") if
@@ -255,7 +272,7 @@ def analysis():
     df300 = df[(df['Temp (K)'] == 300)]
     print(df300)
 
-def arrhenius_plotter(datafiles):
+def arrhenius_plotter_old(datafiles):
     total_temps = []
     total_diffusivities = []
 #    labels = []
@@ -342,12 +359,141 @@ def custom_arrhenius_plot(total_temps, total_diffusivities, names, cifs, diffusi
 
     return plt
 
+def diffusivity_plotter(csv_files, xaxis):
+    """
+    Plot diffusivity from anlysis code of Xingfeng He
 
+    """
+    T = []
+    total_d = []
+    total_d_err = []
+
+    colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
+    plt.figure(figsize=(8, 6))
+    for i, f in enumerate(files):
+        # 850K/Mo_850K_data.csv
+        # step,std,diffusivity,diffusivity_err
+        label = f.split("/")[-1].split("_")[1]
+        temp = label.replace("K", "")
+        df = pd.read_csv(f, index_col=False)
+        runstep = np.array(df['step'].tolist())
+        if xaxis == 'r':
+            x = runstep
+        else:
+            x = runstep * 2
+        d = np.array(df['diffusivity'].tolist())
+        d_err = np.array(df['diffusivity_err'].tolist())
+        d_err_up = d + d_err
+        d_err_dn = d - d_err
+
+        T.append(temp)
+        total_d.append(d[-1])
+        total_d_err.append(d_err[-1])
+
+        #plt.plot(runstep, d, marker='o', ms='3', color=colors[i], label=label)
+        plt.plot(runstep, d, color=colors[i], lw=2, label=label)
+        plt.fill_between(runstep, d_err_up, d_err_dn, facecolor=colors[i], alpha=0.3)
+
+    ax = plt.axes()
+    ax.set_yscale('log')
+    if xaxis == 'r':
+        plt.xlabel("Run step", fontsize=24)
+    else:
+        plt.xlabel("Time step (ps)", fontsize=24)
+    plt.ylabel(r"Diffusivity (cm$^2$/s)", fontsize=24)
+    plt.tick_params(axis='both', which='major', labelsize=16)
+    plt.grid()
+    plt.legend(loc=1, prop={'size': 16})
+    plt.tight_layout()
+    plt.savefig("final_data.png")
+    plt.show()
+
+    data = {'T': T, 'D': total_d, 'D_error': total_d_err}
+    df = pd.DataFrame(data)
+    print("Final steps at each T")
+    print(df)
+    df.to_csv("final_data.csv")
+
+def msd_plotter(csv_files, log):
+    T = []
+    total_d = []
+    total_d_err = []
+
+    colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
+    plt.figure(figsize=(8, 6))
+    for i, f in enumerate(files):
+        # dt (fs),msd (A^2)
+        label = f.split("/")[-1].split("_")[1].replace(".csv", "")
+        temp = label.replace("K", "")
+        df = pd.read_csv(f, index_col=False)
+        dt_fs = np.array(df['dt (fs)'].tolist())
+        dt_ps = dt_fs * 0.001
+        msd = np.array(df['msd (A^2)'].tolist())
+
+        plt.plot(dt_ps, msd, color=colors[i], lw=2, label=label)
+
+    if log:
+        ax = plt.axes()
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+    plt.xlabel("Time step (ps)", fontsize=24)
+    plt.ylabel(r"MSD (cm$^2$/s)", fontsize=24)
+    plt.ylabel(r"MSD ($\mathrm{\AA}^2$)", fontsize=24)
+    plt.tick_params(axis='both', which='major', labelsize=16)
+    plt.grid()
+    plt.legend(loc=1, prop={'size': 16})
+    plt.tight_layout()
+    plt.savefig("final_msd.png")
+    plt.show()
+
+def arrhenius_plotter(csv_files, specie="Li", temp=300):
+    crt_ymin = 9999
+    crt_ymax = -9999
+    colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
+    markers = ['o', 's', 'D', '^', 'v']
+    for i in range(len(csv_files)):
+        aa = ArreheniusAnalyzer.from_csv(csv_files[i])
+        structure = IStructure.from_file(csv_files[i].replace(".csv", ".csv"))
+        label = csv_files[i].replace(".csv", "")
+
+        Ea = aa.Ea
+        Ea_err = aa.Ea_error
+
+        prd_diffusivity = aa.predict_diffusivity(temp)
+        ext_diffusivity = prd_diffusivity[0]
+        rng_diffusivity = prd_diffusivity[1]
+
+        prd_conductivity = aa.predict_conductivity(temp, structure, specie)
+        ext_conductivity = prd_conductivity[0]
+        rng_conductivity = prd_conductivity[1]
+
+        plt.figure(figsize=(8, 6))
+        plt.errorbar([1000./temp], [ext_diffusivity], yerr=[rng_diffusivity], fmt='none', color='blue')
+
+        ymin, ymax = aa.get_custom_arrhenius_plot(colors[i], label, markers[i])
+        crt_ymin = min(crt_ymin, ymin)
+        crt_ymax = max(crt_ymax, ymax)
+
+    plt.xlim(0.5, 3.5)
+    plt.ylim(crt_ymin, crt_ymax)
+
+    ax = plt.axes()
+    ax.set_yscale('log')
+
+    plt.ylabel("D (cm$^2$/s)", fontsize=24)
+    plt.xlabel("1000/T (K$^{-1}$)", fontsize=24)
+    plt.tick_params(axis='both', which='major', labelsize=16)
+    plt.legend(loc=1, prop={'size': 16})
+    plt.tight_layout()
+    plt.show()
 
 if __name__ == "__main__":
     # --- Parsing sub options
     mode = "constant"
     xaxis = "t"
+    log = True
+    specie = "Li"
+    temp = 300
     for arg in sys.argv:
         if "-m=" in arg:
             mode = arg.split("=")[1]
@@ -355,16 +501,26 @@ if __name__ == "__main__":
                 mode = False
         if "-x=" in arg:
             xaxis = arg.split("=")[1]
+        if "-log=" in arg:
+            log = arg.split("=")[1]
+            if log == "False":
+                log = False
+        if '-specie=' in arg:
+            specie = arg.split("=")[1]
+        if '-T=' in arg:
+            temp = float(arg.split("=")[1])
+
 
     # --- Go to main option
     if sys.argv[1] == "1":
         files = get_csvfiles()
-        plot_diffusivity(mode, files, xaxis)
+        diffusivity_plotter(files, xaxis)
     elif sys.argv[1] == "2":
-        vaspruns = get_vaspruns()
-        plot_msd(mode, vaspruns)
+        files = get_csvfiles()
+        msd_plotter(files, log)
     elif sys.argv[1] == "3":
-        analysis()
+        files = get_csvfiles()
+        arrhenius_plotter(files, specie=specie, temp=temp)
     elif sys.argv[1] == "4":
         files = get_csvfiles()
-        arrhenius_plotter(files)
+        plot_diffusivity(mode, files, xaxis)
