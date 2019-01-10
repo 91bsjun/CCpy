@@ -516,6 +516,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
     plt.tick_params(axis='both', which='major', labelsize=16)
     plt.legend(loc=1, prop={'size': 16})
     plt.tight_layout()
+    plt.savefig("arrhenius_fit.png")
     plt.show()
 
     data = {'Name': total_label, 'Ea (eV)': total_Ea, 'Ea_err (+/-)': total_Ea_err,
