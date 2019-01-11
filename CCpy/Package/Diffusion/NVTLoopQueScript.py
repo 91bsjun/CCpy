@@ -23,6 +23,7 @@ specie = sys.argv[3]
 
 heating_nsw = 2000
 nsw = 1000
+min_step = 50
 # -------------------------------------- #
 
 # INCAR
