@@ -258,7 +258,7 @@ def write_ASD_data(csvfile):
 
 def check_converged(crt_step, RSD, ASD):
     converged = False
-    if step >= min_step:
+    if crt_step >= min_step:
         if RSD <= min_RSD:
             if ASD <= min_ASD:
                 converged = True
