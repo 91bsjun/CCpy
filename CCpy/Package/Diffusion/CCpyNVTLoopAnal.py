@@ -505,9 +505,8 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
         total_rng_conductivity_from.append(rng_conductivity[0])
         total_rng_conductivity_to.append(rng_conductivity[1])
 
-
         plt.figure(figsize=(8, 6))
-        plt.errorbar([1000./temp], [ext_diffusivity], yerr=[rng_diffusivity], fmt='none', color='blue')
+        plt.errorbar([1000./temp], [ext_diffusivity], yerr=[rng_diffusivity], fmt='none', color=colors[i])
 
         ymin, ymax = aa.get_custom_arrhenius_plot(colors[i], label, markers[i])
         crt_ymin = min(crt_ymin, ymin)
