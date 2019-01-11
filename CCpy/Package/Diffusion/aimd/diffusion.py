@@ -528,6 +528,7 @@ class ArreheniusAnalyzer(object):
         plt.tight_layout()
         return plt
 
+
     def get_custom_arrhenius_plot(self, color, label, marker):
         import matplotlib.pyplot as plt
 
