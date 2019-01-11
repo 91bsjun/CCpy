@@ -464,7 +464,7 @@ def msd_plotter(csv_files, log):
     plt.show()
 
 def arrhenius_plotter(csv_files, specie="Li", temp=300):
-    from aimd.diffusion import ArreheniusAnalyzer
+    from CCpy.Package.Diffusion.aimd.diffusion import ArreheniusAnalyzer
     from pymatgen.core.structure import IStructure
     crt_ymin = 9999
     crt_ymax = -9999
