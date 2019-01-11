@@ -12,15 +12,17 @@ from pymatgen.core.structure import IStructure
 from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer
 
 # ---------- CONFIGURATIONS ------------ #
+vasp = "vasp"
 NCORE = 4
-heating_nsw = 5000
-nsw = 1000
 #user_incar = {"NCORE": NCORE, "ENCUT": 400, "LREAL": "Auto", "PREC": "Normal", "ALGO": "Fast", "EDIFF": 1E-05, "ICHARG": 0, "IALGO": 48}
 user_incar = {"NCORE": NCORE, "PREC": "Normal", "ALGO": "Fast", "ICHARG": 0}
+
 structure_filename = sys.argv[1]
 temp = int(sys.argv[2])
-vasp = "vasp"
 specie = sys.argv[3]
+
+heating_nsw = 2000
+nsw = 1000
 # -------------------------------------- #
 
 # INCAR
@@ -107,7 +109,6 @@ def running(temp, pre, crt):
     # -- initiating
     if crt == 0:
         structure = IStructure.from_file("../" + structure_filename)
-        heating_nsw = 5000
         crt_nsw = heating_nsw
         user_incar["SMASS"] = -1
         inputset = MITMDSet(structure, 100.0, float(temp), heating_nsw, user_incar_settings=user_incar)
