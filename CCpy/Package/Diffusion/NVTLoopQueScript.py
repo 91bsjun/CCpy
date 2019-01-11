@@ -188,7 +188,7 @@ def write_data_Mo(crt, specie, specie_distance, temp):
         os.system("analyze_aimd diffusivity %s%s run 1 %d %.2f -msd msd_%dK.csv >> anal.log" % (specie, chg_data[specie], crt, specie_distance, temp))
     datafilename = "Mo_%dK_data.csv" % temp
     if datafilename not in os.listdir("./"):
-        f = open("Mo_%s_data.csv" % crt_d, "w")
+        f = open("Mo_%dK_data.csv" % temp, "w")
         f.write("step,std,diffusivity,diffusivity_err,\n")
         f.close()
     df = pd.read_csv(datafilename)
