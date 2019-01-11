@@ -403,8 +403,8 @@ def diffusivity_plotter(csv_files, xaxis):
         total_std.append(str("%.4f" % RSD[-1]))
 
         #plt.plot(runstep, d, marker='o', ms='3', color=colors[i], label=label)
-        plt.plot(runstep, d, color=colors[i], lw=2, label=label)
-        plt.fill_between(runstep, d_err_up, d_err_dn, facecolor=colors[i], alpha=0.3)
+        plt.plot(x, d, color=colors[i], lw=2, label=label)
+        plt.fill_between(x, d_err_up, d_err_dn, facecolor=colors[i], alpha=0.3)
 
     ax = plt.axes()
     ax.set_yscale('log')
