@@ -264,7 +264,7 @@ def check_converged(crt_step, RSD, ASD):
         if RSD <= min_RSD:
             if ASD <= min_ASD:
                 converged = True
-    if crt_step >= 500:
+    if crt_step >= 300:
         converged = True
 
     return converged
