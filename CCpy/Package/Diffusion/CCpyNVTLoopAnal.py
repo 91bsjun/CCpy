@@ -391,7 +391,11 @@ def diffusivity_plotter(csv_files, xaxis):
         d_err = np.array(df['diffusivity_err'].tolist())
         d_err_up = d + d_err
         d_err_dn = d - d_err
-        RSD = np.array(df['std'].tolist())
+        try:
+            # handle old version
+            RSD = np.array(df['std'].tolist())
+        except:
+            RSD = np.array(df['RSD'].tolist())
 
         T.append(temp)
         total_d.append(str("%.12f" % d[-1]))

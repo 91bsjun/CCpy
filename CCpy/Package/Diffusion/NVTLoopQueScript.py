@@ -181,24 +181,92 @@ def write_data(crt):
         f.write("\\n")
         f.close()
 
-def write_data_Mo(crt, specie, specie_distance, temp):
+
+def write_diffusivity_data(crt, specie, specie_distance, temp):
     start_num = 1
     chg_data = {"Li": "+", "Na": "+", "K": "+", "Rb": "+", "Cu": "2+"}
     if crt >= start_num:
         os.system("analyze_aimd diffusivity %s%s run 1 %d %.2f -msd msd_%dK.csv >> anal.log" % (specie, chg_data[specie], crt, specie_distance, temp))
     datafilename = "Mo_%dK_data.csv" % temp
+    bjunfilename = "bj_%dK_data.csv" % temp
     if datafilename not in os.listdir("./"):
         f = open("Mo_%dK_data.csv" % temp, "w")
-        f.write("step,std,diffusivity,diffusivity_err,\n")
+        f.write("step,RSD,diffusivity,diffusivity_err\\n")
         f.close()
     df = pd.read_csv(datafilename)
-    std_list = df['std'].tolist()
+    try:
+        # handle old version
+        std_list = df['std'].tolist()
+    except:
+        std_list = df['RSD'].tolist()
     if len(std_list) == 0:
         RSD = 1
+        ASD = 99
     else:
         RSD = std_list[-1]
+        ASD = write_ASD_data(datafilename)
 
-    return float(RSD)
+    return float(RSD), float(ASD)
+
+
+def write_ASD_data(csvfile):
+    df = pd.read_csv(csvfile)
+    df = df.reset_index()
+    x = df['step']
+    try:
+        y1 = df['RSD']
+    except:
+        # to handle old version datafile
+        y1 = df['std']
+    y2 = np.array(df['diffusivity'].tolist())
+
+    avgs = []
+    stds = []
+    std_avg = []
+    run = []
+    avg_range = 20
+    center_of_avg = int(avg_range / 2)
+    # -- collect std at range of 5 steps (x-4, x-3, x-2, x-1, x)
+    # -- run includes index of x
+    for i, v in enumerate(y2):
+        if i >= avg_range:
+            grp = y2[i-avg_range:i+1]
+            run.append(i + x[0])
+            avgs.append(grp.mean())
+            stds.append(grp.std())
+            std_avg.append(grp.std() / grp.mean() * 100)
+        else:
+            grp = y2[:i+1]
+            run.append(i + x[0])
+            avgs.append(grp.mean())
+            stds.append(grp.std())
+            std_avg.append(grp.std() / grp.mean() * 100)
+
+    data = {'step': run, 'RSD': y1, 'diffusivity': df['diffusivity'], 'diffusivity_err': df['diffusivity_err'], 'ASD': std_avg, 'avg_d': avgs}
+    data_df = pd.DataFrame(data)
+    data_df['diffusivity'] = data_df['diffusivity'].map('{:,.12f}'.format)
+    data_df['diffusivity_err'] = data_df['diffusivity_err'].map('{:,.12f}'.format)
+    data_df['RSD'] = data_df['RSD'].map('{:,.4f}'.format)
+    data_df['avg_d'] = data_df['avg_d'].map('{:,.12f}'.format)
+    data_df['ASD'] = data_df['ASD'].map('{:,.4f}'.format)
+
+    new_filename = csvfile.replace("Mo_", "bj_")
+    data_df.to_csv(new_filename, index=False)
+    
+    return std_avg[-1]
+
+
+def check_converged(crt_step, RSD, ASD):
+    converged = False
+    if step >= min_step:
+        if RSD <= min_RSD:
+            if ASD <= min_ASD:
+                converged = True
+    if crt_step >= 500:
+        converged = True
+
+    return converged
+
 
 if __name__ == "__main__":
     structure = IStructure.from_file(structure_filename)
@@ -217,6 +285,8 @@ if __name__ == "__main__":
     working_dir = "%dK" % temp
     mkdir(working_dir)
     os.chdir(working_dir)
+    if "loop.done" in os.listdir("./"):
+        os.system("rm loop.done")
 
     crt_step = prev_check()
     if crt_step == 0:
@@ -230,13 +300,12 @@ if __name__ == "__main__":
         pre_step = crt_step - 1
         running(temp, pre_step, crt_step)
         write_data(crt_step)
-        RSD = write_data_Mo(crt_step, specie, avg_specie_distance, temp)
-        if RSD <= 0.25 and crt_step >= 50:
-            write_log("Terminated by reached RSD and least run step (100 ps)")
+        RSD, ASD = write_diffusivity_data(crt_step, specie, avg_specie_distance, temp)
+        
+        converged_check = check_converged(crt_step, RSD, ASD)
+        if converged_check:
             os.system("touch loop.done")
-        if crt_step == 300:
-            write_log("Maximum running step")
-            os.system("touch loop.done")
+
         crt_step += 1
 """
     return string
