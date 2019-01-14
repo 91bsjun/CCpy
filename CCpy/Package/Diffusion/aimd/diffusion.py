@@ -529,10 +529,11 @@ class ArreheniusAnalyzer(object):
         return plt
 
 
-    def get_custom_arrhenius_plot(self, color, label, marker):
+    def get_custom_arrhenius_plot(self, color, label, marker, show_room_temp):
         import matplotlib.pyplot as plt
 
         d_2000 = np.power(10, self.slope * 1000./2000. + self.intercept)
+        d_500 = np.power(10, self.slope * 1000./500. + self.intercept)
         d_300 = np.power(10, self.slope * 1000./300. + self.intercept)
         d_250 = np.power(10, self.slope * 1000./250. + self.intercept)
 
@@ -552,7 +553,10 @@ class ArreheniusAnalyzer(object):
         #plt.tight_layout()
 
         # return ylim
-        return d_250, d_2000
+        if show_room_temp:
+            return d_250, d_2000
+        else:
+            return d_500, d_2000
 
     @classmethod
     def from_csv(cls, csv_file):
