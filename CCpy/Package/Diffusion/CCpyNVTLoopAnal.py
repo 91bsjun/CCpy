@@ -67,6 +67,10 @@ future things
 : msd
 """
 
+colors = ["#0054FF", "#FF0000", "#47C83E", "#FFBB00", "#8041D9", "#000000", "#C4B73B", "#00D8FF",
+          "#FF00DD", "#003399", "#980000", "#22741C", "#664B00", "#2A0066", "#005766", "#660058"]
+markers = ['o', 's', 'D', '^', 'v'] * 3
+
 def get_vaspruns():
     all_inputs1 = [d + "/vasprun.xml" for d in os.listdir("./") if
                    os.path.isdir(d) and 'run' in d and 'vasprun.xml' in os.listdir(d)]
@@ -129,7 +133,6 @@ def plot_diffusivity(mode, files, xaxis):
         print("Use max smoothing as default")
 
     plt.figure(figsize=(10, 7))
-    colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
     for i, filename in enumerate(files):
         df = pd.read_csv(filename, index_col=False)
         print(filename)
@@ -318,8 +321,6 @@ def custom_arrhenius_plot(total_temps, total_diffusivities, names, cifs, diffusi
         A matplotlib.pyplot object. Do plt.show() to show the plot.
     """
     from pymatgen.core.structure import IStructure
-    colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
-    markers = ['o', 's', 'D', '^', 'v']
     from pymatgen.util.plotting import pretty_plot
     plt.figure(figsize=(9, 6))
     for i in range(len(total_temps)):
@@ -374,7 +375,6 @@ def diffusivity_plotter(csv_files, xaxis):
     total_d_err = []
     total_std = []
 
-    colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
     plt.figure(figsize=(8, 6))
     for i, f in enumerate(files):
         # 850K/Mo_850K_data.csv
@@ -423,7 +423,7 @@ def diffusivity_plotter(csv_files, xaxis):
     data = {'T': T, 'D': total_d, 'D_error': total_d_err, 'RSD': total_std}
     df = pd.DataFrame(data)
     print("Final steps at each T")
-    tab = tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", "", ".12f", ".12f", ".4f"), showindex=False)
+    tab = tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", ".12f", ".12f", ".4f"), showindex=False)
     print(tab)
 
     df.to_csv("diffusivity_data.csv")
@@ -436,7 +436,6 @@ def msd_plotter(csv_files, log):
     total_d = []
     total_d_err = []
 
-    colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
     plt.figure(figsize=(8, 6))
     for i, f in enumerate(files):
         # dt (fs),msd (A^2)
@@ -468,8 +467,6 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
     from pymatgen.core.structure import IStructure
     crt_ymin = 9999
     crt_ymax = -9999
-    colors = ["#0054FF", "#DB0000", "#00A500", "#FF7012", "#5F00FF", "#000000", "#00D8FF", "#FF00DD"]
-    markers = ['o', 's', 'D', '^', 'v']
     total_label = []
     total_Ea = []
     total_Ea_err = []
@@ -531,7 +528,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
             'ext_c (mS/cm)': total_ext_conductivity, 'c_err_from': total_rng_conductivity_from, 'c_err_to': total_rng_conductivity_to}
 
     df = pd.DataFrame(data)
-    tab = tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", "", ".6f", ".6f", ".12f", ".12f", ".12f", ".6f", ".6f", ".6f"), showindex=False)
+    tab = tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", ".6f", ".6f", ".12f", ".12f", ".12f", ".6f", ".6f", ".6f"), showindex=False)
     print(tab)
     df.to_csv("arrhenius_fit.csv")
     f = open("arrhenius_fit.txt", "w")
