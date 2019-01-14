@@ -423,7 +423,7 @@ def diffusivity_plotter(csv_files, xaxis):
     data = {'T': T, 'D': total_d, 'D_error': total_d_err, 'RSD': total_std}
     df = pd.DataFrame(data)
     print("Final steps at each T")
-    tab = tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", ".12f", ".12f", ".4f"), showindex=False)
+    tab = tabulate(df, headers='keys', tablefmt='psql', floatfmt=("", ".12f", ".12f", ".4f"), showindex=False)
     print(tab)
 
     df.to_csv("diffusivity_data.csv")
@@ -462,7 +462,7 @@ def msd_plotter(csv_files, log):
     plt.savefig("msd.png")
     plt.show()
 
-def arrhenius_plotter(csv_files, specie="Li", temp=300):
+def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True):
     from CCpy.Package.Diffusion.aimd.diffusion import ArreheniusAnalyzer
     from pymatgen.core.structure import IStructure
     crt_ymin = 9999
@@ -476,6 +476,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
     total_ext_conductivity = []
     total_rng_conductivity_from = []
     total_rng_conductivity_to = []
+    plt.figure(figsize=(8, 6))
     for i in range(len(csv_files)):
         aa = ArreheniusAnalyzer.from_csv(csv_files[i])
         structure = IStructure.from_file(csv_files[i].replace(".csv", ".cif"))
@@ -502,14 +503,16 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
         total_rng_conductivity_from.append(rng_conductivity[0])
         total_rng_conductivity_to.append(rng_conductivity[1])
 
-        plt.figure(figsize=(8, 6))
         plt.errorbar([1000./temp], [ext_diffusivity], yerr=[rng_diffusivity], fmt='none', color=colors[i])
 
-        ymin, ymax = aa.get_custom_arrhenius_plot(colors[i], label, markers[i])
+        ymin, ymax = aa.get_custom_arrhenius_plot(colors[i], label, markers[i], show_room_temp)
         crt_ymin = min(crt_ymin, ymin)
         crt_ymax = max(crt_ymax, ymax)
 
-    plt.xlim(0.5, 3.5)
+    if show_room_temp:
+        plt.xlim(0.75, 3.5)
+    else:
+        plt.xlim(0.75, 2.0)
     plt.ylim(crt_ymin, crt_ymax)
 
     ax = plt.axes()
@@ -528,7 +531,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
             'ext_c (mS/cm)': total_ext_conductivity, 'c_err_from': total_rng_conductivity_from, 'c_err_to': total_rng_conductivity_to}
 
     df = pd.DataFrame(data)
-    tab = tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", ".6f", ".6f", ".12f", ".12f", ".12f", ".6f", ".6f", ".6f"), showindex=False)
+    tab = tabulate(df, headers='keys', tablefmt='psql', floatfmt=("", ".6f", ".6f", ".12f", ".12f", ".12f", ".6f", ".6f", ".6f"), showindex=False)
     print(tab)
     df.to_csv("arrhenius_fit.csv")
     f = open("arrhenius_fit.txt", "w")
@@ -542,6 +545,7 @@ if __name__ == "__main__":
     log = True
     specie = "Li"
     temp = 300
+    show_temp = True
     for arg in sys.argv:
         if "-m=" in arg:
             mode = arg.split("=")[1]
@@ -557,6 +561,8 @@ if __name__ == "__main__":
             specie = arg.split("=")[1]
         if '-T=' in arg:
             temp = float(arg.split("=")[1])
+        if '-ns' in arg:
+            show_temp = False
 
 
     # --- Go to main option
@@ -568,7 +574,7 @@ if __name__ == "__main__":
         msd_plotter(files, log)
     elif sys.argv[1] == "3":
         files = get_csvfiles()
-        arrhenius_plotter(files, specie=specie, temp=temp)
+        arrhenius_plotter(files, specie=specie, temp=temp, show_room_temp=show_temp)
     elif sys.argv[1] == "4":
         files = get_csvfiles()
         plot_diffusivity(mode, files, xaxis)
