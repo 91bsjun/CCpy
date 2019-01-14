@@ -504,6 +504,15 @@ def get_ip():
             ip = ip.split(":")[1]
             return ip
 
+def progress_bar(total, crt, len_bar):
+    proceeding = int(crt / total * len_bar)
+    pgb_msg = "[ %s%s ]" % ("=" * proceeding, " " * (len_bar - proceeding))
+    pgb_msg += " [ " + str(crt).rjust(4) + " / " + str(total).rjust(4) + " ]"
+    sys.stdout.write(pgb_msg)
+    sys.stdout.flush()
+    sys.stdout.write("\b" * len(pgb_msg))
+    sys.stdout.flush()
+    
 
 
 def ssh_command(servername,portnum,username,password,msg):
