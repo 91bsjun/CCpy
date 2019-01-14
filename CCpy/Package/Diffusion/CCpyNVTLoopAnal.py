@@ -423,7 +423,7 @@ def diffusivity_plotter(csv_files, xaxis):
     data = {'T': T, 'D': total_d, 'D_error': total_d_err, 'RSD': total_std}
     df = pd.DataFrame(data)
     print("Final steps at each T")
-    tab = tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", "", ".12f", ".12f", ".4f"))
+    tab = tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", "", ".12f", ".12f", ".4f"), showindex=False)
     print(tab)
 
     df.to_csv("diffusivity_data.csv")
@@ -531,7 +531,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300):
             'ext_c (mS/cm)': total_ext_conductivity, 'c_err_from': total_rng_conductivity_from, 'c_err_to': total_rng_conductivity_to}
 
     df = pd.DataFrame(data)
-    tab = tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", "", ".6f", ".6f", ".12f", ".12f", ".12f", ".6f", ".6f", ".6f"))
+    tab = tabulate(df, headers='keys', tablefmt='fancy_grid', floatfmt=("", "", ".6f", ".6f", ".12f", ".12f", ".12f", ".6f", ".6f", ".6f"), showindex=False)
     print(tab)
     df.to_csv("arrhenius_fit.csv")
     f = open("arrhenius_fit.txt", "w")
