@@ -67,7 +67,7 @@ future things
 : msd
 """
 
-colors = ["#0054FF", "#FF0000", "#47C83E", "#FFBB00", "#8041D9", "#000000", "#C4B73B", "#00D8FF",
+colors = ["#0100FF", "#FF0000", "#47C83E", "#FFBB00", "#8041D9", "#000000", "#C4B73B", "#00D8FF",
           "#FF00DD", "#003399", "#980000", "#22741C", "#664B00", "#2A0066", "#005766", "#660058"]
 markers = ['o', 's', 'D', '^', 'v'] * 3
 
@@ -503,9 +503,12 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True):
         total_rng_conductivity_from.append(rng_conductivity[0])
         total_rng_conductivity_to.append(rng_conductivity[1])
 
-        plt.errorbar([1000./temp], [ext_diffusivity], yerr=[rng_diffusivity], fmt='none', color=colors[i])
+        #(_, caps, _) = plt.errorbar([1000./temp], [ext_diffusivity], yerr=[rng_diffusivity], fmt='none', color=colors[i], capsize=5)
+        #for cap in caps:
+        #    cap.set_markeredgewidth(2)
 
-        ymin, ymax = aa.get_custom_arrhenius_plot(colors[i], label, markers[i], show_room_temp)
+        ymin, ymax = aa.get_custom_arrhenius_plot(colors[i], label, markers[i], temp, show_room_temp, rng_diffusivity)
+        #ymin, ymax = aa.get_custom_arrhenius_plot(colors[i], label, markers[i], temp, show_room_temp)
         crt_ymin = min(crt_ymin, ymin)
         crt_ymax = max(crt_ymax, ymax)
 
