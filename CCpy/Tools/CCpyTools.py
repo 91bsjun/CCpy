@@ -513,6 +513,12 @@ def progress_bar(total, crt, len_bar):
     sys.stdout.write("\b" * len(pgb_msg))
     sys.stdout.flush()
     
+def formula_encoder(formula):
+    SUB = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
+    if formula[0].isdigit:
+        return formula[0] + formula[1:].translate(SUB)
+    else:
+        return formula.translate(SUB)
 
 
 def ssh_command(servername,portnum,username,password,msg):
