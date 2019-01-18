@@ -516,7 +516,8 @@ def progress_bar(total, crt, len_bar):
     
 def formula_encoder(formula):
     SUB = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
-    atoms = re.compile("[A-Z]{1}[a-z]*[0-9]*[.]*[0-9]*")
+    #atoms = re.compile("[A-Z]{1}[a-z]*[0-9]*[.]*[0-9]*")
+    atoms = re.compile("[A-Z]{1}.*")
     atoms = atoms.findall(formula)
     s = ""
     for a in atoms:
