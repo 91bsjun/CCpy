@@ -515,10 +515,20 @@ def progress_bar(total, crt, len_bar):
     
 def formula_encoder(formula):
     SUB = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
-    if formula[0].isdigit:
-        return formula[0] + formula[1:].translate(SUB)
+    atoms = re.compile("[A-Z]{1}[a-z]*[0-9]*[.]*[0-9]*")
+    atoms = atoms.findall(formula)
+    s = ""
+    for a in atoms:
+        s += a.translate(SUB)
+
+    number_len = len(formula) - len(s)
+    if number_len != 0:
+        number = formula[:number_len]
     else:
-        return formula.translate(SUB)
+        number = ""
+    encoded_formula = number + s 
+
+    return encoded_formula
 
 
 def ssh_command(servername,portnum,username,password,msg):
