@@ -189,7 +189,7 @@ class CASMhull():
             VO.getFinalStructure(path="../Data/")
             os.chdir("../")
 
-    def getVoltageProfile(self):
+    def getVoltageProfile(self, chempot):
         df = self.hull_df
         cons = df['Concentration'].tolist()
         energies = df['Energy'].tolist()
@@ -209,7 +209,7 @@ class CASMhull():
 
                 diff_Li = n2 - n1
 
-                vol = ((e1 - e2) / diff_Li) - 1.886
+                vol = ((e1 - e2) / diff_Li) - chempot
 
                 if i == 0:
                     x.append(cons[i])
@@ -242,14 +242,14 @@ class CASMhull():
 
         plt.show()
 
-    def mainFlow(self):
+    def mainFlow(self, chempot=1.886):
         self.parsingData()
         self.getFormData()
         self.makeHull()
         self.plotHull()
         self.getHullPointStructures()
         if self.base == "Li":
-            self.getVoltageProfile()
+            self.getVoltageProfile(chempot)
 
 
 if __name__ == "__main__":
@@ -260,7 +260,12 @@ if __name__ == "__main__":
     tot_base = float(tot_base)
 
     ch = CASMhull(base=base, tot_base=tot_base)
-    ch.mainFlow()
+    if base == "Li":
+        get_chempot = raw_input("Chemical potential of Li, just enter to use the default value (1.886)\n: ")
+        chempot = float(get_chempot)
+        ch.mainFlow(chempot=chempot)
+    else:
+        ch.mainFlow()
 
 
 
