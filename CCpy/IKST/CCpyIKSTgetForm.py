@@ -202,7 +202,7 @@ class IKSThull():
             mv = "mv ./Data/" + filename + " ./Data/" + new_filename
             subprocess.call(mv, shell=True)
 
-    def getVoltageProfile(self):
+    def getVoltageProfile(self, chempot):
         df = self.hull_df
         cons = df['Concentration'].tolist()
         energies = df['Energy'].tolist()
@@ -214,15 +214,16 @@ class IKSThull():
         for i in range(len(energies)):
             j = i + 1
             if j < len(energies):
-                e1 = energies[i] * supercells[j]
-                e2 = energies[j] * supercells[i]
+                e1 = energies[i]
+                e2 = energies[j]
 
-                n1 = n_of_atoms[i] * supercells[j]
-                n2 = n_of_atoms[j] * supercells[i]
+                n1 = n_of_atoms[i]
+                n2 = n_of_atoms[j]
 
                 diff_Li = n2 - n1
 
-                vol = ((e1 - e2) / diff_Li) - 1.886
+                pot = ((e2 - e1) / diff_Li) - chemepot
+                vol = -pot
 
                 if i == 0:
                     x.append(cons[i])
@@ -255,13 +256,14 @@ class IKSThull():
 
         plt.show()
 
-    def mainFlow(self):
+    def mainFlow(self, chempot=-1.886):
         self.parsingData()
         self.getFormData()
         self.makeHull()
         self.plotHull()
         self.getHullPointStructures()
-        self.getVoltageProfile()
+        if self.base == "Li"
+            self.getVoltageProfile(chempot)
 
 
 if __name__ == "__main__":
@@ -279,7 +281,16 @@ if __name__ == "__main__":
     tot_base = float(tot_base)
 
     ih = IKSThull(dirname=root, base=base, tot_base=tot_base)
-    ih.mainFlow()
+        
+    if base == "Li":
+        get_chempot = raw_input("Chemical potential of Li, just enter to use the default value (-1.886)\n: ")
+        if len(get_chempot) == 0:
+            chempot = -1.886
+        else:
+            chempot = float(get_chempot)
+        ih.mainFlow(chempot)
+    else:
+        ih.mainFlow()
 
 
 

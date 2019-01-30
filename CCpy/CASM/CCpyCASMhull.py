@@ -201,15 +201,21 @@ class CASMhull():
         for i in range(len(energies)):
             j = i + 1
             if j < len(energies):
-                e1 = energies[i] * supercells[j]
-                e2 = energies[j] * supercells[i]
+                #e1 = energies[i] * supercells[i]
+                #e2 = energies[j] * supercells[j]
 
-                n1 = n_of_atoms[i] * supercells[j]
-                n2 = n_of_atoms[j] * supercells[i]
+                #n1 = n_of_atoms[i] * supercells[i]
+                #n2 = n_of_atoms[j] * supercells[j]
 
+                e1 = energies[i]
+                e2 = energies[j]
+
+                n1 = n_of_atoms[i]
+                n2 = n_of_atoms[j]
                 diff_Li = n2 - n1
 
-                vol = ((e1 - e2) / diff_Li) + chempot
+                pot = ((e2 - e1) / diff_Li) - chempot
+                vol = -pot
 
                 if i == 0:
                     x.append(cons[i])
@@ -242,7 +248,7 @@ class CASMhull():
 
         plt.show()
 
-    def mainFlow(self, chempot=-1.886):
+    def mainFlow(self, chempot):
         self.parsingData()
         self.getFormData()
         self.makeHull()
@@ -262,7 +268,10 @@ if __name__ == "__main__":
     ch = CASMhull(base=base, tot_base=tot_base)
     if base == "Li":
         get_chempot = raw_input("Chemical potential of Li, just enter to use the default value (-1.886)\n: ")
-        chempot = float(get_chempot)
+        if len(get_chempot) == 0:
+            chempot = -1.886
+        else:
+            chempot = float(get_chempot)
         ch.mainFlow(chempot=chempot)
     else:
         ch.mainFlow()
