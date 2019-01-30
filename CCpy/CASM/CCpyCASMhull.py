@@ -209,7 +209,7 @@ class CASMhull():
 
                 diff_Li = n2 - n1
 
-                vol = ((e1 - e2) / diff_Li) - chempot
+                vol = ((e1 - e2) / diff_Li) + chempot
 
                 if i == 0:
                     x.append(cons[i])
@@ -261,7 +261,7 @@ if __name__ == "__main__":
 
     ch = CASMhull(base=base, tot_base=tot_base)
     if base == "Li":
-        get_chempot = raw_input("Chemical potential of Li, just enter to use the default value (1.886)\n: ")
+        get_chempot = raw_input("Chemical potential of Li, just enter to use the default value (-1.886)\n: ")
         chempot = float(get_chempot)
         ch.mainFlow(chempot=chempot)
     else:
