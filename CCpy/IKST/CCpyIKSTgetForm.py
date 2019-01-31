@@ -262,7 +262,7 @@ class IKSThull():
         self.makeHull()
         self.plotHull()
         self.getHullPointStructures()
-        if self.base == "Li"
+        if self.base == "Li":
             self.getVoltageProfile(chempot)
 
 
