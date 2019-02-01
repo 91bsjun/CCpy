@@ -243,6 +243,16 @@ class JobInitiator:
         myJS = JS(inputs[0], self.queue, self.n_of_cpu, node=self.node)
         myJS.AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp, specie=specie)
 
+    def casm_run(self):
+        # checking casm env
+        try:
+            import casm
+        except:
+            print("Activate CASM environment before submitting.")
+
+        # --- SUBMIT QUEUE
+        myJS = JS(None, self.queue, self.n_of_cpu, node=self.node)
+        myJS.casm_run()
 
 if __name__ == "__main__":
     try:
@@ -261,6 +271,7 @@ if __name__ == "__main__":
     7  : LAMMPS
     8  : PBS job display
     9  : NVT MD Loop
+    10 : CASM VASP job run
 
 < Option 2. > Queue
     xeon1, xeon2, xeon3, ...
@@ -400,3 +411,7 @@ if __name__ == "__main__":
             print("Temperature must be assigned. (ex: -T=1000)")
             quit()
         job_init.AIMD_NVT_Loop(temp=temp, specie=specie)
+
+    ## ------ VASP NVT LOOP
+    elif sys.argv[1] == "10":
+        job_init.casm_run()

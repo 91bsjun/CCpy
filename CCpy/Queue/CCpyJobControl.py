@@ -235,7 +235,7 @@ touch vasp.done
         shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
-    def qchem(self, cpu=None, mem=None, q=None):
+    def qchem(self):
         inputfile = self.inputfile
         outputfile = inputfile.replace(".in", ".out")
 
@@ -278,7 +278,7 @@ qchem %s %s
         shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
-    def ATK(self, cpu=None, mem=None, q=None, atk_version="atk2017"):
+    def ATK(self, atk_version="atk2017"):
         if atk_version == "atk2018":
             atk_path = self.atk2018
         else:
@@ -334,7 +334,7 @@ $MPI_EXEC -n %d %s %s > %s
         shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
-    def atat(self, cpu=None, mem=None, q=None):
+    def atat(self):
         dirname = os.getcwd()
         dirname = dirname.split("/")[-1]
 
@@ -380,10 +380,8 @@ rm wait
         shl("rm -rf ./mpi.sh", shell=True)
 
     # -- To show SGE queue system that " I'm running now "
-    def pbs_runner(self, cpu=None, mem=None, q=None):
+    def pbs_runner(self):
         inputfile = self.inputfile
-
-        cpu, q = self.n_of_cpu, self.q
 
         jobname = inputfile.replace(".py", "")
 
@@ -416,7 +414,7 @@ python %s
         shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
-    def lammps(self, cpu=None, q=None):
+    def lammps(self):
         inputfile = self.inputfile
         outputfile = inputfile.replace("in.", "out.")
 
@@ -484,6 +482,38 @@ cd $SGE_O_WORKDIR
 %s %s %s %s %s
 ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.python_path,
        script_filename, structure_filename, temp, specie)
+
+        f = open("mpi.sh", "w")
+        f.write(mpi)
+        f.close()
+
+        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl("rm -rf ./mpi.sh", shell=True)
+
+    def casm_run(self):
+        inputfile = self.inputfile
+
+        jobname = inputfile.replace(".py", "")
+
+        mpi = '''#!/bin/csh
+# Job name 
+#$ -N %s
+
+# pe request
+%s
+
+# queue name
+%s
+
+# node
+%s
+
+#$ -V
+#$ -cwd
+
+casm-calc --run
+
+        ''' % (jobname, self.pe_request, self.queue_name, self.node_assign)
 
         f = open("mpi.sh", "w")
         f.write(mpi)
