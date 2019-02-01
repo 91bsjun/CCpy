@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="fe90ddd4-6adf-4dd8-96fd-3b416717383a" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CCpy/Package/Diffusion/CCpyNVTLoopAnal.py" beforeDir="false" afterPath="$PROJECT_DIR$/CCpy/Package/Diffusion/CCpyNVTLoopAnal.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -22,8 +21,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CCpy/Queue/CCpyJobControl.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="419">
-              <caret line="470" column="12" lean-forward="true" selection-start-line="470" selection-start-column="12" selection-end-line="470" selection-end-column="12" />
+            <state relative-caret-position="7973">
+              <caret line="470" column="12" selection-start-line="470" selection-start-column="12" selection-end-line="470" selection-end-column="12" />
             </state>
           </provider>
         </entry>
@@ -40,20 +39,20 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/CCpy/Package/Diffusion/NVTLoopQueScript.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1774">
-              <caret line="84" column="29" lean-forward="true" selection-start-line="84" selection-start-column="29" selection-end-line="84" selection-end-column="29" />
+            <state relative-caret-position="274">
+              <caret line="267" column="24" selection-start-line="267" selection-start-column="24" selection-end-line="267" selection-end-column="24" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CCpy/Package/Diffusion/CCpyNVTLoopAnal.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="487">
-              <caret line="510" column="43" lean-forward="true" selection-start-line="510" selection-start-column="43" selection-end-line="510" selection-end-column="43" />
+            <state relative-caret-position="7684">
+              <caret line="460" column="40" selection-start-line="460" selection-start-column="40" selection-end-line="460" selection-end-column="40" />
               <folding>
                 <element signature="e#18#32#0" expanded="true" />
               </folding>
@@ -145,8 +144,8 @@
         <option value="$PROJECT_DIR$/CCpy/Tools/CCpyLayerShift.py" />
         <option value="$PROJECT_DIR$/CCpy/Queue/CCpyJobControl.py" />
         <option value="$PROJECT_DIR$/CCpy/Queue/CCpyJobSubmit.py" />
-        <option value="$PROJECT_DIR$/CCpy/Package/Diffusion/NVTLoopQueScript.py" />
         <option value="$PROJECT_DIR$/CCpy/Package/Diffusion/CCpyNVTLoopAnal.py" />
+        <option value="$PROJECT_DIR$/CCpy/Package/Diffusion/NVTLoopQueScript.py" />
       </list>
     </option>
   </component>
@@ -183,6 +182,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -224,7 +224,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -341,18 +340,18 @@
       <workItem from="1544085550093" duration="17876000" />
       <workItem from="1545096273582" duration="1833000" />
       <workItem from="1545630053253" duration="7944000" />
-      <workItem from="1547086045076" duration="4930000" />
+      <workItem from="1547086045076" duration="22373000" />
+      <workItem from="1547540094834" duration="103000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="32583000" />
+    <option name="totallyTimeSpent" value="50129000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.67197454" visible="true" weight="0.1401919" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.67197454" visible="true" weight="0.14179105" />
       <window_info id="Structure" order="1" weight="0.24946696" />
       <window_info id="Favorites" order="2" sideWeight="0.3280255" side_tool="true" weight="0.13541667" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -565,8 +564,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/CCpy/Queue/CCpyJobControl.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="419">
-          <caret line="470" column="12" lean-forward="true" selection-start-line="470" selection-start-column="12" selection-end-line="470" selection-end-column="12" />
+        <state relative-caret-position="7973">
+          <caret line="470" column="12" selection-start-line="470" selection-start-column="12" selection-end-line="470" selection-end-column="12" />
         </state>
       </provider>
     </entry>
@@ -580,20 +579,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/Package/Diffusion/NVTLoopQueScript.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1774">
-          <caret line="84" column="29" lean-forward="true" selection-start-line="84" selection-start-column="29" selection-end-line="84" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/CCpy/Package/Diffusion/CCpyNVTLoopAnal.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="487">
-          <caret line="510" column="43" lean-forward="true" selection-start-line="510" selection-start-column="43" selection-end-line="510" selection-end-column="43" />
+        <state relative-caret-position="7684">
+          <caret line="460" column="40" selection-start-line="460" selection-start-column="40" selection-end-line="460" selection-end-column="40" />
           <folding>
             <element signature="e#18#32#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CCpy/Package/Diffusion/NVTLoopQueScript.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="274">
+          <caret line="267" column="24" selection-start-line="267" selection-start-column="24" selection-end-line="267" selection-end-column="24" />
         </state>
       </provider>
     </entry>
