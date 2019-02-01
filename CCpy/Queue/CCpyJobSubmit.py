@@ -244,12 +244,6 @@ class JobInitiator:
         myJS.AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp, specie=specie)
 
     def casm_run(self):
-        # checking casm env
-        try:
-            import casm
-        except:
-            print("Activate CASM environment before submitting.")
-
         # --- SUBMIT QUEUE
         myJS = JS(None, self.queue, self.n_of_cpu, node=self.node)
         myJS.casm_run()

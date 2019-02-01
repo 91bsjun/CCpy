@@ -491,8 +491,6 @@ cd $SGE_O_WORKDIR
         shl("rm -rf ./mpi.sh", shell=True)
 
     def casm_run(self):
-        inputfile = self.inputfile
-
         jobname = raw_input("Job name: ")
 
         mpi = '''#!/bin/csh
