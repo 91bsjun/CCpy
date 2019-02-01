@@ -493,7 +493,7 @@ cd $SGE_O_WORKDIR
     def casm_run(self):
         inputfile = self.inputfile
 
-        jobname = inputfile.replace(".py", "")
+        jobname = raw_input("Job name: ")
 
         mpi = '''#!/bin/csh
 # Job name 
