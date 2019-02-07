@@ -90,7 +90,7 @@ def get_empty_nodes(df):
     # ------------------ Nodes checking ----------------- #
     if len(df) != 0:
         for i in range(len(df)):
-            running_df = df[(df['   STATUS'] == 'r') | (df['   STATUS'] == 'dr')]
+            running_df = df[(df['   STATUS'] == 'r') | (df['   STATUS'] == 'dr') | (df['   STATUS'] == 't')]
     else:
         running_df = []
         
