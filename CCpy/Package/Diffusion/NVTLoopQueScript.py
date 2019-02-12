@@ -188,7 +188,7 @@ def write_data(crt):
 
 def write_diffusivity_data(crt, specie, specie_distance, temp):
     start_num = 1
-    chg_data = {"Li": "+", "Na": "+", "K": "+", "Rb": "+", "Cu": "2+"}
+    chg_data = {"Li": "+", "Na": "+", "K": "+", "Cu": "+"}
     if crt >= start_num:
         os.system("analyze_aimd.py diffusivity %s%s run 1 %d %.2f -msd msd_%dK.csv >> anal.log" % (specie, chg_data[specie], crt, specie_distance, temp))
     datafilename = "Mo_%dK_data.csv" % temp
