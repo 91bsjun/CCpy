@@ -183,11 +183,11 @@ class CASMhull():
 
         if len(hull_point_dirs) != 0:
             print("Hull point structures")
-        for d in hull_point_dirs:
-            os.chdir(d)
-            VO = VASPOutput()
-            VO.getFinalStructure(path="../Data/")
-            os.chdir("../")
+            for d in hull_point_dirs:
+                os.chdir(d)
+                VO = VASPOutput()
+                VO.getFinalStructure(path="../Data/")
+                os.chdir("../")
 
     def getVoltageProfile(self, chempot):
         df = self.hull_df
