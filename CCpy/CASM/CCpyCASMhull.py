@@ -248,7 +248,7 @@ class CASMhull():
 
         plt.show()
 
-    def mainFlow(self, chempot):
+    def mainFlow(self, chempot=None):
         self.parsingData()
         self.getFormData()
         self.makeHull()
