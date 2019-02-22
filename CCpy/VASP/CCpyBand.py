@@ -271,6 +271,28 @@ class CMSBand():
         datafile.close()
         print("* Save band data : band.dat")
 
+    def save_band_structure(self):
+        plotter = self.plotter
+        data = plotter.bs_plot_data(zero_to_efermi=True)
+        nb_bands = plotter._nb_bands
+
+        band_data = {}
+        for i in range(nb_bands):
+            band_data[i] = []
+        distances = []
+        for di in range(len(data['distances'])):
+            distances += data['distances'][di]
+            energy_data = data['energy'][di][str(Spin.up)]
+            for bi in range(len(energy_data)):
+                band_data[bi].append(energy_data[bi])
+        band_data['d'] = distances
+        import pandas as pd
+        df = pd.DataFrame(band_data)
+        df.to_csv('band_structure.csv')
+
+
+
+
 
 
 def save_pickle_data(name=None, obj=None):
@@ -352,6 +374,7 @@ def main_run():
         plt.tight_layout()
 
         cms_band.save_band_data(color=False)
+        cms_band.save_band_structure()
         
         if "n" not in sys.argv:
             plt.show()
