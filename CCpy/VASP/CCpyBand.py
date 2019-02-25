@@ -91,7 +91,7 @@ class CMSBand():
         plotter = BSPlotter(bands)
         self.plotter = plotter
 
-        plotter.get_plot(zero_to_efermi=True, line_width=line_width)
+        plotter.get_plot(band_indices, smooth=True, zero_to_efermi=True, line_width=line_width)
         plt.axhline(y=0, lw=1, ls=':', color='gray')
         plt.tick_params(labelsize=15)
         plt.ylim(miny, maxy)
@@ -116,7 +116,7 @@ class CMSBand():
 
         # -- if single atom : return to blue band
         if len(elt_ordered) == 1:
-            plt = self.blueBand(miny=miny,maxy=maxy,line_width=line_width)
+            plt = self.blueBand(miny=miny, maxy=maxy, line_width=line_width)
             return plt
         else:
             self.elt_ordered = elt_ordered
@@ -375,9 +375,10 @@ def main_run():
         band_indices = False
         cms_band = CMSBand(fig=fig)
         for argv in sys.argv:
-            if '-nb=' in argv:
-                from CCpy.CCpyTools import input_num_parser
+            if '-nb' in argv:
+                from CCpy.Tools.CCpyTools import input_num_parser
                 nb_bands = cms_band.bands.nb_bands
+                print("Total number of bands: ", nb_bands)
                 band_indices = input_num_parser(nb_bands)
 
         plt = cms_band.blueBand(miny=miny, maxy=maxy, line_width=line_width, band_indices=band_indices)
