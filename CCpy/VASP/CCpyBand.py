@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 from pymatgen.io.vasp.outputs import Vasprun
 from pymatgen.io.vasp.outputs import BSVasprun
+from pymatgen.electronic_structure.core import Spin
 # from pymatgen.electronic_structure.plotter import BSPlotter
 # from pymatgen.electronic_structure.plotter import BSPlotterProjected
 # from pymatgen.electronic_structure.plotter import DosPlotter
@@ -278,16 +279,17 @@ class CMSBand():
 
         band_data = {}
         for i in range(nb_bands):
-            band_data[i] = []
+            band_data['band' + str(i)] = []
+
         distances = []
         for di in range(len(data['distances'])):
             distances += data['distances'][di]
             energy_data = data['energy'][di][str(Spin.up)]
             for bi in range(len(energy_data)):
-                band_data[bi].append(energy_data[bi])
-        band_data['d'] = distances
+                band_data['band' + str(bi)] += energy_data[bi]
+        band_data['distances'] = distances
         import pandas as pd
-        df = pd.DataFrame(band_data)
+        df = pd.DataFrame(band_data).set_index('distances')
         df.to_csv('band_structure.csv')
 
 
@@ -346,6 +348,8 @@ def main_run():
             doslim = [float(doslim[0]), float(doslim[1])]
             dosmin = min(doslim)
             dosmax = max(doslim)
+        elif '-nb=' in argv:
+            
 
         """
         old version method to get elt order
@@ -374,7 +378,7 @@ def main_run():
         plt.tight_layout()
 
         cms_band.save_band_data(color=False)
-        cms_band.save_band_structure()
+        #cms_band.save_band_structure()
         
         if "n" not in sys.argv:
             plt.show()
