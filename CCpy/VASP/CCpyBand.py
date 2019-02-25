@@ -98,7 +98,7 @@ class CMSBand():
                
         return plt
 
-    def colorBand(self, miny=None, maxy=None, elt_ordered=None, color_order=['g','b','r'], line_width=3):
+    def colorBand(self, band_indices, miny=None, maxy=None, elt_ordered=None, color_order=['g','b','r'], line_width=3):
         bands = self.bands
         plotter = BSPlotterProjected(bands)
         self.plotter = plotter
@@ -121,7 +121,7 @@ class CMSBand():
         else:
             self.elt_ordered = elt_ordered
             import matplotlib.pyplot as plt
-            plotter.get_elt_projected_plots_color(zero_to_efermi=True, elt_ordered=elt_ordered, line_width=line_width, color_order=color_order)
+            plotter.get_elt_projected_plots_color(band_indices, zero_to_efermi=True, elt_ordered=elt_ordered, line_width=line_width, color_order=color_order)
             plt.axhline(y=0, lw=1, ls=':', color='gray')
             plt.tick_params(labelsize=15)
 
@@ -371,9 +371,9 @@ def main_run():
     # -- blue band
     elif sys.argv[1] == "1":
         fig = plt.figure(figsize=(6, 10))
+        cms_band = CMSBand(fig=fig)
 
         band_indices = False
-        cms_band = CMSBand(fig=fig)
         for argv in sys.argv:
             if '-nb' in argv:
                 from CCpy.Tools.CCpyTools import input_num_parser
@@ -395,7 +395,16 @@ def main_run():
         fig = plt.figure(figsize=(6, 10))
 
         cms_band = CMSBand(elt_projected=True, fig=fig)
-        plt = cms_band.colorBand(miny=miny, maxy=maxy, elt_ordered=elt_ordered, line_width=line_width, color_order=color_order)
+
+        band_indices = False
+        for argv in sys.argv:
+            if '-nb' in argv:
+                from CCpy.Tools.CCpyTools import input_num_parser
+                nb_bands = cms_band.bands.nb_bands
+                print("Total number of bands: ", nb_bands)
+                band_indices = input_num_parser(nb_bands)
+
+        plt = cms_band.colorBand(band_indices, miny=miny, maxy=maxy, elt_ordered=elt_ordered, line_width=line_width, color_order=color_order)
         plt.tight_layout()
 
         cms_band.save_band_data(color=True)

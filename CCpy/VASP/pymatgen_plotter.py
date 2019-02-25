@@ -28,9 +28,12 @@ DosPlotter
     get_plot
 BSPlotter
     bs_plot_data : zero energy
-    get_plot
-BSPlotterProjected
-
+    get_plot (band numb plot add)
+    get_site_projected_plot
+    get_contrib_projected_plot
+BSPlotterProjected    
+    get_elt_projected_plots_color : custom color order
+    get_elt_projected_plots_color_spin
 
 """
 
@@ -582,7 +585,8 @@ class BSPlotter(object):
                       "smooth_tol.\nCurrent smooth_tol is {s}."
 
             for d in range(len(data['distances'])):
-                for i in range(self._nb_bands):
+                # for i in range(self._nb_bands):
+                for i in range(band_indices):
                     tck = scint.splrep(
                         data['distances'][d],
                         [data['energy'][d][str(Spin.up)][i][j]
@@ -1235,7 +1239,7 @@ class BSPlotterProjected(BSPlotter):
 
         return plt
 
-    def get_elt_projected_plots_color(self, zero_to_efermi=True, line_width=3,
+    def get_elt_projected_plots_color(self, band_indices, zero_to_efermi=True, line_width=3,
                                       elt_ordered=None, color_order=['g','b','r']):
         """
         returns a pylab plot object with one plot where the band structure
@@ -1273,13 +1277,17 @@ class BSPlotterProjected(BSPlotter):
         data = self.bs_plot_data(zero_to_efermi)
         #plt = get_publication_quality_plot(12, 8)
 
+        if not band_indices: ## edit
+            band_indices = range(self._nb_bands)
+
         spins = [Spin.up]
         if self._bs.is_spin_polarized:
             spins = [Spin.up, Spin.down]
         self._maketicks(plt)
         for s in spins:
             for b in range(len(data['distances'])):
-                for i in range(self._nb_bands):
+                # for i in range(self._nb_bands):
+                for i in band_indices:  ## edit
                     for j in range(len(data['energy'][b][str(s)][i]) - 1):
                         sum_e = 0.0
                         for el in elt_ordered:
