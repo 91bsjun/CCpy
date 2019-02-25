@@ -510,7 +510,7 @@ class BSPlotter(object):
                                                         bg['energy'])
                 if not self._bs.is_metal() else ""}
 
-    def get_plot(self, zero_to_efermi=True, ylim=None, smooth=False,
+    def get_plot(self, band_indices, zero_to_efermi=True, ylim=None, smooth=False,
                  vbm_cbm_marker=False,smooth_tol=None, line_width=3):
         """
         Get a matplotlib object for the bandstructure plot.
@@ -550,9 +550,13 @@ class BSPlotter(object):
 
         data = self.bs_plot_data(zero_to_efermi)
 
+        if not band_indices: ## edit
+            band_indices = range(self._nb_bands)
+
         if not smooth:
             for d in range(len(data['distances'])):
-                for i in range(self._nb_bands):
+                # for i in range(self._nb_bands):  ## edit
+                for i in band_indices:
                     plt.plot(data['distances'][d],
                              [data['energy'][d][str(Spin.up)][i][j]
                               for j in range(len(data['distances'][d]))], color='b',

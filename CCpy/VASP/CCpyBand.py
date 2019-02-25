@@ -86,7 +86,7 @@ class CMSBand():
         self.fig = fig
         
 
-    def blueBand(self, miny=None,maxy=None,line_width=3):
+    def blueBand(self, band_indices, miny=None, maxy=None, line_width=3):
         bands = self.bands        
         plotter = BSPlotter(bands)
         self.plotter = plotter
@@ -348,8 +348,7 @@ def main_run():
             doslim = [float(doslim[0]), float(doslim[1])]
             dosmin = min(doslim)
             dosmax = max(doslim)
-        elif '-nb=' in argv:
-            
+
 
         """
         old version method to get elt order
@@ -373,8 +372,15 @@ def main_run():
     elif sys.argv[1] == "1":
         fig = plt.figure(figsize=(6, 10))
 
+        band_indices = False
         cms_band = CMSBand(fig=fig)
-        plt = cms_band.blueBand(miny=miny, maxy=maxy, line_width=line_width)
+        for argv in sys.argv:
+            if '-nb=' in argv:
+                from CCpy.CCpyTools import input_num_parser
+                nb_bands = cms_band.bands.nb_bands
+                band_indices = input_num_parser(nb_bands)
+
+        plt = cms_band.blueBand(miny=miny, maxy=maxy, line_width=line_width, band_indices=band_indices)
         plt.tight_layout()
 
         cms_band.save_band_data(color=False)
