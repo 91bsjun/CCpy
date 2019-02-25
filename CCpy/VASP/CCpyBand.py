@@ -280,22 +280,31 @@ class CMSBand():
 
         band_data = {}
         for i in range(nb_bands):
-            band_data['band' + str(i)] = []
+            band_data['band' + str(i+1)] = []
 
         distances = []
+        critical_distances = []
         for di in range(len(data['distances'])):
             distances += data['distances'][di]
+            critical_distances.append(data['distances'][di][0])
             energy_data = data['energy'][di][str(Spin.up)]
             for bi in range(len(energy_data)):
-                band_data['band' + str(bi)] += energy_data[bi]
+                band_data['band' + str(bi+1)] += energy_data[bi]
+        critical_distances.append(data['distances'][di][-1])
         band_data['distances'] = distances
         import pandas as pd
         df = pd.DataFrame(band_data).set_index('distances')
         df.to_csv('band_structure.csv')
 
+        kpts_labels = list(self.bands.labels_dict.keys())
+        kpts_labels.append(kpts_labels[0])
+        f = open('band_structure_x-point.csv', 'w')
+        f.write('distance,label\n')
+        for i in range(len(critical_distances)):
+            f.write("%f,%s\n" % (float(critical_distances[i]), kpts_labels[i]))
+        f.close()
 
-
-
+        print("* Save raw band structure data: band_structure.csv")
 
 
 def save_pickle_data(name=None, obj=None):
@@ -387,7 +396,7 @@ def main_run():
         plt.tight_layout()
 
         cms_band.save_band_data(color=False)
-        #cms_band.save_band_structure()
+        cms_band.save_band_structure()
         
         if "n" not in sys.argv:
             plt.show()
@@ -411,6 +420,7 @@ def main_run():
         plt.tight_layout()
 
         cms_band.save_band_data(color=True)
+        cms_band.save_band_structure()
         
         if "n" not in sys.argv:
             plt.show()
