@@ -3,6 +3,7 @@
 import os, sys
 import subprocess
 
+import numpy as np
 import matplotlib.pyplot as plt
 
 from pymatgen.io.vasp.outputs import Vasprun
@@ -378,8 +379,9 @@ def main_run():
             if '-nb' in argv:
                 from CCpy.Tools.CCpyTools import input_num_parser
                 nb_bands = cms_band.bands.nb_bands
-                print("Total number of bands: ", nb_bands)
+                print("\nTotal number of bands: ", nb_bands)
                 band_indices = input_num_parser(nb_bands)
+                band_indices = list(np.array(band_indices) - 1)
 
         plt = cms_band.blueBand(miny=miny, maxy=maxy, line_width=line_width, band_indices=band_indices)
         plt.tight_layout()
@@ -401,8 +403,9 @@ def main_run():
             if '-nb' in argv:
                 from CCpy.Tools.CCpyTools import input_num_parser
                 nb_bands = cms_band.bands.nb_bands
-                print("Total number of bands: ", nb_bands)
+                print("\nTotal number of bands: ", nb_bands)
                 band_indices = input_num_parser(nb_bands)
+                band_indices = list(np.array(band_indices) - 1)
 
         plt = cms_band.colorBand(band_indices, miny=miny, maxy=maxy, elt_ordered=elt_ordered, line_width=line_width, color_order=color_order)
         plt.tight_layout()
@@ -525,6 +528,8 @@ Usage : cms_band [option] [sub_option1] [sub_option2]...
       
 -lw=         : Set line width of figure (default: 3)
               (ex: CCpyBand.py 2 -lw=5)
+
+-nb          : choose number of bands to plot
               
 up/down      : if spin polarized calculation / option 5
               (ex: CCpyBand.py 5 -ylim=4,4 down)
