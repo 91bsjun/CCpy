@@ -69,6 +69,7 @@ future things
 
 colors = ["#0100FF", "#FF0000", "#47C83E", "#FF9933", "#8041D9", "#000000", "#C4B73B", "#00D8FF",
           "#FF00DD", "#003399", "#980000", "#22741C", "#664B00", "#2A0066", "#005766", "#660058"]
+colors = ['blue', 'red', 'green', 'darkorange', 'purple', 'black', 'olive', 'maroon', 'darkblue', 'magenta', 'cyan', 'lime']
 markers = ['o', 's', 'D', '^', 'v'] * 3
 
 def get_vaspruns():
