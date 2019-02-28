@@ -594,6 +594,15 @@ def formula_encoder(formula):
 
     return encoded_formula
 
+def header_printer(msg, total_len=30):
+    dec = total_len - len(msg)
+    dec = int(dec / 2)
+    dec1 = "\n# " + "-" * (dec) + " "
+    if len(msg) % 2 == 1:
+        dec += 1
+    dec2 = " " + "-" * (dec) + " #"
+
+    return dec1 + msg + dec2
 
 def ssh_command(servername,portnum,username,password,msg):
     command = "sshpass -p \""+password+"\" ssh -p "+portnum+" "+username+"@"+servername+" \""+msg+"\""
