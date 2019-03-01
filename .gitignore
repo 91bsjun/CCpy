@@ -13,3 +13,6 @@ CCpy.egg-info
 *.pyc
 *.xml
 .idea/CCpy.iml
+.idea/CCpy.iml
+.idea/misc.xml
+.idea/workspace.xml
