@@ -586,7 +586,7 @@ class BSPlotter(object):
 
             for d in range(len(data['distances'])):
                 # for i in range(self._nb_bands):
-                for i in range(band_indices):
+                for i in band_indices:
                     tck = scint.splrep(
                         data['distances'][d],
                         [data['energy'][d][str(Spin.up)][i][j]
