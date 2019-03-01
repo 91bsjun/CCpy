@@ -4,6 +4,7 @@ from collections import OrderedDict
 from pymatgen.core.structure import IStructure
 
 from CCpy.SIESTA.SIESTAio import SIESTARelaxset, SIESTAMDset
+from CCpy.Tools.CCpyTools import selectInputs
 from CCpy.Tools.CCpyTools import header_printer as header
 
 
@@ -34,6 +35,9 @@ except:
     
     ex) CCpySIESTAInputGen.py 2 -spin -kp=4,4,1 -type=Nose -iT=1000 -fT=1000 -ts=1 -ms=5000
 ''')
+    quit()
+
+potential_dirpath = '/home/shared/SIESTA_POT/'
 
 single_point = False
 spin = False
@@ -42,8 +46,9 @@ init_T = None
 final_T = None
 timestep = 2
 max_timestep = None
+run_type = 'CG'
 
-user_opiton = OrderedDict({})
+user_option = OrderedDict({})
 for arg in sys.argv:
     if "-sp" == arg:
         single_point=True
@@ -51,6 +56,9 @@ for arg in sys.argv:
         user_opiton['SpinPolarized'] = '.true.'
     elif "-kp" in arg:
         kpoints = arg.split("=")[1].split(",")
+    elif "-type" in arg:
+        run_type = arg.split("=")[1]
+        user_option['MD.TypeOfRun'] = run_type
     elif "-iT" in arg:
         init_T = int(arg.split("=")[1])
     elif "-fT" in arg:
@@ -86,6 +94,7 @@ if sys.argv[1] == "1":
         mkdir(name)
         os.chdir(name)
         input_set = SIESTARelaxset(structure, name, user_calc_option=user_opiton, in_kpt=kpoints)
+        input_set.write_input(filename=name+".fdf", potential_dirpath=potential_dirpath)
         os.chdir("../")
 elif sys.argv[1] == "2":
     input_marker = [".cif", "POSCAR", "CONTCAR"]
@@ -106,5 +115,6 @@ elif sys.argv[1] == "2":
         structure = IStructure.from_file(each_input)
         mkdir(name)
         os.chdir(name)
-        input_set = SIESTAMDset(structure, name, user_calc_option=user_opiton, in_kpt=kpoints)
+        input_set = SIESTAMDset(structure, name, run_type, init_T, final_T, max_timestep, user_calc_option=user_option, in_kpt=kpoints)
+        input_set.write_input(filename=name+".fdf", potential_dirpath=potential_dirpath)
         os.chdir("../")

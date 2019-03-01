@@ -92,36 +92,61 @@ def Analyze_VASP_MD(args):
     :return:
     """
     vasprun_dirs = []
+    siesta_outs = []
     for i in range(args.runs_start, args.runs_end + 1):
         ii = "%02d" % i
         iii = "%03d" % i
-        if os.path.exists(os.path.join(args.folder_feature + str(ii), 'vasprun.xml.gz')):
-            vasprun_dirs.append(os.path.join(args.folder_feature + str(ii), 'vasprun.xml.gz'))
-        elif os.path.exists(os.path.join(args.folder_feature + str(ii), 'vasprun.xml')):
-            vasprun_dirs.append(os.path.join(args.folder_feature + str(ii), 'vasprun.xml'))
-        elif os.path.exists(os.path.join(args.folder_feature + str(iii), 'vasprun.xml.gz')):
-            vasprun_dirs.append(os.path.join(args.folder_feature + str(iii), 'vasprun.xml.gz'))
-        elif os.path.exists(os.path.join(args.folder_feature + str(iii), 'vasprun.xml')):
-            vasprun_dirs.append(os.path.join(args.folder_feature + str(iii), 'vasprun.xml'))
-        else:
-            raise Exception("No vasprun.xml or vasprun.xml.gz in folder {}".
-                            format(args.folder_feature + str(i)))
+        if args.siesta:
+            if os.path.exists(os.path.join(args.folder_feature + str(ii), 'siesta.out.gz')):
+                siesta_outs.append(os.path.join(args.folder_feature + str(ii), 'siesta.out.gz'))
+            elif os.path.exists(os.path.join(args.folder_feature + str(ii), 'siesta.out')):
+                siesta_outs.append(os.path.join(args.folder_feature + str(ii), 'siesta.out'))
+            elif os.path.exists(os.path.join(args.folder_feature + str(iii), 'siesta.out.gz')):
+                siesta_outs.append(os.path.join(args.folder_feature + str(iii), 'siesta.out.gz'))
+            elif os.path.exists(os.path.join(args.folder_feature + str(iii), 'siesta.out')):
+                siesta_outs.append(os.path.join(args.folder_feature + str(iii), 'siesta.out'))
+            else:
+                raise Exception("No siesta.out or siesta.out.gz in folder {}".
+				format(args.folder_feature + str(i)))
+        else:    
+            if os.path.exists(os.path.join(args.folder_feature + str(ii), 'vasprun.xml.gz')):
+                vasprun_dirs.append(os.path.join(args.folder_feature + str(ii), 'vasprun.xml.gz'))
+            elif os.path.exists(os.path.join(args.folder_feature + str(ii), 'vasprun.xml')):
+                vasprun_dirs.append(os.path.join(args.folder_feature + str(ii), 'vasprun.xml'))
+            elif os.path.exists(os.path.join(args.folder_feature + str(iii), 'vasprun.xml.gz')):
+                vasprun_dirs.append(os.path.join(args.folder_feature + str(iii), 'vasprun.xml.gz'))
+            elif os.path.exists(os.path.join(args.folder_feature + str(iii), 'vasprun.xml')):
+                vasprun_dirs.append(os.path.join(args.folder_feature + str(iii), 'vasprun.xml'))
+            else:
+                raise Exception("No vasprun.xml or vasprun.xml.gz in folder {}".
+				format(args.folder_feature + str(i)))
 
     # In analyzing Arrhenius relationship, it is required to provide charged specie. To keep consistent, I also
     # require charged specie, even it is not necessary
     specie = Specie.from_string(args.specie)
-    da = DiffusivityAnalyzer.from_files(vasprun_dirs, str(specie.element), step_skip=args.step_skip,
-                                        ncores=args.ncores,
-                                        time_intervals_number=args.time_intervals_number,
-                                        spec_dict={'lower_bound': args.lower_bound_in_a_square \
-                                                                  * args.site_distance \
-                                                                  * args.site_distance,
-                                                   'upper_bound': args.upper_bound,
-                                                   'minimum_msd_diff': args.minimum_msd_diff_in_a_square \
-                                                                       * args.site_distance \
-                                                                       * args.site_distance,
-                                                   }
-                                        )
+    if args.siesta:
+        from CCpy.SIESTA.SIESTAio import SIESTAOutput
+        structures = []
+        for out in siesta_outs:
+            so = SIESTAOutput(out)
+            sts = so.structure_parser()
+            structures += sts
+        da = DiffusivityAnalyzer.from_structures(structures, str(specie.element), args.T, 2, step_skip=args.step_skip)
+        
+
+    else:
+        da = DiffusivityAnalyzer.from_files(vasprun_dirs, str(specie.element), step_skip=args.step_skip,
+	      			            ncores=args.ncores,
+					    time_intervals_number=args.time_intervals_number,
+					    spec_dict={'lower_bound': args.lower_bound_in_a_square \
+								      * args.site_distance \
+								      * args.site_distance,
+						       'upper_bound': args.upper_bound,
+						       'minimum_msd_diff': args.minimum_msd_diff_in_a_square \
+									   * args.site_distance \
+									   * args.site_distance,
+						       }
+					    )
     ea = ErrorAnalysisFromDiffusivityAnalyzer(da, site_distance=args.site_distance)
     if da.diffusivity > 0:  # The linear fitting succeed
         summary_info = ea.get_summary_dict(oxidized_specie=args.specie)
@@ -139,9 +164,14 @@ def Analyze_VASP_MD(args):
 
     # output
     print("=" * 40)
-    print("Used vasprun.xml files")
-    print("Start run: {}, end run: {}".format(vasprun_dirs[0], vasprun_dirs[-1]))
-    print("=" * 40)
+    if args.siesta:
+        print("Used siesta.out files")
+        print("Start run: {}, end run: {}".format(siesta_outs[0], siesta_outs[-1]))
+        print("=" * 40)
+    else:
+        print("Used vasprun.xml files")
+        print("Start run: {}, end run: {}".format(vasprun_dirs[0], vasprun_dirs[-1]))
+        print("=" * 40)
 
     # If drift larger than 3 angstrom, raise warning
     if 'drift_maximum' in summary_info.keys():
@@ -345,6 +375,14 @@ def main():
     parser_diffusivity.add_argument(
         "-n", "--ncores", type=int, default=1,
         help="Number of cores used to do the analysis, default is 1. "
+    )
+    parser_diffusivity.add_argument(
+        "-T", "--temperature", dest="T", type=int, default=None,
+        help="Option to set temperature"
+    )
+    parser_diffusivity.add_argument(
+        "-s", "--siesta",
+        help="Option to use siesta mode"
     )
     parser_diffusivity.set_defaults(
         func=Analyze_VASP_MD

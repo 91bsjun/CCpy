@@ -101,8 +101,6 @@ class SIESTAInput():
                    'MinSCFIterations': 10, 'MaxSCFIterations': 100,
                    'DM.Tolerance': '2.d-3', 'DM.NumberPulay': 8, 'DM.MixingWeight': 0.10}
         options = OrderedDict(options)
-        if spin:
-            options['SpinPolarized'] = '.true.'
         self.calc_options = options
 
         return options
@@ -118,7 +116,7 @@ class SIESTAInput():
 
         return options
 
-    def md_option_part(self, run_type, init_T, final_T, max_time_step, timestep=2):
+    def md_option_part(self, run_type, init_T, final_T, max_timestep, timestep=2):
         """
         timestep (fs)
         """
@@ -127,7 +125,7 @@ class SIESTAInput():
         timestep = '%s fs' % str(timestep)
         options = {'MD.UseSaveXV': '.true.', 'MD.TypeOfRun': run_type,
                    'MD.InitialTemperature': init_T, 'MD.TargetTemperature': final_T,
-                   'MD.Initial.Time.Step': 1, 'MD.Final.Time.Step': max_time_step, 'MD.Length.Time.Step': timestep}
+                   'MD.Initial.Time.Step': 1, 'MD.Final.Time.Step': max_timestep, 'MD.Length.Time.Step': timestep}
         options = OrderedDict(options)
         self.md_options = options
 
@@ -154,7 +152,8 @@ class SIESTAInput():
         return options
 
     def potential_maker(self, potential_dirpath):
-        types_of_specie = self.types_of_specie
+        st = self.input_structure
+        types_of_specie = st.types_of_specie
         for elt in types_of_specie:
             psf = str(elt) + ".psf"
             full_path = potential_dirpath + "/" + psf
@@ -182,18 +181,18 @@ class SIESTARelaxset():
         calc_option.update(relax_option)
 
         output_option = si.output_option_part()
-        calc_option.update(output_option)
-
         sr_option = si.saving_reading_option_part()
-        calc_option.update(sr_option)
-
-        if user_calc_option:
-            calc_option.update(user_calc_option)
+        output_option.update(sr_option)
 
         self.si = si
         self.system_option = system_option
         self.blk_structure_option = blk_structure_option
         self.calc_option = calc_option
+        self.output_option = output_option
+        if user_calc_option:
+            self.user_calc_option = user_calc_option
+        else:
+            self.user_calc_option = None
 
     def update_option(self, option_dict):
         self.calc_option.update(OrderedDict(option_dict))
@@ -201,15 +200,18 @@ class SIESTARelaxset():
     def write_input(self, filename, potential_dirpath):
         f = open(filename, 'w')
         f.close()
-        input_writer(filename, self.system_option)
+        input_writer(filename, self.system_option, "Structure info")
         blk_input_writer(filename, self.blk_structure_option)
-        input_writer(filename, self.calc_option)
+        input_writer(filename, self.calc_option, "Calculation option")
+        input_writer(filename, self.output_option, "Output option")
+        if self.user_calc_option:
+            input_writer(filename, self.user_calc_option, "User option")
         self.si.potential_maker(potential_dirpath)
 
 
 class SIESTAMDset():
     def __init__(self, structure, sys_name, run_type, init_T, final_T,
-                 max_time_step, timestep=2, sys_label=None, user_calc_option=None, in_kpt=None):
+                 max_timestep, timestep=2, sys_label=None, user_calc_option=None, in_kpt=None):
         self.name = sys_name
         if not sys_label:
             sys_label = sys_name
@@ -222,14 +224,12 @@ class SIESTAMDset():
         system_option.update(structure_option)
 
         calc_option = si.calc_option_part()
-        md_option = si.md_option_part(run_type, init_T, final_T, max_time_step, timestep=timestep)
+        md_option = si.md_option_part(run_type, init_T, final_T, max_timestep, timestep=timestep)
         calc_option.update(md_option)
 
         output_option = si.output_option_part()
-        calc_option.update(output_option)
-
         sr_option = si.saving_reading_option_part()
-        calc_option.update(sr_option)
+        output_option.update(sr_option)
 
         if user_calc_option:
             calc_option.update(user_calc_option)
@@ -238,6 +238,7 @@ class SIESTAMDset():
         self.system_option = system_option
         self.blk_structure_option = blk_structure_option
         self.calc_option = calc_option
+        self.output_option = output_option
 
     def update_option(self, option_dict):
         self.calc_option.update(OrderedDict(option_dict))
@@ -245,9 +246,10 @@ class SIESTAMDset():
     def write_input(self, filename, potential_dirpath):
         f = open(filename, 'w')
         f.close()
-        input_writer(filename, self.system_option)
+        input_writer(filename, self.system_option, "Structure info")
         blk_input_writer(filename, self.blk_structure_option)
-        input_writer(filename, self.calc_option)
+        input_writer(filename, self.calc_option, "Calculation info")
+        input_writer(filename, self.output_option, "Output info")
         self.si.potential_maker(potential_dirpath)
 
 
@@ -274,7 +276,8 @@ class SIESTAOutput():
         self.coords_are_cartesian = coords_are_cartesian
 
         # find iteration length
-        iteration_patt = re.compile("Begin CG move")
+        # TODO: better way
+        iteration_patt = re.compile("Begin")
         iteration_len = len(iteration_patt.findall(out))
         self.iteration_len = iteration_len
 
