@@ -1,9 +1,15 @@
 ./build
+build
+./build/*
 ./dist
+./dist/*
+dist
 ./CCpy.egg-info
+CCpy.egg-info
 .idea/
 .idea/*
+.idea
 .idea/workspace.xml
 *.pyc
 *.xml
-.idea/workspace.xml
+.idea/CCpy.iml
