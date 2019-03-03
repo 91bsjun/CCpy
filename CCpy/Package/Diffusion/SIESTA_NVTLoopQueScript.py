@@ -6,10 +6,11 @@ import time
 import pickle
 import numpy as np
 import pandas as pd
-from pymatgen.io.vasp import Vasprun
-from pymatgen.io.vasp.sets import MITMDSet
+
 from pymatgen.core.structure import IStructure
 from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer
+
+from CCpy.SIESTA.SIESTAio import SIESTAMDset, SIESTAOutput
 
 # ---------- CONFIGURATIONS ------------ #
 siesta = "siesta"
@@ -18,6 +19,7 @@ structure_filename = sys.argv[1]
 temp = int(sys.argv[2])
 specie = sys.argv[3]
 
+potential_dirpath = '/home/shared/SIESTA_POT'
 heating_timestep = 2000
 timestep = 1000
 min_step = 50
@@ -79,37 +81,44 @@ def running(temp, pre, crt):
     total_try = 1
     pre_dir = ("run%03d" % pre)
     crt_dir = ("run%03d" % crt)
+    name = structure_filename.replace(".cif", "") + "_" + str(temp) + "K"
+    input_filename = name + ".fdf"
     # -- initiating
     if crt == 0:
         structure = IStructure.from_file("../" + structure_filename)
-        crt_nsw = heating_nsw
-        user_incar["SMASS"] = -1
-        inputset = MITMDSet(structure, 100.0, float(temp), heating_nsw, user_incar_settings=user_incar)
-        inputset.write_input(crt_dir)
+        crt_nsw = heating_timestep
+
+        mkdir(crt_dir)
+        os.chdir(crt_dir)
+        input_set = SIESTAMDset(structure, name, 'Nose', 100, temp, heating_timestep, in_kpt=[1, 1, 1])
+        input_set.write_input(filename=input_filename, potential_dirpath=potential_dirpath)
+        os.chdir("../")
     # -- run
     else:
-        run = Vasprun("%s/vasprun.xml.gz" % pre_dir, parse_dos=False, parse_eigen=False)
-        structure = run.final_structure
-        crt_nsw = nsw
-        #structure = IStructure.from_file("%s/CONTCAR" % pre_dir)
-        user_incar["SMASS"] = 0
-        inputset = MITMDSet(structure, float(temp), float(temp), nsw, user_incar_settings=user_incar)
-        inputset.write_input(crt_dir)
-        os.system("cp %s/WAVECAR %s" % (pre_dir, crt_dir))
+        siesta_out = SIESTAOutput("%s/siesta.out.gz" % pre_dir)
+        siesta_out.structure_parser()
+        structure = siesta_out.final_structure
+        crt_nsw = timestep
+
+        mkdir(crt_dir)
+        os.chdir(crt_dir)
+        input_set = SIESTAMDset(structure, name, 'Nose', 100, temp, heating_timestep, in_kpt=[1, 1, 1])
+        input_set.write_input(filename=input_filename, potential_dirpath=potential_dirpath)
+        os.chdir("../")
     os.chdir(crt_dir)    
-    os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
+    os.system("mpirun -np $NSLOTS %s < %s > siesta.out" % (siesta, input_filename))
     time.sleep(5)
-    os.system("gzip OUTCAR vasprun.xml")
+    os.system("gzip siesta.out")
     write_log("try: %d" % total_try)
     properly_terminated = terminated_check(crt_nsw)
     while not properly_terminated:
         total_try += 1
-        os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
+        os.system("mpirun -np $NSLOTS %s < %s > siesta.out" % (siesta, input_filename))
         time.sleep(5)
-        os.system("gzip OUTCAR vasprun.xml")
+        os.system("gzip siesta.out")
         write_log("try: %d" % total_try)
         properly_terminated = terminated_check(crt_nsw)        
-    os.system("touch vasp.done")    
+    os.system("touch siesta.done")
     os.chdir("../")
 
 
@@ -118,17 +127,18 @@ def write_data(crt):
     # -- Skip initial heating process and stablizing process : set as start_num
     start_num = 1
     if crt >= start_num:
-        vaspruns = []
+        structures = []
         for i in range(start_num, crt + 1):
             dirname = "run%03d" % i
-            vasprun = dirname + "/vasprun.xml.gz"
-            vaspruns.append(vasprun)
+            siesta_out = SIESTAOutput("%s/siesta.out.gz" % dirname)
+            sts = siesta_out.structure_parser()
+            structures.append(sts)
 
         # -- collect all smoothing modes of analyzer
         analyzers = {}
         for mode in [False, 'constant', 'max']:
             try:
-                analyzers[mode] = DiffusionAnalyzer.from_files(vaspruns, specie=specie, smoothed=mode, min_obs=60)
+                analyzers[mode] = DiffusionAnalyzer.from_structures(structures, specie=specie, smoothed=mode, min_obs=60)
             except:
                 analyzers[mode] = None
 
@@ -139,8 +149,8 @@ def write_data(crt):
 
         # -- write data
         f = open("data_%sK.csv" % temp, "a")
-        timestep = (crt - start_num + 1) * nsw * 2 / 1000
-        step_info = "%d,%d," % (crt, timestep)
+        ts = (crt - start_num + 1) * timestep * 2 / 1000
+        step_info = "%d,%d," % (crt, ts)
         f.write(step_info)
         for mode in [False, 'constant', 'max']:
             if analyzers[mode] == None:
@@ -160,7 +170,7 @@ def write_diffusivity_data(crt, specie, specie_distance, temp):
     start_num = 1
     chg_data = {"Li": "+", "Na": "+", "K": "+", "Cu": "+"}
     if crt >= start_num:
-        os.system("analyze_aimd.py diffusivity %s%s run 1 %d %.2f -msd msd_%dK.csv >> anal.log" % (specie, chg_data[specie], crt, specie_distance, temp))
+        os.system("analyze_aimd.py diffusivity %s%s run 1 %d %.2f -T %d -msd msd_%dK.csv -siesta>> anal.log" % (specie, chg_data[specie], crt, specie_distance, temp, temp))
     datafilename = "Mo_%dK_data.csv" % temp
     bjunfilename = "bj_%dK_data.csv" % temp
     if datafilename not in os.listdir("./"):
