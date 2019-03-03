@@ -53,7 +53,7 @@ for arg in sys.argv:
     if "-sp" == arg:
         single_point=True
     elif "-spin" in arg:
-        user_opiton['SpinPolarized'] = '.true.'
+        user_option['SpinPolarized'] = '.true.'
     elif "-kp" in arg:
         kpoints = arg.split("=")[1].split(",")
     elif "-type" in arg:
@@ -83,7 +83,7 @@ if sys.argv[1] == "1":
         for o in in_option:
             key = o.split("=")[0]
             val = o.split("=")[1]
-            user_opiton[key] = val
+            user_option[key] = val
 
     for each_input in inputs:
         if '.cif' in each_input:
@@ -93,7 +93,7 @@ if sys.argv[1] == "1":
         structure = IStructure.from_file(each_input)
         mkdir(name)
         os.chdir(name)
-        input_set = SIESTARelaxset(structure, name, user_calc_option=user_opiton, in_kpt=kpoints)
+        input_set = SIESTARelaxset(structure, name, user_calc_option=user_option, in_kpt=kpoints)
         input_set.write_input(filename=name+".fdf", potential_dirpath=potential_dirpath)
         os.chdir("../")
 elif sys.argv[1] == "2":
@@ -105,7 +105,7 @@ elif sys.argv[1] == "2":
         for o in in_option:
             key = o.split("=")[0]
             val = o.split("=")[1]
-            user_opiton[key] = val
+            user_option[key] = val
 
     for each_input in inputs:
         if '.cif' in each_input:
