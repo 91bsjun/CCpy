@@ -543,7 +543,7 @@ casm-calc --run
 #$ -cwd
 
 cd %s
-mpirun -np %s < %s > siesta.out
+mpirun -np $NSLOTS %s < %s > siesta.out
 
         ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, dir_path, self.siesta_path, input_filename)
 
