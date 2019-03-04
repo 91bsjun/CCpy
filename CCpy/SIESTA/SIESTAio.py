@@ -1,6 +1,7 @@
 import os, sys
 import re
 import numpy as np
+import gzip
 from collections import OrderedDict
 
 from pymatgen.core.structure import Structure
@@ -255,7 +256,10 @@ class SIESTAMDset():
 
 class SIESTAOutput():
     def __init__(self, output_filename="siesta.out"):
-        out = open(output_filename, "r").read()
+        if output_filename[-3:] == '.gz':
+            out = gzip.open(output_filename, "rt").read() 
+        else:
+            out = open(output_filename, "r").read()
         self.out = out
         self.out_lines = out.split("\n")
 
