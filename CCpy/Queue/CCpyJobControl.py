@@ -57,6 +57,8 @@ class JobSubmit:
         self.lammps_mpirun_path = "mpirun"
         self.lammps_path = "lmp_g++"
 
+        self.siesta_path = "siesta"
+
         # -- queue settings
         self.pe_request = "#$ -pe mpi_%d %d" % (self.n_of_cpu, self.n_of_cpu)
         self.queue_name = "#$ -q %s" % self.q
@@ -512,6 +514,38 @@ cd $SGE_O_WORKDIR
 casm-calc --run
 
         ''' % (jobname, self.pe_request, self.queue_name, self.node_assign)
+
+        f = open("mpi.sh", "w")
+        f.write(mpi)
+        f.close()
+
+        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl("rm -rf ./mpi.sh", shell=True)
+
+    def siesta(self):
+        input_filename = self.inputfile.split("/")[-1]
+        dir_path = self.inputfile.replace(input_filename, "")
+        jobname = "S" + input_filename.replace(".fdf", "")
+        mpi = '''#!/bin/csh
+# Job name 
+#$ -N %s
+
+# pe request
+%s
+
+# queue name
+%s
+
+# node
+%s
+
+#$ -V
+#$ -cwd
+
+cd %s
+mpirun -np %s < %s > siesta.out
+
+        ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, dir_path, self.siesta_path, input_filename)
 
         f = open("mpi.sh", "w")
         f.write(mpi)

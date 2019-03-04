@@ -8,7 +8,7 @@ from subprocess import call as shl
 import pandas as pd
 
 from CCpy.Queue.CCpyJobControl import JobSubmit as JS
-from CCpy.Tools.CCpyTools import selectInputs, selectVASPInputs
+from CCpy.Tools.CCpyTools import selectInputs, selectVASPInputs, selectSIESTAInput
 from CCpy.Tools.CCpyTools import linux_command as lc
 from CCpy.Tools.CCpyTools import get_ip
 
@@ -248,6 +248,15 @@ class JobInitiator:
         myJS = JS(None, self.queue, self.n_of_cpu, node=self.node)
         myJS.casm_run()
 
+    def siesta(self, sub=False):
+        # --- Collect inputs
+        inputs = selectSIESTAInput("./", ask=ask, sub=sub)
+
+        # --- SUBMIT QUEUE
+        for each_input in inputs:
+            myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
+            myJS.siesta()
+
 if __name__ == "__main__":
     try:
         chk = sys.argv[1]
@@ -263,9 +272,10 @@ if __name__ == "__main__":
     4  : Q-chem
     6  : ATAT
     7  : LAMMPS
-    8  : PBS job display
+    8  : SIESTA
     9  : NVT MD Loop
     10 : CASM VASP job run
+    11 : PBS job display
 
 < Option 2. > Queue
     xeon1, xeon2, xeon3, ...
@@ -395,9 +405,9 @@ if __name__ == "__main__":
     elif sys.argv[1] == "7":
         job_init.lammps()
 
-    ## ------ PBS JOBS DISPLAYER
+    ## ------ SIESTA
     elif sys.argv[1] == "8":
-        job_init.pbs_runner()
+        job_init.siesta(sub=sub)
 
     ## ------ VASP NVT LOOP
     elif sys.argv[1] == "9":
@@ -409,3 +419,7 @@ if __name__ == "__main__":
     ## ------ VASP NVT LOOP
     elif sys.argv[1] == "10":
         job_init.casm_run()
+
+    ## ------ PBS JOBS DISPLAYER
+    elif sys.argv[1] == "11":
+        job_init.pbs_runner()
