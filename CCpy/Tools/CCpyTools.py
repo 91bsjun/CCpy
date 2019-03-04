@@ -430,11 +430,11 @@ def selectVASPBandOutputs(directory_path, ask=True):
     else:
         get_num = "0"
 
+    inputs = []
     try:
         if get_num == "0":
             inputs = all_inputs
         else:
-            inputs = []
             get_num = get_num.split(",")  # 1-4,6-10,11,12
             for i in get_num:
                 if "-" in i:
@@ -482,6 +482,8 @@ def selectSIESTAInput(directory_path, dir_list=None, ask=True, sub=False):
     all_dirs.sort()
     all_inputs = all_dirs
 
+    inputs = input_chooser(all_inputs, ask=ask)
+    '''
     if ask == True:
         for i in range(len(all_inputs)):
             print(str(i + 1) + " : " + all_inputs[i])
@@ -508,7 +510,7 @@ def selectSIESTAInput(directory_path, dir_list=None, ask=True, sub=False):
         print("Unvalid input type.")
         print("ex : 1-3,5-10,11,12,13")
         quit()
-
+    '''
     if len(inputs) == 0:
         print("No available file detected.")
         quit()
