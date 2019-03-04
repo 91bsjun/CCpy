@@ -257,6 +257,17 @@ class JobInitiator:
             myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.siesta()
 
+    def siesta_AIMD_NVT_Loop(self, temp=None, specie="Li"):
+        # --- COLLECT INPUT FILES
+        input_marker = [".cif", "POSCAR", "CONTCAR"]
+        inputs = selectInputs(input_marker, "./", ask=ask)
+        if len(inputs) != 1:
+            print("Only single file available.")
+            quit()
+
+        myJS = JS(inputs[0], self.queue, self.n_of_cpu, node=self.node)
+        myJS.siesta_AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp, specie=specie)
+
 if __name__ == "__main__":
     try:
         chk = sys.argv[1]
@@ -276,6 +287,7 @@ if __name__ == "__main__":
     9  : NVT MD Loop
     10 : CASM VASP job run
     11 : PBS job display
+    12 : SIESTA NVT MD Loop
 
 < Option 2. > Queue
     xeon1, xeon2, xeon3, ...
@@ -423,3 +435,10 @@ if __name__ == "__main__":
     ## ------ PBS JOBS DISPLAYER
     elif sys.argv[1] == "11":
         job_init.pbs_runner()
+
+        ## ------ VASP NVT LOOP
+    elif sys.argv[1] == "12":
+        if not temp:
+            print("Temperature must be assigned. (ex: -T=1000)")
+            quit()
+        job_init.siesta_AIMD_NVT_Loop(temp=temp, specie=specie)

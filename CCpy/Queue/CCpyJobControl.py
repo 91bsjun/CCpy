@@ -462,7 +462,7 @@ cd $SGE_O_WORKDIR
         f.write(script_string)
         f.close()
 
-        jobname = "NVT%s%dK" % (structure_filename.replace(".cif", ""), temp)
+        jobname = "NVT%s_%dK" % (structure_filename.replace(".cif", ""), temp)
 
         mpi = '''#!/bin/csh
 # Job name 
@@ -546,6 +546,45 @@ cd %s
 mpirun -np $NSLOTS %s < %s > siesta.out
 
         ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, dir_path, self.siesta_path, input_filename)
+
+        f = open("mpi.sh", "w")
+        f.write(mpi)
+        f.close()
+
+        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl("rm -rf ./mpi.sh", shell=True)
+
+    def siesta_AIMD_NVT_Loop(self, structure_filename=None, temp=None, specie="Li"):
+        # -- load loop queue script
+        from CCpy.Package.Diffusion.SIESTA_NVTLoopQueScript import NVTLoopQueScriptString
+        script_string = NVTLoopQueScriptString()
+        script_filename = ".AIMDLoop.py"
+        f = open(script_filename, "w")
+        f.write(script_string)
+        f.close()
+
+        jobname = "SNVT%s_%dK" % (structure_filename.replace(".cif", ""), temp)
+
+        mpi = '''#!/bin/csh
+ # Job name 
+ #$ -N %s
+
+ # pe request
+ %s
+
+ # queue name
+ %s
+
+ # node
+ %s
+
+ #$ -V
+ #$ -cwd
+
+
+ %s %s %s %s %s
+ ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.python_path,
+        script_filename, structure_filename, temp, specie)
 
         f = open("mpi.sh", "w")
         f.write(mpi)

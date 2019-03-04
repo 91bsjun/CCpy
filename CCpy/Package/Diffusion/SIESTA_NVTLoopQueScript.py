@@ -1,5 +1,5 @@
-#def NVTLoopQueScriptString():
-#    string = """
+def NVTLoopQueScriptString():
+    string = """
 import os, sys
 import re
 import time
@@ -25,6 +25,8 @@ timestep = 1000
 min_step = 50
 min_RSD = 0.25
 min_ASD = 3
+
+
 # -------------------------------------- #
 
 
@@ -32,10 +34,12 @@ def mkdir(dirname):
     if dirname not in os.listdir("./"):
         os.mkdir(dirname)
 
+
 def write_log(msg):
     f = open("log", "a")
     f.write(msg + "\\n")
     f.close()
+
 
 def terminated_check(timestep):
     tail_mde = os.popen("tail *.MDE").readlines()
@@ -51,6 +55,7 @@ def terminated_check(timestep):
         # -- when previous run was stopped
         else:
             return False
+
 
 def prev_check():
     # -- Checking previous AIMD runs step
@@ -102,10 +107,10 @@ def running(temp, pre, crt):
 
         mkdir(crt_dir)
         os.chdir(crt_dir)
-        input_set = SIESTAMDset(structure, name, 'Nose', 100, temp, heating_timestep, in_kpt=[1, 1, 1])
+        input_set = SIESTAMDset(structure, name, 'Nose', temp, temp, timestep, in_kpt=[1, 1, 1])
         input_set.write_input(filename=input_filename, potential_dirpath=potential_dirpath)
         os.chdir("../")
-    os.chdir(crt_dir)    
+    os.chdir(crt_dir)
     os.system("mpirun -np $NSLOTS %s < %s > siesta.out" % (siesta, input_filename))
     time.sleep(5)
     os.system("gzip siesta.out")
@@ -117,7 +122,7 @@ def running(temp, pre, crt):
         time.sleep(5)
         os.system("gzip siesta.out")
         write_log("try: %d" % total_try)
-        properly_terminated = terminated_check(crt_nsw)        
+        properly_terminated = terminated_check(crt_nsw)
     os.system("touch siesta.done")
     os.chdir("../")
 
@@ -138,7 +143,8 @@ def write_data(crt):
         analyzers = {}
         for mode in [False, 'constant', 'max']:
             try:
-                analyzers[mode] = DiffusionAnalyzer.from_structures(structures, specie=specie, smoothed=mode, min_obs=60)
+                analyzers[mode] = DiffusionAnalyzer.from_structures(structures, specie=specie, smoothed=mode,
+                                                                    min_obs=60)
             except:
                 analyzers[mode] = None
 
@@ -170,7 +176,8 @@ def write_diffusivity_data(crt, specie, specie_distance, temp):
     start_num = 1
     chg_data = {"Li": "+", "Na": "+", "K": "+", "Cu": "+"}
     if crt >= start_num:
-        os.system("analyze_aimd.py diffusivity %s%s run 1 %d %.2f -T %d -msd msd_%dK.csv -siesta>> anal.log" % (specie, chg_data[specie], crt, specie_distance, temp, temp))
+        os.system("analyze_aimd.py diffusivity %s%s run 1 %d %.2f -T %d -msd msd_%dK.csv -siesta>> anal.log" % (
+        specie, chg_data[specie], crt, specie_distance, temp, temp))
     datafilename = "Mo_%dK_data.csv" % temp
     bjunfilename = "bj_%dK_data.csv" % temp
     if datafilename not in os.listdir("./"):
@@ -214,19 +221,20 @@ def write_ASD_data(csvfile):
     # -- run includes index of x
     for i, v in enumerate(y2):
         if i >= avg_range:
-            grp = y2[i-avg_range:i+1]
+            grp = y2[i - avg_range:i + 1]
             run.append(i + x[0])
             avgs.append(grp.mean())
             stds.append(grp.std())
             std_avg.append(grp.std() / grp.mean() * 100)
         else:
-            grp = y2[:i+1]
+            grp = y2[:i + 1]
             run.append(i + x[0])
             avgs.append(grp.mean())
             stds.append(grp.std())
             std_avg.append(grp.std() / grp.mean() * 100)
 
-    data = {'step': run, 'RSD': y1, 'diffusivity': df['diffusivity'], 'diffusivity_err': df['diffusivity_err'], 'ASD': std_avg, 'avg_d': avgs}
+    data = {'step': run, 'RSD': y1, 'diffusivity': df['diffusivity'], 'diffusivity_err': df['diffusivity_err'],
+            'ASD': std_avg, 'avg_d': avgs}
     data_df = pd.DataFrame(data)
     data_df['diffusivity'] = data_df['diffusivity'].map('{:,.12f}'.format)
     data_df['diffusivity_err'] = data_df['diffusivity_err'].map('{:,.12f}'.format)
@@ -236,7 +244,7 @@ def write_ASD_data(csvfile):
 
     new_filename = csvfile.replace("Mo_", "bj_")
     data_df.to_csv(new_filename, index=False)
-    
+
     return std_avg[-1]
 
 
@@ -258,14 +266,14 @@ if __name__ == "__main__":
     sites = structure.sites
     specie_sites = [s for s in sites if str(s.specie) == specie]
     distance = []
-    for specie_site in specie_sites:    
+    for specie_site in specie_sites:
         nbrs = structure.get_neighbors(specie_site, 5)
         nbrs = [nbr for nbr in nbrs if str(nbr[0].specie) == specie]
         for nbr in nbrs:
             distance.append(nbr[1])
     distance = np.array(distance)
     avg_specie_distance = distance.mean()
-    
+
     working_dir = "%dK" % temp
     mkdir(working_dir)
     os.chdir(working_dir)
@@ -278,18 +286,19 @@ if __name__ == "__main__":
         if "data_%sK.csv" % temp in os.listdir("./"):
             os.rename("data_%sK.csv" % temp, "data_%sK.csv~" % temp)
         f = open("data_%sK.csv" % temp, "w")
-        f.write("run step,timestep,diffusivity(F),conductivity(F),diffusivity(c),conductivity(c),diffusivity(m),conductivity(m)\\n")
+        f.write(
+            "run step,timestep,diffusivity(F),conductivity(F),diffusivity(c),conductivity(c),diffusivity(m),conductivity(m)\\n")
         f.close()
     while "loop.done" not in os.listdir("./"):
         pre_step = crt_step - 1
         running(temp, pre_step, crt_step)
         write_data(crt_step)
         RSD, ASD = write_diffusivity_data(crt_step, specie, avg_specie_distance, temp)
-        
+
         converged_check = check_converged(crt_step, RSD, ASD)
         if converged_check:
             os.system("touch loop.done")
 
         crt_step += 1
-#"""
-#    return string
+"""
+    return string
