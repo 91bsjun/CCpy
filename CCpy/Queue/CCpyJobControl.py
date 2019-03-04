@@ -566,24 +566,24 @@ mpirun -np $NSLOTS %s < %s > siesta.out
         jobname = "SNVT%s_%dK" % (structure_filename.replace(".cif", ""), temp)
 
         mpi = '''#!/bin/csh
- # Job name 
- #$ -N %s
+# Job name 
+#$ -N %s
 
- # pe request
- %s
+# pe request
+%s
 
- # queue name
- %s
+# queue name
+%s
 
- # node
- %s
+# node
+%s
 
- #$ -V
- #$ -cwd
+#$ -V
+#$ -cwd
 
 
- %s %s %s %s %s
- ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.python_path,
+%s %s %s %s %s
+''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.python_path,
         script_filename, structure_filename, temp, specie)
 
         f = open("mpi.sh", "w")
