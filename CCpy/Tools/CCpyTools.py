@@ -483,34 +483,6 @@ def selectSIESTAInput(directory_path, dir_list=None, ask=True, sub=False):
     all_inputs = all_dirs
 
     inputs = input_chooser(all_inputs, ask=ask)
-    '''
-    if ask == True:
-        for i in range(len(all_inputs)):
-            print(str(i + 1) + " : " + all_inputs[i])
-        print("0 : All files")
-        get_num = raw_input("Choose file : ")
-    else:
-        get_num = "0"
-
-    try:
-        if get_num == "0":
-            inputs = all_inputs
-        else:
-            inputs = []
-            get_num = get_num.split(",")  # 1-4,6-10,11,12
-            for i in get_num:
-                if "-" in i:
-                    r = i.split("-")
-                    for j in range(int(r[0]), int(r[1]) + 1):
-                        inputs.append(all_inputs[j - 1])
-                else:
-                    i = int(i)
-                    inputs.append(all_inputs[i - 1])
-    except:
-        print("Unvalid input type.")
-        print("ex : 1-3,5-10,11,12,13")
-        quit()
-    '''
     if len(inputs) == 0:
         print("No available file detected.")
         quit()
