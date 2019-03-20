@@ -531,24 +531,28 @@ class ArreheniusAnalyzer(object):
 
     def get_custom_arrhenius_plot(self, color, label, marker, temp, show_room_temp, rng_diffusivity):
         import matplotlib.pyplot as plt
-
+        
         d_2000 = np.power(10, self.slope * 1000./2000. + self.intercept)
         d_500 = np.power(10, self.slope * 1000./500. + self.intercept)
         d_250 = np.power(10, self.slope * 1000./250. + self.intercept)
         d_ext = np.power(10, self.slope * 1000./temp + self.intercept)
 
-        plt.scatter(self.x, self.diffusivities, marker=marker, s=75, linewidth=2, facecolors='w', edgecolors=color, label=label)
+        plt.scatter(self.x, self.diffusivities, marker=marker, s=100, linewidth=2, facecolors='w', edgecolors=color, label=label)
         #plt.scatter(self.x, self.diffusivities, marker=marker, s=50, linewidth=2, facecolors=color, edgecolors=color, label=label)
-        (_, caps, _) = plt.errorbar(self.x, self.diffusivities, yerr=self.diffusivity_errors, fmt='none', color=color, capsize=5)
+        #(_, caps, _) = plt.errorbar(self.x, self.diffusivities, yerr=self.diffusivity_errors, fmt='none', color=color, capsize=5)
+        (_, caps, _) = plt.errorbar(self.x, self.diffusivities, yerr=self.diffusivity_errors, fmt=marker, mfc='w', color=color, capsize=5)
         for cap in caps:
             cap.set_markeredgewidth(2)
         plt.plot([1000./2000., 1000./250.], [d_2000, d_250], ls='--', color=color)
+        print("D at 2000 K: ", d_2000)
+        print("D at 250 K: ", d_250)
 
-        plt.scatter([1000./temp], [d_ext], marker=marker, s=75, linewidths=2, facecolors='w', edgecolors=color) 
-        #plt.scatter([1000./temp], [d_ext], marker=marker, s=50, linewidths=2, facecolors=color, edgecolors=color) 
         d_error_lower = d_ext - rng_diffusivity[0]
         d_error_upper = rng_diffusivity[1] - d_ext
-        (_, caps, _) = plt.errorbar([1000./temp], [d_ext], yerr=[[d_error_lower], [d_error_upper]], fmt='none', color=color, capsize=5)
+        plt.scatter([1000./temp], [d_ext], marker=marker, s=75, linewidths=2, facecolors='w', edgecolors=color) 
+        #plt.scatter([1000./temp], [d_ext], marker=marker, s=50, linewidths=2, facecolors=color, edgecolors=color) 
+        #(_, caps, _) = plt.errorbar([1000./temp], [d_ext], yerr=[[d_error_lower], [d_error_upper]], fmt='none', color=color, capsize=5)
+        (_, caps, _) = plt.errorbar([1000./temp], [d_ext], yerr=[[d_error_lower], [d_error_upper]], fmt=marker, mfc='w', color=color, capsize=5)
         for cap in caps:
             cap.set_markeredgewidth(2)
 

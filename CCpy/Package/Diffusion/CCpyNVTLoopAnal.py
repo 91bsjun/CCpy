@@ -70,7 +70,7 @@ future things
 colors = ["#0100FF", "#FF0000", "#47C83E", "#FF9933", "#8041D9", "#000000", "#C4B73B", "#00D8FF",
           "#FF00DD", "#003399", "#980000", "#22741C", "#664B00", "#2A0066", "#005766", "#660058"]
 colors = ['blue', 'red', 'green', 'darkorange', 'purple', 'black', 'olive', 'maroon', 'darkblue', 'magenta', 'cyan', 'lime']
-markers = ['o', 's', 'D', '^', 'v'] * 3
+markers = ['s', 'o', 'D', '^', 'v'] * 3
 
 def get_vaspruns():
     all_inputs1 = [d + "/vasprun.xml" for d in os.listdir("./") if
@@ -466,6 +466,8 @@ def msd_plotter(csv_files, log):
 def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True):
     from CCpy.Package.Diffusion.aimd.diffusion import ArreheniusAnalyzer
     from pymatgen.core.structure import IStructure
+    import matplotlib as mpl
+    import math
     crt_ymin = 9999
     crt_ymax = -9999
     total_label = []
@@ -477,7 +479,46 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True):
     total_ext_conductivity = []
     total_rng_conductivity_from = []
     total_rng_conductivity_to = []
-    plt.figure(figsize=(8, 6))
+
+    width = 8
+    #golden_ratio = (math.sqrt(5) - 1) / 2
+    #height = int(width * golden_ratio)
+    #print(height)
+
+    mpl.rcParams['axes.linewidth'] = 2
+    mpl.rcParams['lines.markeredgewidth'] = 2
+    mpl.rcParams['lines.linewidth'] = 1.5
+    mpl.rcParams['lines.markersize'] = 15
+
+    mpl.rcParams['xtick.major.width'] = 1.5
+    mpl.rcParams['xtick.major.size'] = width
+
+    mpl.rcParams['xtick.minor.width'] = 1.5
+    mpl.rcParams['xtick.minor.size'] = width / 2
+
+    mpl.rcParams['ytick.major.width'] = 1.5
+    mpl.rcParams['ytick.major.size'] = width
+
+    mpl.rcParams['ytick.minor.width'] = 1.5
+    mpl.rcParams['ytick.minor.size'] = width / 2
+
+    mpl.rcParams["font.family"] = 'Arial'
+
+    plt.figure(figsize=(8, 7), facecolor="w")
+
+    ticksize = int(width * 2.5)
+    plt.xticks(fontsize=ticksize)
+    plt.yticks(fontsize=ticksize)
+
+    ax = plt.gca()
+    ax.set_title(ax.get_title(), size=width * 4)
+    labelsize = int(width * 4)
+    #ax.set_xlabel(ax.get_xlabel(), size=labelsize, fontproperties=prop)
+    ax.set_xlabel(ax.get_xlabel(), size=labelsize)
+    ax.set_ylabel(ax.get_ylabel(), size=labelsize)
+
+
+
     for i in range(len(csv_files)):
         aa = ArreheniusAnalyzer.from_csv(csv_files[i])
         structure = IStructure.from_file(csv_files[i].replace(".csv", ".cif"))
@@ -522,11 +563,19 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True):
     ax = plt.axes()
     ax.set_yscale('log')
 
-    plt.ylabel("D (cm$^2$/s)", fontsize=24)
+    plt.ylabel("Diffusivity (cm$^2$/s)")
+    plt.xlabel("1000/T (K$^{-1}$)")
+    #legend = plt.legend(prop={'size': width * 3}, borderpad=0.5, edgecolor='k', fancybox=False)
+    #legend = plt.legend(prop={'size': width * 2}, fontsize=width*3, edgecolor='k', fancybox=False)
+    legend = plt.legend(fontsize=width*3, edgecolor='k', fancybox=False)
+    legend.get_frame().set_linewidth(2)
+    '''
+    plt.ylabel("Dffusivity (cm$^2$/s)", fontsize=24)
     plt.xlabel("1000/T (K$^{-1}$)", fontsize=24)
     plt.tick_params(axis='both', which='major', labelsize=16)
     #plt.legend(loc=1, prop={'size': 16})
     plt.legend(prop={'size': 16})
+    '''
     plt.tight_layout()
     plt.savefig("arrhenius_fit.png")
     plt.show()
