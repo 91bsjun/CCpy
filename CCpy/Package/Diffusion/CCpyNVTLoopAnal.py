@@ -504,7 +504,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True):
 
     mpl.rcParams["font.family"] = 'Arial'
 
-    plt.figure(figsize=(8, 7), facecolor="w")
+    fig = plt.figure(figsize=(8, 8), facecolor="w")
 
     ticksize = int(width * 2.5)
     plt.xticks(fontsize=ticksize)
@@ -517,7 +517,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True):
     ax.set_xlabel(ax.get_xlabel(), size=labelsize)
     ax.set_ylabel(ax.get_ylabel(), size=labelsize)
 
-
+    ax1 = fig.add_subplot(111)
 
     for i in range(len(csv_files)):
         aa = ArreheniusAnalyzer.from_csv(csv_files[i])
@@ -549,25 +549,34 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True):
         #for cap in caps:
         #    cap.set_markeredgewidth(2)
 
-        ymin, ymax = aa.get_custom_arrhenius_plot(colors[i], label, markers[i], temp, show_room_temp, rng_diffusivity)
+        ymin, ymax = aa.get_custom_arrhenius_plot(ax1, colors[i], label, markers[i], temp, show_room_temp, rng_diffusivity)
         #ymin, ymax = aa.get_custom_arrhenius_plot(colors[i], label, markers[i], temp, show_room_temp)
         crt_ymin = min(crt_ymin, ymin)
         crt_ymax = max(crt_ymax, ymax)
 
     if show_room_temp:
-        plt.xlim(0.75, 3.5)
+        ax1.set_xlim(0.75, 3.5)
     else:
-        plt.xlim(0.75, 2.0)
-    plt.ylim(crt_ymin, crt_ymax)
+        ax1.set_xlim(0.75, 2.0)
+    ax1.set_ylim(crt_ymin, crt_ymax)
 
     ax = plt.axes()
     ax.set_yscale('log')
 
-    plt.ylabel("Diffusivity (cm$^2$/s)")
-    plt.xlabel("1000/T (K$^{-1}$)")
+    ax1.set_ylabel("Diffusivity (cm$^2$/s)")
+    ax1.set_xlabel("1000/T (K$^{-1}$)")
+
+    ax2 = ax1.twiny()
+    temps = np.array([1200, 900, 600, 300])
+    ax1_ticks = 1000. / temps
+    ax2.set_xlim(ax1.get_xlim())
+    ax2.set_xticks(ax1_ticks)
+    ax2.set_xticklabels(temps, fontsize=ticksize)
+    ax2.set_xlabel("T (K)", fontsize=labelsize)
+
     #legend = plt.legend(prop={'size': width * 3}, borderpad=0.5, edgecolor='k', fancybox=False)
     #legend = plt.legend(prop={'size': width * 2}, fontsize=width*3, edgecolor='k', fancybox=False)
-    legend = plt.legend(fontsize=width*3, edgecolor='k', fancybox=False)
+    legend = ax1.legend(fontsize=width*3, edgecolor='k', frameon=False)
     legend.get_frame().set_linewidth(2)
     '''
     plt.ylabel("Dffusivity (cm$^2$/s)", fontsize=24)
