@@ -531,6 +531,8 @@ class ArreheniusAnalyzer(object):
 
     def get_custom_arrhenius_plot(self, plt, color, label, marker, temp, show_room_temp, rng_diffusivity):
         #import matplotlib.pyplot as plt
+        from CCpy.Tools.CCpyTools import formula_encoder_mpl
+        label = formula_encoder_mpl(label)
         
         d_2000 = np.power(10, self.slope * 1000./2000. + self.intercept)
         d_500 = np.power(10, self.slope * 1000./500. + self.intercept)

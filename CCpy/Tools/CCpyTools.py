@@ -630,6 +630,34 @@ def formula_encoder(formula):
 
     return encoded_formula
 
+def formula_encoder_mpl(formula):
+    def to_subs(num):
+        num = str(num)
+        return '$_{%s}$' % num
+
+    atoms = re.compile("[A-Z]{1}[a-z]?\d*[.]?\d*")
+    atoms = atoms.findall(formula)
+
+    s = ""
+    raw_s = ""
+    for a in atoms:     # atoms = ['Li4.5', 'Co2']
+        raw_s += a
+        specie = re.compile("[A-Z]{1}[a-z]?")
+        specie = specie.findall(a)[0]
+        num = a[len(specie):]
+        sub_num = to_subs(num)
+
+        s += specie + sub_num
+
+    number_len = len(formula) - len(raw_s)
+    if number_len != 0:
+        number = formula[:number_len]
+    else:
+        number = ""
+    encoded_formula = number + s
+
+    return encoded_formula
+
 def header_printer(msg, total_len=30):
     dec = total_len - len(msg)
     dec = int(dec / 2)
