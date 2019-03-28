@@ -603,10 +603,12 @@ def get_ip():
             ip = ip.split(":")[1]
             return ip
 
-def progress_bar(total, crt, len_bar):
+def progress_bar(total, crt, len_bar, cmt=None):
     proceeding = int(crt / total * len_bar)
     pgb_msg = "[ %s%s ]" % ("=" * proceeding, " " * (len_bar - proceeding))
-    pgb_msg += " [ " + str(crt).rjust(8) + " / " + str(total).rjust(8) + " ]"
+    pgb_msg += " [ " + str(crt).rjust(8) + " / " + str(total).rjust(8) + " ] "
+    if cmt:
+        pgb_msg += cmt
     sys.stdout.write(pgb_msg)
     sys.stdout.flush()
     sys.stdout.write("\b" * len(pgb_msg))
