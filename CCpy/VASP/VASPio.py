@@ -10,7 +10,7 @@ from CCpy.VASP.VASPtools import vasp_incar_json, vasp_phonon_incar_json, magmom_
 
 from CCpy.Tools.CCpyStructure import PeriodicStructure as PS
 from CCpy.Tools.CCpyStructure import latticeGen
-from CCpy.Tools.CCpyTools import file_writer, linux_command, change_dict_key, save_json, load_json
+from CCpy.Tools.CCpyTools import file_writer, linux_command, change_dict_key, save_json, load_json, progress_bar
 
 from pymatgen.core import IStructure as pmgIS
 from pymatgen.io.vasp import Vasprun
@@ -1200,15 +1200,22 @@ class VASPOutput():
         def gzip_exec(file_list):
             for f in file_list:
                 if f in os.listdir("./"):
+                    fgz = f + ".gz"
+                    if fgz in os.listdir("./"):
+                        os.system("mv %s %s" % (fgz, fgz.replace(".gz", ".1.gz")))
                     os.system("gzip %s" % f)
 
+        total = len(dirs)
+        cnt = 1
+        progress_bar(total, 0, 50)
         for d in dirs:
             os.chdir(d)
-            msg = "  [  " + str(cnt+1).rjust(6) + " / " + str(len(dirs)).rjust(6) + "  ]"
-            msg = "Current directory: " + d.ljust(minimum_length) + msg
-            sys.stdout.write(msg)
-            sys.stdout.flush()
-            sys.stdout.write("\b" * len(msg))
+            progress_bar(total, cnt, 50, cmt=d.ljust(minimum_length))
+            #msg = "  [  " + str(cnt+1).rjust(6) + " / " + str(len(dirs)).rjust(6) + "  ]"
+            #msg = "Current directory: " + d.ljust(minimum_length) + msg
+            #sys.stdout.write(msg)
+            #sys.stdout.flush()
+            #sys.stdout.write("\b" * len(msg))
 
             gzip_exec(['CHG', 'CHGCAR', 'DOSCAR', 'OUTCAR', 'PROCAR', 'vasprun.xml', 'XDATCAR'])
 
