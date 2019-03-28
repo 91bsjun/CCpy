@@ -1210,7 +1210,8 @@ class VASPOutput():
         progress_bar(total, 0, 50)
         for d in dirs:
             os.chdir(d)
-            progress_bar(total, cnt, 50, cmt=d.ljust(minimum_length))
+            cmt = 'Dir: ' + d.ljust(minimum_length)
+            progress_bar(total, cnt, 50, cmt=cmt)
             #msg = "  [  " + str(cnt+1).rjust(6) + " / " + str(len(dirs)).rjust(6) + "  ]"
             #msg = "Current directory: " + d.ljust(minimum_length) + msg
             #sys.stdout.write(msg)
