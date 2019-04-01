@@ -50,6 +50,8 @@ except:
     -specie=Li  : Set specie (default: Li)
                   ex) CCpyNVTLoopAnal.py 3 NaPS.csv -specie=Na
     -T=300      : Set temperature to extrapolate
+    -ns         : Do not show 300 K when arrhenius plot
+    -f          : Set label as chemical formula when arrhenius plot
                   
 
 4   : Plot diffusivity(ies) written by Pymatgen (old version)
@@ -463,7 +465,7 @@ def msd_plotter(csv_files, log):
     plt.savefig("msd.png")
     plt.show()
 
-def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True):
+def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True, formula_label=False):
     from CCpy.Package.Diffusion.aimd.diffusion import ArreheniusAnalyzer
     from pymatgen.core.structure import IStructure
     import matplotlib as mpl
@@ -519,10 +521,13 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True):
 
     ax1 = fig.add_subplot(111)
 
+    from CCpy.Tools.CCpyTools import formula_encoder_mpl
     for i in range(len(csv_files)):
         aa = ArreheniusAnalyzer.from_csv(csv_files[i])
         structure = IStructure.from_file(csv_files[i].replace(".csv", ".cif"))
         label = csv_files[i].replace(".csv", "")
+        if formula_label:
+            label = formula_encoder_mpl(label)
 
         Ea = aa.Ea
         Ea_err = aa.Ea_error
@@ -609,6 +614,7 @@ if __name__ == "__main__":
     specie = "Li"
     temp = 300
     show_temp = True
+    formula_label = False
     for arg in sys.argv:
         if "-m=" in arg:
             mode = arg.split("=")[1]
@@ -626,6 +632,8 @@ if __name__ == "__main__":
             temp = float(arg.split("=")[1])
         if '-ns' in arg:
             show_temp = False
+        if '-f' in arg:
+            formula_label = True
 
 
     # --- Go to main option
@@ -637,7 +645,7 @@ if __name__ == "__main__":
         msd_plotter(files, log)
     elif sys.argv[1] == "3":
         files = get_csvfiles()
-        arrhenius_plotter(files, specie=specie, temp=temp, show_room_temp=show_temp)
+        arrhenius_plotter(files, specie=specie, temp=temp, show_room_temp=show_temp, formula_label=formula_label)
     elif sys.argv[1] == "4":
         files = get_csvfiles()
         plot_diffusivity(mode, files, xaxis)
