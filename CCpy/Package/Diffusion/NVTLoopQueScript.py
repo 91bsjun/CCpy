@@ -130,6 +130,7 @@ def running(temp, pre, crt):
     os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
     time.sleep(5)
     os.system("gzip OUTCAR vasprun.xml")
+    os.system("rm -rf DOSCAR XDATCAR")
     write_log("try: %d" % total_try)
     properly_terminated = terminated_check(crt_nsw)
     while not properly_terminated:
@@ -137,10 +138,12 @@ def running(temp, pre, crt):
         os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
         time.sleep(5)
         os.system("gzip OUTCAR vasprun.xml")
+        os.system("rm -rf DOSCAR XDATCAR")
         write_log("try: %d" % total_try)
         properly_terminated = terminated_check(crt_nsw)        
     os.system("touch vasp.done")    
     os.chdir("../")
+    os.system("rm -rf %s/WAVECAR" % pre_dir)   # remove WAVECAR in previous dir to reduce storage
 
 
 def write_data(crt):
@@ -166,6 +169,7 @@ def write_data(crt):
         if crt % 10 == 0:
             with open("analyzer%03d.pkl" % crt, 'wb') as save_data:
                 pickle.dump(analyzers, save_data)
+        os.system("gzip analyzer%03d.pkl" % crt)
 
         # -- write data
         f = open("data_%sK.csv" % temp, "a")
