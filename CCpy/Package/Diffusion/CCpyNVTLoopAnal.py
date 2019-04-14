@@ -569,7 +569,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True, for
     ax.set_yscale('log')
 
     ax1.set_ylabel("Diffusivity (cm$^2$/s)")
-    ax1.set_xlabel("1000/T (K$^{-1}$)")
+    ax1.set_xlabel("1000/$T$ (K$^{-1}$)")
 
     ax2 = ax1.twiny()
     temps = np.array([1200, 900, 600, 300])
@@ -577,7 +577,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True, for
     ax2.set_xlim(ax1.get_xlim())
     ax2.set_xticks(ax1_ticks)
     ax2.set_xticklabels(temps, fontsize=ticksize)
-    ax2.set_xlabel("T (K)", fontsize=labelsize)
+    ax2.set_xlabel("$T$ (K)", fontsize=labelsize)
 
     #legend = plt.legend(prop={'size': width * 3}, borderpad=0.5, edgecolor='k', fancybox=False)
     #legend = plt.legend(prop={'size': width * 2}, fontsize=width*3, edgecolor='k', fancybox=False)
