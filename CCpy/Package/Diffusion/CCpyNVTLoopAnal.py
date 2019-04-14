@@ -506,7 +506,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True, for
 
     mpl.rcParams["font.family"] = 'Arial'
 
-    fig = plt.figure(figsize=(8, 8), facecolor="w")
+    fig = plt.figure(figsize=(8, 7.5), facecolor="w")
 
     ticksize = int(width * 2.5)
     plt.xticks(fontsize=ticksize)
@@ -591,7 +591,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True, for
     plt.legend(prop={'size': 16})
     '''
     plt.tight_layout()
-    plt.savefig("arrhenius_fit.png")
+    plt.savefig("arrhenius_fit.png", dpi=300)
     plt.show()
 
     data = {'Name': total_label, 'Ea (eV)': total_Ea, 'Ea_err (+/-)': total_Ea_err,
