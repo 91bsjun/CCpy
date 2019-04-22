@@ -166,10 +166,9 @@ def write_data(crt):
                 analyzers[mode] = None
 
         # -- save DiffusionAnalzyer as pickle to plot msd quickly
-        if crt % 10 == 0:
-            with open("analyzer%03d.pkl" % crt, 'wb') as save_data:
-                pickle.dump(analyzers, save_data)
-        os.system("gzip analyzer%03d.pkl" % crt)
+        #if crt % 10 == 0:
+        #    with open("analyzer%03d.pkl" % crt, 'wb') as save_data:
+        #        pickle.dump(analyzers, save_data)
 
         # -- write data
         f = open("data_%sK.csv" % temp, "a")
