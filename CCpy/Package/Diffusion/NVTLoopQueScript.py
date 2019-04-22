@@ -137,13 +137,16 @@ def running(temp, pre, crt):
         total_try += 1
         os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
         time.sleep(5)
-        os.system("gzip OUTCAR vasprun.xml")
+        os.system("gzip vasprun.xml")
         os.system("rm -rf DOSCAR XDATCAR")
         write_log("try: %d" % total_try)
         properly_terminated = terminated_check(crt_nsw)        
     os.system("touch vasp.done")    
     os.chdir("../")
-    os.system("rm -rf %s/WAVECAR" % pre_dir)   # remove WAVECAR in previous dir to reduce storage
+    # -- remove files in previous directory to reduce stroage
+    os.system("rm -rf %s/WAVECAR" % pre_dir)
+    os.system("rm -rf %s/OUTCAR" % pre_dir)
+    os.system("rm -rf %s/PROCAR" % pre_dir)
 
 
 def write_data(crt):
