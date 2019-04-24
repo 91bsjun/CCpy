@@ -27,6 +27,7 @@ except:
 
  1 : Get final structures
     ex) CCpyVASPAnal.py 1
+    ex) CCpyVASPAnal.py 1 -poscar    -> make cif files using POSCAR
 
  2 : Get final total energy list
     ex) CCpyVASPAnal.py 2 n  : sub option n -> do not show plot
@@ -91,7 +92,10 @@ elif sys.argv[1] == "1":
         os.chdir(each_input)
         if "CONTCAR" in os.listdir("./") and os.path.getsize("CONTCAR") != 0:
             VO = VASPOutput()
-            VO.getFinalStructure(path=pwd+"/")
+            if "-poscar" in sys.argv:
+                VO.getFinalStructure(filename="POSCAR", path=pwd+"/")
+            else:
+                VO.getFinalStructure(path=pwd+"/")
             os.chdir("../")
         else:
             print(each_input + ": CONTCAR is empty!")
