@@ -378,7 +378,41 @@ def diffusivity_plotter(csv_files, xaxis):
     total_d_err = []
     total_std = []
 
-    plt.figure(figsize=(8, 6))
+    import matplotlib as mpl
+    width = 8
+    
+    mpl.rcParams['axes.linewidth'] = 2
+    mpl.rcParams['lines.markeredgewidth'] = 2
+    mpl.rcParams['lines.linewidth'] = 1.5
+    mpl.rcParams['lines.markersize'] = 15
+
+    mpl.rcParams['xtick.major.width'] = 1.5
+    mpl.rcParams['xtick.major.size'] = width
+
+    mpl.rcParams['xtick.minor.width'] = 1.5
+    mpl.rcParams['xtick.minor.size'] = width / 2
+
+    mpl.rcParams['ytick.major.width'] = 1.5
+    mpl.rcParams['ytick.major.size'] = width
+
+    mpl.rcParams['ytick.minor.width'] = 1.5
+    mpl.rcParams['ytick.minor.size'] = width / 2
+
+    mpl.rcParams["font.family"] = 'Arial'
+
+    fig = plt.figure(figsize=(8, 7), facecolor="w")
+
+    ticksize = int(width * 2.5)
+    plt.xticks(fontsize=ticksize)
+    plt.yticks(fontsize=ticksize)
+
+    ax = plt.gca()
+    ax.set_title(ax.get_title(), size=width * 4)
+    labelsize = int(width * 4)
+    #ax.set_xlabel(ax.get_xlabel(), size=labelsize, fontproperties=prop)
+    ax.set_xlabel(ax.get_xlabel(), size=labelsize)
+    ax.set_ylabel(ax.get_ylabel(), size=labelsize)
+
     for i, f in enumerate(files):
         # 850K/Mo_850K_data.csv
         # step,std,diffusivity,diffusivity_err
@@ -412,13 +446,15 @@ def diffusivity_plotter(csv_files, xaxis):
     ax = plt.axes()
     ax.set_yscale('log')
     if xaxis == 'r':
-        plt.xlabel("Run step", fontsize=24)
+        plt.xlabel("Run step")
     else:
-        plt.xlabel("Time step (ps)", fontsize=24)
-    plt.ylabel(r"Diffusivity (cm$^2$/s)", fontsize=24)
-    plt.tick_params(axis='both', which='major', labelsize=16)
-    plt.grid()
-    plt.legend(loc=1, prop={'size': 16})
+        plt.xlabel("$t$ (ps)")
+    plt.ylabel(r"Diffusivity (cm$^2$/s)")
+    plt.tick_params(axis='both', which='major')
+    plt.grid(linestyle='--')
+    #plt.legend(loc=1, prop={'size': 16})
+    legend = plt.legend(fontsize=width*3, edgecolor='k', frameon=False)
+    legend.get_frame().set_linewidth(2)
     plt.tight_layout()
     plt.savefig("diffusivity_data.png")
     plt.show()
