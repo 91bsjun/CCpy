@@ -670,6 +670,38 @@ def header_printer(msg, total_len=30):
 
     return dec1 + msg + dec2
 
+def plt_deco(width=8, height=7):
+    import matplotlib as mpl
+    tick_labelsize = int(width * 2.5)
+    axes_labelsize = width * 5        
+
+    mpl.rcParams['axes.linewidth'] = width / 4
+    mpl.rcParams['lines.markeredgewidth'] = width / 4
+    mpl.rcParams['lines.linewidth'] = 1.5 
+    mpl.rcParams['lines.markersize'] = 15
+
+    mpl.rcParams['axes.labelsize'] = width * 4
+    mpl.rcParams['xtick.labelsize'] = tick_labelsize
+    mpl.rcParams['ytick.labelsize'] = tick_labelsize
+
+    mpl.rcParams['xtick.major.width'] = width / 4
+    mpl.rcParams['xtick.major.size'] = width
+
+    mpl.rcParams['xtick.minor.width'] = width / 6
+    mpl.rcParams['xtick.minor.size'] = width / 1.5
+
+    mpl.rcParams['ytick.major.width'] = width / 4
+    mpl.rcParams['ytick.major.size'] = width
+
+    mpl.rcParams['ytick.minor.width'] = width / 6
+    mpl.rcParams['ytick.minor.size'] = width / 1.5
+
+    mpl.rcParams["font.family"] = 'Arial'
+
+    fig = plt.figure(figsize=(width, height), facecolor="w")
+
+    return fig
+
 def ssh_command(servername,portnum,username,password,msg):
     command = "sshpass -p \""+password+"\" ssh -p "+portnum+" "+username+"@"+servername+" \""+msg+"\""
     linux_command(command)
