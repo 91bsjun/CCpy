@@ -528,16 +528,16 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True, for
     mpl.rcParams['lines.linewidth'] = 1.5
     mpl.rcParams['lines.markersize'] = 15
 
-    mpl.rcParams['xtick.major.width'] = 1.5
+    mpl.rcParams['xtick.major.width'] = width / 4
     mpl.rcParams['xtick.major.size'] = width
 
-    mpl.rcParams['xtick.minor.width'] = 1.5
-    mpl.rcParams['xtick.minor.size'] = width / 2
+    mpl.rcParams['xtick.minor.width'] = width / 6
+    mpl.rcParams['xtick.minor.size'] = width / 1.5
 
-    mpl.rcParams['ytick.major.width'] = 1.5
+    mpl.rcParams['ytick.major.width'] = width / 4
     mpl.rcParams['ytick.major.size'] = width
 
-    mpl.rcParams['ytick.minor.width'] = 1.5
+    mpl.rcParams['ytick.minor.width'] = width / 6
     mpl.rcParams['ytick.minor.size'] = width / 2
 
     mpl.rcParams["font.family"] = 'Arial'
@@ -595,11 +595,6 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True, for
         crt_ymin = min(crt_ymin, ymin)
         crt_ymax = max(crt_ymax, ymax)
 
-    if show_room_temp:
-        ax1.set_xlim(0.75, 3.5)
-    else:
-        ax1.set_xlim(0.75, 2.0)
-    ax1.set_ylim(crt_ymin, crt_ymax)
 
     ax = plt.axes()
     ax.set_yscale('log')
@@ -607,8 +602,19 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True, for
     ax1.set_ylabel("Diffusivity (cm$^2$/s)")
     ax1.set_xlabel("1000/$T$ (K$^{-1}$)")
 
+    if show_room_temp:
+        ax1.set_xlim(0.75, 3.5)
+    else:
+        ax1.set_xlim(0.75, 2.0)
+    ax1.set_ylim(crt_ymin, crt_ymax)
+
     ax2 = ax1.twiny()
-    temps = np.array([1200, 900, 600, 300])
+    if show_room_temp:
+        ax1.set_xlim(0.75, 3.5)
+        temps = np.array([1200, 900, 600, 300])
+    else:
+        ax1.set_xlim(0.75, 2.0)
+        temps = np.array([1200, 900, 600])
     ax1_ticks = 1000. / temps
     ax2.set_xlim(ax1.get_xlim())
     ax2.set_xticks(ax1_ticks)
