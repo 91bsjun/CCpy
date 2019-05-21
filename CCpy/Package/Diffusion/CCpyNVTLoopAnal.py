@@ -400,7 +400,7 @@ def diffusivity_plotter(csv_files, xaxis):
 
     mpl.rcParams["font.family"] = 'Arial'
 
-    fig = plt.figure(figsize=(8, 7), facecolor="w")
+    fig = plt.figure(figsize=(8, 6), facecolor="w")
 
     ticksize = int(width * 2.5)
     plt.xticks(fontsize=ticksize)

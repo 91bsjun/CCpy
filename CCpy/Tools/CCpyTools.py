@@ -672,6 +672,7 @@ def header_printer(msg, total_len=30):
 
 def plt_deco(width=8, height=7):
     import matplotlib as mpl
+    import matplotlib.pyplot as plt
     tick_labelsize = int(width * 2.5)
     axes_labelsize = width * 5        
 
