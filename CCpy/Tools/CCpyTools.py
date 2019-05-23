@@ -492,7 +492,7 @@ def selectSIESTAInput(directory_path, dir_list=None, ask=True, sub=False):
 
     return full_path_inputs
 
-def input_chooser(all_inputs, ask=False):
+def input_chooser(all_inputs, ask=True):
     if ask == True:
         for i in range(len(all_inputs)):
             print(str(i + 1) + " : " + all_inputs[i])
