@@ -90,10 +90,10 @@ elif sys.argv[1] == "1":
     pwd = os.getcwd()
     for each_input in inputs:
         os.chdir(each_input)
+        VO = VASPOutput()
         if "-poscar" in sys.argv:
-	    VO.getFinalStructure(filename="POSCAR", path=pwd+"/")
+            VO.getFinalStructure(filename="POSCAR", path=pwd+"/")
         elif "CONTCAR" in os.listdir("./") and os.path.getsize("CONTCAR") != 0:
-            VO = VASPOutput()
             VO.getFinalStructure(path=pwd+"/")
         else:
             print(each_input + ": CONTCAR is empty!")
