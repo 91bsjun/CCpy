@@ -697,6 +697,9 @@ def plt_deco(width=8, height=6.5):
     mpl.rcParams['ytick.minor.width'] = width / 6
     mpl.rcParams['ytick.minor.size'] = width / 1.5
 
+    mpl.rcParams['lines.linewidth'] = width / 3
+    mpl.rcParams['lines.markersize'] = width * 1.5
+
     mpl.rcParams['legend.fontsize'] = width * 3
     mpl.rcParams['legend.frameon'] = False
 
