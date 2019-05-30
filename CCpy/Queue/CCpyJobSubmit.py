@@ -336,9 +336,11 @@ if __name__ == "__main__":
 
     -loop           : run VASP jobs until converged. (error will be handled using custodian library in pymatgen)
                       ex) CCpyJobSubmit.py 2 xeon5 -loop
+                      very careful when use this option
 
     <Options for ATK version handling>
     -atk2018        : ex) CCpyJobSubmit.py 3 xeon4 -atk2018  
+    -atk2019
 
     Since the default version is 2017, you do not need to mention it when you want to use the 2017 version.
 
@@ -377,6 +379,8 @@ if __name__ == "__main__":
             ask = False
         if '-atk2018' in s:
             atk_version = 'atk2018'
+        if '-atk2019' in s:
+            atk_version = 'atk2019'
         if '-T=' in s:
             temp = int(s.split("=")[1])
         if '-sub' in s:
