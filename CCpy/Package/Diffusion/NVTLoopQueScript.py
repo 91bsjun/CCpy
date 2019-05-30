@@ -12,16 +12,17 @@ from pymatgen.core.structure import IStructure
 from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer
 
 # ---------- CONFIGURATIONS ------------ #
+structure_filename = sys.argv[1]
+temp = int(sys.argv[2])
+specie = sys.argv[3]
+structure = IStructure.from_file(structure_filename)
+
 vasp = "vasp"
 NCORE = 4
 #user_incar = {"NCORE": NCORE, "ENCUT": 400, "LREAL": "Auto", "PREC": "Normal", "ALGO": "Fast", "EDIFF": 1E-05, "ICHARG": 0, "IALGO": 48}
 #user_incar = {"NCORE": NCORE, "PREC": "Normal", "ALGO": "Fast", "ICHARG": 0}
 #user_incar = {"NCORE": NCORE, "ICHARG": 0, "ISIF": 2, "MDALGO": 3, "LANGEVIN_GAMMA": [10] * structure.ntypesp, "LANGEVIN_GAMMA_L": 1}   # Langevin NVT
 user_incar = {"NCORE": NCORE, "ICHARG": 0}
-
-structure_filename = sys.argv[1]
-temp = int(sys.argv[2])
-specie = sys.argv[3]
 
 heating_nsw = 2000
 nsw = 1000
