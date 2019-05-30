@@ -53,6 +53,7 @@ class JobSubmit:
 
         self.atk2017 = "/opt/QuantumWise/VNL-ATK-2017.2/bin/atkpython"
         self.atk2018 = "/opt/QuantumWise/VNL-ATK-2018.06/bin/atkpython"
+        self.atk2019 = "/opt/QuantumWise/VNL-ATK-2019.03/bin/atkpython"
 
         self.lammps_mpirun_path = "mpirun"
         self.lammps_path = "lmp_g++"
@@ -283,6 +284,8 @@ qchem %s %s
     def ATK(self, atk_version="atk2017"):
         if atk_version == "atk2018":
             atk_path = self.atk2018
+        elif atk_version == "atk2019":
+            atk_path = self.atk2019
         else:
             atk_path = self.atk2017
 
