@@ -12,6 +12,8 @@ warnings.filterwarnings("ignore")
 
 from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer, fit_arrhenius, get_arrhenius_plot, get_extrapolated_conductivity, get_extrapolated_diffusivity
 
+from CCpy.Tools.CCpyTools import plt_deco
+
 version = sys.version
 if version[0] == '3':
     raw_input = input
@@ -378,40 +380,7 @@ def diffusivity_plotter(csv_files, xaxis):
     total_d_err = []
     total_std = []
 
-    import matplotlib as mpl
-    width = 8
-    
-    mpl.rcParams['axes.linewidth'] = 2
-    mpl.rcParams['lines.markeredgewidth'] = 2
-    mpl.rcParams['lines.linewidth'] = 1.5
-    mpl.rcParams['lines.markersize'] = 15
-
-    mpl.rcParams['xtick.major.width'] = 1.5
-    mpl.rcParams['xtick.major.size'] = width
-
-    mpl.rcParams['xtick.minor.width'] = 1.5
-    mpl.rcParams['xtick.minor.size'] = width / 2
-
-    mpl.rcParams['ytick.major.width'] = 1.5
-    mpl.rcParams['ytick.major.size'] = width
-
-    mpl.rcParams['ytick.minor.width'] = 1.5
-    mpl.rcParams['ytick.minor.size'] = width / 2
-
-    mpl.rcParams["font.family"] = 'Arial'
-
-    fig = plt.figure(figsize=(8, 6.5), facecolor="w")
-
-    ticksize = int(width * 2.5)
-    plt.xticks(fontsize=ticksize)
-    plt.yticks(fontsize=ticksize)
-
-    ax = plt.gca()
-    ax.set_title(ax.get_title(), size=width * 4)
-    labelsize = int(width * 4)
-    #ax.set_xlabel(ax.get_xlabel(), size=labelsize, fontproperties=prop)
-    ax.set_xlabel(ax.get_xlabel(), size=labelsize)
-    ax.set_ylabel(ax.get_ylabel(), size=labelsize)
+    fig = plt_deco(8, 6.5)
 
     for i, f in enumerate(files):
         # 850K/Mo_850K_data.csv
@@ -440,7 +409,7 @@ def diffusivity_plotter(csv_files, xaxis):
         total_std.append(str("%.4f" % RSD[-1]))
 
         #plt.plot(runstep, d, marker='o', ms='3', color=colors[i], label=label)
-        plt.plot(x, d, color=colors[i], lw=2, label=label)
+        plt.plot(x, d, color=colors[i], label=label)
         plt.fill_between(x, d_err_up, d_err_dn, facecolor=colors[i], alpha=0.3)
 
     ax = plt.axes()
@@ -452,9 +421,9 @@ def diffusivity_plotter(csv_files, xaxis):
     plt.ylabel(r"Diffusivity (cm$^2$/s)")
     plt.tick_params(axis='both', which='major')
     plt.grid(linestyle='--')
-    #plt.legend(loc=1, prop={'size': 16})
-    legend = plt.legend(fontsize=width*3, edgecolor='k', frameon=False)
-    legend.get_frame().set_linewidth(2)
+    plt.legend()
+    #legend = plt.legend(fontsize=width*3, edgecolor='k', frameon=False)
+    #legend.get_frame().set_linewidth(2)
     plt.tight_layout()
     plt.savefig("diffusivity_data.png")
     plt.show()
