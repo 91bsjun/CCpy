@@ -90,15 +90,14 @@ elif sys.argv[1] == "1":
     pwd = os.getcwd()
     for each_input in inputs:
         os.chdir(each_input)
-        if "CONTCAR" in os.listdir("./") and os.path.getsize("CONTCAR") != 0:
+        if "-poscar" in sys.argv:
+	    VO.getFinalStructure(filename="POSCAR", path=pwd+"/")
+        elif "CONTCAR" in os.listdir("./") and os.path.getsize("CONTCAR") != 0:
             VO = VASPOutput()
-            if "-poscar" in sys.argv:
-                VO.getFinalStructure(filename="POSCAR", path=pwd+"/")
-            else:
-                VO.getFinalStructure(path=pwd+"/")
-            os.chdir("../")
+            VO.getFinalStructure(path=pwd+"/")
         else:
             print(each_input + ": CONTCAR is empty!")
+        os.chdir("../")
 
 elif sys.argv[1] == "2":
     show_plot = True
