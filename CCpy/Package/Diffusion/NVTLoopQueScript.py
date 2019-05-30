@@ -26,6 +26,7 @@ nsw = 1000
 min_step = 50
 min_RSD = 0.25
 min_ASD = 7
+max_step = 300
 # -------------------------------------- #
 
 # INCAR
@@ -272,7 +273,7 @@ def check_converged(crt_step, RSD, ASD):
         if RSD <= min_RSD:
             if ASD <= min_ASD:
                 converged = True
-    if crt_step >= 300:
+    if crt_step >= max_step:
         converged = True
 
     return converged
