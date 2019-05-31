@@ -21,8 +21,8 @@ vasp = "vasp"
 NCORE = 4
 #user_incar = {"NCORE": NCORE, "ENCUT": 400, "LREAL": "Auto", "PREC": "Normal", "ALGO": "Fast", "EDIFF": 1E-05, "ICHARG": 0, "IALGO": 48}
 #user_incar = {"NCORE": NCORE, "PREC": "Normal", "ALGO": "Fast", "ICHARG": 0}
-#user_incar = {"NCORE": NCORE, "ICHARG": 0, "EDIFF_PER_ATOM": 0.000001, "ISIF": 2, "MDALGO": 3, "LANGEVIN_GAMMA": [10] * structure.ntypesp, "LANGEVIN_GAMMA_L": 1}   # Langevin NVT
-user_incar = {"NCORE": NCORE, "ICHARG": 0, "EDIFF_PER_ATOM": 0.000001}
+#user_incar = {"NCORE": NCORE, "ICHARG": 0, "EDIFF": 1E-05, "ISIF": 2, "MDALGO": 3, "LANGEVIN_GAMMA": [10] * structure.ntypesp, "LANGEVIN_GAMMA_L": 1}   # Langevin NVT
+user_incar = {"NCORE": NCORE, "ICHARG": 0, "EDIFF": 1E-05}
 
 heating_nsw = 2000
 nsw = 1000
