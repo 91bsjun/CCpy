@@ -118,8 +118,8 @@ def running(temp, pre, crt):
         structure = IStructure.from_file("../" + structure_filename)
         crt_nsw = heating_nsw
         user_incar["SMASS"] = -1
-        #inputset = MITMDSet(structure, 100.0, float(temp), heating_nsw, user_incar_settings=user_incar)
-        inputset = MPMDSet(structure, 100.0, float(temp), int(heating_nsw / 4), user_incar_settings=user_incar)
+        inputset = MITMDSet(structure, 100.0, float(temp), heating_nsw, user_incar_settings=user_incar)
+        #inputset = MPMDSet(structure, 100.0, float(temp), int(heating_nsw / 4), user_incar_settings=user_incar)
         inputset.write_input(crt_dir)
     # -- run
     else:
@@ -128,8 +128,8 @@ def running(temp, pre, crt):
         crt_nsw = nsw
         #structure = IStructure.from_file("%s/CONTCAR" % pre_dir)
         user_incar["SMASS"] = 0
-        #inputset = MITMDSet(structure, float(temp), float(temp), nsw, user_incar_settings=user_incar)
-        inputset = MPMDSet(structure, float(temp), float(temp), int(nsw / 4), user_incar_settings=user_incar)
+        inputset = MITMDSet(structure, float(temp), float(temp), nsw, user_incar_settings=user_incar)
+        #inputset = MPMDSet(structure, float(temp), float(temp), int(nsw / 4), user_incar_settings=user_incar)
         inputset.write_input(crt_dir)
         os.system("cp %s/WAVECAR %s" % (pre_dir, crt_dir))
     os.chdir(crt_dir)    
