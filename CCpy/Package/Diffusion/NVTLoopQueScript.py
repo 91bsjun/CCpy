@@ -10,6 +10,9 @@ from pymatgen.io.vasp import Vasprun
 from pymatgen.io.vasp.sets import MITMDSet, MPMDSet
 from pymatgen.core.structure import IStructure
 from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer
+import warnings
+warnings.filterwarnings("ignore")
+
 
 # ---------- CONFIGURATIONS ------------ #
 structure_filename = sys.argv[1]
@@ -66,7 +69,11 @@ def terminated_check(nsw):
         crt_step = int(oszicar.split()[0])
         # -- when previous run was completed
         if crt_step == nsw:
-            return True
+            try:
+               run_chk = Vasprun("vasprun.xml.gz")
+               return True
+            except:
+               return False
         # -- when previous run was stopped
         else:
             return False
