@@ -704,6 +704,9 @@ def plt_deco(width=8, height=6.5):
     mpl.rcParams['legend.frameon'] = False
 
     mpl.rcParams["font.family"] = 'Arial'
+    
+    from cycler import cycler
+    mpl.rcParams['axes.prop_cycle'] = cycler('color', ['#377eb8','#4daf4a','#e41a1c','#984ea3','#ff7f00', '#999999', '#a65628','#f781bf', '#17becf', '#bcbd22'])
 
     fig = plt.figure(figsize=(width, height), facecolor="w")
 
