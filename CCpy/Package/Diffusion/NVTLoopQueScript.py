@@ -29,8 +29,8 @@ user_incar = {"NCORE": NCORE, "ICHARG": 0, "PREC": "Normal"}
 
 heating_nsw = 2000
 nsw = 1000
-min_step = 25
-min_RSD = 0.3
+min_step = 50
+min_RSD = 0.25
 min_ASD = 7
 max_step = 250
 # -------------------------------------- #
