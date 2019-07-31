@@ -18,7 +18,7 @@ queue_info = {"xeon1": [16, 32, "xeon1.q", ['node01']],
               "xeon2": [24, 64, "xeon2.q", ['node02', 'node03', 'node04']],
               "xeon3": [24, 256, "xeon3.q", ['node05', 'node06']],
               "xeon4": [36, 256, "xeon4.q", ['node07']],
-              "xeon5": [72, 512, "xeon5.q", ['node08', 'node09', 'node10', 'node14']],
+              "xeon5": [72, 512, "xeon5.q", ['node08', 'node09', 'node10', 'node14', 'node15', 'node16']],
               "xeon6": [48, 512, "xeon6.q", ['node12']],
               "xeon7": [52, 192, "xeon7.q", ['node13']],
               "epyc": [64, 256, "epyc.q", ['node11']]}
