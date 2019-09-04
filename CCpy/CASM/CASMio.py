@@ -9,6 +9,7 @@ import pandas as pd
 import json
 
 from CCpy.Tools.CCpyStructure import PeriodicStructure as ps
+from CCpy.Tools.CCpyTools import input_num_parser
 
 class CASMInput():
     def __init__(self, filename):
@@ -45,23 +46,29 @@ class CASMInput():
         for i in range(len(atoms)):
             print(str(i).ljust(2)+" : "+atoms[i].ljust(2)+str(fcoords[i][0]).rjust(12)+str(fcoords[i][1]).rjust(12)+str(fcoords[i][2]).rjust(12))
 
-        dopings = raw_input("Pick atom(s) : ")
-        if len(dopings) != 0:
-            dopings = dopings.split(",")
-            dopings = [int(i) for i in dopings]
+        picking = True
+        dopings = {}
 
-            elements = raw_input("To which element ?")
-            elements = elements.split(",")
-        else:
-            dopings = []
+        while picking:
+            dopings = input_num_parser(len(atoms))
+            if len(dopings) == 0:
+                picking = False
+            else:
+                elements = raw_input("To which element(s) ?")
+                elements = elements.replace(" ", "").split(",")
+
+                for i in picked_atoms:
+                    dopings[i] = elements
+
+        dopings_keys = list(dopings.keys())
 
         for i in range(len(atoms)):
             each_basis = {}
             each_basis['coordinate'] = fcoords[i]
             occupants = []
 
-            if i in dopings:
-                occupants = [e for e in elements]
+            if i in dopings_keys:
+                occupants = [e for e in dopings[i]]
                 occupants.append(atoms[i])
                 each_basis['occupant_dof'] = occupants   
             else:
