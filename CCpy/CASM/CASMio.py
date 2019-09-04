@@ -50,15 +50,16 @@ class CASMInput():
         dopings = {}
 
         while picking:
-            dopings = input_num_parser(len(atoms))
-            if len(dopings) == 0:
-                picking = False
-            else:
-                elements = raw_input("To which element(s) ?")
+            do_pick = raw_input("\nPick sites? (y/n) :")
+            if do_pick == "y":
+                picked_atoms = input_num_parser(len(atoms))
+                elements = raw_input("To which element(s) ? ex) Mn, Co \nCAUTION: Include initial element\n:")
                 elements = elements.replace(" ", "").split(",")
 
                 for i in picked_atoms:
                     dopings[i] = elements
+            else:
+                picking = False
 
         dopings_keys = list(dopings.keys())
 
@@ -69,7 +70,7 @@ class CASMInput():
 
             if i in dopings_keys:
                 occupants = [e for e in dopings[i]]
-                occupants.append(atoms[i])
+                # occupants.append(atoms[i])
                 each_basis['occupant_dof'] = occupants   
             else:
                 each_basis['occupant_dof'] = [atoms[i]]
@@ -78,12 +79,14 @@ class CASMInput():
 
         prim_dic['basis'] = basis
         prim_dic['coordinate_mode'] = "Fractional"
-        prim_dic['description'] = "Hello"
+        prim_dic['description'] = "Description"
         prim_dic['lattice_vectors'] = lattice_v
-        prim_dic['title'] = "MyTitle"
+        title = raw_input("Work title: ")
+        prim_dic['title'] = title
 
         jsonString = json.dumps(prim_dic, indent=4)
 
         f = open("prim.json", "w")
         f.write(jsonString)
         f.close()
+        print("done.")
