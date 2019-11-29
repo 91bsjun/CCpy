@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/home/shared/anaconda3/envs/CCpy/bin/python
 # -*- coding:utf-8 -*-
 
 import tables as tb
@@ -473,8 +473,13 @@ def transmission_3D(item):
 
 def cusmtom_cmap():
     import pickle
-    with open("/home/shared/GitHub/CCpy/CCpy/Tools/ATK_transmission_cmap.pkl", "rb") as mydata:
-        custom_cmap = pickle.load(mydata)
+    import matplotlib
+    try:
+        pkl_file = open('/home/shared/GitHub/CCpy/CCpy/Tools/ATK_transmission_cmap.pkl', 'rb')
+        custom_cmap = pickle.load(pkl_file)
+    except:
+        pkl_file = open('/home/shared/GitHub/CCpy/CCpy/Tools/ATK_transmission_cmap.pkl', 'rb')
+        custom_cmap = pickle.load(pkl_file, encoding='latin1')
 
     cm = matplotlib.colors.ListedColormap(custom_cmap/255.0)
     return cm

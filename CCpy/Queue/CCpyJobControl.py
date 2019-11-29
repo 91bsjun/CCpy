@@ -142,7 +142,7 @@ cd $SGE_O_WORKDIR
             self.vasp_run = "%s %s" % (self.python_path, script_path)
         else:
             jobname = "V" + inputfile
-        jobname = jobname.replace(".", "_").replace("-", "_")
+        jobname = jobname.replace(".", "_").replace("-", "_").replace("/", "_")
         mpi = '''#!/bin/csh
 # Job name 
 #$ -N %s

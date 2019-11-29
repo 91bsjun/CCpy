@@ -97,7 +97,7 @@ elif sys.argv[1] == "1":
             VO.getFinalStructure(path=pwd+"/")
         else:
             print(each_input + ": CONTCAR is empty!")
-        os.chdir("../")
+        os.chdir(pwd)
 
 elif sys.argv[1] == "2":
     show_plot = True
