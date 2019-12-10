@@ -514,7 +514,7 @@ class BSPlotter(object):
                 if not self._bs.is_metal() else ""}
 
     def get_plot(self, band_indices, zero_to_efermi=True, ylim=None, smooth=False,
-                 vbm_cbm_marker=False,smooth_tol=None, line_width=3):
+                 vbm_cbm_marker=False,smooth_tol=None, line_width=3, spin='both'):
         """
         Get a matplotlib object for the bandstructure plot.
         Blue lines are up spin, red lines are down
@@ -1371,7 +1371,7 @@ class BSPlotterProjected(BSPlotter):
         return plt
 
     def get_elt_projected_plots_color_spin(self, zero_to_efermi=True, line_width=3,
-                                           elt_ordered=None, spin="up", color_order=['g', 'b', 'r']):
+                                           elt_ordered=None, spin="both", color_order=['g', 'b', 'r']):
         """
         returns a pylab plot object with one plot where the band structure
         line color depends on the character of the band (along different
@@ -1405,8 +1405,14 @@ class BSPlotterProjected(BSPlotter):
         data = self.bs_plot_data(zero_to_efermi)
         #plt = get_publication_quality_plot(12, 8)
 
-        spins = [Spin.up]
-        if spin == "down":
+        if self._bs.is_spin_polarized:
+            spins = [Spin.up, Spin.down]
+        else:
+            spins = [Spin.up]
+
+        if spin == "up":
+            spins = [Spin.up]
+        elif spin == "down":
             spins = [Spin.down]
         self._maketicks(plt)
         for s in spins:
