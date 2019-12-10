@@ -514,7 +514,7 @@ class BSPlotter(object):
                 if not self._bs.is_metal() else ""}
 
     def get_plot(self, band_indices, zero_to_efermi=True, ylim=None, smooth=False,
-                 vbm_cbm_marker=False,smooth_tol=None, line_width=3, spin='both'):
+                 vbm_cbm_marker=False,smooth_tol=None, line_width=3, spin='default'):
         """
         Get a matplotlib object for the bandstructure plot.
         Blue lines are up spin, red lines are down
@@ -583,37 +583,23 @@ class BSPlotter(object):
                       "See full warning in source.\n"+\
                       "If this is not a mistake, try increasing "+\
                       "smooth_tol.\nCurrent smooth_tol is {s}."
+            if self._bs.is_spin_polarized:
+                spins = [Spin.up, Spin.down]
+            else:
+                spins = [Spin.up]
 
-            for d in range(len(data['distances'])):
-                # for i in range(self._nb_bands):
-                for i in band_indices:
-                    tck = scint.splrep(
-                        data['distances'][d],
-                        [data['energy'][d][str(Spin.up)][i][j]
-                         for j in range(len(data['distances'][d]))],
-                        s = smooth_tol)
-                    step = (data['distances'][d][-1]
-                            - data['distances'][d][0]) / 1000
+            if spin == "up":
+                spins = [Spin.up]
+            elif spin == "down":
+                spins = [Spin.down]
 
-                    xs = [x * step + data['distances'][d][0] 
-                          for x in range(1000)]
-
-                    ys = [scint.splev(x * step + data['distances'][d][0],
-                                      tck, der=0)
-                          for x in range(1000)]
-                    
-                    for y in ys:
-                        if np.isnan(y):
-                            print(warning.format(d=str(d),i=str(i),
-                                                 s=str(smooth_tol)))
-                            break
-
-                    plt.plot(xs, ys, color='b', linewidth=band_linewidth)
-
-                    if self._bs.is_spin_polarized:
+            for s in spins:
+                for d in range(len(data['distances'])):
+                    # for i in range(self._nb_bands):
+                    for i in band_indices:
                         tck = scint.splrep(
                             data['distances'][d],
-                            [data['energy'][d][str(Spin.down)][i][j]
+                            [data['energy'][d][str(s)][i][j]
                              for j in range(len(data['distances'][d]))],
                             s = smooth_tol)
                         step = (data['distances'][d][-1]
@@ -622,9 +608,8 @@ class BSPlotter(object):
                         xs = [x * step + data['distances'][d][0]
                               for x in range(1000)]
 
-                        ys = [scint.splev(
-                                 x * step + data['distances'][d][0],
-                                 tck, der=0)
+                        ys = [scint.splev(x * step + data['distances'][d][0],
+                                          tck, der=0)
                               for x in range(1000)]
 
                         for y in ys:
@@ -633,15 +618,12 @@ class BSPlotter(object):
                                                      s=str(smooth_tol)))
                                 break
 
-                        plt.plot(xs, ys, 'r--', linewidth=band_linewidth)
+                        if spin == 'default' and str(s) == 'down':
+                            plt.plot(xs, ys, color='b', linewidth=band_linewidth)
+                        else:
+                            plt.plot(xs, ys, 'r--', linewidth=band_linewidth)
 
-#                        plt.plot([x * step + data['distances'][d][0]
-#                                  for x in range(1000)],
-#                                 [scint.splev(
-#                                     x * step + data['distances'][d][0],
-#                                     tck, der=0)
-#                                  for x in range(1000)], 'r--',
-#                                 linewidth=band_linewidth)
+
 
         self._maketicks(plt)
 

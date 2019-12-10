@@ -87,19 +87,19 @@ class CMSBand():
         self.fig = fig
         
 
-    def blueBand(self, band_indices, miny=None, maxy=None, line_width=3):
+    def blueBand(self, band_indices, miny=None, maxy=None, line_width=3, spin='default'):
         bands = self.bands        
         plotter = BSPlotter(bands)
         self.plotter = plotter
 
-        plotter.get_plot(band_indices, smooth=True, zero_to_efermi=True, line_width=line_width)
+        plotter.get_plot(band_indices, smooth=True, zero_to_efermi=True, line_width=line_width, spin=spin)
         plt.axhline(y=0, lw=1, ls=':', color='gray')
         plt.tick_params(labelsize=15)
         plt.ylim(miny, maxy)
                
         return plt
 
-    def colorBand(self, band_indices, miny=None, maxy=None, elt_ordered=None, color_order=['g','b','r'], line_width=3):
+    def colorBand(self, band_indices, miny=None, maxy=None, elt_ordered=None, color_order=['g','b','r'], line_width=3, spin='line'):
         bands = self.bands
         plotter = BSPlotterProjected(bands)
         self.plotter = plotter
@@ -117,12 +117,12 @@ class CMSBand():
 
         # -- if single atom : return to blue band
         if len(elt_ordered) == 1:
-            plt = self.blueBand(miny=miny, maxy=maxy, line_width=line_width)
+            plt = self.blueBand(miny=miny, maxy=maxy, line_width=line_width, spin=spin)
             return plt
         else:
             self.elt_ordered = elt_ordered
             import matplotlib.pyplot as plt
-            plotter.get_elt_projected_plots_color(band_indices, zero_to_efermi=True, elt_ordered=elt_ordered, line_width=line_width, color_order=color_order)
+            plotter.get_elt_projected_plots_color(band_indices, zero_to_efermi=True, elt_ordered=elt_ordered, line_width=line_width, color_order=color_order, spin=spin)
             plt.axhline(y=0, lw=1, ls=':', color='gray')
             plt.tick_params(labelsize=15)
 
@@ -540,6 +540,12 @@ Usage : cms_band [option] [sub_option1] [sub_option2]...
               (ex: CCpyBand.py 2 -lw=5)
 
 -nb          : choose number of bands to plot
+              
+-spin=       : Choose plot type of spin polarized calculation
+               default     --> up:line, down:dashed line
+               -spin=line  --> show all spins to line plot
+               -spin=up    --> show 'up'   spin only as line plot
+               -spin=down  --> show 'down' spin only as line plot 
               
 up/down      : if spin polarized calculation / option 5
               (ex: CCpyBand.py 5 -ylim=4,4 down)
