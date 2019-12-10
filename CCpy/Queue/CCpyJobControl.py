@@ -456,7 +456,7 @@ cd $SGE_O_WORKDIR
         shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
-    def AIMD_NVT_Loop(self, structure_filename=None, temp=None, specie="Li"):
+    def AIMD_NVT_Loop(self, structure_filename=None, temp=None, specie="Li", screen='no_screen'):
         # -- load loop queue script
         from CCpy.Package.Diffusion.NVTLoopQueScript import NVTLoopQueScriptString
         script_string = NVTLoopQueScriptString()
@@ -484,9 +484,57 @@ cd $SGE_O_WORKDIR
 #$ -cwd
 
 
-%s %s %s %s %s
+%s %s %s %s %s %s
 ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.python_path,
-       script_filename, structure_filename, temp, specie)
+       script_filename, structure_filename, temp, specie, screen)
+
+        f = open("mpi.sh", "w")
+        f.write(mpi)
+        f.close()
+
+        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl("rm -rf ./mpi.sh", shell=True)
+
+    def AIMD_NVT_Loop_batch(self, structure_files=None, temp=None, specie="Li", screen='no_screen'):
+        # -- load loop queue script
+        from CCpy.Package.Diffusion.NVTLoopQueScript import NVTLoopQueScriptString
+        script_string = NVTLoopQueScriptString()
+        script_filename = ".AIMDLoop.py"
+        f = open(script_filename, "w")
+        f.write(script_string)
+        f.close()
+
+        jobname = input("Job name: ")
+
+        runs = ""
+        pwd = os.getcwd()
+        if 'structures' not in os.listdir('./'):
+            os.mkdir('structures')
+        for structure_filename in structure_files:
+            dirname = structure_filename.replace(".cif", "")
+            runs += "cp %s structures; mkdir %s; mv %s %s; cp %s %s; cd %s\n" % (structure_filename, dirname, structure_filename, dirname, script_filename, dirname, dirname)
+            runs += "%s %s %s %s %s %s\n\n" % (self.python_path, script_filename, structure_filename, temp, specie, screen)
+            runs += "cd %s \n" % pwd
+
+        mpi = '''#!/bin/csh
+# Job name 
+#$ -N %s
+
+# pe request
+%s
+
+# queue name
+%s
+
+# node
+%s
+
+#$ -V
+#$ -cwd
+
+
+%s
+''' % (jobname, self.pe_request, self.queue_name, self.node_assign, runs)
 
         f = open("mpi.sh", "w")
         f.write(mpi)

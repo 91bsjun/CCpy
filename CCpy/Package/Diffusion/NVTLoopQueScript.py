@@ -18,6 +18,7 @@ warnings.filterwarnings("ignore")
 structure_filename = sys.argv[1]
 temp = int(sys.argv[2])
 specie = sys.argv[3]
+screen = sys.argv[4]
 structure = IStructure.from_file(structure_filename)
 
 vasp = "vasp"
@@ -33,6 +34,15 @@ min_step = 50
 min_RSD = 0.25
 min_ASD = 7
 max_step = 250
+if screen == 'screen':
+    heating_nsw = 1000
+    nsw = 1000
+    max_step = 15
+    min_step = 15
+    min_RSD = 1
+    min_ASD = 50
+    user_incar = {"NCORE": NCORE, "ICHARG": 0, "PREC": "Normal", "NELM": 60}
+
 # -------------------------------------- #
 
 # INCAR
@@ -207,7 +217,7 @@ def write_data(crt):
 
 def write_diffusivity_data(crt, specie, specie_distance, temp):
     start_num = 1
-    chg_data = {"Li": "+", "Na": "+", "K": "+", "Cu": "+"}
+    chg_data = {"Li": "+", "Na": "+", "K": "+", "Cu": "+", "Ag": "+"}
     if crt >= start_num:
         os.system("analyze_aimd.py diffusivity %s%s run 1 %d %.2f -msd msd_%dK.csv >> anal.log" % (specie, chg_data[specie], crt, specie_distance, temp))
     datafilename = "Mo_%dK_data.csv" % temp
@@ -295,11 +305,11 @@ if __name__ == "__main__":
     structure = IStructure.from_file(structure_filename)
     # -- Find neighboring specie distance
     sites = structure.sites
-    specie_sites = [s for s in sites if str(s.specie) == specie]
+    specie_sites = [s for s in sites if s.specie.symbol == specie]
     distance = []
     for specie_site in specie_sites:    
         nbrs = structure.get_neighbors(specie_site, 5)
-        nbrs = [nbr for nbr in nbrs if str(nbr[0].specie) == specie]
+        nbrs = [nbr for nbr in nbrs if nbr[0].specie.symbol == specie]
         for nbr in nbrs:
             distance.append(nbr[1])
     distance = np.array(distance)

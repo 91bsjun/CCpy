@@ -232,7 +232,7 @@ class JobInitiator:
             myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.pbs_runner()
 
-    def AIMD_NVT_Loop(self, temp=None, specie="Li"):
+    def AIMD_NVT_Loop(self, temp=None, specie="Li", screen="no_screen"):
         # --- COLLECT INPUT FILES
         input_marker = [".cif", "POSCAR", "CONTCAR"]
         inputs = selectInputs(input_marker, "./", ask=ask)
@@ -241,7 +241,15 @@ class JobInitiator:
             quit()
 
         myJS = JS(inputs[0], self.queue, self.n_of_cpu, node=self.node)
-        myJS.AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp, specie=specie)
+        myJS.AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp, specie=specie, screen=screen)
+
+    def AIMD_NVT_Loop_batch(self, temp=None, specie="Li", screen="no_screen"):
+        # --- COLLECT INPUT FILES
+        input_marker = [".cif", "POSCAR", "CONTCAR"]
+        inputs = selectInputs(input_marker, "./", ask=ask)
+
+        myJS = JS(inputs, self.queue, self.n_of_cpu, node=self.node)
+        myJS.AIMD_NVT_Loop_batch(structure_files = inputs, temp=temp, specie=specie, screen=screen)
 
     def casm_run(self):
         # --- SUBMIT QUEUE
@@ -370,6 +378,7 @@ if __name__ == "__main__":
     loop = False
     node = None
     specie = "Li"
+    screen = "no_screen"
     for s in sys.argv:
         if "-n=" in s:
             n_of_cpu = int(s.split("=")[1])
@@ -391,6 +400,8 @@ if __name__ == "__main__":
             node = s.split("=")[1]
         if '-specie=' in s:
             specie = s.split("=")[1]
+        if '-screen' in s:
+            screen = 'screen'
 
     job_init = JobInitiator(queue=queue, node=node, n_of_cpu=n_of_cpu)
 
@@ -430,7 +441,10 @@ if __name__ == "__main__":
         if not temp:
             print("Temperature must be assigned. (ex: -T=1000)")
             quit()
-        job_init.AIMD_NVT_Loop(temp=temp, specie=specie)
+        if "-batch" in sys.argv:
+            job_init.AIMD_NVT_Loop_batch(temp=temp, specie=specie, screen=screen)
+        else:
+            job_init.AIMD_NVT_Loop(temp=temp, specie=specie, screen=screen)
 
     ## ------ VASP NVT LOOP
     elif sys.argv[1] == "10":
