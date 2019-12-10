@@ -523,7 +523,6 @@ Usage : cms_band [option] [sub_option1] [sub_option2]...
 2   : color band
 3   : blue band & element DOS
 4   : color band & element DOS
-5   : color band spin UP or DOWN
 
 [sub_options]
 -ylim=       : set y-axis limitation (default: -5,5)
@@ -550,9 +549,6 @@ Usage : cms_band [option] [sub_option1] [sub_option2]...
                -spin=line  --> show all spins to line plot
                -spin=up    --> show 'up'   spin only as line plot
                -spin=down  --> show 'down' spin only as line plot 
-              
-up/down      : if spin polarized calculation / option 5
-              (ex: CCpyBand.py 5 -ylim=4,4 down)
 
 a            : Select all possible directories
               (ex: CCpyBand.py 1 a)
