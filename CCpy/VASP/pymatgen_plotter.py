@@ -1233,7 +1233,7 @@ class BSPlotterProjected(BSPlotter):
         return plt
 
     def get_elt_projected_plots_color(self, band_indices, zero_to_efermi=True, line_width=3,
-                                      elt_ordered=None, color_order=['g','b','r']):
+                                      elt_ordered=None, color_order=['g','b','r'], spin='default'):
         """
         returns a pylab plot object with one plot where the band structure
         line color depends on the character of the band (along different
@@ -1273,10 +1273,18 @@ class BSPlotterProjected(BSPlotter):
         if not band_indices: ## edit
             band_indices = range(self._nb_bands)
 
-        spins = [Spin.up]
         if self._bs.is_spin_polarized:
-            spins = [Spin.up, Spin.down]
+            spins = [Spin.down, Spin.up]
+        else:
+            spins = [Spin.up]
+
+        if spin == "up":
+            spins = [Spin.up]
+        elif spin == "down":
+            spins = [Spin.down]
+
         self._maketicks(plt)
+
         for s in spins:
             for b in range(len(data['distances'])):
                 # for i in range(self._nb_bands):
@@ -1345,8 +1353,8 @@ class BSPlotterProjected(BSPlotter):
                             color = new_color  
                         
                         sign = '-'
-                        if s == Spin.down:
-                            sign = '-'
+                        if spin == 'default' and s == Spin.down:
+                            sign = '--'
 
                         plt.plot([data['distances'][b][j],
                                   data['distances'][b][j + 1]],

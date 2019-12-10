@@ -100,7 +100,7 @@ class CMSBand():
                
         return plt
 
-    def colorBand(self, band_indices, miny=None, maxy=None, elt_ordered=None, color_order=['g','b','r'], line_width=3, spin='line'):
+    def colorBand(self, band_indices, miny=None, maxy=None, elt_ordered=None, color_order=['g','b','r'], line_width=3, spin='default'):
         bands = self.bands
         plotter = BSPlotterProjected(bands)
         self.plotter = plotter
