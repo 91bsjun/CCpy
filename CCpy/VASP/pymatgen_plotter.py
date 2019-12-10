@@ -557,18 +557,29 @@ class BSPlotter(object):
             band_indices = range(self._nb_bands)
 
         if not smooth:
-            for d in range(len(data['distances'])):
-                # for i in range(self._nb_bands):  ## edit
-                for i in band_indices:
-                    plt.plot(data['distances'][d],
-                             [data['energy'][d][str(Spin.up)][i][j]
-                              for j in range(len(data['distances'][d]))], color='b',
-                             linewidth=band_linewidth)
-                    if self._bs.is_spin_polarized:
-                        plt.plot(data['distances'][d],
-                                 [data['energy'][d][str(Spin.down)][i][j]
-                                  for j in range(len(data['distances'][d]))],
-                                 'r--', linewidth=band_linewidth)
+            if self._bs.is_spin_polarized:
+                spins = [Spin.down, Spin.up]
+            else:
+                spins = [Spin.up]
+
+            if spin == "up":
+                spins = [Spin.up]
+            elif spin == "down":
+                spins = [Spin.down]
+            for s in spins:
+                for d in range(len(data['distances'])):
+                    # for i in range(self._nb_bands):  ## edit
+                    for i in band_indices:
+                        if spin == 'default' and s == Spin.down:
+                            plt.plot(data['distances'][d],
+                                     [data['energy'][d][str(s)][i][j]
+                                      for j in range(len(data['distances'][d]))], 'r--',
+                                     linewidth=band_linewidth)
+                        else:
+                            plt.plot(data['distances'][d],
+                                     [data['energy'][d][str(s)][i][j]
+                                      for j in range(len(data['distances'][d]))], color='b',
+                                     linewidth=band_linewidth)
         else:
             # Interpolation failure can be caused by trying to fit an entire
             # band with one spline rather than fitting with piecewise splines
@@ -584,7 +595,7 @@ class BSPlotter(object):
                       "If this is not a mistake, try increasing "+\
                       "smooth_tol.\nCurrent smooth_tol is {s}."
             if self._bs.is_spin_polarized:
-                spins = [Spin.up, Spin.down]
+                spins = [Spin.down, Spin.up]
             else:
                 spins = [Spin.up]
 
@@ -618,10 +629,10 @@ class BSPlotter(object):
                                                      s=str(smooth_tol)))
                                 break
 
-                        if spin == 'default' and str(s) == 'down':
-                            plt.plot(xs, ys, color='b', linewidth=band_linewidth)
-                        else:
+                        if spin == 'default' and s == Spin.down:
                             plt.plot(xs, ys, 'r--', linewidth=band_linewidth)
+                        else:
+                            plt.plot(xs, ys, color='b', linewidth=band_linewidth)
 
 
 

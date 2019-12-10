@@ -92,7 +92,8 @@ class CMSBand():
         plotter = BSPlotter(bands)
         self.plotter = plotter
 
-        plotter.get_plot(band_indices, smooth=True, zero_to_efermi=True, line_width=line_width, spin=spin)
+        #plotter.get_plot(band_indices, smooth=True, zero_to_efermi=True, line_width=line_width, spin=spin)
+        plotter.get_plot(band_indices, smooth=False, zero_to_efermi=True, line_width=line_width, spin=spin)
         plt.axhline(y=0, lw=1, ls=':', color='gray')
         plt.tick_params(labelsize=15)
         plt.ylim(miny, maxy)
@@ -332,6 +333,7 @@ def main_run():
     doslim = [0, 20]
     dosmin = min(doslim)
     dosmax = max(doslim)
+    spin = 'default'
     for argv in sys.argv:
         if '-ylim=' in argv:
             ylim = argv.replace("-ylim=", "")
@@ -358,6 +360,8 @@ def main_run():
             doslim = [float(doslim[0]), float(doslim[1])]
             dosmin = min(doslim)
             dosmax = max(doslim)
+        elif '-spin=' in argv:
+            spin = argv.replace("-spin=", "")
 
 
         """
@@ -392,7 +396,7 @@ def main_run():
                 band_indices = input_num_parser(nb_bands)
                 band_indices = list(np.array(band_indices) - 1)
 
-        plt = cms_band.blueBand(miny=miny, maxy=maxy, line_width=line_width, band_indices=band_indices)
+        plt = cms_band.blueBand(miny=miny, maxy=maxy, line_width=line_width, band_indices=band_indices, spin=spin)
         plt.tight_layout()
 
         cms_band.save_band_data(color=False)
