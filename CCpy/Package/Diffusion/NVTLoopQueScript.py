@@ -151,6 +151,7 @@ def running(temp, pre, crt):
         inputset.write_input(crt_dir)
         os.system("cp %s/WAVECAR %s" % (pre_dir, crt_dir))
     os.chdir(crt_dir)    
+    os.system("rm -rf vasprun.xml vasprun.xml.gz")
     os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
     time.sleep(5)
     os.system("gzip OUTCAR vasprun.xml")
@@ -159,6 +160,7 @@ def running(temp, pre, crt):
     properly_terminated = terminated_check(crt_nsw)
     while not properly_terminated:
         total_try += 1
+        os.system("rm -rf vasprun.xml vasprun.xml.gz")
         os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
         time.sleep(5)
         os.system("gzip vasprun.xml")
