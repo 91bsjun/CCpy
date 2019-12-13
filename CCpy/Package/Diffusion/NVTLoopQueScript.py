@@ -82,7 +82,8 @@ def terminated_check(nsw):
             try:
                run_chk = Vasprun("vasprun.xml.gz")
                return True
-            except:
+            except Exception as e:
+               write_log(str(e) + "\n")
                return False
         # -- when previous run was stopped
         else:
