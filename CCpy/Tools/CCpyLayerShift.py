@@ -392,6 +392,7 @@ def get_3d_plot(df, e_unit='eV', plot_group=False):
     cbar = plt.colorbar()
     cbar.set_label('Relative Energy (%s)' % e_unit)
     plt.tight_layout()
+    plt.save_fig('3dplot.png', dpi=200)
 
     plt.show()
 
