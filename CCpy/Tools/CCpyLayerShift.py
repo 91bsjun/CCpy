@@ -40,8 +40,9 @@ except:
     -etol = 0.0001      : tolerance energy for grouping structures by similar energy
 
     <When Option 3 (plot)
-    -3d : plot 3d surface
-    -2d : plot 2d (useful when check energy via stacking distance)
+    -3d    : plot 3d surface
+    -2d    : plot 2d (useful when check energy via stacking distance)
+    -unit= : use when relative energy is too small (ex. -unit=meV // default: eV)
 
 * Notice before run
 - Set vacumm direction to z-axis (c-axis)
@@ -306,7 +307,7 @@ def get_final_energies():
     return sorted_df
     
 
-def get_3d_plot(df, plot_group=False):
+def get_3d_plot(df, unit='eV', plot_group=False):
     import matplotlib
     from matplotlib import rc
     import matplotlib.pyplot as plt
@@ -348,7 +349,10 @@ def get_3d_plot(df, plot_group=False):
 
     # ------ make 3d data format
     fixed_axis_df['relative energy (meV)'] = fixed_axis_df['relative energy (eV)'] * 1000
-    plot_df = fixed_axis_df.pivot('shifted frac y', 'shifted frac x', 'relative energy (meV)')
+    if unit == 'meV':
+        plot_df = fixed_axis_df.pivot('shifted frac y', 'shifted frac x', 'relative energy (meV)')
+    else:
+        plot_df = fixed_axis_df.pivot('shifted frac y', 'shifted frac x', 'relative energy (eV)')
 
     plot_df.to_csv("%s_3dplot.csv" % basename, index=False)
     
@@ -385,7 +389,8 @@ def get_3d_plot(df, plot_group=False):
         lev_val += unit
     
     plt.contourf(X, Y, Z, cmap=cm.jet, levels=lev, extend="both")
-    plt.colorbar()
+    cbar = plt.colorbar()
+    cbar.set_label('Relative Energy (%s)' % unit)
     plt.tight_layout()
 
     plt.show()
@@ -437,6 +442,13 @@ def get_fixed_axis_df(df, axis):
                                          
 
 if __name__ == "__main__":
+    group = False
+    unit = 'eV'
+    for argv in sys.argv:
+        if '-group' in argv:
+            group = True
+        if '-unit' in argv:
+            unit = argv.split('=')[1]
     if sys.argv[1] == "1":
         cif_gen()
     elif sys.argv[1] == "2":
@@ -453,10 +465,7 @@ if __name__ == "__main__":
                 df = pd.read_csv(sorted_final_dbname)
             else:
                 df = get_final_energies()
-            group = False
-            if '-group' in sys.argv:
-                group = True
-            get_3d_plot(df, plot_group=group)
+            get_3d_plot(df, unit=unit, plot_group=group)
         elif sys.argv[4] == "-2d":
             if final_dbname not in os.listdir("./"):
                 df = get_final_energies()
