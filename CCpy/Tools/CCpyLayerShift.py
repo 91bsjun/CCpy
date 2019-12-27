@@ -307,7 +307,7 @@ def get_final_energies():
     return sorted_df
     
 
-def get_3d_plot(df, unit='eV', plot_group=False):
+def get_3d_plot(df, e_unit='eV', plot_group=False):
     import matplotlib
     from matplotlib import rc
     import matplotlib.pyplot as plt
@@ -349,7 +349,7 @@ def get_3d_plot(df, unit='eV', plot_group=False):
 
     # ------ make 3d data format
     fixed_axis_df['relative energy (meV)'] = fixed_axis_df['relative energy (eV)'] * 1000
-    if unit == 'meV':
+    if e_unit == 'meV':
         plot_df = fixed_axis_df.pivot('shifted frac y', 'shifted frac x', 'relative energy (meV)')
     else:
         plot_df = fixed_axis_df.pivot('shifted frac y', 'shifted frac x', 'relative energy (eV)')
@@ -390,7 +390,7 @@ def get_3d_plot(df, unit='eV', plot_group=False):
     
     plt.contourf(X, Y, Z, cmap=cm.jet, levels=lev, extend="both")
     cbar = plt.colorbar()
-    cbar.set_label('Relative Energy (%s)' % unit)
+    cbar.set_label('Relative Energy (%s)' % e_unit)
     plt.tight_layout()
 
     plt.show()
@@ -465,7 +465,7 @@ if __name__ == "__main__":
                 df = pd.read_csv(sorted_final_dbname)
             else:
                 df = get_final_energies()
-            get_3d_plot(df, unit=unit, plot_group=group)
+            get_3d_plot(df, e_unit=unit, plot_group=group)
         elif sys.argv[4] == "-2d":
             if final_dbname not in os.listdir("./"):
                 df = get_final_energies()
