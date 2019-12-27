@@ -1356,6 +1356,7 @@ class BSPlotterProjected(BSPlotter):
                         if spin == 'default' and s == Spin.down:
                             sign = '--'
 
+                        # print(spin, s, sign)
                         plt.plot([data['distances'][b][j],
                                   data['distances'][b][j + 1]],
                                  [data['energy'][b][str(s)][i][j],
