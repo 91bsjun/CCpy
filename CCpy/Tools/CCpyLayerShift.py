@@ -6,7 +6,9 @@ import pickle
 
 from pymatgen.core.structure import IStructure
 from pymatgen.core.lattice import Lattice
+
 from CCpy.Tools.CCpyStructure import PeriodicStructure
+from CCpy.Tools.CCpyTools import plt_deco
 
 version = sys.version
 if version[0] == '3':
@@ -54,8 +56,8 @@ except:
 [user@localhost work]$ CCpyLayerShift.py 2 Graphene.cif graphene_shift
 
 <option 3. Plotting 3d or 2d>
-[user@localhost work]$ CCpyLayerShift.py 2 Graphene.cif graphene_shift -3d
-[user@localhost work]$ CCpyLayerShift.py 2 Graphene.cif graphene_shift -2d
+[user@localhost work]$ CCpyLayerShift.py 3 Graphene.cif graphene_shift -3d
+[user@localhost work]$ CCpyLayerShift.py 3 Graphene.cif graphene_shift -2d
   
     '''
           )
@@ -297,14 +299,14 @@ def get_final_energies():
             group_index.append(gi)
     sorted_df['group'] = group_index
 
-    DB_df.to_csv(final_dbname)
-    sorted_df.to_csv(sorted_final_dbname)
+    DB_df.to_csv(final_dbname, index=False)
+    sorted_df.to_csv(sorted_final_dbname, index=False)
     
 
     return sorted_df
     
 
-def get_3d_plot(df):
+def get_3d_plot(df, plot_group=False):
     import matplotlib
     from matplotlib import rc
     import matplotlib.pyplot as plt
@@ -348,11 +350,12 @@ def get_3d_plot(df):
     fixed_axis_df['relative energy (meV)'] = fixed_axis_df['relative energy (eV)'] * 1000
     plot_df = fixed_axis_df.pivot('shifted frac y', 'shifted frac x', 'relative energy (meV)')
 
-    plot_df.to_csv("%s_3dplot.csv" % basename)
+    plot_df.to_csv("%s_3dplot.csv" % basename, index=False)
     
 
     # ------ make 3d plot
-    fig = plt.figure(figsize=(7,5))
+    fig = plt_deco(7, 5)
+    # fig = plt.figure(figsize=(7,5))
     
     X = plot_df.columns.values
     Y = plot_df.index.values
@@ -361,15 +364,16 @@ def get_3d_plot(df):
     x_label = r'$\Delta$ x'
     y_label = r'$\Delta$ y'
 
-    plt.xlabel(x_label, fontsize=18)
-    plt.ylabel(y_label, fontsize=18)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
 
-    # x, y 
-    plt.plot(grp1_x, grp1_y, marker="o", color="w", lw=0)
-    plt.plot(grp2_x, grp2_y, marker="<", color="y", lw=0)
-    plt.plot(grp3_x, grp3_y, marker="s", color="c", lw=0)
-    plt.plot(grp4_x, grp4_y, marker="D", color="g", lw=0)
-    plt.plot(grp5_x, grp5_y, marker="x", color="r", lw=0)
+    # x, y
+    if plot_group:
+        plt.plot(grp1_x, grp1_y, marker="o", color="w", lw=0)
+        plt.plot(grp2_x, grp2_y, marker="<", color="y", lw=0)
+        plt.plot(grp3_x, grp3_y, marker="s", color="c", lw=0)
+        plt.plot(grp4_x, grp4_y, marker="D", color="g", lw=0)
+        plt.plot(grp5_x, grp5_y, marker="x", color="r", lw=0)
 
     # -- make levels
     unit = (abs(Z.min() - Z.max())) / 50
@@ -449,7 +453,10 @@ if __name__ == "__main__":
                 df = pd.read_csv(sorted_final_dbname)
             else:
                 df = get_final_energies()
-            get_3d_plot(df)
+            group = False
+            if '-group' in sys.argv:
+                group = True
+            get_3d_plot(df, plot_group=group)
         elif sys.argv[4] == "-2d":
             if final_dbname not in os.listdir("./"):
                 df = get_final_energies()
