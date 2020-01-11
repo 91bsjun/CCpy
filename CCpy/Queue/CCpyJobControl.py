@@ -47,7 +47,12 @@ class JobSubmit:
 
         self.atk_mpi_run = "/opt/intel/compilers_and_libraries_2018.1.163/linux/mpi/intel64/bin/mpirun"
 
-        self.vasp_run = "mpirun -np $NSLOTS vasp < /dev/null > vasp.out"
+        vasp_path = '/opt/vasp/vasp.5.4.1/bin/vasp_std'
+        self.vasp_run = "mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp_path
+        vasp_path = '/opt/vasp/vasp.5.4.4-beef/bin/vasp_std'
+        self.vasp_run_beef = "mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp_path
+        vasp_path = '/opt/vasp/vasp.5.4.1-vaspsol/bin/vasp_std'
+        self.vasp_run_sol = "mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp_path
 
         self.g09_path = "g09"
 
@@ -121,9 +126,15 @@ cd $SGE_O_WORKDIR
         shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
-    def vasp(self, band=False, phonon=False, dirpath=None, loop=False):
+    def vasp(self, band=False, phonon=False, dirpath=None, loop=False, diff_ver=False):
         inputfile = self.inputfile
 
+        if diff_ver == 'beef':
+            vasp_run = self.vasp_run_beef
+        elif diff_ver == 'sol':
+            vasp_run = self.vasp_run_sol
+        else:
+            vasp_run = self.vasp_run
         # -- Band calculation after previous calculation
         if band:
             jobname = "VB" + inputfile
@@ -166,7 +177,7 @@ endif
 %s
 touch vasp.done
 
- ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, dirpath, self.vasp_run)
+ ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, dirpath, vasp_run)
 
         pwd = os.getcwd()
         os.chdir(dirpath)
@@ -177,7 +188,7 @@ touch vasp.done
         shl("rm -rf ./mpi.sh", shell=True)
         os.chdir(pwd)
 
-    def vasp_batch(self, dirs=None, scratch=False, loop=False):
+    def vasp_batch(self, dirs=None, scratch=False, loop=False, diff_ver=False):
         """
         Run multiple VASP jobs in a single queue
         """
@@ -185,6 +196,14 @@ touch vasp.done
 
         runs = ""
         script_path = None
+
+        if diff_ver == 'beef':
+            vasp_run = self.vasp_run_beef
+        elif diff_ver == 'sol':
+            vasp_run = self.vasp_run_sol
+        else:
+            vasp_run = self.vasp_run
+
         if loop:
             from CCpy.Package.VASPOptLoopQueScript import VASPOptLoopQueScriptString
             script_string = VASPOptLoopQueScriptString()
@@ -195,7 +214,7 @@ touch vasp.done
             script_path = os.getcwd() + "/" + script_filename
             each_run = "rm vasp.done\n%s %s\ntouch vasp.done\nsleep 30\n" % (self.python_path, script_path)
         else:
-            each_run = "rm vasp.done\n%s\ntouch vasp.done\nsleep 30\n" % self.vasp_run
+            each_run = "rm vasp.done\n%s\ntouch vasp.done\nsleep 30\n" % vasp_run
         for d in dirs:
             # if use scratch, copy input to /scratch/vasp and run job in that dir,
             # when finished, copy to original working directory

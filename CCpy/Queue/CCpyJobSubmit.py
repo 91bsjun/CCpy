@@ -40,7 +40,7 @@ class JobInitiator:
             myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.gaussian()
 
-    def vasp(self, sub=None, loop=None):
+    def vasp(self, sub=None, loop=None, diff_ver=None):
         # --- Collect VASP inputs
         band = False
         phonon = False
@@ -79,7 +79,7 @@ class JobInitiator:
             elif phonon:
                 dirpath += "/Phonon_opt"
             myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
-            myJS.vasp(band=band, dirpath=dirpath, phonon=phonon, loop=loop)
+            myJS.vasp(band=band, dirpath=dirpath, phonon=phonon, loop=loop, diff_ver=diff_ver)
 
     def vasp_batch(self, scratch=False, sub=False, loop=False):
         # --- Collect VASP inputs
@@ -123,7 +123,7 @@ class JobInitiator:
                 dirpath += "/Phonon_opt"
             dirs.append(dirpath)
         myJS = JS("batch_job", self.queue, self.n_of_cpu, node=self.node)
-        myJS.vasp_batch(dirs=dirs, scratch=scratch, loop=loop)
+        myJS.vasp_batch(dirs=dirs, scratch=scratch, loop=loop, diff_ver=diff_ver)
 
     def qchem(self):
         # --- Collect inputs
@@ -347,6 +347,9 @@ if __name__ == "__main__":
                       very careful when use this option
 
     <Options for ATK version handling>
+    -sol
+    -beef
+    <Options for ATK version handling>
     -atk2018        : ex) CCpyJobSubmit.py 3 xeon4 -atk2018  
     -atk2019
 
@@ -379,6 +382,7 @@ if __name__ == "__main__":
     node = None
     specie = "Li"
     screen = "no_screen"
+    vasp_run = 'default'
     for s in sys.argv:
         if "-n=" in s:
             n_of_cpu = int(s.split("=")[1])
@@ -402,6 +406,10 @@ if __name__ == "__main__":
             specie = s.split("=")[1]
         if '-screen' in s:
             screen = 'screen'
+        if '-beef' in s:
+            vasp_run = 'beef'
+        if '-sol' in s:
+            vasp_run = 'sol'
 
     job_init = JobInitiator(queue=queue, node=node, n_of_cpu=n_of_cpu)
 
@@ -412,9 +420,9 @@ if __name__ == "__main__":
     ## ------ VASP
     elif sys.argv[1] == "2":
         if "-batch" in sys.argv:
-            job_init.vasp_batch(scratch=scratch, sub=sub, loop=loop)
+            job_init.vasp_batch(scratch=scratch, sub=sub, loop=loop, diff_ver=vasp_run)
         else:
-            job_init.vasp(sub=sub, loop=loop)
+            job_init.vasp(sub=sub, loop=loop, diff_ver=vasp_run)
 
     ## ------ ATK
     elif sys.argv[1] == "3":
