@@ -154,13 +154,19 @@ def chk_load():
         if spl[0][:4] == 'node':
             node = spl[0]
             info['NODE'].append(node)
-            ncpu = float(spl[2])
+
+            ncpu = spl[2]
             info['NCPU'].append(ncpu)
+            if ncpu == '-':
+                ncpu = 1 
+            ncpu = float(ncpu)
+
             load = spl[3]
             info['LOAD'].append(load)
             if load == '-':
                 load = -1
             load = float(load)
+
             cpu_use = round(load / ncpu * 100, 1)
             if cpu_use < 0:
                 cpu_use = -1
