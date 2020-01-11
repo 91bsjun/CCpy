@@ -160,7 +160,9 @@ cd $SGE_O_WORKDIR
 #$ -cwd
 
 cd %s
-rm vasp.done
+if (-f "vasp.done") then
+    rm vasp.done
+endif
 %s
 touch vasp.done
 
