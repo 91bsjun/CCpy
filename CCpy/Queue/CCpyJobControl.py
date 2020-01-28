@@ -56,9 +56,9 @@ class JobSubmit:
 
         self.g09_path = "g09"
 
-        self.atk2017 = "/opt/QuantumWise/VNL-ATK-2017.2/bin/atkpython"
-        self.atk2018 = "/opt/QuantumWise/VNL-ATK-2018.06/bin/atkpython"
-        self.atk2019 = "/opt/QuantumWise/VNL-ATK-2019.03/bin/atkpython"
+        self.atk2017 = "/opt/QuantumWise/VNL-ATK-2017.02/bin/atkpython"
+        self.atk2018 = "/opt/QuantumWise/VNL-ATK-2018.06SP1/bin/atkpython"
+        self.atk2019 = "/opt/QuantumWise/VNL-ATK-2019.12/bin/atkpython"
 
         self.lammps_mpirun_path = "mpirun"
         self.lammps_path = "lmp_g++"

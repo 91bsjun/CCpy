@@ -81,7 +81,7 @@ class JobInitiator:
             myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.vasp(band=band, dirpath=dirpath, phonon=phonon, loop=loop, diff_ver=diff_ver)
 
-    def vasp_batch(self, scratch=False, sub=False, loop=False):
+    def vasp_batch(self, scratch=False, sub=False, loop=False, diff_ver=False):
         # --- Collect VASP inputs
         band = False
         phonon = False
