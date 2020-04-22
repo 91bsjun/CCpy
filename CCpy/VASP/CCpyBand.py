@@ -436,7 +436,8 @@ def main_run():
 
         plt.subplot(121)
         cms_band = CMSBand(elt_projected=True, dos=True, fig=fig)
-        plt = cms_band.blueBand(miny=miny, maxy=maxy, line_width=line_width)
+        # plt = cms_band.blueBand(miny=miny, maxy=maxy, line_width=line_width)
+        plt = cms_band.blueBand(miny=miny, maxy=maxy, line_width=line_width, band_indices=band_indices, spin=spin)
 
         cms_band.save_band_data(color=False, savefig=False)
 
