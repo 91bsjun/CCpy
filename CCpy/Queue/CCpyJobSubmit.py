@@ -351,7 +351,8 @@ if __name__ == "__main__":
     -beef
     <Options for ATK version handling>
     -atk2018        : ex) CCpyJobSubmit.py 3 xeon4 -atk2018  
-    -atk2019
+    -atk2019        --> 2019.03
+    -atk2019.12     --> 2019.12 
 
     Since the default version is 2017, you do not need to mention it when you want to use the 2017 version.
 
@@ -394,6 +395,8 @@ if __name__ == "__main__":
             atk_version = 'atk2018'
         if '-atk2019' in s:
             atk_version = 'atk2019'
+        if '-atk2019.12' in s:
+            atk_version = 'atk2019.12'
         if '-T=' in s:
             temp = int(s.split("=")[1])
         if '-sub' in s:
