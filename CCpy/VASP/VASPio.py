@@ -536,8 +536,9 @@ class VASPInput():
             print("Band-DOS directory is exist already. All files wii be override.")
 
         os.chdir("Band-DOS")
-        prev_files =["CHG", "CHGCAR", "CONTCAR", "DOSCAR", "EIGENVAL", "IBZKPT", "INCAR", "KPOINTS",
-                     "POSCAR", "POTCAR", "PROCAR", "WAVECAR", "XDATCAR"]
+        # prev_files =["CHG", "CHGCAR", "CONTCAR", "DOSCAR", "EIGENVAL", "IBZKPT", "INCAR", "KPOINTS",
+        #              "POSCAR", "POTCAR", "PROCAR", "WAVECAR", "XDATCAR"]
+        prev_files =["CHGCAR", "CONTCAR", "INCAR", "KPOINTS", "POSCAR", "POTCAR"]
         for pf in prev_files:
             if pf in os.listdir("../"):
                 linux_command("cp ../" + pf + " ./")
@@ -567,7 +568,7 @@ class VASPInput():
         incar_keys = incar_dict.keys()
 
         # -- Band-DOS INCAR
-        get_sets = "ICHARG=11,SIGMA=0.02,NSW=0,NEDOS=2001"
+        get_sets = "ICHARG=11,SIGMA=0.02,NSW=0,NEDOS=2001,ISMEAR=-5,PREC=Accurate"
         if get_sets != "n":
             vals = get_sets.replace(", ", ",")
             vals = vals.split(",")
