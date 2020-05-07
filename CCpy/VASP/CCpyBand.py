@@ -431,9 +431,16 @@ def main_run():
 
     # -- blue band & elt DOS
     elif sys.argv[1] == "3":
+        band_indices = False
+        for argv in sys.argv:
+            if '-nb' in argv:
+                from CCpy.Tools.CCpyTools import input_num_parser
+                nb_bands = cms_band.bands.nb_bands
+                print("\nTotal number of bands: ", nb_bands)
+                band_indices = input_num_parser(nb_bands)
+                band_indices = list(np.array(band_indices) - 1)
+
         fig = plt.figure(figsize=(12, 10))
-
-
         plt.subplot(121)
         cms_band = CMSBand(elt_projected=True, dos=True, fig=fig)
         # plt = cms_band.blueBand(miny=miny, maxy=maxy, line_width=line_width)
