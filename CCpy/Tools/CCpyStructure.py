@@ -285,7 +285,7 @@ class PeriodicStructure():
                 "_atom_site_fract_z\n"+
                 "_atom_site_occupancy\n")
         for i in range(len(atoms)):
-            f.write(str(atoms[i]) + "    " + str(round(fcoords[i][0]), 6).rjust(12) + str(round(fcoords[i][1]), 6).rjust(12) + str(round(fcoords[i][2]), 6).rjust(12) + "1.00".rjust(12) + "\n")
+            f.write(str(atoms[i]) + "    " + str(round(fcoords[i][0], 6)).rjust(12) + str(round(fcoords[i][1], 6)).rjust(12) + str(round(fcoords[i][2], 6)).rjust(12) + "1.00".rjust(12) + "\n")
 
         f.close()
 
