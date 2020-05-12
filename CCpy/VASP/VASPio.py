@@ -1190,7 +1190,7 @@ class VASPOutput():
         print("* Handled error log saved: 02_error_handled.yaml")
         print("\nDone.")
 
-    def vasp_zip(self, dirs):
+    def vasp_zip(self, dirs, minimize=False):
         cnt = 0
         pwd = os.getcwd()
         minimum_length = 8
@@ -1205,6 +1205,11 @@ class VASPOutput():
                     if fgz in os.listdir("./"):
                         os.system("mv %s %s" % (fgz, fgz.replace(".gz", ".1.gz")))
                     os.system("gzip %s" % f)
+        def rm_exec(file_list):
+            for f in file_list:
+                if f in os.listdir("./"):
+                    os.remove(f)
+       
 
         total = len(dirs)
         cnt = 1
@@ -1219,7 +1224,11 @@ class VASPOutput():
             #sys.stdout.flush()
             #sys.stdout.write("\b" * len(msg))
 
-            gzip_exec(['CHG', 'CHGCAR', 'DOSCAR', 'OUTCAR', 'PROCAR', 'vasprun.xml', 'XDATCAR'])
+            if minimize:
+                gzip_exec(['OUTCAR', 'vasprun.xml', 'XDATCAR'])
+                rm_exec(['CHG', 'CHG.gz', 'CHGCAR', 'CHGCAR.gz', 'DOSCAR', 'DOSCAR.gz', 'PROCAR', 'PROCAR.gz'])
+            else:
+                gzip_exec(['CHG', 'CHGCAR', 'DOSCAR', 'OUTCAR', 'PROCAR', 'vasprun.xml', 'XDATCAR'])
 
             cnt+=1
             os.chdir(pwd)

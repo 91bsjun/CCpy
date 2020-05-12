@@ -43,13 +43,14 @@ except:
 -e : Handling errors listed '01_unconverged_jobs.csv' file 
      based on Materials Project's custodian module.
 
--zip : zip unnecessary files (remove CHG, zip CHGCAR DOSCAR PROCAR XDATCAR vasprun.xml)
+-zip : zip unnecessary files (zip CHGCAR DOSCAR PROCAR XDATCAR vasprun.xml)
     ex) CCpyVASPAnal.py -zip      -> user choose directories
     ex) CCpyVASPAnal.py -zip -sub -> user choose directories (include subdirectories)
     ex) CCpyVASPAnal.py -zip -auto        -> automatically detect converged jobs
     ex) CCpyVASPAnal.py -zip -auto -sub   ->               (include subdirectories)
     ex) CCpyVASPAnal.py -zip -bg          -> detect and zip converged jobs every 30 minutes
     ex) CCpyVASPAnal.py -zip -bg -sub     ->               (include sub directories)
+    ex) CCpyVaspAnal.py -zip -m           -> remove CHG* DOSCAR* PROCAR*
    
     
 """
@@ -145,6 +146,9 @@ elif sys.argv[1] == "-zip":
     """
     zipped status add
     """
+    minimize = False
+    if '-m' in sys.argv:
+        minimize = True
     VO = VASPOutput()
     if "-bg" in sys.argv:
         print("Start loop..")
@@ -174,11 +178,11 @@ elif sys.argv[1] == "-zip":
             print("Cannot find unzipped VASP job.")
         else:
             print("\n\n# ----------- Zipping -------------- #")
-            VO.vasp_zip(dirs)
+            VO.vasp_zip(dirs, minimize=minimize)
     else:
         dirs = selectVASPOutputs("./", sub=sub)
         print("\n\n# ----------- Zipping -------------- #")
-        VO.vasp_zip(dirs)
+        VO.vasp_zip(dirs, minimize=minimize)
 
         
 elif sys.argv[1] == "-e":
