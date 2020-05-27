@@ -301,12 +301,11 @@ class GaussianOutput():
 
     def chkTerminatedState(self):
         state = "Not finished or stopped"
-
-	f = os.popen("tail %s" % self.filename).read()
-	if "Normal termination" in f:
-	    state = "Normal termination"
-	elif "Error termination" in f:
-	    state = "Error termination"
+        f = os.popen("tail %s" % self.filename).read()
+        if "Normal termination" in f:
+            state = "Normal termination"
+        elif "Error termination" in f:
+            state = "Error termination"
 
         return state
         
