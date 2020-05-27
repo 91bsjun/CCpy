@@ -43,7 +43,14 @@ if sys.argv[1] == "0":
         states.append(state)
     info["Status"] = states
     df = pd.DataFrame(info, index=logs)
+    pd.set_option('display.max_rows', None)
     print(df)
+
+    df.to_csv(".00_job_status.csv")
+    filename = "00_job_status.txt"
+    f = open("00_job_status.txt", "w") 
+    f.write(df.to_string())
+    f.close()
 
 elif sys.argv[1] == "1":
     for log in logs:
