@@ -300,16 +300,13 @@ class GaussianOutput():
         return homo, data
 
     def chkTerminatedState(self):
-        lines = self.log_file_lines
+        state = "Not finished or stopped"
 
-        for line in lines:
-            if "Normal termination" in line:
-                state = "Normal termination"
-            elif "Error termination" in line:
-                state = "Error termination"
-                print("e")
-            else:
-                state = "Not finished or stopped"
+	f = os.popen("tail %s" % self.filename).read()
+	if "Normal termination" in f:
+	    state = "Normal termination"
+	elif "Error termination" in f:
+	    state = "Error termination"
 
         return state
         
