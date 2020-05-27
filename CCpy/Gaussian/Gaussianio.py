@@ -307,6 +307,7 @@ class GaussianOutput():
                 state = "Normal termination"
             elif "Error termination" in line:
                 state = "Error termination"
+                print("e")
             else:
                 state = "Not finished or stopped"
 
