@@ -127,6 +127,62 @@ cd $SGE_O_WORKDIR
         shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
+    def gaussian_batch(self, input_files):
+        cpu, mem, q = self.n_of_cpu, self.mem, self.q
+        d = self.divided
+
+        mem = int(mem / d)
+
+        f = open(inputfile, "r")
+        lines = f.readlines()
+        f.close()
+
+        f = open(inputfile, "w")
+        for line in lines:
+            if "%nproc=" in line:
+                f.write("%nproc=" + str(cpu) + "\n")
+            elif "%mem=" in line:
+                f.write("%mem=" + str(mem) + "Gb\n")
+            else:
+                f.write(line)
+        f.close()
+
+        jobname = raw_input("Jobname for this job \n: ")
+        runs = ""
+        for each_input in input_files:
+            runs += "%s %s\nsleep 10\n" % (self.g09_path, each_input)
+
+        mpi = '''#!/bin/csh
+# Job name 
+#$ -N %s
+
+# pe request
+%s
+
+# queue name
+%s
+
+# node
+%s
+
+#$ -V
+#$ -cwd
+
+
+cd $SGE_O_WORKDIR
+
+%s
+
+''' % (jobname, self.pe_request, self.queue_name, self.node_assign, runs)
+
+        f = open("mpi.sh", "w")
+        f.write(mpi)
+        f.close()
+
+        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl("rm -rf ./mpi.sh", shell=True)
+
+
     def vasp(self, band=False, phonon=False, dirpath=None, loop=False, diff_ver=False):
         inputfile = self.inputfile
 

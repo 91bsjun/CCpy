@@ -40,6 +40,14 @@ class JobInitiator:
             myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.gaussian()
 
+    def gaussian_batch(self):
+        # --- COLLECT INPUT FILES
+        input_marker = [".com"]
+        inputs = selectInputs(input_marker, "./", ask=ask)
+
+        myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
+        myJS.gaussian_batch(inputs)
+
     def vasp(self, sub=None, loop=None, diff_ver=None):
         # --- Collect VASP inputs
         band = False
@@ -105,11 +113,6 @@ class JobInitiator:
             inputs = selectVASPInputs("./", dir_list=df['Directory'].tolist())
         else:
             inputs = selectVASPInputs("./", ask=ask, sub=sub)
-
-        # -- Clean vasp.done if exists
-        for each_input in inputs:
-            if 'vasp.done' in os.listdir(each_input):
-                os.remove(each_input + '/vasp.done')
 
         # --- SUBMIT QUEUE
         dirs = []
@@ -418,7 +421,10 @@ if __name__ == "__main__":
 
     ## ------ GAUSSIAN
     if sys.argv[1] == "1":
-        job_init.gaussian()
+        if "-batch" in sys.argv:
+            job_init.gaussian_batch()
+        else:
+            job_init.gaussian()
 
     ## ------ VASP
     elif sys.argv[1] == "2":
