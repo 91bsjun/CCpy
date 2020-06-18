@@ -45,7 +45,7 @@ class JobInitiator:
         input_marker = [".com"]
         inputs = selectInputs(input_marker, "./", ask=ask)
 
-        myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
+        myJS = JS("batch_job", self.queue, self.n_of_cpu, node=self.node)
         myJS.gaussian_batch(inputs)
 
     def vasp(self, sub=None, loop=None, diff_ver=None):

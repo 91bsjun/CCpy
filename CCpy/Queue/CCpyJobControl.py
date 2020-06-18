@@ -133,19 +133,20 @@ cd $SGE_O_WORKDIR
 
         mem = int(mem / d)
 
-        f = open(inputfile, "r")
-        lines = f.readlines()
-        f.close()
+        for inputfile in input_files:
+            f = open(inputfile, "r")
+            lines = f.readlines()
+            f.close()
 
-        f = open(inputfile, "w")
-        for line in lines:
-            if "%nproc=" in line:
-                f.write("%nproc=" + str(cpu) + "\n")
-            elif "%mem=" in line:
-                f.write("%mem=" + str(mem) + "Gb\n")
-            else:
-                f.write(line)
-        f.close()
+            f = open(inputfile, "w")
+            for line in lines:
+                if "%nproc=" in line:
+                    f.write("%nproc=" + str(cpu) + "\n")
+                elif "%mem=" in line:
+                    f.write("%mem=" + str(mem) + "Gb\n")
+                else:
+                    f.write(line)
+            f.close()
 
         jobname = raw_input("Jobname for this job \n: ")
         runs = ""
