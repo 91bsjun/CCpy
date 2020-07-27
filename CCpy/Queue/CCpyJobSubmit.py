@@ -4,8 +4,10 @@
 
 import os, sys
 from subprocess import call as shl
+from collections import OrderedDict
 
 import pandas as pd
+import yaml
 
 from CCpy.Queue.CCpyJobControl import JobSubmit as JS
 from CCpy.Tools.CCpyTools import selectInputs, selectVASPInputs, selectSIESTAInput
@@ -279,7 +281,30 @@ class JobInitiator:
         myJS = JS(inputs[0], self.queue, self.n_of_cpu, node=self.node)
         myJS.siesta_AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp, specie=specie)
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+
 if __name__ == "__main__":
+    # -- settings for command path
+    home = os.getenv("HOME")
+    if ".CCpy" not in os.listdir(home):
+        os.mkdir(home+"/.CCpy")
+    if "queue_config.yaml" not in os.listdir(home + "/.CCpy"):
+        queue_config = OrderedDict({"qsub": "qsub", "python_path": "/home/shared/anaconda3/envs/CCpy/bin/python", "mpi_run": "mpirun", "atk_mpi_run": "/opt/intel/compilers_and_libraries_2018.1.163/linux/mpi/intel64/bin/mpirun", "vasp_path": "/opt/vasp/vasp.5.4.1/bin/vasp_std", "g09_path": "g09", "atk_path": "/opt/Quantumwise/VNL-ATK-2019.12/bin/atkpython", "lammps_path": "lmp_g++", "siesta_path": "siesta"})
+        yaml_string = yaml.dump(queue_config, default_flow_style=False)
+
+        f = open("%s/.CCpy/queue_config.yaml" % home, "w")
+        f.write(yaml_string)
+        f.close()
+
     try:
         chk = sys.argv[1]
         chk = sys.argv[2]
@@ -349,19 +374,15 @@ if __name__ == "__main__":
                       ex) CCpyJobSubmit.py 2 xeon5 -loop
                       very careful when use this option
 
-    <Options for ATK version handling>
-    -sol
-    -beef
-    <Options for ATK version handling>
-    -atk2018        : ex) CCpyJobSubmit.py 3 xeon4 -atk2018  
-    -atk2019        --> 2019.03
-    -atk2019.12     --> 2019.12 
-
-    Since the default version is 2017, you do not need to mention it when you want to use the 2017 version.
-
-
     '''
               )
+        print(bcolors.OKGREEN + "    *** Queue config file: %s/.CCpy/queue_config.yaml ***" % home + bcolors.ENDC)
+        print("""    - User can modify software version (ex. vasp_beef, atk2019...)
+    - This file is created when CCpyJobSubmit.py is executed without option.
+    - Therefore, if you want to regenerate as the default option or 
+      if an error occurs due to this file, remove the file and execute the A command.
+""")
+
         quit()
 
     # --- Queue name check

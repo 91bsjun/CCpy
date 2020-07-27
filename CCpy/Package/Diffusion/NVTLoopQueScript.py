@@ -21,7 +21,7 @@ specie = sys.argv[3]
 screen = sys.argv[4]
 structure = IStructure.from_file(structure_filename)
 
-vasp = "vasp"
+vasp = "/opt/vasp/vasp.5.4.1/bin/vasp_std"
 NCORE = 4
 #user_incar = {"NCORE": NCORE, "ENCUT": 400, "LREAL": "Auto", "PREC": "Normal", "ALGO": "Fast", "EDIFF": 1E-05, "ICHARG": 0, "IALGO": 48}
 #user_incar = {"NCORE": NCORE, "PREC": "Normal", "ALGO": "Fast", "ICHARG": 0}

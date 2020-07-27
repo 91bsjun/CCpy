@@ -1,5 +1,10 @@
 import os, sys
 from subprocess import call as shl
+from collections import OrderedDict
+import yaml
+def represent_dictionary_order(self, dict_data):
+    return self.represent_mapping('tag:yaml.org,2002:map', dict_data.items())
+yaml.add_representer(OrderedDict, represent_dictionary_order)
 
 # -- version chk
 version = sys.version
@@ -38,33 +43,28 @@ class JobSubmit:
             self.n_of_cpu = cpu
         self.divided = cpu / self.n_of_cpu
 
-        # -- settings for command path
-        self.queue_path = ""
-        self.qsub = "qsub"
+        home = os.getenv("HOME")
+        yaml_string = open("%s/.CCpy/queue_config.yaml" % home, "r").read()
+        queue_config = yaml.load(yaml_string)
+            
+        self.qsub = queue_config['qsub']
 
-        self.python_path = "/home/shared/anaconda3/envs/CCpy/bin/python"
-        self.mpi_run = "mpirun"  # default mpirun
+        self.python_path = queue_config['python_path']
+        self.mpi_run = queue_config['mpi_run']
 
-        self.atk_mpi_run = "/opt/intel/compilers_and_libraries_2018.1.163/linux/mpi/intel64/bin/mpirun"
+        self.atk_mpi_run = queue_config['atk_mpi_run']
 
-        vasp_path = '/opt/vasp/vasp.5.4.1/bin/vasp_std'
-        self.vasp_run = "mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp_path
-        vasp_path = '/opt/vasp/vasp.5.4.4-beef/bin/vasp_std'
-        self.vasp_run_beef = "mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp_path
-        vasp_path = '/opt/vasp/vasp.5.4.1-vaspsol/bin/vasp_std'
-        self.vasp_run_sol = "mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp_path
+        vasp_path = queue_config['vasp_path']
+        self.vasp_run = "%s -np $NSLOTS %s < /dev/null > vasp.out" % (self.mpi_run, vasp_path)
 
-        self.g09_path = "g09"
+        self.g09_path = queue_config['g09_path']
+        self.atk_path = queue_config['atk_path']
 
-        self.atk2017 = "/opt/Quantumwise/VNL-ATK-2017.02/bin/atkpython"
-        self.atk2018 = "/opt/Quantumwise/VNL-ATK-2018.06SP1/bin/atkpython"
-        self.atk2019 = "/opt/Quantumwise/VNL-ATK-2019.03/bin/atkpython"
-        self.atk2019_12 = "/opt/Quantumwise/VNL-ATK-2019.12/bin/atkpython"
+        self.lammps_mpirun_path = self.mpi_run
+        self.lammps_path = queue_config['lammps_path']
+        
+        self.siesta_path = queue_config['siesta_path']
 
-        self.lammps_mpirun_path = "mpirun"
-        self.lammps_path = "lmp_g++"
-
-        self.siesta_path = "siesta"
 
         # -- queue settings
         self.pe_request = "#$ -pe mpi_%d %d" % (self.n_of_cpu, self.n_of_cpu)
@@ -124,7 +124,7 @@ cd $SGE_O_WORKDIR
         f.write(mpi)
         f.close()
 
-        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def gaussian_batch(self, input_files):
@@ -180,7 +180,7 @@ cd $SGE_O_WORKDIR
         f.write(mpi)
         f.close()
 
-        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
 
@@ -242,7 +242,7 @@ touch vasp.done
         f = open("mpi.sh", "w")
         f.write(mpi)
         f.close()
-        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
         os.chdir(pwd)
 
@@ -314,7 +314,7 @@ touch vasp.done
         f = open("mpi.sh", "w")
         f.write(mpi)
         f.close()
-        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def qchem(self):
@@ -357,19 +357,10 @@ qchem %s %s
         f.write(mpi)
         f.close()
 
-        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def ATK(self, atk_version="atk2017"):
-        if atk_version == "atk2018":
-            atk_path = self.atk2018
-        elif atk_version == "atk2019":
-            atk_path = self.atk2019
-        elif atk_version == "atk2019.12":
-            atk_path = self.atk2019_12
-        else:
-            atk_path = self.atk2017
-
         inputfile = self.inputfile
 
         jobname = "A" + inputfile.replace(".py", "")
@@ -410,14 +401,14 @@ cd $SGE_O_WORKDIR
 env | grep PRELOAD
 $MPI_EXEC -n %d %s %s > %s
 
-''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.atk_mpi_run, self.n_of_cpu, atk_path,
+''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.atk_mpi_run, self.n_of_cpu, self.atk_path,
        inputfile, outputfile)
 
         f = open("mpi.sh", "w")
         f.write(mpi)
         f.close()
 
-        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def atat(self):
@@ -462,7 +453,7 @@ rm wait
         f.write(mpi)
         f.close()
 
-        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     # -- To show SGE queue system that " I'm running now "
@@ -497,7 +488,7 @@ python %s
         f.write(mpi)
         f.close()
 
-        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def lammps(self):
@@ -534,7 +525,7 @@ cd $SGE_O_WORKDIR
         f.write(mpi)
         f.close()
 
-        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def AIMD_NVT_Loop(self, structure_filename=None, temp=None, specie="Li", screen='no_screen'):
@@ -573,7 +564,7 @@ cd $SGE_O_WORKDIR
         f.write(mpi)
         f.close()
 
-        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def AIMD_NVT_Loop_batch(self, structure_files=None, temp=None, specie="Li", screen='no_screen'):
@@ -621,7 +612,7 @@ cd $SGE_O_WORKDIR
         f.write(mpi)
         f.close()
 
-        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def casm_run(self):
@@ -651,7 +642,7 @@ casm-calc --run
         f.write(mpi)
         f.close()
 
-        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def siesta(self):
@@ -683,7 +674,7 @@ mpirun -np $NSLOTS %s < %s > siesta.out
         f.write(mpi)
         f.close()
 
-        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
     def siesta_AIMD_NVT_Loop(self, structure_filename=None, temp=None, specie="Li"):
@@ -722,5 +713,5 @@ mpirun -np $NSLOTS %s < %s > siesta.out
         f.write(mpi)
         f.close()
 
-        shl(self.queue_path + self.qsub + " mpi.sh", shell=True)
+        shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
