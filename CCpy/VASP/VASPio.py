@@ -528,7 +528,7 @@ class VASPInput():
     # ------------------------------------------------------------------------------#
     #                     CMS band and DOS calc VASP input set                      #
     # ------------------------------------------------------------------------------#
-    def cms_band_set(self, input_line_kpts=None):
+    def cms_band_set(self, input_line_kpts=None, dos=False):
         ## -------------------------- Copy previous Calc --------------------------- ##
         try:
             os.mkdir("Band-DOS")
@@ -616,61 +616,63 @@ class VASPInput():
 
         ## -------------------------------- KPOINTS -------------------------------- ##
         # -- Line mode KPOINTS is needed to calc band structure
-        if not input_line_kpts:
-            print("\n# -------------------------------------------------------- #")
-            print("#              Make new line-mode KPOINTS file             #")
-            print("# -------------------------------------------------------- #")
-            from pymatgen.symmetry.bandstructure import HighSymmKpath
+        if not dos:
+            if not input_line_kpts:
+                print("\n# -------------------------------------------------------- #")
+                print("#              Make new line-mode KPOINTS file             #")
+                print("# -------------------------------------------------------- #")
+                from pymatgen.symmetry.bandstructure import HighSymmKpath
 
-            structure = pmgIS.from_file("POSCAR")
-            hsk = HighSymmKpath(structure)
-            line_kpoints = Kpoints.automatic_linemode(20, hsk)
-            line_kpoints = str(line_kpoints)
-            splt_kpts = line_kpoints.split("\n")
+                structure = pmgIS.from_file("POSCAR")
+                hsk = HighSymmKpath(structure)
+                line_kpoints = Kpoints.automatic_linemode(20, hsk)
+                line_kpoints = str(line_kpoints)
+                splt_kpts = line_kpoints.split("\n")
 
-            pts = {}
-            keys = []
-            for kp in splt_kpts:
-                if "!" in kp:
-                    tmp = kp.split("!")
-                    name = tmp[1].replace(" ","")
-                    if name not in pts.keys():
-                        pts[name] = tmp[0]
-                        keys.append(name)
-            print("\n* Available k-points in this structure")
-            for key in keys:
-                print(key + " : " + pts[key])
-            get_pts = raw_input("\n* Choose k-points to use Band calculations (ex: \Gamma,M,K,L) \n: ")
-            get_pts = get_pts.replace(" ", "")
-            get_pts = get_pts.split(",")
+                pts = {}
+                keys = []
+                for kp in splt_kpts:
+                    if "!" in kp:
+                        tmp = kp.split("!")
+                        name = tmp[1].replace(" ","")
+                        if name not in pts.keys():
+                            pts[name] = tmp[0]
+                            keys.append(name)
+                print("\n* Available k-points in this structure")
+                for key in keys:
+                    print(key + " : " + pts[key])
+                get_pts = raw_input("\n* Choose k-points to use Band calculations (ex: \Gamma,M,K,L) \n: ")
+                get_pts = get_pts.replace(" ", "")
+                get_pts = get_pts.split(",")
 
-            line_kpoints = """Line_mode KPOINTS file
-20
-Line_mode
-Reciprocal
-"""
+                line_kpoints = """Line_mode KPOINTS file
+    20
+    Line_mode
+    Reciprocal
+    """
 
-            for i in range(len(get_pts)):
-                try:
-                    ini = pts[get_pts[i]] + " ! " +get_pts[i] + "\n"
-                    fin = pts[get_pts[i + 1]] + " ! " + get_pts[i + 1] + "\n\n"
-                    line_kpoints += ini + fin
-                except:
-                    ini = pts[get_pts[i]] + " ! " + get_pts[i] + "\n"
-                    fin = pts[get_pts[0]] + " ! " + get_pts[0] + "\n\n"
-                    line_kpoints += ini + fin
+                for i in range(len(get_pts)):
+                    try:
+                        ini = pts[get_pts[i]] + " ! " +get_pts[i] + "\n"
+                        fin = pts[get_pts[i + 1]] + " ! " + get_pts[i + 1] + "\n\n"
+                        line_kpoints += ini + fin
+                    except:
+                        ini = pts[get_pts[i]] + " ! " + get_pts[i] + "\n"
+                        fin = pts[get_pts[0]] + " ! " + get_pts[0] + "\n\n"
+                        line_kpoints += ini + fin
 
-            file_writer("../../KPOINTSP", str(line_kpoints))
-            print("\n* Line-mode KPOINTS file has been saved : KPOINTSP")
+                file_writer("../../KPOINTSP", str(line_kpoints))
+                print("\n* Line-mode KPOINTS file has been saved : KPOINTSP")
 
-        # -- Read KPOINTS from user
-        else:
-            line_kpoints = input_line_kpts
+            # -- Read KPOINTS from user
+            else:
+                line_kpoints = input_line_kpts
 
 
         ## --------------------------- Write input files ---------------------- ##
         file_writer("INCAR",str(incar))
-        file_writer("KPOINTS",str(line_kpoints))
+        if not dos:
+            file_writer("KPOINTS",str(line_kpoints))
         os.chdir("../")
         sys.stdout.write(" Done !\n")
 

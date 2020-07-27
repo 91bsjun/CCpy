@@ -4,7 +4,6 @@
     <list default="true" id="fe90ddd4-6adf-4dd8-96fd-3b416717383a" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -16,52 +15,6 @@
   <component name="FavoritesManager">
     <favorites_list name="CCpy" />
   </component>
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/CCpy/Queue/CCpyJobControl.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="7973">
-              <caret line="470" column="12" selection-start-line="470" selection-start-column="12" selection-end-line="470" selection-end-column="12" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/CCpy/Queue/CCpyJobSubmit.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4845">
-              <caret line="293" column="13" selection-start-line="293" selection-start-column="13" selection-end-line="293" selection-end-column="13" />
-              <folding>
-                <element signature="e#63#77#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/CCpy/Package/Diffusion/NVTLoopQueScript.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="274">
-              <caret line="267" column="24" selection-start-line="267" selection-start-column="24" selection-end-line="267" selection-end-column="24" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/CCpy/Package/Diffusion/CCpyNVTLoopAnal.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="7684">
-              <caret line="460" column="40" selection-start-line="460" selection-start-column="40" selection-end-line="460" selection-end-column="40" />
-              <folding>
-                <element signature="e#18#32#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
-  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -70,91 +23,11 @@
       </list>
     </option>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>qdel</find>
-      <find>index</find>
-      <find>colors</find>
-      <find>subprocess</find>
-      <find>dump</find>
-      <find>Zipped</find>
-      <find>, queue=None, n_of_cpu=None</find>
-      <find>queue</find>
-      <find>n_of_cpu</find>
-    </findStrings>
-    <replaceStrings>
-      <replace>y_index</replace>
-      <replace>self.q</replace>
-      <replace>self.n_of_cpu</replace>
-    </replaceStrings>
-  </component>
   <component name="Git.Settings">
     <option name="ROOT_SYNC" value="DONT_SYNC" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/Tools/vasp_incar.json" />
-        <option value="$PROJECT_DIR$/Gaussian/Gaussianio.py" />
-        <option value="$PROJECT_DIR$/Package/CCpyROEcalc.py" />
-        <option value="$PROJECT_DIR$/Queue/CCpyJobDelete.py" />
-        <option value="$PROJECT_DIR$/VASP/CCpyContribBand.py" />
-        <option value="$PROJECT_DIR$/VASP/CCpyDOS.py" />
-        <option value="$PROJECT_DIR$/Gaussian/CCpyGaussianAnal.py" />
-        <option value="$PROJECT_DIR$/Gaussian/CCpyGaussianInputGen.py" />
-        <option value="$PROJECT_DIR$/Qchem/CCpyQchemAnal.py" />
-        <option value="$PROJECT_DIR$/Qchem/CCpyQchemInputGen.py" />
-        <option value="$PROJECT_DIR$/IKST/CCpyIKSTconvertPOSCAR.py" />
-        <option value="$PROJECT_DIR$/IKST/CCpyIKSTeditINCAR.py" />
-        <option value="$PROJECT_DIR$/Queue/CCpyqstat.py" />
-        <option value="$PROJECT_DIR$/ATAT/CCpyATATInputGen.py" />
-        <option value="$PROJECT_DIR$/ATAT/ATATio.py" />
-        <option value="$PROJECT_DIR$/IKST/CCpyIKSTgetForm.py" />
-        <option value="$PROJECT_DIR$/CASM/CCpyCASMhull.py" />
-        <option value="$PROJECT_DIR$/VASP/CCpyVASPAnal.py" />
-        <option value="$PROJECT_DIR$/VASP/CCpyBand.py" />
-        <option value="$PROJECT_DIR$/Tools/CCpyTools.py" />
-        <option value="$PROJECT_DIR$/Queue/CCpyJobSubmit.py" />
-        <option value="$PROJECT_DIR$/Queue/CCpyJobControl.py" />
-        <option value="$PROJECT_DIR$/VASP/VASPtools.py" />
-        <option value="$PROJECT_DIR$/VASP/VASPio.py" />
-        <option value="$PROJECT_DIR$/VASP/CCpyVASPInputGen.py" />
-        <option value="$PROJECT_DIR$/VASP/pymatgen_plotter.py" />
-        <option value="$PROJECT_DIR$/__init__.py" />
-        <option value="$PROJECT_DIR$/CCpy/__init__.py" />
-        <option value="$PROJECT_DIR$/CCpy/VASP/CCpyBand.py" />
-        <option value="$PROJECT_DIR$/CCpy/ATK/CCpyATKAnal.py" />
-        <option value="$PROJECT_DIR$/CCpy/VASP/Readme.md" />
-        <option value="$PROJECT_DIR$/CCpy/VASP/CCpyDiffusionAnal.py" />
-        <option value="$PROJECT_DIR$/setup.py" />
-        <option value="$PROJECT_DIR$/CCpy/VASP/CCpyVASPInputGen.py" />
-        <option value="$PROJECT_DIR$/CCpy/AIMD/CCpyNVTLoop.py" />
-        <option value="$PROJECT_DIR$/CCpy/AIMD/__init__.py" />
-        <option value="$PROJECT_DIR$/CCpy/AIMD/CCpyNVTLoopAnal.py" />
-        <option value="$PROJECT_DIR$/CCpy/AIMD/NVTLoopQueScript.py" />
-        <option value="$PROJECT_DIR$/CCpy/Tools/CCpyTools.py" />
-        <option value="$PROJECT_DIR$/CCpy/VASP/CCpyVASPAnal.py" />
-        <option value="$PROJECT_DIR$/CCpy/Package/VASPOptLoopQueScript.py" />
-        <option value="$PROJECT_DIR$/CCpy/VASP/VASPio.py" />
-        <option value="$PROJECT_DIR$/CCpy/VASP/VASPtools.py" />
-        <option value="$PROJECT_DIR$/CCpy/Package/Diffusion/__init__.py" />
-        <option value="$PROJECT_DIR$/CCpy/Package/CCpyNVTLoopAnal.py" />
-        <option value="$PROJECT_DIR$/CCpy/bin/CCpyNVTLoopAnal.py" />
-        <option value="$PROJECT_DIR$/CCpy/Tools/CCpyLayerShift.py" />
-        <option value="$PROJECT_DIR$/CCpy/Queue/CCpyJobControl.py" />
-        <option value="$PROJECT_DIR$/CCpy/Queue/CCpyJobSubmit.py" />
-        <option value="$PROJECT_DIR$/CCpy/Package/Diffusion/CCpyNVTLoopAnal.py" />
-        <option value="$PROJECT_DIR$/CCpy/Package/Diffusion/NVTLoopQueScript.py" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="254" />
-    <option name="y" value="-13" />
-    <option name="width" value="1366" />
-    <option name="height" value="1047" />
-  </component>
+  <component name="ProjectId" id="1VPwKs4sU5mCZ6o5eSJxUeeNsL4" />
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
       <profile-state>
@@ -177,59 +50,21 @@
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
-  <component name="ProjectView">
-    <navigator proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="Scope" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="CCpy" type="b2602c69:ProjectViewProjectNode" />
-              <item name="CCpy" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="CCpy" type="b2602c69:ProjectViewProjectNode" />
-              <item name="CCpy" type="462c0819:PsiDirectoryNode" />
-              <item name="CCpy" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="CCpy" type="b2602c69:ProjectViewProjectNode" />
-              <item name="CCpy" type="462c0819:PsiDirectoryNode" />
-              <item name="CCpy" type="462c0819:PsiDirectoryNode" />
-              <item name="Package" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="CCpy" type="b2602c69:ProjectViewProjectNode" />
-              <item name="CCpy" type="462c0819:PsiDirectoryNode" />
-              <item name="CCpy" type="462c0819:PsiDirectoryNode" />
-              <item name="Package" type="462c0819:PsiDirectoryNode" />
-              <item name="Diffusion" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="CCpy" type="b2602c69:ProjectViewProjectNode" />
-              <item name="CCpy" type="462c0819:PsiDirectoryNode" />
-              <item name="CCpy" type="462c0819:PsiDirectoryNode" />
-              <item name="Queue" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="CCpy" type="b2602c69:ProjectViewProjectNode" />
-              <item name="CCpy" type="462c0819:PsiDirectoryNode" />
-              <item name="CCpy" type="462c0819:PsiDirectoryNode" />
-              <item name="Tools" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-    </panes>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../CCpyNN" />
-    <property name="settings.editor.selected.configurable" value="preferences.sourceCode" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Python" />
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
@@ -246,18 +81,6 @@
       <recent name="C:\Users\bsjun\Documents\Codes\CCpy\Package" />
       <recent name="C:\Users\bsjun\Documents\Codes\CCpy\VASP" />
     </key>
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
   </component>
   <component name="RunManager">
     <configuration default="true" type="tests" factoryName="Attests">
@@ -327,6 +150,18 @@
       <method v="2" />
     </configuration>
   </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -342,42 +177,33 @@
       <workItem from="1545630053253" duration="7944000" />
       <workItem from="1547086045076" duration="22373000" />
       <workItem from="1547540094834" duration="103000" />
+      <workItem from="1577167981413" duration="396000" />
+      <workItem from="1577168462006" duration="22000" />
+      <workItem from="1577334621128" duration="598000" />
+      <workItem from="1577412808150" duration="1794000" />
+      <workItem from="1577415354217" duration="953000" />
+      <workItem from="1586139286041" duration="2365000" />
+      <workItem from="1590476548391" duration="749000" />
+      <workItem from="1592466022309" duration="2034000" />
     </task>
     <servers />
   </component>
-  <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="50129000" />
-  </component>
-  <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.67197454" visible="true" weight="0.14179105" />
-      <window_info id="Structure" order="1" weight="0.24946696" />
-      <window_info id="Favorites" order="2" sideWeight="0.3280255" side_tool="true" weight="0.13541667" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32910052" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.21375662" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" weight="0.32908705" />
-      <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info anchor="bottom" id="Python Console" order="9" weight="0.329718" />
-      <window_info anchor="bottom" id="Terminal" order="10" weight="0.25382933" />
-      <window_info anchor="bottom" id="Docker" order="11" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Database Changes" order="12" />
-      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Data View" order="3" />
-      <window_info anchor="right" id="Remote Host" order="4" />
-      <window_info anchor="right" id="Database" order="5" />
-      <window_info anchor="right" id="SciView" order="6" />
-    </layout>
-  </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="739" y="261" key="FileChooserDialogImpl" timestamp="1577415507479">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="739" y="261" key="FileChooserDialogImpl/0.0.1920.1040/-1080.-446.1080.1880@0.0.1920.1040" timestamp="1577415507479" />
+    <state x="461" y="161" key="SettingsEditor" timestamp="1577168185179">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="461" y="161" key="SettingsEditor/0.0.1920.1040/-1080.-446.1080.1880@0.0.1920.1040" timestamp="1577168185179" />
+    <state x="652" y="343" key="com.intellij.ide.util.TipDialog" timestamp="1577167985726">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="652" y="343" key="com.intellij.ide.util.TipDialog/0.0.1920.1040/-1080.-446.1080.1880@0.0.1920.1040" timestamp="1577167985726" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -386,216 +212,13 @@
           <url>file://$PROJECT_DIR$/CCpy/VASP/VASPio.py</url>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/CCpy/Tools/CCpyLayerShift.py</url>
+          <line>1</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
-  </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Gaussian/CCpyGaussianAnal.py" />
-    <entry file="file://$PROJECT_DIR$/Gaussian/CCpyGaussianInputGen.py" />
-    <entry file="file://$PROJECT_DIR$/Qchem/CCpyQchemAnal.py" />
-    <entry file="file://$PROJECT_DIR$/Qchem/CCpyQchemInputGen.py" />
-    <entry file="file://$PROJECT_DIR$/IKST/CCpyIKSTconvertPOSCAR.py" />
-    <entry file="file://$PROJECT_DIR$/CASM/CCpyCASMInputGen.py" />
-    <entry file="file://$PROJECT_DIR$/CASM/CASMio.py" />
-    <entry file="file://$PROJECT_DIR$/Queue/CCpyqstat.py" />
-    <entry file="file://$PROJECT_DIR$/IKST/CCpyIKSTeditINCAR.py" />
-    <entry file="file://$PROJECT_DIR$/ATAT/CCpyATATAnal.py" />
-    <entry file="file://$PROJECT_DIR$/IKST/CCpyIKSTgetForm.py" />
-    <entry file="file://$PROJECT_DIR$/ATAT/CCpyATATInputGen.py" />
-    <entry file="file://$PROJECT_DIR$/ATAT/ATATio.py" />
-    <entry file="file://$PROJECT_DIR$/CASM/CCpyCASMhull.py" />
-    <entry file="file://$PROJECT_DIR$/VASP/CCpyVASPAnal.py" />
-    <entry file="file://$PROJECT_DIR$/Queue/CCpyJobSubmit.py" />
-    <entry file="file://$PROJECT_DIR$/Queue/CCpyJobControl.py" />
-    <entry file="file://$PROJECT_DIR$/Tools/CCpyTools.py" />
-    <entry file="file://$PROJECT_DIR$/VASP/VASPtools.py" />
-    <entry file="file://$PROJECT_DIR$/VASP/VASPio.py" />
-    <entry file="file://$PROJECT_DIR$/VASP/CCpyVASPInputGen.py" />
-    <entry file="file://$PROJECT_DIR$/VASP/CCpyBand.py" />
-    <entry file="file://$PROJECT_DIR$/VASP/pymatgen_plotter.py" />
-    <entry file="file://$PROJECT_DIR$/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" selection-start-line="8" selection-end-line="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret selection-end-line="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/Queue/Readme.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="357">
-          <caret line="75" column="67" selection-start-line="75" selection-start-column="67" selection-end-line="75" selection-end-column="67" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/VASP/Readme.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="595">
-          <caret line="35" column="109" selection-start-line="35" selection-start-column="109" selection-end-line="35" selection-end-column="109" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/VASP/CCpyContribBand.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="39" column="35" selection-start-line="39" selection-start-column="35" selection-end-line="39" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/VASP/CCpyDiffusionAnal.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="3" selection-start-line="3" selection-end-line="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="25" column="19" selection-start-line="25" selection-start-column="19" selection-end-line="25" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/VASP/pymatgen_plotter.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/VASP/CCpyBand.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" selection-start-line="16" selection-end-line="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/ATK/CCpyATKAnal.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="12" column="22" selection-start-line="12" selection-start-column="22" selection-end-line="12" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/Tools/CCpyStructure.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2754">
-          <caret line="164" column="8" lean-forward="true" selection-start-line="164" selection-start-column="8" selection-end-line="166" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/AIMD/__init__.py" />
-    <entry file="file://$PROJECT_DIR$/CCpy/VASP/CCpySiteBand.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/Tools/CCpyTools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="481">
-          <caret line="369" column="43" selection-start-line="369" selection-start-column="43" selection-end-line="369" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/VASP/VASPtools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="697">
-          <caret line="128" selection-start-line="128" selection-end-line="128" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/VASP/VASPio.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="838">
-          <caret line="71" column="42" selection-start-line="71" selection-start-column="19" selection-end-line="71" selection-end-column="43" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/VASP/CCpyVASPAnal.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="838">
-          <caret line="201" column="33" selection-start-line="201" selection-start-column="33" selection-end-line="201" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/VASP/CCpyVASPInputGen.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="838">
-          <caret line="77" column="8" selection-start-line="77" selection-start-column="8" selection-end-line="77" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/bin/CCpyCASMhull.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/bin/CCpyNVTLoopAnal.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="39" lean-forward="true" selection-start-column="39" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/Package/Diffusion/__init__.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/Queue/CCpyqstat.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="24" column="14" selection-start-line="24" selection-start-column="14" selection-end-line="24" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/Tools/CCpyLayerShift.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="80" lean-forward="true" selection-start-line="80" selection-end-line="80" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/Package/VASPOptLoopQueScript.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="281">
-          <caret line="109" column="18" selection-start-line="109" selection-start-column="18" selection-end-line="109" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/Queue/CCpyJobControl.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7973">
-          <caret line="470" column="12" selection-start-line="470" selection-start-column="12" selection-end-line="470" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/Queue/CCpyJobSubmit.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4845">
-          <caret line="293" column="13" selection-start-line="293" selection-start-column="13" selection-end-line="293" selection-end-column="13" />
-          <folding>
-            <element signature="e#63#77#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/Package/Diffusion/CCpyNVTLoopAnal.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7684">
-          <caret line="460" column="40" selection-start-line="460" selection-start-column="40" selection-end-line="460" selection-end-column="40" />
-          <folding>
-            <element signature="e#18#32#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CCpy/Package/Diffusion/NVTLoopQueScript.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="274">
-          <caret line="267" column="24" selection-start-line="267" selection-start-column="24" selection-end-line="267" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
   </component>
   <component name="masterDetails">
     <states>
