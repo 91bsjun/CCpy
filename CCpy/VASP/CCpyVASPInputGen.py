@@ -68,6 +68,7 @@ kpoints=False
 pseudo=False
 phonon=False
 functional="PBE_54"
+ismear=0
 
 for arg in sys.argv:
     if "-sp" == arg:
@@ -90,6 +91,8 @@ for arg in sys.argv:
         pseudo = arg.split("=")[1].split(",")
     elif "-phonon" in arg:
         phonon = True
+    elif "-ismear" in arg:
+        ismear = arg.split("=")[1]
     
 
 if sys.argv[1] == "1":
@@ -175,7 +178,7 @@ elif sys.argv[1] == "MPRelax":
         ispin = 2
     else:
         ispin = 1
-    user_incar = {"ISPIN": ispin}
+    user_incar = {"ISPIN": ispin, "LCHARG": "False", "ISMEAR": ismear}
     for each_input in inputs:
         MP_relax_VI = VASPInput(each_input)
         MP_relax_VI.MP_relax_set(user_incar=user_incar)
