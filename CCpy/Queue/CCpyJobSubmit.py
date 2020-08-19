@@ -376,14 +376,23 @@ if __name__ == "__main__":
 
         quit()
 
+    try:
+    CCpy_SCHEDULER_CONFIG = os.environ['CCpy_SCHEDULER_CONFIG']
+    except:
+        print('''Error while load $CCpy_SCHEDULER_CONFIG file.
+Please check the example of scheduler config file at https://github.com/91bsjun/CCpy/tree/master/CCpy/Queue''')
+        quit()
+
+    queue_info = yaml.load(open(CCpy_SCHEDULER_CONFIG, 'r'))
+
     # --- Queue name check
-    queues = ["xeon1", "xeon2", "xeon3", "xeon4", "xeon5", "xeon6", "xeon7", "I5", "epyc", "aws"]
+    queues = list(queue_info.keys())
     try:
         queue = sys.argv[2]
     except:
         queue = raw_input("Queue (xeon1, xeon2, ...) : ")
     if queue not in queues:
-        print("Unvalid queue name")
+        print("%s not in %s" % (queue, str(queues)))
         quit()
 
     # --- Suboption parsing
