@@ -29,7 +29,20 @@ queue_info = yaml.load(open(CCpy_SCHEDULER_CONFIG, 'r'))
 
 
 class JobSubmit:
-    def __init__(self, inputfile, queue, n_of_cpu, node=None):
+    def __init__(self, inputfile, queue, n_of_cpu, node=None, init_only=False):
+        home = os.getenv("HOME")
+        user_queue_config = "%s/.CCpy/queue_config.yaml" % home
+        if not os.path.isfile(user_queue_config):
+            from pathlib import Path
+            MODULE_DIR = Path(__file__).resolve().parent
+            default_queue_config = str(MODULE_DIR) + "/queue_config.yaml"
+            if ".CCpy" not in os.listdir(home):
+                os.mkdir(".CCpy")
+            os.system('cp %s %s' % (default_queue_config, user_queue_config))
+
+        if init_only:
+            quit()
+
         self.inputfile = inputfile
         cpu, mem, q = queue_info[queue][0], queue_info[queue][1], queue_info[queue][2]
 
@@ -42,16 +55,7 @@ class JobSubmit:
             self.n_of_cpu = cpu
         self.divided = cpu / self.n_of_cpu
 
-        home = os.getenv("HOME")
-        user_queue_config = "%s/.CCpy/queue_config.yaml" % home
-        if not os.path.isfile(user_queue_config):
-            from pathlib import Path
-            MODULE_DIR = Path(__file__).resolve().parent
-            default_queue_config = str(MODULE_DIR) + "/queue_config.yaml"
-            if ".CCpy" not in os.listdir(home):
-                os.mkdir(".CCpy")
-            os.system('cp %s %s' % (default_queue_config, user_queue_config))
-            
+        # -- read configs from queue_config.yaml            
         yaml_string = open(user_queue_config, "r").read()
         queue_config = yaml.load(yaml_string)
             

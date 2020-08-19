@@ -294,7 +294,7 @@ class bcolors:
 
 if __name__ == "__main__":
     # -- initiate config file
-    JS(None, 'xeon1', 16)
+    JS(None, None, None, init_only=True)
     try:
         chk = sys.argv[1]
         chk = sys.argv[2]
