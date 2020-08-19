@@ -293,18 +293,8 @@ class bcolors:
 
 
 if __name__ == "__main__":
-    # -- settings for command path
-    home = os.getenv("HOME")
-    if ".CCpy" not in os.listdir(home):
-        os.mkdir(home+"/.CCpy")
-    if "queue_config.yaml" not in os.listdir(home + "/.CCpy"):
-        queue_config = OrderedDict({"qsub": "qsub", "python_path": "/home/shared/anaconda3/envs/CCpy/bin/python", "mpi_run": "mpirun", "atk_mpi_run": "/opt/intel/compilers_and_libraries_2018.1.163/linux/mpi/intel64/bin/mpirun", "vasp_path": "/opt/vasp/vasp.5.4.1/bin/vasp_std", "g09_path": "g09", "atk_path": "/opt/Quantumwise/VNL-ATK-2019.12/bin/atkpython", "lammps_path": "lmp_g++", "siesta_path": "siesta"})
-        yaml_string = yaml.dump(queue_config, default_flow_style=False)
-
-        f = open("%s/.CCpy/queue_config.yaml" % home, "w")
-        f.write(yaml_string)
-        f.close()
-
+    # -- initiate config file
+    JS(None, 'xeon1', 16)
     try:
         chk = sys.argv[1]
         chk = sys.argv[2]
@@ -376,6 +366,7 @@ if __name__ == "__main__":
 
     '''
               )
+        home = os.getenv("HOME")
         print(bcolors.OKGREEN + "    *** Queue config file: %s/.CCpy/queue_config.yaml ***" % home + bcolors.ENDC)
         print("""    - User can modify software version (ex. vasp_beef, atk2019...)
     - This file is created when CCpyJobSubmit.py is executed without option.

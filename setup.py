@@ -19,6 +19,8 @@ setup(
     #packages=['CCpy','CCpy/ATAT','CCpy/ATK','CCpy/CASM','CCpy/Gaussian', 'CCpy/Gaussian/myGausssum',
     #          'CCpy/IKST','CCpy/Package','CCpy/Qchem','CCpy/Queue','CCpy/Tools','CCpy/VASP'],
     packages=find_packages(),
+    package_data={'CCpy': ['Queue/queue_config.yaml']},
+    include_package_data=True,
     url='https://github.com/91bsjun/CCpy',
     license='',
     author='Byeongsun Jun',

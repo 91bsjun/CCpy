@@ -5,10 +5,20 @@ import datetime
 from datetime import timedelta, date
 import getpass
 import pandas as pd
+import yaml
 from CCpy.Queue import CCpyJobControl
 
 queue_path = ""
-queue_info = CCpyJobControl.queue_info
+# -- Queue and nodes settings
+try:
+    CCpy_SCHEDULER_CONFIG = os.environ['CCpy_SCHEDULER_CONFIG']
+except:
+    print('''Error while load $CCpy_SCHEDULER_CONFIG file.
+Please check the example of scheduler config file at https://github.com/91bsjun/CCpy/tree/master/CCpy/Queue''')
+    quit()
+
+queue_info = yaml.load(open(CCpy_SCHEDULER_CONFIG, 'r'))
+
 
 def CCpyqstat(in_user="*", in_status="", node_check=False):
     """

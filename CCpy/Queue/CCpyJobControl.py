@@ -18,15 +18,14 @@ Only SGE queue system allowed
 """
 
 # -- Queue and nodes settings
-#            {"arg":[cpu, mem, queue name, [hosts,]]
-queue_info = {"xeon1": [16, 32, "xeon1.q", ['node01']],
-              "xeon2": [24, 64, "xeon2.q", ['node02', 'node03', 'node04']],
-              "xeon3": [24, 256, "xeon3.q", ['node05', 'node06']],
-              "xeon4": [36, 256, "xeon4.q", ['node07']],
-              "xeon5": [72, 512, "xeon5.q", ['node08', 'node09', 'node10', 'node14', 'node15', 'node16']],
-              "xeon6": [48, 512, "xeon6.q", ['node12', 'node17', 'node18']],
-              "xeon7": [52, 192, "xeon7.q", ['node13']],
-              "epyc": [64, 256, "epyc.q", ['node11']]}
+try:
+    CCpy_SCHEDULER_CONFIG = os.environ['CCpy_SCHEDULER_CONFIG']
+except:
+    print('''Error while load $CCpy_SCHEDULER_CONFIG file.
+Please check the example of scheduler config file at https://github.com/91bsjun/CCpy/tree/master/CCpy/Queue''')
+    quit()
+
+queue_info = yaml.load(open(CCpy_SCHEDULER_CONFIG, 'r'))
 
 
 class JobSubmit:
@@ -44,7 +43,16 @@ class JobSubmit:
         self.divided = cpu / self.n_of_cpu
 
         home = os.getenv("HOME")
-        yaml_string = open("%s/.CCpy/queue_config.yaml" % home, "r").read()
+        user_queue_config = "%s/.CCpy/queue_config.yaml" % home
+        if not os.path.isfile(user_queue_config):
+            from pathlib import Path
+            MODULE_DIR = Path(__file__).resolve().parent
+            default_queue_config = str(MODULE_DIR) + "/queue_config.yaml"
+            if ".CCpy" not in os.listdir(home):
+                os.mkdir(".CCpy")
+            os.system('cp %s %s' % (default_queue_config, user_queue_config))
+            
+        yaml_string = open(user_queue_config, "r").read()
         queue_config = yaml.load(yaml_string)
             
         self.qsub = queue_config['qsub']
@@ -68,7 +76,7 @@ class JobSubmit:
 
         # -- queue settings
         self.pe_request = "#$ -pe mpi_%d %d" % (self.n_of_cpu, self.n_of_cpu)
-        self.queue_name = "#$ -q %s" % self.q
+        self.queue_name = "#$ -q %s" % self.q if self.q else self.queue_name = ""
         self.node_assign = ""
         if node:
             self.node_assign = "#$ -l h=%s" % node
