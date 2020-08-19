@@ -76,7 +76,7 @@ class JobSubmit:
 
         # -- queue settings
         self.pe_request = "#$ -pe mpi_%d %d" % (self.n_of_cpu, self.n_of_cpu)
-        self.queue_name = "#$ -q %s" % self.q if self.q else self.queue_name = ""
+        self.queue_name = "#$ -q %s" % self.q if self.q else ""
         self.node_assign = ""
         if node:
             self.node_assign = "#$ -l h=%s" % node
