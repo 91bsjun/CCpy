@@ -41,7 +41,7 @@ class JobSubmit:
             os.system('cp %s %s' % (default_queue_config, user_queue_config))
 
         if init_only:
-            quit()
+            return
 
         self.inputfile = inputfile
         cpu, mem, q = queue_info[queue][0], queue_info[queue][1], queue_info[queue][2]
