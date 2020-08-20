@@ -450,9 +450,9 @@ Please check the example of scheduler config file at https://github.com/91bsjun/
     ## ------ VASP
     elif sys.argv[1] == "2":
         if "-batch" in sys.argv:
-            job_init.vasp_batch(scratch=scratch, sub=sub, loop=loop, diff_ver=vasp_run)
+            job_init.vasp_batch(scratch=scratch, sub=sub, loop=loop)
         else:
-            job_init.vasp(sub=sub, loop=loop, diff_ver=vasp_run)
+            job_init.vasp(sub=sub, loop=loop)
 
     ## ------ ATK
     elif sys.argv[1] == "3":

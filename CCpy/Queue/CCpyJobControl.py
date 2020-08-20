@@ -211,13 +211,11 @@ cd $SGE_O_WORKDIR
         elif phonon:
             jobname = "VP" + inputfile
         elif loop:
-            jobname = "VL" + inputfile
-            from CCpy.Package.VASPOptLoopQueScript import VASPOptLoopQueScriptString
-            script_string = VASPOptLoopQueScriptString()
+            from pathlib import Path
+            MODULE_DIR = Path(__file__).resolve().parent
+            loop_opt_script = str(MODULE_DIR) + "/../Package/VASPOptLoop.py"
+            os.system('cp %s ./.VASPOptLoop.py' % loop_opt_script)
             script_filename = ".VASPOptLoop.py"
-            f = open(script_filename, "w")
-            f.write(script_string)
-            f.close()
             script_path = os.getcwd() + "/" + script_filename
             # self.vasp_run = "%s %s\nrm %s" % (self.python_path, script_path, script_path)
             self.vasp_run = "%s %s" % (self.python_path, script_path)
