@@ -185,6 +185,8 @@
       <workItem from="1586139286041" duration="2365000" />
       <workItem from="1590476548391" duration="749000" />
       <workItem from="1592466022309" duration="2034000" />
+      <workItem from="1597888103259" duration="1416000" />
+      <workItem from="1597891903762" duration="5234000" />
     </task>
     <servers />
   </component>
@@ -192,26 +194,18 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="739" y="261" key="FileChooserDialogImpl" timestamp="1577415507479">
+    <state x="552" y="178" key="#Notifications" timestamp="1597900736613">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="739" y="261" key="FileChooserDialogImpl/0.0.1920.1040/-1080.-446.1080.1880@0.0.1920.1040" timestamp="1577415507479" />
-    <state x="461" y="161" key="SettingsEditor" timestamp="1577168185179">
+    <state x="552" y="178" key="#Notifications/0.0.1920.1040/-1080.-449.1080.1880@0.0.1920.1040" timestamp="1597900736613" />
+    <state x="740" y="274" key="FileChooserDialogImpl" timestamp="1597891936378">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="461" y="161" key="SettingsEditor/0.0.1920.1040/-1080.-446.1080.1880@0.0.1920.1040" timestamp="1577168185179" />
-    <state x="652" y="343" key="com.intellij.ide.util.TipDialog" timestamp="1577167985726">
-      <screen x="0" y="0" width="1920" height="1040" />
-    </state>
-    <state x="652" y="343" key="com.intellij.ide.util.TipDialog/0.0.1920.1040/-1080.-446.1080.1880@0.0.1920.1040" timestamp="1577167985726" />
+    <state x="740" y="274" key="FileChooserDialogImpl/0.0.1920.1040/-1080.-449.1080.1880@0.0.1920.1040" timestamp="1597891936378" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/CCpy/VASP/VASPio.py</url>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/CCpy/Tools/CCpyLayerShift.py</url>
           <line>1</line>
