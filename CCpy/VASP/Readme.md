@@ -196,6 +196,7 @@ INCAR:
 </pre>
 ### 2.1.4. Generate Inputs for Band Structure
 You can make inputs for calculating VASP band structure as <code> CCpyVASPInputGen.py 2 </code>
+<pre>
 [user@localhost test]$ CCpyVASPInputGen.py 2
 0 : All files
 1 : graphene_000001
