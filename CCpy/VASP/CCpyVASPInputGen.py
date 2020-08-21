@@ -21,8 +21,7 @@ except:
 1 : Relaxation calculation  (from initial structure files)
 2 : Band-DOS calculation    (after previous calculation)
 3 : Band-DOS calculation    (from initial structure files)
-4 : Static calculation      (after previous calculation)
-5 : Relaxation for phonon   (after previous calculation)
+
 
 [sub_options]
 ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_sv, -pot=LDA_54...
@@ -31,9 +30,8 @@ ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_s
     -sp      : Single point calculation      (DEFAULT : NSW = 200)
     -isif=#  : ISIF value                    (DEFAULT : 3)
     -spin    : Spin polarized calculation    (DEFAULT : unpolarized)
-    -mag     : Add magnetic monet parameters (values from Pymatgen)
-    -ldau    : Add LDA+U parameters          (values from Pymatgen)
-    -phonon  : force sets for phonon         (EDIFF=1.0e-08,EDIFFG=-1.0e-08,LREAL=F,IALGO=38,PREC=accurate)
+    -mag     : Use magnetic monet parameters (values from config file)
+    -ldau    : Use LDA+U parameters          (values from config file)
 
     van der Waals corrections                (DEFAULT : do not use)
     -vdw=D2     : DFT-D2 method of Grimme                   (VASP.5.2.11)
@@ -51,25 +49,25 @@ ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_s
                   ex) -pseudo=Nb_sv,Ti_sv    --> will use 'Nb_sv, Ti_sv' pseudo potential to 'Nb, Ti'
 
 [preset options]
-~/.CCpy/*.json
+~/.CCpy/vasp/___.yaml
     '''
           )
     quit()
 
 
-single_point=False
-cell_fixed=False
-vdw=False
-spin=False
-mag=False
-ldau=False
-isif=False
-kpoints=False
-pseudo=False
-phonon=False
-incar_preset=False
-functional="PBE_54"
-ismear=0
+single_point = False
+cell_fixe = False
+vdw = False
+spin = False
+mag = False
+ldau = False
+isif = False
+kpoints = False
+pseudo = False
+incar_preset = False
+functional = "PBE_54"
+ismear = 0
+additional_dir = None
 
 for arg in sys.argv:
     if "-sp" == arg:
@@ -95,6 +93,8 @@ for arg in sys.argv:
     elif "-preset" in arg:
         incar_preset = arg.split("=")[1]
         incar_preset = incar_preset + ".yaml"
+    elif "-dir" in arg:
+        additional_dir = arg.split("=")[1]
     
 
 if sys.argv[1] == "1":
@@ -136,40 +136,22 @@ elif sys.argv[1] == "2":
         sys.stdout.write(each_input + "... ")
         sys.stdout.flush()
         os.chdir(each_input)
-        VI = VASPInput(additional=True, dirname=each_input)
+        VI = VASPInput(additional_dir=True, dirname=each_input)
         VI.cms_band_set(input_line_kpts=input_line_kpts)
         os.chdir("../")
 
-elif sys.argv[1] == "3":
-    input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
-    inputs = selectInputs(input_marker, "./")
-    for each_input in inputs:
-        VI = VASPInput(each_input)
-        dirname = each_input.replace(".cif","").replace(".xsd","")
-        os.mkdir(dirname)
-        os.chdir(dirname)
-        VI.cms_band_set(kpoints=kpoints,spin=spin,mag=mag,ldau=ldau)
-        os.chdir("../")
 
-elif sys.argv[1] == "4":
-    inputs = selectVASPOutputs("./")
-    for each_input in inputs:
-        os.chdir(each_input)
-
-        static_VI = VASPInput("CONTCAR", dirname="STATIC")
-        static_VI.MP_static_set()
-        
-        os.chdir("../")
-
-elif sys.argv[1] == "5":
+elif sys.argv[1] == "add":
     inputs = selectVASPOutputs("./")
     for each_input in inputs:
         sys.stdout.write(each_input + "... ")
         sys.stdout.flush()
-        os.chdir(each_input)
-        VI = VASPInput(additional=True, dirname=each_input)
-        VI.cms_phonon_opt()
-        os.chdir("../")
+        VI = VASPInput(additional_dir=additional_dir, dirname=each_input)
+        VI.cms_vasp_set(single_point=single_point, isif=isif, vdw=vdw, kpoints=kpoints, spin=spin, mag=mag, ldau=ldau,
+                        functional=functional, pseudo=pseudo,
+                        get_pre_incar=None)
+
+
 
 elif sys.argv[1] == "MPRelax":
     input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]

@@ -26,10 +26,18 @@ if version[0] == '3':
     raw_input = input
 
 class VASPInput():
-    def __init__(self, filename=None, dirname=None, additional=False, preset_yaml=None):
-        # additional calc : Like band calculations from previous calc
-        if additional:
-            self.jobname = dirname
+    def __init__(self, filename=None, dirname=None, preset_yaml=None, additional_dir=False, keep_files=[]):
+        """
+        filename: structure filename (*.cif, *POSCAR*, *CONTCAR*)
+        dirname: when using additional calc
+        additional:
+        """
+        self.additional_calc = False
+        if additional_dir:
+            jobname = dirname
+            dirname = dirname + "/" + additional_dir
+            structure = pmgIS.from_file(dirname + "/CONTCAR")
+            self.additional_calc = True
         else:
             if ".xsd" in filename:
                 ps = PS(filename)
@@ -43,9 +51,6 @@ class VASPInput():
                 jobname = filename.replace(".cif","")
             elif "POSCAR" in filename or "CONTCAR" in filename:
                 structure = pmgIS.from_file(filename)
-                #pwd = os.getcwd()
-                #pwd = pwd.split("/")[-1]
-                #jobname = pwd
                 jobname = filename
                 dirname = filename + "_vasp"
             else:
@@ -55,54 +60,55 @@ class VASPInput():
             if not dirname:
                 dirname = jobname
 
-            self.filename = filename
-            self.structure = structure
-            self.dirname = dirname
+        self.filename = filename
+        self.structure = structure
+        self.dirname = dirname
 
-            # ------------ Grimme's parameters ------------- #
-            vdw_C6, vdw_R0 = vasp_grimme_parameters()
-            # ------------ check preset config ------------- #
-            home = os.getenv("HOME")
-            vasp_config_dir = home + "/.CCpy/vasp/"
-            MODULE_DIR = str(Path(__file__).resolve().parent)
+        # ------------ Grimme's parameters ------------- #
+        vdw_C6, vdw_R0 = vasp_grimme_parameters()
+        # ------------ check preset config ------------- #
+        home = os.getenv("HOME")
+        vasp_config_dir = home + "/.CCpy/vasp/"
+        MODULE_DIR = str(Path(__file__).resolve().parent)
 
-            self.home = home
-            self.vasp_config_dir = vasp_config_dir
-            if not os.path.isdir(vasp_config_dir):
-                os.system("mkdir -p %s" % vasp_config_dir)
-                print("* Preset options will be saved under :" + vasp_config_dir)
-            configs = os.listdir(vasp_config_dir)
-            # INCAR preset check
-            kpt_len = 20
-            yaml_file = ""
-            if preset_yaml:
-                if preset_yaml in configs:
-                    incar_dict = load_yaml(vasp_config_dir + preset_yaml, "INCAR")
-                else:
-                    print("%s not in %s" % (preset_yaml, vasp_config_dir))
-                    quit()
-                yaml_file = vasp_config_dir + preset_yaml
-            # Use default
+        self.home = home
+        self.vasp_config_dir = vasp_config_dir
+        if not os.path.isdir(vasp_config_dir):
+            os.system("mkdir -p %s" % vasp_config_dir)
+            print("* Preset options will be saved under :" + vasp_config_dir)
+        configs = os.listdir(vasp_config_dir)
+        # INCAR preset check
+        kpt_len = 20
+        yaml_file = ""
+        if preset_yaml:
+            if preset_yaml in configs:
+                incar_dict = load_yaml(vasp_config_dir + preset_yaml, "INCAR")
             else:
-                if "default.yaml" in configs:
-                    incar_dict = load_yaml(vasp_config_dir + "default.yaml", "INCAR")
-                else:
-                    os.system('cp %s %s' % (MODULE_DIR + '/vasp_default.yaml', vasp_config_dir + "default.yaml"))
-                    incar_dict = load_yaml(vasp_config_dir + "default.yaml", "INCAR")
-                yaml_file = vasp_config_dir + "default.yaml"
+                print("%s not in %s" % (preset_yaml, vasp_config_dir))
+                quit()
+            yaml_file = vasp_config_dir + preset_yaml
+        # Use default
+        else:
+            if "default.yaml" in configs:
+                incar_dict = load_yaml(vasp_config_dir + "default.yaml", "INCAR")
+            else:
+                os.system('cp %s %s' % (MODULE_DIR + '/vasp_default.yaml', vasp_config_dir + "default.yaml"))
+                incar_dict = load_yaml(vasp_config_dir + "default.yaml", "INCAR")
+            yaml_file = vasp_config_dir + "default.yaml"
 
-            kpt_len = load_yaml(yaml_file, "KPOINTS")['length']
+        kpt_len = load_yaml(yaml_file, "KPOINTS")['length']
 
-            magmom = load_yaml(yaml_file, "MAGMOM")
-            LDAU = load_yaml(yaml_file, "LDAU")
-            LDAUU = LDAU['LDAUU']
-            LDAUJ = LDAU['LDAUJ']
-            LDAUL = LDAU['LDAUL']
+        magmom = load_yaml(yaml_file, "MAGMOM")
+        LDAU = load_yaml(yaml_file, "LDAU")
+        LDAUU = LDAU['LDAUU']
+        LDAUJ = LDAU['LDAUJ']
+        LDAUL = LDAU['LDAUL']
 
-            self.incar_dict, self.magmom, self.LDAUL, self.LDAUU, self.LDAUJ, self.vdw_C6, self.vdw_R0 = incar_dict, magmom, LDAUL, LDAUU, LDAUJ, vdw_C6, vdw_R0
-            self.kpt_len = kpt_len
-            self.yaml_file = yaml_file
-            self.incar_dict_desc = load_yaml(MODULE_DIR + '/vasp_incar_desc.yaml')
+        self.incar_dict, self.magmom, self.LDAUL, self.LDAUU, self.LDAUJ, self.vdw_C6, self.vdw_R0 = incar_dict, magmom, LDAUL, LDAUU, LDAUJ, vdw_C6, vdw_R0
+        self.kpt_len = kpt_len
+        self.yaml_file = yaml_file
+        self.incar_dict_desc = load_yaml(MODULE_DIR + '/vasp_incar_desc.yaml')
+        self.keep_files = keep_files
 
 
     # ------------------------------------------------------------------------------#
@@ -112,19 +118,18 @@ class VASPInput():
                      spin=False, mag=False, ldau=False,
                      functional="PBE_54", pseudo=None,
                      kpoints=False, get_pre_incar=None,
-                     flask_app=False):
+                     batch=False):
         """
+        Interactive VASP input generator
 
         :param single_point: set NSW=0
         :param isif: set ISIF parameter
         :param vdw: perform DFT-D2 calc
         :param spin: set ISPIN=2
-        :param mag: MAGMOM value
-        :param ldau: LDA+U method
         :param functional: POTCAR functional setting
         :param kpoints: list [4,4,1]
-        :param get_pre_options: Load previous option when multiple input generation
-        :param flask_app: in case of flask app, avoid confirm menu (use default k-points = input_kpts)
+        :param get_pre_incar: Load previous option when multiple input generation
+        :param batch: in case of batch, avoid confirm menu (use default k-points = input_kpts)
 
         :return: no return, but write VASP input files at dirname
         """
@@ -133,6 +138,7 @@ class VASPInput():
         dirname = self.dirname
         home = self.home
         incar_dict_desc = self.incar_dict_desc
+        pwd = os.getcwd()
 
         # -- Load previous option when multiple input generation
         if get_pre_incar:
@@ -171,7 +177,7 @@ class VASPInput():
 
         # -- edit magmom parameters
         magmom = self.magmom
-        if mag and not flask_app and not magmom_dict:
+        if mag and not batch and not magmom_dict:
             print(bcolors.OKGREEN + "\n# ---------- Read MAGMOM value from %s ---------- #" % self.yaml_file + bcolors.ENDC)
             magmom_keys = list(magmom.keys())
             magmom_keys.sort()
@@ -197,7 +203,7 @@ class VASPInput():
         LDAUU = self.LDAUU
         LDAUL = self.LDAUL
         LDAUJ = self.LDAUJ
-        if ldau and not flask_app and not ldau_dict:
+        if ldau and not batch and not ldau_dict:
             print(bcolors.OKGREEN + "\n# ---------- Read LDA U parameters from %s ---------- #" % self.yaml_file + bcolors.ENDC)
             LDAUU_keys = LDAUU.keys()
             #LDAUU_keys.sort()
@@ -313,9 +319,8 @@ class VASPInput():
                 pass
 
         ## --------------------------- Update INCAR  values -------------------------- ##
-        if flask_app:
-            incar = Incar(incar_dict)
-            pass
+        if batch:
+            incar = incar_dict_to_str(incar_dict, incar_dict_desc)
         else:
             # -- INCAR
             print(dirname)
@@ -365,19 +370,22 @@ class VASPInput():
         file_writer("POTCAR",str(potcar))
         file_writer("INCAR",str(incar))
         file_writer("KPOINTS",str(kpoints))
-        # -- vdw kernel
-        if vdw == "optB86b":
-            linux_command("cp ")
+        os.chdir(pwd)
 
-        os.chdir("../")
-
-
-        ## ------------------------- Move structure file ------------------------- ##
-        if "structures" not in os.listdir():
-            os.mkdir("structures")
-
-        os.rename(self.filename, "./structures/"+self.filename)
-
+        if self.additional_calc:
+            os.chdir(dirname)
+            for prev_file in self.keep_files:
+                if prev_file in os.listdir("../"):
+                    os.system("cp ../" + prev_file + " ./")
+            if "CONTCAR" in self.keep_files:
+                os.rename("POSCAR", "POSCAR.orig")
+                os.rename("CONTCAR", "POSCAR")
+            os.chdir(pwd)
+        else:
+            # -- backup structure file
+            if "structures" not in os.listdir():
+                os.mkdir("structures")
+            os.rename(self.filename, "./structures/"+self.filename)
 
 
     # ------------------------------------------------------------------------------#
@@ -391,8 +399,7 @@ class VASPInput():
             print("Band-DOS directory is exist already. All files wii be override.")
 
         os.chdir("Band-DOS")
-        # prev_files =["CHG", "CHGCAR", "CONTCAR", "DOSCAR", "EIGENVAL", "IBZKPT", "INCAR", "KPOINTS",
-        #              "POSCAR", "POTCAR", "PROCAR", "WAVECAR", "XDATCAR"]
+
         prev_files =["CHGCAR", "CONTCAR", "INCAR", "KPOINTS", "POSCAR", "POTCAR"]
         for pf in prev_files:
             if pf in os.listdir("../"):
