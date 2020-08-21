@@ -7,20 +7,24 @@ When you run script without any argument, it returns a manual.
 How to use : CCpyVASPInputGen.py [option] [sub_option1] [sub_option2..]
 --------------------------------------
 [options]
-1 : Relaxation calculation  (from initial structure files)
-2 : Band-DOS calculation    (after previous calculation)
-3 : Band-DOS calculation    (from initial structure files)
-4 : Static calculation      (after previous calculation)
+1  : Relaxation calculation  (from initial structure files)
+2  : Band-DOS calculation    (after previous calculation)
+3  : Band-DOS calculation    (from initial structure files)
+add: User defined additional calculation
+
 
 [sub_options]
 ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_sv, -pot=LDA_54...
+
+    < USE PRESET >
+    -preset=[NAME] : [NAME].yaml in ~/.CCpy/vasp/
 
     < INCAR OPTION >
     -sp      : Single point calculation      (DEFAULT : NSW = 200)
     -isif=#  : ISIF value                    (DEFAULT : 3)
     -spin    : Spin polarized calculation    (DEFAULT : unpolarized)
-    -mag     : Add magnetic monet parameters (values from Pymatgen)
-    -ldau    : Add LDA+U parameters          (values from Pymatgen)
+    -mag     : Use magnetic monet parameters (values from config file)
+    -ldau    : Use LDA+U parameters          (values from config file)
 
     van der Waals corrections                (DEFAULT : do not use)
     -vdw=D2     : DFT-D2 method of Grimme                   (VASP.5.2.11)
@@ -33,15 +37,27 @@ ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_s
 
     < POTCAR OPTION>
     -pot=PBE_54 : VASP potential setting     (DEFAULT : PBE_54)
-                  Possible potentials = PBE, PBE_52, PBE_54, LDA, LDA_52, LDA_54, PW91, LDA_US, PW91_US, USPP
+                  Possible potentials = PBE, PBE_52, PBE_54, LDA, LDA_52, LDA_54, PW91, LDA_US, PW91_US
     -pseudo=    : Select pseudo potential    (DEFAULT : normal)
                   ex) -pseudo=Nb_sv,Ti_sv    --> will use 'Nb_sv, Ti_sv' pseudo potential to 'Nb, Ti'
 
+    < ADDITIONAL CALCULATION >
+    when use option 'add', 
+    -dir=[DIRNAME]  : Additional calculation dir under previous run
+    -preset=[NAME] : [NAME].yaml in ~/.CCpy/vasp/
+
 [preset options]
-~/.CCpy/*.json
-    
+~/.CCpy/vasp/___.yaml
+   
 
 </pre>
+### 2.1.0. Preset input options
+Once you run <code>CCpyVASPInputGen.py</code>, <code>$HOME/.CCpy/vasp/default.yaml</code> will be created.   
+This file contains general relaxation options.   
+When you run <code>CCpyVASPInputGen.py</code> without any <code>-preset=</code> option, the command will read that file.
+#### Use custom preset
+- Create <code>my_option.yaml</code> in <code>$HOME/.CCpy/vasp</code>
+- Run command with <code>-preset=my_option</code>
 ### 2.1.1. Basic input generation
 Option '1' is a basic input generation. It detects structure file types in current directory.
 - \*.cif
@@ -66,37 +82,41 @@ Choose file : 1-3,6                   # Choose files using dash and comma
 </pre>
 #### It will return default INCAR options
 <pre>
-# -------------------------------------------------------- #
-#            Here are the current INCAR options            #
-# -------------------------------------------------------- #
-SYSTEM           = LiCoBO3                       
+# ---------- Read INCAR option from /home/user/.CCpy/vasp/default.yaml ---------- #
 
-#1 Startparameter for this Run:
-NWRITE           = 2                             ! LPETIM=F    write-flag & timer
-ISTART           = 0                             ! job   : 0-new  1-contEcut  2-sameBS
+# ------------------------------------------------------------------ #
+#                 Here are the current INCAR options                 #
+# ------------------------------------------------------------------ #
+SYSTEM           = Graphene                             
+
+# -- Startparameter for this Run
+NWRITE           = 2                             ! LPETIM-F    write-flag & timer
+ISTART           = 0                             ! job   0-new  1-contEcut  2-sameBS
 INIWAV           = 1                             ! 0-jellium  1-random
-IWAVPR           = 1                             ! prediction:  0-non 1-charg 2-wave 3-comb
+IWAVPR           = 1                             ! prediction  0-non 1-charg 2-wave 3-comb
 ICHARG           = 2                             ! 0-from WF  1-from CHGCAR  2-from atom  11-12-fixed
-LWAVE            = .FALSE.                       ! determines whether the wavefunctions are written to the WAVECAR file
+LWAVE            = .FALSE.                       ! determines write WAVECAR file
+LCHARG           = .FALSE.                       ! determines write CHGCAR and CHG
 
-#2 Electronic Relaxation 1
-NELM             = 100                           ! number of iterations
-EDIFF            = 1E-04                         ! stopping-criterion for ELM
-BMIX             = 3.00                          ! sets the cutoff wave vector for Kerker mixing for the magnetization density
+....
+....
 
-...
-...
-
-#10 lda+uparameters
-# LMAXMIX        = 4                             !
+# -- LDAU+U parameters
+# LMAXMIX        = 4                             ! None
 # LDAU           = .TRUE.                        ! or .FALSE.
-# LDAUTYPE       = 2                             ! or 1
-# LDAUL          = 2 2 2 2                       !
-# LDAUU          = 0 4.0 0 0                     !
-# LDAUJ          = 0 0 0 0                       !
+# LDAUTYPE       = 2                             ! 1 or 2 and when 2, U-J
+# LDAUL          = 2                             ! l-quantum number for which the on-site interaction is added.
+# LDAUU          = 0                             ! the strength of the effective on-site Coulomb interactions
+# LDAUJ          = 0                             ! the strength of the effective on-site exchange interactions.
 
-#11 vdWcorrections
-# IVDW           = 0                             ! 0-no , 1-DFT-D2_Grimme, 11-DFT-D3_Grimme, 12-DFT-D3_BJ, 4-dDsC
+# -- vdW corrections
+# IVDW           = 12                            ! specifiy vdW corrections method
+
+* Anything want to modify or add? (ex: ISPIN=2,ISYM=1,#MAGMOM= ) else, enter "n" 
+: n
+
+* Use this INCAR to others? (y/n)y
+
 
 </pre>
 #### If you want to edit or add option, fill as below or not, enter "n"
@@ -109,27 +129,75 @@ BMIX             = 3.00                          ! sets the cutoff wave vector f
 * Anything want to modify or add? (ex: ISPIN=2,ISYM=1,PREC=Accurate // without spacing) if not, enter "n" 
 : n
 </pre>
-#### Then, it will ask if you want to update preset of INCAR. 
-- The preset options might be saved in <code>~/.CCpy/</code> as json type.
-- If you edit <code> ~/.CCpy/vasp_incar.json </code> , this script read it when generate INCAR options.
+#### Then, it will ask create other structures as same as these options.
 <pre>
-* Do you want to update INCAR preset ? (y/n)
-: n
-</pre>
-#### Finally, it will ask create other structures as same as these options.
-<pre>
-* Do you want create the rest of inputs as same as these INCAR ? (y/n) y
+* Use this INCAR to others? (y/n) y
 LiFeBO3
 LiMnBO3
 TiO
 </pre>
-### 2.1.3. Example II
-Following arguments 
+### 2.1.3. Additional Calculations from previous run
+<code>add</code> option allows to generate additional vasp inputs from previous run
+- required option: <code>-dir=[NAME]</code> and <code>-preset=[PRESET]</code>
+- <code>-dir=[NAME]</code> : additional calculation directory name under previous run
+- <code>-preset=[PRESET]</code> : input options for additional calculation (see 2.1.0)
+#### Run <code>CCpyVASPInputGen.py add -dir=[DIRNAME] -preset=[PRESET]</code>
+example   
+Here, we have 2 VASP directories.
+<pre>
+[user@localhost test]$ ls *
+TEST:
+CHG     CONTCAR  EIGENVAL  INCAR    OSZICAR  PCDAT   POTCAR  vasp.out     VTEST.e11948  VTEST.o11948  VTEST.pe11948  VTEST.po11948  WAVECAR
+CHGCAR  DOSCAR   IBZKPT    KPOINTS  OUTCAR   POSCAR  REPORT  vasprun.xml  VTEST.e11963  VTEST.o11963  VTEST.pe11963  VTEST.po11963  XDATCAR
 
+TEST2:
+CHG     CONTCAR  EIGENVAL  INCAR    OSZICAR  PCDAT   POTCAR  vasp.done  vasprun.xml   VTEST.e11963  VTEST.o11963   VTEST.pe11963  VTEST.po11963  XDATCAR
+CHGCAR  DOSCAR   IBZKPT    KPOINTS  OUTCAR   POSCAR  REPORT  vasp.out   VTEST.e11948  VTEST.o11948  VTEST.pe11948  VTEST.po11948  WAVECAR
+
+</pre>
+Create preset files in <code>$HOME/.CCpy/vasp</code>
+<pre>
+[user@localhost test]$ ls ~/.CCpy/vasp/
+default.yaml  phonon.yaml
+</pre>
+When you run <code>CCpyVASPInputGen.py add -dir=phonon_opt -preset=phonon</code> it will find finished jobs.   
+And create inputs using <code>$HOME/.CCpy/vasp/phonon.yaml</code> under <code>phonon_opt</code> directory.
+<pre>
+[user@localhost test]$ CCpyVASPInputGen.py add -dir=phonon_opt -preset=phonon
+1 : TEST
+2 : TEST2
+0 : All files
+Choose file : 0
+TEST/phonon_opt
+TEST2/phonon_opt
+
+[user@localhost test]$ ls TEST/phonon_opt/ TEST2/phonon_opt/
+TEST2/phonon_opt/:
+INCAR  KPOINTS  POSCAR  POTCAR
+
+TEST/phonon_opt/:
+INCAR  KPOINTS  POSCAR  POTCAR
+</pre>
+If you want to copy outputs from previous run, add file lists under <code>KEEP_FILES</code> in <code>[preset].yaml</code> file
+##### <code>[peset].yaml</code>
+<pre>
+KPOINTS:
+  length: 30
+KEEP_FILES:
+  - CONTCAR
+  - CHGCAR
+  - WAVECAR
+INCAR:
+  SYSTEM: Li7PS6    
+  
+  SECTION1: '# -- Startparameter for this Run'
+  NWRITE: 2
+
+</pre>
 ### 2.1.4. Generate Inputs for Band Structure
 You can make inputs for calculating VASP band structure as <code> CCpyVASPInputGen.py 2 </code>
 <pre>
-[bsjun@cms test]$ CCpyVASPInputGen.py 2
+[user@localhost test]$ CCpyVASPInputGen.py 2
 0 : All files
 1 : graphene_000001
 2 : graphene_000002
