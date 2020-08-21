@@ -1,4 +1,5 @@
 import os, sys, re
+import shutil
 import time
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -67,14 +68,15 @@ class VASPInput():
         # ------------ Grimme's parameters ------------- #
         vdw_C6, vdw_R0 = vasp_grimme_parameters()
         # ------------ check preset config ------------- #
-        home = os.getenv("HOME")
+        # home = os.getenv("HOME")
+        home = os.path.expanduser('~')
         vasp_config_dir = home + "/.CCpy/vasp/"
         MODULE_DIR = str(Path(__file__).resolve().parent)
 
         self.home = home
         self.vasp_config_dir = vasp_config_dir
         if not os.path.isdir(vasp_config_dir):
-            os.system("mkdir -p %s" % vasp_config_dir)
+            os.makedirs(vasp_config_dir)
             print("* Preset options will be saved under :" + vasp_config_dir)
         configs = os.listdir(vasp_config_dir)
         # INCAR preset check
@@ -92,7 +94,8 @@ class VASPInput():
             if "default.yaml" in configs:
                 incar_dict = load_yaml(vasp_config_dir + "default.yaml", "INCAR")
             else:
-                os.system('cp %s %s' % (MODULE_DIR + '/vasp_default.yaml', vasp_config_dir + "default.yaml"))
+                shutil.copy('%s' % MODULE_DIR + '/vasp_default.yaml', '%s' % vasp_config_dir + "default.yaml")
+                #os.system('cp %s %s' % (MODULE_DIR + '/vasp_default.yaml', vasp_config_dir + "default.yaml"))
                 incar_dict = load_yaml(vasp_config_dir + "default.yaml", "INCAR")
             yaml_file = vasp_config_dir + "default.yaml"
 
@@ -381,8 +384,9 @@ class VASPInput():
             os.chdir(dirname)
             for prev_file in self.keep_files:
                 if prev_file in os.listdir("../"):
-                    os.system("cp ../" + prev_file + " ./")
+                    shutil.copy("../" + prev_file, "./")
             if "CONTCAR" in self.keep_files:
+                os.remove("POSCAR")
                 os.rename("CONTCAR", "POSCAR")
             os.chdir(pwd)
         else:
@@ -407,7 +411,7 @@ class VASPInput():
         prev_files =["CHGCAR", "CONTCAR", "INCAR", "KPOINTS", "POSCAR", "POTCAR"]
         for pf in prev_files:
             if pf in os.listdir("../"):
-                linux_command("cp ../" + pf + " ./")
+                shutil.copy("../" + pf, " ./")
         os.rename("POSCAR", "POSCAR.orig")
         os.rename("CONTCAR", "POSCAR")
 
