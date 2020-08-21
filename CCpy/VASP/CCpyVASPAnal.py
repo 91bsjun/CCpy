@@ -58,12 +58,16 @@ except:
     quit()
 
 sub = False
+additional_dir = None
 if "-sub" in sys.argv:
     sub = True
+for arg in sys.argv:
+    if "-dir" in arg:
+        additional_dir = arg.split("=")[1]
 
 if sys.argv[1] == "-d":
     inputfiles = ["INCAR","POSCAR","POTCAR","KPOINTS"]
-    inputs = selectVASPOutputs("./")
+    inputs = selectVASPOutputs("./", additional_dir=additional_dir)
     for each_input in inputs:
         print(each_input)
     yn = raw_input("Are you sure to remove these output files? (y/n)")
@@ -71,6 +75,7 @@ if sys.argv[1] == "-d":
         pass
     else:
         quit()
+    pwd = os.getcwd()
     for each_input in inputs:
         os.chdir(each_input)
         files = [f for f in os.listdir("./")]
@@ -79,10 +84,10 @@ if sys.argv[1] == "-d":
                 pass
             else:
                 linux_command("rm -rf "+f)
-        os.chdir("../")
+        os.chdir(pwd)
 
 if sys.argv[1] == "0":
-    dirs = selectVASPOutputs("./", ask=False, sub=sub)
+    dirs = selectVASPOutputs("./", ask=False, sub=sub, additional_dir=additional_dir)
     VO = VASPOutput()
     VO.check_terminated(dirs=dirs)
 
@@ -109,7 +114,7 @@ elif sys.argv[1] == "2":
             show_plot = False
     except:
         show_plot = True
-    dirs = selectVASPOutputs("./", ask=False, sub=sub)
+    dirs = selectVASPOutputs("./", ask=False, sub=sub, additional_dir=additional_dir)
     # dirs = [d for d in dirs if "OUTCAR" in os.listdir(d)]    # duplicated work
     VO = VASPOutput()
     if "-st" in sys.argv:
@@ -128,7 +133,7 @@ elif sys.argv[1] == "3":
     except:
         show_plot = True
 
-    inputs = selectVASPOutputs("./")
+    inputs = selectVASPOutputs("./", additional_dir=additional_dir)
     for each_input in inputs:
         os.chdir(each_input)
         print(each_input)
@@ -203,7 +208,7 @@ elif sys.argv[1] == "-e":
     print("Unconverged job list in 01_unconverged_jobs.csv")
 
     dirs = df['Directory'].tolist()
-    outputs = selectVASPOutputs("./", dir_list=dirs)
+    outputs = selectVASPOutputs("./", dir_list=dirs, additional_dir=additional_dir)
 
     VO = VASPOutput()
     VO.vasp_error_handle(outputs)

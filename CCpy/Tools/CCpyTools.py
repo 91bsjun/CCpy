@@ -343,7 +343,7 @@ def selectVASPInputs(directory_path, dir_list=None, ask=True, sub=False, additio
 
     return inputs
 
-def selectVASPOutputs(directory_path, dir_list=None, ask=True, sub=False):
+def selectVASPOutputs(directory_path, dir_list=None, ask=True, sub=False, additional_dir=None):
     if dir_list:
         all_dirs = dir_list
     elif sub:
@@ -371,8 +371,12 @@ def selectVASPOutputs(directory_path, dir_list=None, ask=True, sub=False):
     all_inputs = []
     for each_dir in all_dirs:
         files = os.listdir(each_dir)
-        if "vasprun.xml" in files or "POSCAR" in files or "CONTCAR" in files or "OUTCAR" in files:
-            all_inputs.append(each_dir)
+        if additional_dir:
+            if additional_dir in files:
+                all_inputs.append(each_dir + "/" + additional_dir)
+        else:
+            if "vasprun.xml" in files or "POSCAR" in files or "CONTCAR" in files or "OUTCAR" in files:
+                all_inputs.append(each_dir)
     if ask == True:
         for i in range(len(all_inputs)):
             print(str(i+1) + " : " + all_inputs[i])
