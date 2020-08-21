@@ -5,7 +5,7 @@ import json
 from collections import OrderedDict
 
 from CCpy.VASP.VASPio import VASPInput
-from CCpy.Tools.CCpyTools import selectInputs, selectVASPInputs, selectVASPOutputs, linux_command
+from CCpy.Tools.CCpyTools import selectInputs, selectVASPInputs, selectVASPOutputs, linux_command, bcolors
 
 version = sys.version
 if version[0] == '3':
@@ -67,6 +67,7 @@ isif=False
 kpoints=False
 pseudo=False
 phonon=False
+incar_preset=False
 functional="PBE_54"
 ismear=0
 
@@ -89,10 +90,11 @@ for arg in sys.argv:
         functional = arg.split("=")[1]
     elif "-pseudo" in arg:
         pseudo = arg.split("=")[1].split(",")
-    elif "-phonon" in arg:
-        phonon = True
     elif "-ismear" in arg:
         ismear = arg.split("=")[1]
+    elif "-preset" in arg:
+        incar_preset = arg.split("=")[1]
+        incar_preset = incar_preset + ".yaml"
     
 
 if sys.argv[1] == "1":
@@ -100,26 +102,24 @@ if sys.argv[1] == "1":
     inputs = selectInputs(input_marker, "./")
     chk = True
     for each_input in inputs:
-        VI = VASPInput(each_input, phonon=phonon)
+        VI = VASPInput(each_input, preset_yaml=incar_preset)
 
         # -- First process of edit INCAR, KPOINTS while create Inputs
         # -- If user want to use same options go to else
         if chk:
             VI.cms_vasp_set(single_point=single_point, isif=isif, vdw=vdw, kpoints=kpoints, spin=spin, mag=mag, ldau=ldau,
                             functional=functional, pseudo=pseudo,
-                            get_pre_options=None)
-            same_inputs = raw_input("\n* Do you want create the rest of inputs as same as these INCAR ? (y/n)")
-            if same_inputs == "y":
-                chk = False
-                jstring = open("current_options.json", "r").read()
-                current_options = json.loads(jstring, object_pairs_hook=OrderedDict)
-            else:
-                chk = True
+                            get_pre_incar=None)
+            if len(inputs) >= 2:
+                same_inputs = raw_input(bcolors.OKGREEN + "\n* Use this INCAR to others? (y/n)" + bcolors.ENDC)
+                if same_inputs == "y":
+                    chk = False
+                else:
+                    chk = True
         else:
             VI.cms_vasp_set(single_point=single_point,isif=isif,vdw=vdw,kpoints=kpoints,spin=spin,mag=mag,ldau=ldau,
                             pseudo=pseudo, functional=functional,
-                            get_pre_options=current_options)
-    linux_command("rm current_options.json")
+                            get_pre_incar=".prev_incar.yaml")
 
 elif sys.argv[1] == "2":
     inputs = selectVASPOutputs("./")

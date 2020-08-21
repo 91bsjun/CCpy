@@ -723,3 +723,15 @@ def ssh_send_file(servername,portnum,username,password,obj,dst):
 def ssh_send_directory(servername,portnum,username,password,obj,dst):
     command = 'sshpass -p'+password+' scp -P '+portnum+' -r -o StrictHostKeyChecking=no '+obj+' '+username+'@'+servername+':'+dst
     linux_command(command)
+
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+

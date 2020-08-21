@@ -11,7 +11,7 @@ from CCpy.VASP.VASPtools import vasp_incar_json, vasp_phonon_incar_json, magmom_
 
 from CCpy.Tools.CCpyStructure import PeriodicStructure as PS
 from CCpy.Tools.CCpyStructure import latticeGen
-from CCpy.Tools.CCpyTools import file_writer, linux_command, change_dict_key, save_json, load_json, progress_bar
+from CCpy.Tools.CCpyTools import file_writer, linux_command, change_dict_key, save_json, load_json, progress_bar, bcolors
 
 from pymatgen.core import IStructure as pmgIS
 from pymatgen.io.vasp import Vasprun
@@ -26,7 +26,7 @@ if version[0] == '3':
     raw_input = input
 
 class VASPInput():
-    def __init__(self, filename=None, dirname=None, additional=False, phonon=False):
+    def __init__(self, filename=None, dirname=None, additional=False, preset_yaml=None):
         # additional calc : Like band calculations from previous calc
         if additional:
             self.jobname = dirname
@@ -63,55 +63,46 @@ class VASPInput():
             vdw_C6, vdw_R0 = vasp_grimme_parameters()
             # ------------ check preset config ------------- #
             home = os.getenv("HOME")
+            vasp_config_dir = home + "/.CCpy/vasp/"
             MODULE_DIR = str(Path(__file__).resolve().parent)
 
             self.home = home
-            if ".CCpy" not in os.listdir(home):
-                os.mkdir(home+"/.CCpy")
-                print("* Preset options will be saved under :" + home + "/.CCpy/")
-            configs = os.listdir(home+"/.CCpy")
+            self.vasp_config_dir = vasp_config_dir
+            if not os.path.isdir(vasp_config_dir):
+                os.system("mkdir -p %s" % vasp_config_dir)
+                print("* Preset options will be saved under :" + vasp_config_dir)
+            configs = os.listdir(vasp_config_dir)
             # INCAR preset check
-            if phonon:
-                if "vasp_phonon_incar.json" in configs:
-                    incar_dict = load_json(home + "/.CCpy/vasp_phonon_incar.json", ordered=True)
+            kpt_len = 20
+            yaml_file = ""
+            if preset_yaml:
+                if preset_yaml in configs:
+                    incar_dict = load_yaml(vasp_config_dir + preset_yaml, "INCAR")
                 else:
-                    jstring = vasp_phonon_incar_json()         # Generate new INCAR
-                    incar_dict = json.loads(jstring, object_pairs_hook=OrderedDict)
-                    save_json(incar_dict, home + "/.CCpy/vasp_phonon_incar.json")
+                    print("%s not in %s" % (preset_yaml, vasp_config_dir))
+                    quit()
+                yaml_file = vasp_config_dir + preset_yaml
+            # Use default
             else:
-                if "vasp_incar.yaml" in configs:
-                    incar_dict = load_incar_yaml(home + "/.CCpy/vasp_incar.yaml")
+                if "default.yaml" in configs:
+                    incar_dict = load_yaml(vasp_config_dir + "default.yaml", "INCAR")
                 else:
-                    incar_dict = load_incar_yaml(MODULE_DIR + '/vasp_incar_default.yaml')
-                    os.system('cp %s %s' % (MODULE_DIR + '/vasp_incar_default.yaml', home + "/.CCpy"))
-            # MAGMOM value preset check
-            if "vasp_MAGMOM.json" in configs:
-                magmom = load_json(home + "/.CCpy/vasp_MAGMOM.json")
-            else:
-                magmom = magmom_parameters()
-                save_json(magmom, home+"/.CCpy/vasp_MAGMOM.json")
-            # LDAUU value preset check
-            if "vasp_LDAUU.json" in configs:
-                LDAUU = load_json(home + "/.CCpy/vasp_LDAUU.json")
-            else:
-                LDAUU = ldauu_parameters()
-                save_json(LDAUU, home + "/.CCpy/vasp_LDAUU.json")
-            # LDAUL value preset check
-            if "vasp_LDAUL.json" in configs:
-                LDAUL = load_json(home + "/.CCpy/vasp_LDAUL.json")
-            else:
-                LDAUL = ldaul_parameters()
-                save_json(LDAUL, home + "/.CCpy/vasp_LDAUL.json")
-            # LDAUJ value preset check
-            if "vasp_LDAUJ.json" in configs:
-                LDAUJ = load_json(home + "/.CCpy/vasp_LDAUJ.json")
-            else:
-                LDAUJ = ldauj_parameters()
-                save_json(LDAUJ, home + "/.CCpy/vasp_LDAUJ.json")
+                    os.system('cp %s %s' % (MODULE_DIR + '/vasp_default.yaml', vasp_config_dir + "default.yaml"))
+                    incar_dict = load_yaml(vasp_config_dir + "default.yaml", "INCAR")
+                yaml_file = vasp_config_dir + "default.yaml"
 
+            kpt_len = load_yaml(yaml_file, "KPOINTS")['length']
+
+            magmom = load_yaml(yaml_file, "MAGMOM")
+            LDAU = load_yaml(yaml_file, "LDAU")
+            LDAUU = LDAU['LDAUU']
+            LDAUJ = LDAU['LDAUJ']
+            LDAUL = LDAU['LDAUL']
 
             self.incar_dict, self.magmom, self.LDAUL, self.LDAUU, self.LDAUJ, self.vdw_C6, self.vdw_R0 = incar_dict, magmom, LDAUL, LDAUU, LDAUJ, vdw_C6, vdw_R0
-            self.incar_dict_desc = load_incar_yaml(MODULE_DIR + '/vasp_incar_desc.yaml')
+            self.kpt_len = kpt_len
+            self.yaml_file = yaml_file
+            self.incar_dict_desc = load_yaml(MODULE_DIR + '/vasp_incar_desc.yaml')
 
 
     # ------------------------------------------------------------------------------#
@@ -120,8 +111,7 @@ class VASPInput():
     def cms_vasp_set(self, single_point=False, isif=False, vdw=False,
                      spin=False, mag=False, ldau=False,
                      functional="PBE_54", pseudo=None,
-                     kpoints=False, get_pre_options=None,
-                     magmom_dict=None, ldau_dict=None,
+                     kpoints=False, get_pre_incar=None,
                      flask_app=False):
         """
 
@@ -145,15 +135,10 @@ class VASPInput():
         incar_dict_desc = self.incar_dict_desc
 
         # -- Load previous option when multiple input generation
-        if get_pre_options:
-            pre_dict = get_pre_options
-            incar_dict = pre_dict["incar"]
-            magmom_dict = pre_dict["magmom"]
-            ldau_dict = pre_dict["ldauu"]
+        if get_pre_incar:
+            incar_dict = OrderedDict(yaml.load(open(get_pre_incar)))
         else:
-            incar_dict = None
-            magmom_dict = None
-            ldau_dict = None
+            incar_dict = self.incar_dict
 
         ## -------------------------------- POSCAR -------------------------------- ##
         # -- Create POSCAR string from pymatgen structure object
@@ -173,13 +158,6 @@ class VASPInput():
 
 
         ## -------------------------------- INCAR -------------------------------- ##
-        # -- INCAR preset dictionary
-        # -- if incar_dict arg exist use it
-        if incar_dict:
-            pass
-        else:
-            incar_dict = self.incar_dict
-
         if "SYSTEM" in incar_dict.keys():
             incar_dict["SYSTEM"] = dirname
 
@@ -191,29 +169,16 @@ class VASPInput():
         if spin:
             incar_dict['ISPIN'] = 2
 
-        # -- magnetic momentum
-        if magmom_dict:
-            magmom = magmom_dict        # get magmom parameters from previous option
-        else:
-            magmom = self.magmom
-
         # -- edit magmom parameters
+        magmom = self.magmom
         if mag and not flask_app and not magmom_dict:
-            print("\n# ---------- Here are the current MAGMOM values ---------- #")
+            print(bcolors.OKGREEN + "\n# ---------- Read MAGMOM value from %s ---------- #" % self.yaml_file + bcolors.ENDC)
             magmom_keys = list(magmom.keys())
             magmom_keys.sort()
             for key in magmom_keys:
                 print(str(key).ljust(8) + " = " + str(magmom[key]))
             print("Other atoms which not in here are = 0.6")
-            get_sets = raw_input(
-                "* Anything want to modify or add? if not, enter \"n\" or (Co=6,Ni=4) \n: ")
-            if get_sets != "n":
-                vals = get_sets.replace(" ", "")
-                vals = vals.split(",")
-                for val in vals:
-                    key = val.split("=")[0]
-                    value = val.split("=")[1]
-                    magmom[key] = value
+            cont = raw_input("Continue (enter)")
 
         mag_string = ""
         for i in range(len(n_of_atoms)):
@@ -222,34 +187,25 @@ class VASPInput():
             except:
                 mag_string += str(n_of_atoms[i]) + "*" + str(0.6) + " "
 
-        incar_dict = update_incar(incar_dict, {"MAGMOM": mag_string}) if mag else update_incar(incar_dict, {"# MAGMOM": mag_string})
+        if mag:
+            incar_dict = update_incar(incar_dict, {"MAGMOM": mag_string}) 
+        else:
+            incar_dict = update_incar(incar_dict, {"MAGMOM": mag_string}, maintain_block=True)
 
 
         # -- LDA+U parameters
-        if ldau_dict:
-            LDAUU = ldau_dict       # get ldauu parameters from previous option
-        else:
-            LDAUU = self.LDAUU
+        LDAUU = self.LDAUU
+        LDAUL = self.LDAUL
+        LDAUJ = self.LDAUJ
         if ldau and not flask_app and not ldau_dict:
-            print("\n# -------------------------------------------------------- #")
-            print("#          Here are the current LDAU+U parameters          #")
-            print("# -------------------------------------------------------- #")
+            print(bcolors.OKGREEN + "\n# ---------- Read LDA U parameters from %s ---------- #" % self.yaml_file + bcolors.ENDC)
             LDAUU_keys = LDAUU.keys()
             #LDAUU_keys.sort()
             for key in LDAUU_keys:
                 print(str(key).ljust(8) + " = " + str(LDAUU[key]))
             print("Other atoms which not in here are = 0")
-            get_sets = raw_input("* Anything want to modify or add? if not, enter \"n\" or (Ni=7.3,Mn=3.6) \n: ")
-            if get_sets != "n":
-                vals = get_sets.replace(" ", "")
-                vals = vals.split(",")
-                for val in vals:
-                    key = val.split("=")[0]
-                    value = val.split("=")[1]
-                    LDAUU[key] = value
+            cont = raw_input("Continue (enter)")
 
-        LDAUL = self.LDAUL
-        LDAUJ = self.LDAUJ
 
         LDAUL_string = ""
         for i in range(len(elts)):
@@ -272,18 +228,17 @@ class VASPInput():
             except:
                 LDAUJ_string += str(0) + " "
 
-        # uncomment ldau options. if already uncommented, just change LDAUU,LDAUL,LDAUJ parameters
-        if ldau:
-            update_ldau = {"LDAU": incar_dict["# LDAU"], "LMAXMIX": incar_dict["# LMAXMIX"],
-                           "LDAUTYPE": incar_dict["# LDAUTYPE"],
-                           "LDAUL": LDAUL_string, "LDAUU": LDAUU_string, "LDAUJ": LDAUJ_string}
+        val_ldau = incar_dict["LDAU"] if "LDAU" in incar_dict.keys() else incar_dict["# LDAU"]
+        val_lmix = incar_dict["LMAXMIX"] if "LMAXMIX" in incar_dict.keys() else incar_dict["# LMAXMIX"]
+        val_ldau_type = incar_dict["LDAUTYPE"] if "LDAUTYPE" in incar_dict.keys() else incar_dict["# LDAUTYPE"]
+        update_ldau = {"LDAU": val_ldau, "LMAXMIX": val_lmix, "LDAUTYPE": val_ldau_type,
+                       "LDAUL": LDAUL_string, "LDAUU": LDAUU_string, "LDAUJ": LDAUJ_string}
+        if ldau:           # if use ldau option, uncomment LDAU options
             incar_dict = update_incar(incar_dict, update_ldau)
-        else:
-            update_ldau = {"# LDAU": incar_dict["# LDAU"], "# LMAXMIX": incar_dict["# LMAXMIX"],
-                           "# LDAUTYPE": incar_dict["# LDAUTYPE"],
-                           "# LDAUL": LDAUL_string, "# LDAUU": LDAUU_string, "# LDAUJ": LDAUJ_string}
-            incar_dict = update_incar(incar_dict, update_ldau)
+        else:              # else, up to yaml file
+            incar_dict = update_incar(incar_dict, update_ldau, maintain_block=True)
 
+        # vdw parameters
         if vdw:
             if vdw == "D2":
                 vdw_C6 = self.vdw_C6
@@ -309,9 +264,6 @@ class VASPInput():
                 elif vdw == "dDsC":
                     ivdw = "4"
                 incar_dict = update_incar(incar_dict, {"IVDW": ivdw})
-        else:
-            if "IVDW" in incar_dict.keys():
-                incar_dict = change_dict_key(incar_dict, "IVDW", "# IVDW", incar_dict["IVDW"])
 
 
 
@@ -325,10 +277,10 @@ class VASPInput():
             length = [lattice['length'][0], lattice['length'][1], lattice['length'][2]]
             kpts = []
             for param in length:
-                if 20 // param == 0 or 20 // param == 1:
+                if self.kpt_len // param == 0 or self.kpt_len // param == 1:
                     kpts.append(1)
                 else:
-                    kpts.append(int(20 // param))
+                    kpts.append(int(self.kpt_len // param))
         kpoints = dirname+"\n0\nMonkhorst-Pack\n"+str(kpts[0])+" "+str(kpts[1])+" "+str(kpts[2])+"\n0 0 0\n"
 
         ## -------------------------------- POTCAR -------------------------------- ##
@@ -346,12 +298,13 @@ class VASPInput():
             pot_elt = elements
         potcar = Potcar(symbols=pot_elt, functional=functional)
 
+        ## ----------------------- Prepare write inputs ------------------------- ##
         try:
             os.mkdir(dirname)
         except:
             files = os.listdir(dirname)
             if "INCAR" in files or "POSCAR" in files or "KPOINTS" in files or "POTCAR" in files:
-                ans = raw_input(dirname+" already exist. Will you override ? (y/n)")
+                ans = raw_input(bcolors.WARNING + dirname+" already exist. Will you override ? (y/n)" + bcolors.ENDC)
                 if ans == "y":
                     pass
                 else:
@@ -359,32 +312,40 @@ class VASPInput():
             else:
                 pass
 
-        ## --------------------------- Confirm input values ---------------------- ##
-
+        ## --------------------------- Update INCAR  values -------------------------- ##
         if flask_app:
             incar = Incar(incar_dict)
             pass
         else:
             # -- INCAR
             print(dirname)
-            if not get_pre_options:        # This process is for avoiding multiple inputs generation.
+            highlights = ["NSW", "ISPIN", "ISIF", "PREC", "EDIFF", "IVDW"]
+            warnings = []
+            if not get_pre_incar:        # This process is for avoiding multiple inputs generation.
+                print(bcolors.OKGREEN + "\n# ---------- Read INCAR option from %s ---------- #" % self.yaml_file + bcolors.ENDC)
                 get_sets = None
                 while get_sets != "n":
-                    print("\n# -------------------------------------------------------- #")
-                    print("#            Here are the current INCAR options            #")
-                    print("# -------------------------------------------------------- #")
-                    incar_string = incar_dict_to_str(incar_dict)
+                    print("\n# ------------------------------------------------------------------ #")
+                    print("#                 Here are the current INCAR options                 #")
+                    print("# ------------------------------------------------------------------ #")
+                    incar_string = incar_dict_to_str(incar_dict, incar_dict_desc, highlights=highlights, warnings=warnings)
                     print(incar_string)
 
-                    get_sets = raw_input("* Anything want to modify or add? (ex: ISPIN=2,ISYM=1,PREC=Accurate // without spacing) if not, enter \"n\" \n: ")
+                    get_sets = raw_input(bcolors.OKGREEN + "* Anything want to modify or add? (ex: ISPIN=2,ISYM=1,#MAGMOM= ) else, enter \"n\" \n: " + bcolors.ENDC)
                     if get_sets != "n":
-                        vals = get_sets.replace(", ",",")
-                        vals = vals.split(",")
+                        edit_pairs = get_sets.replace(", ",",").replace(" =", "=").replace("= ", "=")
+                        edit_pairs = edit_pairs.split(",")
                         input_dict = {}
-                        for val in vals:
-                            key = val.split("=")[0]
-                            value = val.split("=")[1]
+                        for pair in edit_pairs:
+                            key = pair.split("=")[0]
+                            if "#" in key and key[1] != " ":
+                                key = key.replace("#", "# ")
+                            try:
+                                value = pair.split("=")[1]
+                            except:
+                                value = ""
                             input_dict[key] = value
+                            warnings.append(key)
                         incar_dict = update_incar(incar_dict, input_dict)
                 # make INCAR as string type
                 incar_string = incar_dict_to_str(incar_dict, incar_dict_desc)
@@ -394,8 +355,8 @@ class VASPInput():
                 incar = incar_string
 
         # save current options, for rest inputs
-        current_options = {"incar":incar_dict, "magmom":magmom, "ldauu":LDAUU}
-        save_json(current_options,"current_options.json")
+        yaml_str = yaml.dump(incar_dict, default_flow_style=False)
+        file_writer(".prev_incar.yaml", yaml_str)
 
 
         ## ----------------------------- Write inputs ---------------------------- ##
@@ -1130,13 +1091,13 @@ class VASPOutput():
             os.chdir(pwd)
         print("\nDone.")
 
-def load_incar_yaml(yaml_file):
-    dict = yaml.load(yaml_file)
-    dict = OrderedDict(dict)
+def load_yaml(yaml_file, key=None):
+    dict = yaml.load(open(yaml_file))
+    dict = OrderedDict(dict[key]) if key else OrderedDict(dict)
 
     return dict
 
-def incar_dict_to_str(incar_dict, incar_dict_desc):
+def incar_dict_to_str(incar_dict, incar_dict_desc, highlights=[], warnings=[]):
     incar_keys = incar_dict.keys()
     incar_string = ""
     for key in incar_keys:
@@ -1153,23 +1114,54 @@ def incar_dict_to_str(incar_dict, incar_dict_desc):
                 description = str(incar_dict_desc[key.replace("# ", "")])
             else:
                 description = ""
-            incar_string += key.ljust(16) + " = " + str(val).ljust(30) + "! " + description + "\n"
+
+            if key in warnings or key.replace("# ", "") in warnings:
+                key = bcolors.WARNING + key + bcolors.ENDC 
+                val = bcolors.WARNING + val + bcolors.ENDC 
+                incar_string += key.ljust(25) + " = " + str(val).ljust(39) + "! " + description + "\n"
+            elif key in highlights or key.replace("# ", "") in highlights:
+                key = bcolors.OKGREEN + key + bcolors.ENDC 
+                val = bcolors.OKGREEN + val + bcolors.ENDC 
+                incar_string += key.ljust(25) + " = " + str(val).ljust(39) + "! " + description + "\n"
+            else:
+                incar_string += key.ljust(16) + " = " + str(val).ljust(30) + "! " + description + "\n"
 
     return incar_string
 
-def update_incar(incar_dict, input_option):
+def update_incar(incar_dict, input_option, maintain_block=False):
+    """
+    1. block   -> block          # LDAUU =    --> # LDAUU = 
+    2. blcok   -> unblock        # IVDW = 12  --> IVDW = 12
+    3. unblock -> unblock        ISIF = 2     --> ISIF = 3
+    4. unblock -> block          IVDW = 12    --> # IVDW = 
+    """
+    # change_dict_key(ordered_dict, ori_key, new_key, new_val)
     for key in input_option:
-        block_key = "# " + key
-        if block_key in incar_dict.keys():           # before blocked --> unblock
-            incar_dict = change_dict_key(incar_dict, block_key, key, input_option[key])
-        elif "# " in key:                            # before ublocked --> block
+        if "# " in key:
+            key_type = "block"
+            block_key = key
             unblock_key = key.replace("# ", "")
-            incar_dict = change_dict_key(incar_dict, unblock_key, key, input_option[key])
-        elif key in incar_dict.keys():
-            incar_dict[key] = input_option[key]
+            if block_key in incar_dict.keys():                          # unblock -> unblock
+                incar_dict[block_key] = input_option[key]
+            elif unblock_key in incar_dict.keys() and maintain_block:       # block -> block
+                incar_dict[unblock_key] = input_option[key]
+            elif unblock_key not in incar_dict.keys() and block_key not in incar_dict.keys():     # new key
+                incar_dict[key] = input_option[key]
+            else:
+                incar_dict = change_dict_key(incar_dict, unblock_key, block_key, input_option[key])   # unblock -> block
         else:
-            incar_dict[key] = input_option[key]
-            incar_dict_desc[key] = ""
+            key_type = "unblock"
+            block_key = "# " + key
+            unblock_key = key
+            if unblock_key in incar_dict.keys():                          # unblock -> unblock
+                incar_dict[key] = input_option[key]
+            elif block_key in incar_dict.keys() and maintain_block:       # block -> block
+                incar_dict[block_key] = input_option[key]
+            elif unblock_key not in incar_dict.keys() and block_key not in incar_dict.keys():     # new key
+                incar_dict[key] = input_option[key]
+            else:
+                incar_dict = change_dict_key(incar_dict, block_key, unblock_key, input_option[key])   # unblock -> block
+
     return incar_dict
 
 
