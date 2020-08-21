@@ -18,13 +18,17 @@ except:
     print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [sub_option1] [sub_option2..]")
     print('''--------------------------------------
 [options]
-1 : Relaxation calculation  (from initial structure files)
-2 : Band-DOS calculation    (after previous calculation)
-3 : Band-DOS calculation    (from initial structure files)
+1  : Relaxation calculation  (from initial structure files)
+2  : Band-DOS calculation    (after previous calculation)
+3  : Band-DOS calculation    (from initial structure files)
+add: User defined additional calculation
 
 
 [sub_options]
 ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_sv, -pot=LDA_54...
+
+    < USE PRESET >
+    -preset=[NAME] : [NAME].yaml in ~/.CCpy/vasp/
 
     < INCAR OPTION >
     -sp      : Single point calculation      (DEFAULT : NSW = 200)
@@ -47,6 +51,11 @@ ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_s
                   Possible potentials = PBE, PBE_52, PBE_54, LDA, LDA_52, LDA_54, PW91, LDA_US, PW91_US
     -pseudo=    : Select pseudo potential    (DEFAULT : normal)
                   ex) -pseudo=Nb_sv,Ti_sv    --> will use 'Nb_sv, Ti_sv' pseudo potential to 'Nb, Ti'
+
+    < ADDITIONAL CALCULATION >
+    when use option 'add', 
+    -dir=[DIRNAME]  : Additional calculation dir under previous run
+    -preset=[NAME] : [NAME].yaml in ~/.CCpy/vasp/
 
 [preset options]
 ~/.CCpy/vasp/___.yaml
@@ -142,14 +151,19 @@ elif sys.argv[1] == "2":
 
 
 elif sys.argv[1] == "add":
+    if not additional_dir:
+        print("Additional input dirname must be assigned: -dir=")
+        quit()
+    elif not incar_preset:
+        print("WARNING: preset option is not assigned: -preset=")
+
     inputs = selectVASPOutputs("./")
     for each_input in inputs:
-        sys.stdout.write(each_input + "... ")
-        sys.stdout.flush()
-        VI = VASPInput(additional_dir=additional_dir, dirname=each_input)
+        print(each_input + "/" + additional_dir)
+        VI = VASPInput(additional_dir=additional_dir, dirname=each_input, preset_yaml=incar_preset)
         VI.cms_vasp_set(single_point=single_point, isif=isif, vdw=vdw, kpoints=kpoints, spin=spin, mag=mag, ldau=ldau,
                         functional=functional, pseudo=pseudo,
-                        get_pre_incar=None)
+                        get_pre_incar=None, batch=True)
 
 
 

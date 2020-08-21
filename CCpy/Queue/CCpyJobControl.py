@@ -196,20 +196,13 @@ cd $SGE_O_WORKDIR
         shl("rm -rf ./mpi.sh", shell=True)
 
 
-    def vasp(self, band=False, phonon=False, dirpath=None, loop=False, diff_ver=False):
+    def vasp(self, band=False, dirpath=None, loop=False):
         inputfile = self.inputfile
 
-        if diff_ver == 'beef':
-            vasp_run = self.vasp_run_beef
-        elif diff_ver == 'sol':
-            vasp_run = self.vasp_run_sol
-        else:
-            vasp_run = self.vasp_run
+        vasp_run = self.vasp_run
         # -- Band calculation after previous calculation
         if band:
             jobname = "VB" + inputfile
-        elif phonon:
-            jobname = "VP" + inputfile
         elif loop:
             from pathlib import Path
             MODULE_DIR = Path(__file__).resolve().parent
@@ -256,7 +249,7 @@ touch vasp.done
         shl("rm -rf ./mpi.sh", shell=True)
         os.chdir(pwd)
 
-    def vasp_batch(self, dirs=None, scratch=False, loop=False, diff_ver=False):
+    def vasp_batch(self, dirs=None, scratch=False, loop=False):
         """
         Run multiple VASP jobs in a single queue
         """
@@ -265,12 +258,7 @@ touch vasp.done
         runs = ""
         script_path = None
 
-        if diff_ver == 'beef':
-            vasp_run = self.vasp_run_beef
-        elif diff_ver == 'sol':
-            vasp_run = self.vasp_run_sol
-        else:
-            vasp_run = self.vasp_run
+        vasp_run = self.vasp_run
 
         if loop:
             from CCpy.Package.VASPOptLoopQueScript import VASPOptLoopQueScriptString

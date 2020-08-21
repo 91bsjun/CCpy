@@ -35,8 +35,8 @@ class VASPInput():
         self.additional_calc = False
         if additional_dir:
             jobname = dirname
-            dirname = dirname + "/" + additional_dir
             structure = pmgIS.from_file(dirname + "/CONTCAR")
+            dirname = dirname + "/" + additional_dir
             self.additional_calc = True
         else:
             if ".xsd" in filename:
@@ -108,7 +108,11 @@ class VASPInput():
         self.kpt_len = kpt_len
         self.yaml_file = yaml_file
         self.incar_dict_desc = load_yaml(MODULE_DIR + '/vasp_incar_desc.yaml')
-        self.keep_files = keep_files
+        if len(keep_files) == 0:
+            self.keep_files = load_yaml(yaml_file)["KEEP_FILES"]
+        else:
+            self.keep_files = keep_files
+         
 
 
     # ------------------------------------------------------------------------------#
@@ -372,13 +376,13 @@ class VASPInput():
         file_writer("KPOINTS",str(kpoints))
         os.chdir(pwd)
 
+        ## ----------------------- When Additional Calc ------------------------- ##
         if self.additional_calc:
             os.chdir(dirname)
             for prev_file in self.keep_files:
                 if prev_file in os.listdir("../"):
                     os.system("cp ../" + prev_file + " ./")
             if "CONTCAR" in self.keep_files:
-                os.rename("POSCAR", "POSCAR.orig")
                 os.rename("CONTCAR", "POSCAR")
             os.chdir(pwd)
         else:

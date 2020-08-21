@@ -1,5 +1,7 @@
 KPOINTS:
   length: 20
+KEEP_FILES:
+  - CONTCAR
 INCAR:
   SYSTEM: Name
   

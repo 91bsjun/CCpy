@@ -50,13 +50,12 @@ class JobInitiator:
         myJS = JS("batch_job", self.queue, self.n_of_cpu, node=self.node)
         myJS.gaussian_batch(inputs)
 
-    def vasp(self, sub=None, loop=None, diff_ver=None):
+    def vasp(self, sub=None, loop=None, additional_dir=None):
         # --- Collect VASP inputs
         band = False
-        phonon = False
         if "-band" in sys.argv:
             band = True
-            inputs = selectVASPInputs("./", ask=ask, band=True, sub=sub)
+            inputs = selectVASPInputs("./", ask=ask, sub=sub, additional_dir="Band-DOS")
         elif "-r" in sys.argv:
             if "01_unconverged_jobs.csv" not in os.listdir("./"):
                 print("\n01_unconverged_jobs.csv was not found in this directory.")
@@ -69,9 +68,8 @@ class JobInitiator:
                 pass
             print("\n* Unconverged job list in 01_unconverged_jobs.csv")
             inputs = selectVASPInputs("./", dir_list=df['Directory'].tolist())
-        elif "-phonon" in sys.argv:
-            phonon = True
-            inputs = selectVASPInputs("./", ask=ask, phonon=True, sub=sub)
+        elif additional_dir:
+            inputs = selectVASPInputs("./", ask=ask, sub=sub, additional_dir=additional_dir)
         else:
             inputs = selectVASPInputs("./", ask=ask, sub=sub)
 
@@ -86,21 +84,19 @@ class JobInitiator:
             dirpath = pwd + "/" + each_input
             if band:
                 dirpath += "/Band-DOS"
-            elif phonon:
-                dirpath += "/Phonon_opt"
+            elif additional_dir:
+                dirpath += "/" + additional_dir
             myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
-            myJS.vasp(band=band, dirpath=dirpath, phonon=phonon, loop=loop, diff_ver=diff_ver)
+            myJS.vasp(band=band, dirpath=dirpath, loop=loop)
 
-    def vasp_batch(self, scratch=False, sub=False, loop=False, diff_ver=False):
+    def vasp_batch(self, scratch=False, sub=False, loop=False, additional_dir=None):
         # --- Collect VASP inputs
         band = False
-        phonon = False
         if "-band" in sys.argv:
             band = True
-            inputs = selectVASPInputs("./", ask=ask, band=True, sub=sub)
-        elif "-phonon" in sys.argv:
-            phonon = True
-            inputs = selectVASPInputs("./", ask=ask, phonon=True, sub=sub)
+            inputs = selectVASPInputs("./", ask=ask, sub=sub, additional_dir="Band-DOS")
+        elif additional_dir:
+            inputs = selectVASPInputs("./", ask=ask, sub=sub, additional_dir=additional_dir)
         elif "-r" in sys.argv:
             if "01_unconverged_jobs.csv" not in os.listdir("./"):
                 print("\n01_unconverged_jobs.csv was not found in this directory.")
@@ -124,11 +120,11 @@ class JobInitiator:
             dirpath = pwd + "/" + each_input
             if band:
                 dirpath += "/Band-DOS"
-            elif phonon:
-                dirpath += "/Phonon_opt"
+            elif additional_dir:
+                dirpath += "/" + additional_dir
             dirs.append(dirpath)
         myJS = JS("batch_job", self.queue, self.n_of_cpu, node=self.node)
-        myJS.vasp_batch(dirs=dirs, scratch=scratch, loop=loop, diff_ver=diff_ver)
+        myJS.vasp_batch(dirs=dirs, scratch=scratch, loop=loop)
 
     def qchem(self):
         # --- Collect inputs
@@ -340,8 +336,6 @@ if __name__ == "__main__":
                       ex) CCpyJobSubmit.py 2 xeon5 -band -n=8
                       ex) CCpyJobSubmit.py 2 xeon5 -n=8 -band
 
-    -phonon         : when perform optimize calculation for phonon (high accuracy VASP)
-
     -batch          : run multiple jobs in a single queue (only support for vasp)
                       ex) CCpyJobSubmit.py 2 xeon5 -batch
                       ex) CCpyJobSubmit.py 2 xeon5 -batch -band
@@ -362,7 +356,12 @@ if __name__ == "__main__":
 
     -loop           : run VASP jobs until converged. (error will be handled using custodian library in pymatgen)
                       ex) CCpyJobSubmit.py 2 xeon5 -loop
-                      very careful when use this option
+                      *** very careful when use this option ***
+                      Not recommend under less understanding of VASP jobs
+
+    -dir=[NAME]     : Find vasp jobs under */[NAME]
+                      ./graphene/DOS
+                      ex) CCpyJobSubmit.py 2 xeon2 -dir=DOS
 
     '''
               )
@@ -407,7 +406,7 @@ Please check the example of scheduler config file at https://github.com/91bsjun/
     node = None
     specie = "Li"
     screen = "no_screen"
-    vasp_run = 'default'
+    additional_dir = None       # additional calc for VASP
     for s in sys.argv:
         if "-n=" in s:
             n_of_cpu = int(s.split("=")[1])
@@ -433,10 +432,8 @@ Please check the example of scheduler config file at https://github.com/91bsjun/
             specie = s.split("=")[1]
         if '-screen' in s:
             screen = 'screen'
-        if '-beef' in s:
-            vasp_run = 'beef'
-        if '-sol' in s:
-            vasp_run = 'sol'
+        if '-dir=' in s:
+            additional_dir = s.split("=")[1]
 
     job_init = JobInitiator(queue=queue, node=node, n_of_cpu=n_of_cpu)
 
@@ -450,9 +447,9 @@ Please check the example of scheduler config file at https://github.com/91bsjun/
     ## ------ VASP
     elif sys.argv[1] == "2":
         if "-batch" in sys.argv:
-            job_init.vasp_batch(scratch=scratch, sub=sub, loop=loop)
+            job_init.vasp_batch(scratch=scratch, sub=sub, loop=loop, additional_dir=additional_dir)
         else:
-            job_init.vasp(sub=sub, loop=loop)
+            job_init.vasp(sub=sub, loop=loop, additional_dir=additional_dir)
 
     ## ------ ATK
     elif sys.argv[1] == "3":
