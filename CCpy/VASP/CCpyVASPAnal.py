@@ -92,7 +92,7 @@ if sys.argv[1] == "0":
     VO.check_terminated(dirs=dirs)
 
 elif sys.argv[1] == "1":
-    inputs = selectVASPOutputs("./", sub=sub)
+    inputs = selectVASPOutputs("./", sub=sub, additional_dir=additional_dir)
     pwd = os.getcwd()
     for each_input in inputs:
         os.chdir(each_input)
