@@ -232,9 +232,6 @@ cd $SGE_O_WORKDIR
 #$ -cwd
 
 cd %s
-if (-f "vasp.done") then
-    rm vasp.done
-endif
 %s
 touch vasp.done
 
@@ -242,6 +239,8 @@ touch vasp.done
 
         pwd = os.getcwd()
         os.chdir(dirpath)
+        if 'vasp.done' in os.listdir():
+            os.remove('vasp.done')
         f = open("mpi.sh", "w")
         f.write(mpi)
         f.close()
@@ -259,7 +258,7 @@ touch vasp.done
         script_path = None
 
         vasp_run = self.vasp_run
-
+        pwd = os.getcwd()
         if loop:
             from CCpy.Package.VASPOptLoopQueScript import VASPOptLoopQueScriptString
             script_string = VASPOptLoopQueScriptString()
@@ -268,13 +267,17 @@ touch vasp.done
             f.write(script_string)
             f.close()
             script_path = os.getcwd() + "/" + script_filename
-            each_run = "rm vasp.done\n%s %s\ntouch vasp.done\nsleep 30\n" % (self.python_path, script_path)
+            each_run = "%s %s\ntouch vasp.done\nsleep 30\n" % (self.python_path, script_path)
         else:
-            each_run = "rm vasp.done\n%s\ntouch vasp.done\nsleep 30\n" % vasp_run
+            each_run = "%s\ntouch vasp.done\nsleep 30\n" % vasp_run
         for d in dirs:
             # if use scratch, copy input to /scratch/vasp and run job in that dir,
             # when finished, copy to original working directory
             # scratch is recommended when perform small jobs
+            os.chdir(d)
+            if 'vasp.done' in os.listdir():
+                os.remove('vasp.done')
+            os.chdir(pwd)
             if scratch:
                 dir_path = "/scratch/vasp" + d
                 runs += "mkdir -p " + dir_path + "\n"  # make dir under /scratch/vasp

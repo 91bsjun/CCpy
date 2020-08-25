@@ -73,10 +73,6 @@ class JobInitiator:
         else:
             inputs = selectVASPInputs("./", ask=ask, sub=sub)
 
-        # -- Clean vasp.done if exists
-        for each_input in inputs:
-            if 'vasp.done' in os.listdir(each_input):
-                os.remove(each_input + '/vasp.done')
 
         # --- SUBMIT QUEUE
         pwd = os.getcwd()
