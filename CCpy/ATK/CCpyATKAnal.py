@@ -10,6 +10,7 @@ import tables as tb
 import warnings
 warnings.filterwarnings("ignore")
 from CCpy.Tools.CCpyTools import selectInputs
+from CCpy.Tools.CCpyTools import plt_deco
 
 
 def transmission_3d_hdf5(hdf5_filename, trans_max=False):
@@ -100,6 +101,50 @@ def transmission_3d_hdf5(hdf5_filename, trans_max=False):
     
     plt.show()
 
+
+def IVCurve(hdf5_filename):
+    root_name = hdf5_filename.replace('.hdf5', '')
+    
+    h5file = tb.open_file(hdf5_filename, "a")
+    raw_data = {}
+    # e_val:: energies // t_val:: transmission data // bias
+    energies = None
+    max_t = 0
+    for node in h5file:
+        nodes = str(node)
+        if "/current" in nodes and "V/array/data" in nodes:
+            voltage = float(nodes.split('/')[1].split()[0].replace('current', ''))
+            if voltage not in raw_data.keys():
+                raw_data[voltage] = {}
+            raw_data[voltage]['currents'] = node.read()
+
+    voltages = []
+    currents = []
+    keys = list(raw_data.keys())
+    keys.reverse()
+    for k in keys:
+        voltages.append(k)
+        currents.append(raw_data[k]['currents'] * 1000000)
+
+    df = pd.DataFrame({"I (uA)": currents, "V": voltages})
+    df.to_csv(root_name + "_IVcurve.csv", index=False)
+    print("\"" + root_name + "_IVcurve.csv\" has been saved.")
+
+    fig = plt_deco(8, 6.5)
+    plt.plot(voltages, currents, ls='-', marker=None)
+    plt.xlabel("Voltage ($V$)")
+    plt.ylabel("Current ($\mu$$A$)")
+    xlim = plt.xlim()
+    ylim = plt.ylim()
+    plt.xlim(0, xlim[1])
+    plt.ylim(0, ylim[1])
+    plt.tight_layout()
+    plt.savefig(root_name + "_IVcurve.png", dpi=500)
+    print("\"" + root_name + "_IVcurve.png\" has been saved.")
+    plt.show()
+    
+
+
 def cusmtom_cmap():
     import pickle
     #with open("/home/shared/GitHub/CCpy/CCpy/Tools/ATK_transmission_cmap.pkl", "rb") as mydata:
@@ -118,7 +163,7 @@ if __name__ == '__main__':
     except:
         print('''
             CCpyATKAnal.py [1]   :   Show IV Curve (Bias voltage, Gate voltage
-            CCpyATKAnal.py [2]   :   Show 2d Transmission Spectrum  (Bias voltage)
+            CCpyATKAnal.py [2]   :   Show 2d Transmission Spectrum  (Bias voltage)  # not supported
             CCpyATKAnal.py [3]   :   Show 3d Transmission Spectrum  (Bias voltage)
                 <sub option>
                 CCpyATKAnal [3] [value] : set z-value limitation
@@ -127,7 +172,10 @@ if __name__ == '__main__':
               )
         quit()
 
-    if chk == '3':
+    if chk == '1':
+        input_file = selectInputs(['.hdf5'], './')
+        IVCurve(input_file[0])
+    elif chk == '3':
         input_file = selectInputs(['.hdf5'], './')
         if len(input_file) != 1:
             print('Only single file available.')
@@ -136,4 +184,5 @@ if __name__ == '__main__':
         if len(sys.argv) == 3:
             z_limit = float(sys.argv)
         transmission_3d_hdf5(input_file[0], z_limit)
+
 
