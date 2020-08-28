@@ -720,20 +720,11 @@ class VASPOutput():
     def __init__(self):
         pass
 
-    def getFinalStructure(self, filename="CONTCAR", path="../"):
+    def getFinalStructure(self, filename="CONTCAR", target_name="None", path="../"):
         from pymatgen.io.cif import CifWriter
         
         structure_object = pmgIS.from_file(filename)
         cif = CifWriter(structure_object)
-        dirname = os.getcwd()
-        dirname = dirname.split("/")[-1]
-        
-        if filename == "CONTCAR":
-            target_name = dirname+"_contcar.cif"
-        elif filename == "POSCAR":
-            target_name = dirname+"_poscar.cif"
-        else:
-            target_name = filename+".cif"
 
         cif.write_file(target_name)
         print(target_name + " has been generated.")

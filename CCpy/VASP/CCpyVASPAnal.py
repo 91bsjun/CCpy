@@ -95,12 +95,17 @@ elif sys.argv[1] == "1":
     inputs = selectVASPOutputs("./", sub=sub, additional_dir=additional_dir)
     pwd = os.getcwd()
     for each_input in inputs:
+        dirname = each_input
+        if additional_dir:
+            dirname = "%s_%s" % (each_input.split("/")[0], each_input.split("/")[1])
         os.chdir(each_input)
         VO = VASPOutput()
         if "-poscar" in sys.argv:
-            VO.getFinalStructure(filename="POSCAR", path=pwd+"/")
+            target_name = dirname + "_poscar.cif"
+            VO.getFinalStructure(filename="POSCAR", target_name=target_name, path=pwd+"/")
         elif "CONTCAR" in os.listdir("./") and os.path.getsize("CONTCAR") != 0:
-            VO.getFinalStructure(path=pwd+"/")
+            target_name = dirname + "_contcar.cif"
+            VO.getFinalStructure(target_name=target_name, path=pwd+"/")
         else:
             print(each_input + ": CONTCAR is empty!")
         os.chdir(pwd)
