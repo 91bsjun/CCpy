@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-
 import os, sys
+import shutil
 import json
 from collections import OrderedDict
 
 from CCpy.VASP.VASPio import VASPInput
 from CCpy.Tools.CCpyTools import selectInputs, selectVASPInputs, selectVASPOutputs, linux_command, bcolors
+from pathlib import Path
 
 version = sys.version
 if version[0] == '3':
@@ -54,13 +55,16 @@ ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_s
 
     < ADDITIONAL CALCULATION >
     when use option 'add', 
-    -dir=[DIRNAME]  : Additional calculation dir under previous run
-    -preset=[NAME] : [NAME].yaml in ~/.CCpy/vasp/
+    -dir=[DIRNAME]     : Additional calculation dir under previous run
+    -pre_dir=[DIRNAME] : Previous directory name to copy CONTCAR, ... (default ./)
+    -preset=[NAME]     : [NAME].yaml in ~/.CCpy/vasp/
+ 
 
 [preset options]
 ~/.CCpy/vasp/___.yaml
     '''
           )
+    VI = VASPInput()
     quit()
 
 
@@ -77,6 +81,7 @@ incar_preset = False
 functional = "PBE_54"
 ismear = 0
 additional_dir = None
+pre_dir = "./"
 
 for arg in sys.argv:
     if "-sp" == arg:
@@ -104,6 +109,8 @@ for arg in sys.argv:
         incar_preset = incar_preset + ".yaml"
     elif "-dir" in arg:
         additional_dir = arg.split("=")[1]
+    elif "-pre_dir" in arg:
+        pre_dir = arg.split("=")[1]
     
 
 if sys.argv[1] == "1":
@@ -163,7 +170,7 @@ elif sys.argv[1] == "add":
         VI = VASPInput(additional_dir=additional_dir, dirname=each_input, preset_yaml=incar_preset)
         VI.cms_vasp_set(single_point=single_point, isif=isif, vdw=vdw, kpoints=kpoints, spin=spin, mag=mag, ldau=ldau,
                         functional=functional, pseudo=pseudo,
-                        get_pre_incar=None, batch=True)
+                        get_pre_incar=None, batch=True, pre_dir=pre_dir)
 
 
 

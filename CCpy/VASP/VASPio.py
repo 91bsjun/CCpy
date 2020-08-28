@@ -40,7 +40,10 @@ class VASPInput():
             dirname = dirname + "/" + additional_dir
             self.additional_calc = True
         else:
-            if ".xsd" in filename:
+            if not filename:
+                structure, dirname, jobname = None, None, None
+                pass               # for run init only
+            elif ".xsd" in filename:
                 ps = PS(filename)
                 ps.xsdFile()
                 ps.cifWrite(filename="tmpstructure.cif")
@@ -124,7 +127,7 @@ class VASPInput():
     def cms_vasp_set(self, single_point=False, isif=False, vdw=False,
                      spin=False, mag=False, ldau=False,
                      functional="PBE_54", pseudo=None,
-                     kpoints=False, get_pre_incar=None,
+                     kpoints=False, get_pre_incar=None, pre_dir="./",
                      batch=False):
         """
         Interactive VASP input generator
@@ -382,9 +385,11 @@ class VASPInput():
         ## ----------------------- When Additional Calc ------------------------- ##
         if self.additional_calc:
             os.chdir(dirname)
+            if pre_dir[-1] != "/":
+                pre_dir += "/"
             for prev_file in self.keep_files:
-                if prev_file in os.listdir("../"):
-                    shutil.copy("../" + prev_file, "./")
+                if prev_file in os.listdir("../" + pre_dir):
+                    shutil.copy("../" + pre_dir + prev_file, "./")
             if "CONTCAR" in self.keep_files:
                 os.remove("POSCAR")
                 os.rename("CONTCAR", "POSCAR")
