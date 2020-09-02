@@ -34,6 +34,7 @@ class VASPInput():
         additional:
         """
         self.additional_calc = False
+        self.additional_dir = additional_dir
         if additional_dir:
             jobname = dirname
             structure = pmgIS.from_file(dirname + "/CONTCAR")
@@ -82,9 +83,16 @@ class VASPInput():
             os.makedirs(vasp_config_dir)
             print("* Preset options will be saved under :" + vasp_config_dir)
         configs = os.listdir(vasp_config_dir)
+
         # INCAR preset check
-        kpt_len = 20
         yaml_file = ""
+        if "default.yaml" in configs:
+            default_incar_dict = load_yaml(vasp_config_dir + "default.yaml", "INCAR")
+        else:
+            shutil.copy('%s' % MODULE_DIR + '/vasp_default.yaml', '%s' % vasp_config_dir + "default.yaml")
+            default_incar_dict = load_yaml(vasp_config_dir + "default.yaml", "INCAR")
+        default_yaml_file = vasp_config_dir + "default.yaml"
+
         if preset_yaml:
             if preset_yaml in configs:
                 incar_dict = load_yaml(vasp_config_dir + preset_yaml, "INCAR")
@@ -94,18 +102,21 @@ class VASPInput():
             yaml_file = vasp_config_dir + preset_yaml
         # Use default
         else:
-            if "default.yaml" in configs:
-                incar_dict = load_yaml(vasp_config_dir + "default.yaml", "INCAR")
-            else:
-                shutil.copy('%s' % MODULE_DIR + '/vasp_default.yaml', '%s' % vasp_config_dir + "default.yaml")
-                #os.system('cp %s %s' % (MODULE_DIR + '/vasp_default.yaml', vasp_config_dir + "default.yaml"))
-                incar_dict = load_yaml(vasp_config_dir + "default.yaml", "INCAR")
-            yaml_file = vasp_config_dir + "default.yaml"
+            incar_dict = default_incar_dict
+            yaml_file = default_yaml_file
 
-        kpt_len = load_yaml(yaml_file, "KPOINTS")['length']
-
-        magmom = load_yaml(yaml_file, "MAGMOM")
-        LDAU = load_yaml(yaml_file, "LDAU")
+        try:
+            kpt_len = load_yaml(yaml_file, "KPOINTS")['length']
+        except:
+            kpt_len = load_yaml(default_yaml_file, "KPOINTS")['length']
+        try:
+            magmom = load_yaml(yaml_file, "MAGMOM")
+        except:
+            magmom = load_yaml(default_yaml_file, "MAGMOM")
+        try:
+            LDAU = load_yaml(yaml_file, "LDAU")
+        except:
+            LDAU = load_yaml(default_yaml_file, "LDAU")
         LDAUU = LDAU['LDAUU']
         LDAUJ = LDAU['LDAUJ']
         LDAUL = LDAU['LDAUL']
@@ -113,6 +124,7 @@ class VASPInput():
         self.incar_dict, self.magmom, self.LDAUL, self.LDAUU, self.LDAUJ, self.vdw_C6, self.vdw_R0 = incar_dict, magmom, LDAUL, LDAUU, LDAUJ, vdw_C6, vdw_R0
         self.kpt_len = kpt_len
         self.yaml_file = yaml_file
+        self.default_incar_dict = default_incar_dict
         self.incar_dict_desc = load_yaml(MODULE_DIR + '/vasp_incar_desc.yaml')
         if len(keep_files) == 0:
             self.keep_files = load_yaml(yaml_file)["KEEP_FILES"]
@@ -150,9 +162,33 @@ class VASPInput():
         incar_dict_desc = self.incar_dict_desc
         pwd = os.getcwd()
 
+        ## ----------------------- Prepare write inputs ------------------------- ##
+        try:
+            os.mkdir(dirname)
+        except:
+            files = os.listdir(dirname)
+            if "INCAR" in files or "POSCAR" in files or "KPOINTS" in files or "POTCAR" in files:
+                ans = raw_input(bcolors.WARNING + dirname+" already exist. Will you override ? (y/n)" + bcolors.ENDC)
+                if ans == "y":
+                    pass
+                else:
+                    quit()
+            else:
+                pass
+
+
         # -- Load previous option when multiple input generation
         if get_pre_incar:
             incar_dict = OrderedDict(yaml.load(open(get_pre_incar)))
+        # -- Load previous INCAR when additional calc and INCAR in keep_files
+        elif self.additional_calc and 'INCAR' in self.keep_files:
+            # 1. load default  -->  2. update using previous calc --> 3. update using preset_yaml
+            tmp_incar_dict = self.default_incar_dict
+            os.chdir(dirname)
+            pre_calc_incar = Incar.from_file("../" + pre_dir + '/INCAR')
+            os.chdir(pwd)
+            tmp_incar_dict = update_incar(tmp_incar_dict, pre_calc_incar)
+            incar_dict = update_incar(tmp_incar_dict, self.incar_dict)
         else:
             incar_dict = self.incar_dict
 
@@ -314,19 +350,6 @@ class VASPInput():
             pot_elt = elements
         potcar = Potcar(symbols=pot_elt, functional=functional)
 
-        ## ----------------------- Prepare write inputs ------------------------- ##
-        try:
-            os.mkdir(dirname)
-        except:
-            files = os.listdir(dirname)
-            if "INCAR" in files or "POSCAR" in files or "KPOINTS" in files or "POTCAR" in files:
-                ans = raw_input(bcolors.WARNING + dirname+" already exist. Will you override ? (y/n)" + bcolors.ENDC)
-                if ans == "y":
-                    pass
-                else:
-                    quit()
-            else:
-                pass
 
         ## --------------------------- Update INCAR  values -------------------------- ##
         if batch:
@@ -388,7 +411,7 @@ class VASPInput():
             if pre_dir[-1] != "/":
                 pre_dir += "/"
             for prev_file in self.keep_files:
-                if prev_file in os.listdir("../" + pre_dir):
+                if prev_file in os.listdir("../" + pre_dir) and prev_file != 'INCAR':
                     shutil.copy("../" + pre_dir + prev_file, "./")
             if "CONTCAR" in self.keep_files:
                 os.remove("POSCAR")
