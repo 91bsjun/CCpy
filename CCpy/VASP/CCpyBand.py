@@ -297,12 +297,10 @@ class CMSBand():
         df = pd.DataFrame(band_data).set_index('distances')
         df.to_csv('band_structure.csv')
 
-        kpts_labels = list(self.bands.labels_dict.keys())
-        kpts_labels.append(kpts_labels[0])
         f = open('band_structure_x-point.csv', 'w')
-        f.write('distance,label\n')
+        f.write('distance\n')
         for i in range(len(critical_distances)):
-            f.write("%f,%s\n" % (float(critical_distances[i]), kpts_labels[i]))
+            f.write("%f\n" % float(critical_distances[i]))
         f.close()
 
         print("* Save raw band structure data: band_structure.csv")
