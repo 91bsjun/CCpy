@@ -91,6 +91,7 @@ class VASPInput():
             default_incar_dict = load_yaml(vasp_config_dir + "default.yaml", "INCAR")
         else:
             shutil.copy('%s' % MODULE_DIR + '/vasp_default.yaml', '%s' % vasp_config_dir + "default.yaml")
+            shutil.copy('%s' % MODULE_DIR + '/band.yaml', '%s' % vasp_config_dir + "band_sample.yaml")
             default_incar_dict = load_yaml(vasp_config_dir + "default.yaml", "INCAR")
         default_yaml_file = vasp_config_dir + "default.yaml"
 

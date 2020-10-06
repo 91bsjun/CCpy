@@ -19,10 +19,10 @@ except:
     print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [sub_option1] [sub_option2..]")
     print('''--------------------------------------
 [options]
-1  : Relaxation calculation  (from initial structure files)
-2  : Band-DOS calculation    (after previous calculation)
-3  : Band-DOS calculation    (from initial structure files)
-add: User defined additional calculation
+1   : Relaxation calculation  (from initial structure files)
+2   : Band-DOS calculation    (after previous calculation)
+3   : Band-DOS calculation    (from initial structure files)
+add : User defined additional calculation from previous calculation
 
 
 [sub_options]
