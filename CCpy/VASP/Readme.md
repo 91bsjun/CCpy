@@ -7,10 +7,10 @@ When you run script without any argument, it returns a manual.
 How to use : CCpyVASPInputGen.py [option] [sub_option1] [sub_option2..]
 --------------------------------------
 [options]
-1  : Relaxation calculation  (from initial structure files)
-2  : Band-DOS calculation    (after previous calculation)
-3  : Band-DOS calculation    (from initial structure files)
-add: User defined additional calculation
+1   : Relaxation calculation  (from initial structure files)
+2   : Band-DOS calculation    (after previous calculation)
+3   : Band-DOS calculation    (from initial structure files)
+add : User defined additional calculation from previous calculation
 
 
 [sub_options]
@@ -43,11 +43,14 @@ ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_s
 
     < ADDITIONAL CALCULATION >
     when use option 'add', 
-    -dir=[DIRNAME]  : Additional calculation dir under previous run
-    -preset=[NAME] : [NAME].yaml in ~/.CCpy/vasp/
+    -dir=[DIRNAME]     : Additional calculation dir under previous run
+    -pre_dir=[DIRNAME] : Previous directory name to copy CONTCAR, ... (default ./)
+    -preset=[NAME]     : [NAME].yaml in ~/.CCpy/vasp/
+ 
 
 [preset options]
 ~/.CCpy/vasp/___.yaml
+
    
 
 </pre>
