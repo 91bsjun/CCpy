@@ -468,8 +468,17 @@ def main_run():
 
         cms_band = CMSBand(elt_projected=True, dos=True, fig=fig)
 
+        band_indices = False
+        for argv in sys.argv:
+            if '-nb' in argv:
+                from CCpy.Tools.CCpyTools import input_num_parser
+                nb_bands = cms_band.bands.nb_bands
+                print("\nTotal number of bands: ", nb_bands)
+                band_indices = input_num_parser(nb_bands)
+                band_indices = list(np.array(band_indices) - 1)
+
         plt.subplot(121)
-        plt = cms_band.colorBand(miny=miny, maxy=maxy, elt_ordered=elt_ordered, color_order=color_order, line_width=line_width)
+        plt = cms_band.colorBand(band_indices, miny=miny, maxy=maxy, elt_ordered=elt_ordered, color_order=color_order, line_width=line_width)
         cms_band.save_band_data(color=True, savefig=False)
 
         plt.subplot(122)

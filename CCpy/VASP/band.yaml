@@ -1,0 +1,14 @@
+KPOINTS:
+  linemode: True
+  linemode_file: False
+  use_all_path: False
+  show_brillouin_zone: True 
+KEEP_FILES:
+  - CONTCAR
+  - INCAR
+  - CHGCAR
+INCAR:
+  ICHARG: 11
+  NSW: 0
+  NEDOS: 2001
+  SIGMA: 0.02

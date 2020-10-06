@@ -95,7 +95,7 @@ elif sys.argv[1] == "1":
     inputs = selectVASPOutputs("./", sub=sub, additional_dir=additional_dir)
     pwd = os.getcwd()
     for each_input in inputs:
-        dirname = each_input
+        dirname = each_input.split('/')[-1]
         if additional_dir:
             dirname = "%s_%s" % (each_input.split("/")[0], each_input.split("/")[1])
         os.chdir(each_input)

@@ -9,6 +9,7 @@ from pathlib import Path
 from collections import OrderedDict
 
 from CCpy.VASP.VASPtools import vasp_incar_json, vasp_phonon_incar_json, magmom_parameters, ldauu_parameters, ldauj_parameters, ldaul_parameters, vasp_grimme_parameters
+from CCpy.VASP.VASPtools import line_kpts_generator
 
 from CCpy.Tools.CCpyStructure import PeriodicStructure as PS
 from CCpy.Tools.CCpyStructure import latticeGen
@@ -106,9 +107,26 @@ class VASPInput():
             yaml_file = default_yaml_file
 
         try:
-            kpt_len = load_yaml(yaml_file, "KPOINTS")['length']
+            kpt_density = load_yaml(yaml_file, "KPOINTS")['reciprocal_density']
         except:
-            kpt_len = load_yaml(default_yaml_file, "KPOINTS")['length']
+            kpt_density = load_yaml(default_yaml_file, "KPOINTS")['reciprocal_density']
+        try:
+            kpt_linemode = load_yaml(yaml_file, "KPOINTS")['linemode']
+        except:
+            kpt_linemode = False
+        try:
+            kpt_linemode_file = load_yaml(yaml_file, "KPOINTS")['linemode_file']
+        except:
+            kpt_linemode_file = False
+        try:
+            kpt_linemode_use_all_path = load_yaml(yaml_file, "KPOINTS")['use_all_path']
+        except:
+            kpt_linemode_use_all_path = False
+        try:
+            kpt_linemode_show_brill = load_yaml(yaml_file, "KPOINTS")['show_brillouin_zone']
+        except:
+            kpt_linemode_show_brill = False
+
         try:
             magmom = load_yaml(yaml_file, "MAGMOM")
         except:
@@ -122,7 +140,12 @@ class VASPInput():
         LDAUL = LDAU['LDAUL']
 
         self.incar_dict, self.magmom, self.LDAUL, self.LDAUU, self.LDAUJ, self.vdw_C6, self.vdw_R0 = incar_dict, magmom, LDAUL, LDAUU, LDAUJ, vdw_C6, vdw_R0
-        self.kpt_len = kpt_len
+        self.kpt_density = kpt_density
+        self.kpt_linemode = kpt_linemode
+        self.kpt_linemode_file = kpt_linemode_file
+        self.kpt_linemode_use_all_path = kpt_linemode_use_all_path
+        self.kpt_linemode_show_brill = kpt_linemode_show_brill
+        
         self.yaml_file = yaml_file
         self.default_incar_dict = default_incar_dict
         self.incar_dict_desc = load_yaml(MODULE_DIR + '/vasp_incar_desc.yaml')
@@ -323,17 +346,25 @@ class VASPInput():
         # -- if user input the k-points in command
         if kpoints:
             kpts = kpoints
+#        else:
+#            lattice_vector = structure.lattice.matrix
+#            lattice = latticeGen(lattice_vector[0],lattice_vector[1],lattice_vector[2])
+#            length = [lattice['length'][0], lattice['length'][1], lattice['length'][2]]
+#            kpts = []
+#            for param in length:
+#                if self.kpt_len // param == 0 or self.kpt_len // param == 1:
+#                    kpts.append(1)
+#                else:
+#                    kpts.append(int(self.kpt_len // param))
+#        kpoints = dirname+"\n0\nMonkhorst-Pack\n"+str(kpts[0])+" "+str(kpts[1])+" "+str(kpts[2])+"\n0 0 0\n"
+        elif self.kpt_linemode:
+            if self.kpt_linemode_file:
+                kpoints = open(self.kpt_linemode_file, 'r').read()
+            else:
+                print(self.kpt_linemode_use_all_path)
+                kpoints = line_kpts_generator(structure, use_all=self.kpt_linemode_use_all_path, plot_brillouin_zone=self.kpt_linemode_show_brill)
         else:
-            lattice_vector = structure.lattice.matrix
-            lattice = latticeGen(lattice_vector[0],lattice_vector[1],lattice_vector[2])
-            length = [lattice['length'][0], lattice['length'][1], lattice['length'][2]]
-            kpts = []
-            for param in length:
-                if self.kpt_len // param == 0 or self.kpt_len // param == 1:
-                    kpts.append(1)
-                else:
-                    kpts.append(int(self.kpt_len // param))
-        kpoints = dirname+"\n0\nMonkhorst-Pack\n"+str(kpts[0])+" "+str(kpts[1])+" "+str(kpts[2])+"\n0 0 0\n"
+            kpoints = str(Kpoints.automatic_density_by_vol(structure, self.kpt_density))
 
         ## -------------------------------- POTCAR -------------------------------- ##
         if pseudo:

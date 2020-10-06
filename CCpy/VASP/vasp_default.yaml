@@ -1,5 +1,9 @@
 KPOINTS:
-  length: 20
+  reciprocal_density: 64
+  linemode: False
+  linemode_file: False
+  use_all_path: False
+  show_brillouin_zone: False
 KEEP_FILES:
   - CONTCAR
 INCAR:
@@ -16,7 +20,7 @@ INCAR:
   
   SECTION2: '# -- Electronic Relaxation 1'
   NELM: 100
-  EDIFF: 1E-04
+  EDIFF: 1E-05
   BMIX: 3.00
   ENCUT: 500
   
@@ -36,7 +40,7 @@ INCAR:
   ISYM: 2
   '# SYMPREC': 1e-6
   LCORR: T
-  EDIFFG: -0.04
+  EDIFFG: -0.02
   POTIM: 0.50
   SMASS: 3.00
   
