@@ -1,5 +1,5 @@
 # VASP modules
-## 2.1. VASP Input Generation
+# 2.1. VASP Input Generation
 When you run script without any argument, it returns a manual.
 <pre>
 [user@localhost ~]$ CCpyVASPInputGen.py
@@ -7,10 +7,10 @@ When you run script without any argument, it returns a manual.
 How to use : CCpyVASPInputGen.py [option] [sub_option1] [sub_option2..]
 --------------------------------------
 [options]
-1  : Relaxation calculation  (from initial structure files)
-2  : Band-DOS calculation    (after previous calculation)
-3  : Band-DOS calculation    (from initial structure files)
-add: User defined additional calculation
+1   : Relaxation calculation  (from initial structure files)
+2   : Band-DOS calculation    (after previous calculation)
+3   : Band-DOS calculation    (from initial structure files)
+add : User defined additional calculation from previous calculation
 
 
 [sub_options]
@@ -43,27 +43,30 @@ ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_s
 
     < ADDITIONAL CALCULATION >
     when use option 'add', 
-    -dir=[DIRNAME]  : Additional calculation dir under previous run
-    -preset=[NAME] : [NAME].yaml in ~/.CCpy/vasp/
+    -dir=[DIRNAME]     : Additional calculation dir under previous run
+    -pre_dir=[DIRNAME] : Previous directory name to copy CONTCAR, ... (default ./)
+    -preset=[NAME]     : [NAME].yaml in ~/.CCpy/vasp/
+ 
 
 [preset options]
 ~/.CCpy/vasp/___.yaml
+
    
 
 </pre>
-### 2.1.0. Preset input options
+## 2.1.0. Preset input options
 Once you run <code>CCpyVASPInputGen.py</code>, <code>$HOME/.CCpy/vasp/default.yaml</code> will be created.   
 This file contains general relaxation options.   
 When you run <code>CCpyVASPInputGen.py</code> without any <code>-preset=</code> option, the command will read that file.
 #### Use custom preset
 - Create <code>my_option.yaml</code> in <code>$HOME/.CCpy/vasp</code>
 - Run command with <code>-preset=my_option</code>
-### 2.1.1. Basic input generation
+## 2.1.1. Basic input generation
 Option '1' is a basic input generation. It detects structure file types in current directory.
 - \*.cif
 - \*.xsd (material studio, P1 space group)
 - \*POSCAR\* (VASP structure type, file name contains 'POSCAR')
-### 2.1.2. Example I
+## 2.1.2. Example I
 #### Run with option 1, without additional options
 <pre>
 [users@localhost structures]$ ls
@@ -136,7 +139,7 @@ LiFeBO3
 LiMnBO3
 TiO
 </pre>
-### 2.1.3. Additional Calculations from previous run
+## 2.1.3. Additional Calculations from previous run
 <code>add</code> option allows to generate additional vasp inputs from previous run
 - required option: <code>-dir=[NAME]</code> and <code>-preset=[PRESET]</code>
 - <code>-dir=[NAME]</code> : additional calculation directory name under previous run
@@ -182,7 +185,7 @@ If you want to copy outputs from previous run, add file lists under <code>KEEP_F
 ##### <code>[peset].yaml</code>
 <pre>
 KPOINTS:
-  length: 30
+  reciprocal_density: 512
 KEEP_FILES:
   - CONTCAR
   - CHGCAR
@@ -194,7 +197,73 @@ INCAR:
   NWRITE: 2
 
 </pre>
-### 2.1.4. Generate Inputs for Band Structure
+### Subit Job using <code>-dir=</code> option
+<pre>
+CCpyJobSubmit.py 2 xeon2 -dir=phonon_opt
+</pre>
+## 2.1.4. Generate Inputs for Band Structure Calculation
+Default preset file (<code>band_sample.yaml</code>) for band calculation will be generated after run <code>CCpyVASPInputGen.py</code> under <code>~/.CCpy/vasp/</code>
+### <code>band_sample.yaml</code>
+<pre>
+KPOINTS:
+  linemode: True                    --> Use line mode K-points
+  linemode_file: False              --> Assign own line mode KPOINTS file (ex. KPOINTSP)
+  use_all_path: False               --> Whether use all symmetry path when make new line mode KPOINTS
+  show_brillouin_zone: True         --> Show brillouin zone path when make new line mode KPOINTS
+KEEP_FILES:
+  - CONTCAR
+  - INCAR
+  - CHGCAR
+INCAR:
+  ICHARG: 11
+  NSW: 0
+  NEDOS: 2001
+  SIGMA: 0.02
+</pre>
+### Example
+<pre>
+[user@localhost test]$ CCpyVASPInputGen.py add -dir=Band -preset=band_sample
+1 : PTeCl
+0 : All files
+Choose file : 1
+PTeCl/Band
+False
+
+* Available k-points in this structure
+\Gamma : 0.0 0.0 0.0 
+X : 0.5 0.0 0.5 
+W : 0.5 0.25 0.75 
+K : 0.375 0.375 0.75 
+L : 0.5 0.5 0.5 
+U : 0.625 0.25 0.625 
+
+* Choose k-points to use Band calculations (ex: \Gamma,M,K,L) 
+: \Gamma,X,L
+[user@localhost test]$ ls PTeCl/Band/
+CHGCAR  INCAR  KPOINTS  POSCAR  POTCAR
+</pre>
+When use other previous calculation
+<pre>
+[user@localhost test]$ CCpyVASPInputGen.py add -dir=Band -preset=band_sample -pre_dir=PreCalc
+</pre>
+When use your own line mode KPOINTS file, edit preset file
+<pre>
+KPOINTS:
+  linemode: True
+  linemode_file: /home/user01/graphene_KPOINTS       <<<
+  use_all_path: False
+  show_brillouin_zone: True 
+KEEP_FILES:
+  - CONTCAR
+  - INCAR
+  - CHGCAR
+INCAR:
+  ICHARG: 11
+  NSW: 0
+  NEDOS: 2001
+  SIGMA: 0.02
+</pre>
+## 2.1.4. Generate Inputs for Band Structure (OLD)
 You can make inputs for calculating VASP band structure as <code> CCpyVASPInputGen.py 2 </code>
 <pre>
 [user@localhost test]$ CCpyVASPInputGen.py 2
