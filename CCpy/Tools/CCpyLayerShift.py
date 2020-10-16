@@ -33,8 +33,8 @@ except:
     -tol=0.1        : fractional coordinates tolerance for grouping layer (default: 0.01)
     -x=0.05         : fractional shift distance for x-axis. if=0, fix (default: 0.1)
     -y=0.05         : fractional shift distance for y-axis. if=0, fix (default: 0.1)
-    -z=0.05         : fractional shift distance for z-axis. if=0, fix (default: set to 0.1 Angstrom (cartesian))
-                      2.5 < interlayer distance < 5 (Angstrom)
+    -z=-1,1,0.2     : cartesian shift distance for z-axis. if=0, fix (default: -1 to 1 Angstrom with 0.2 interval (cartesian))
+                      
 
     <When Option 2 
     -etol = 0.0001      : tolerance energy for grouping structures by similar energy
@@ -87,7 +87,9 @@ def cif_gen():
     layer_tol = 0.01
     x_ratio = 0.1
     y_ratio = 0.1
-    z_ratio = round(0.1 / lat_param[2], 8)
+    z_min = -1
+    z_max = 1
+    z_interval = 0.2
     for s in sys.argv:
         if "-tol=" in s:
             layer_tol = float(s.replace("-tol=",""))
@@ -96,8 +98,10 @@ def cif_gen():
         elif "-y" in s:
             y_ratio = float(s.replace("-y=",""))
         elif "-z" in s:
-            z_ratio = float(s.replace("-z=",""))
-
+            z_input= s.replace("-z=","").split(",")
+            z_min = float(z_input[0])
+            z_max = float(z_input[1])
+            z_interval = float(z_input[2])
 
     # ---------- Distinct layer
     '''
@@ -156,7 +160,7 @@ def cif_gen():
 
 
     # ---------- Set layer1 as upper layer
-    if avg_layer2_z > avg_layer1_z:
+    if avg_layer2_z < avg_layer1_z:
         tmp_index = layer1_index
         layer1_index = layer2_index
         layer2_index = tmp_index
@@ -167,6 +171,7 @@ def cif_gen():
     x_shift = []
     y_shift = []
     z_shift = []
+    z_shift_cart = []
     total_x_shift = 0
     if x_ratio == 0:
         x_shift.append(0)
@@ -187,27 +192,15 @@ def cif_gen():
                 y_shift.append(total_y_shift)
             total_y_shift += y_ratio
 
-    if z_ratio == 0:
+    if z_interval == 0:
         z_shift.append(0)
     else:
-        # -- for z-axis: 2.5 <  d  < 5.0
-        frac_layer_distance = abs(avg_layer1_z - avg_layer2_z)
-        min_distance = 2.5 / lat_param[2]
-        max_distance = 5.0 / lat_param[2]
-        total_z_shift = 0.0
-        # -- closer
-        while frac_layer_distance - total_z_shift > 2.5 / lat_param[2]:
-            total_z_shift = round(total_z_shift, 8)
-            z_shift.append(total_z_shift)
-            total_z_shift += z_ratio
-        z_shift.reverse()
-        total_z_shift = 0.0
-        # -- farther
-        while frac_layer_distance + total_z_shift < 5 / lat_param[2]:
-            total_z_shift = round(total_z_shift, 8)
-            if -total_z_shift not in z_shift:
-                z_shift.append(-total_z_shift)
-            total_z_shift += z_ratio
+        for i in np.arange(z_min, z_max, z_interval):            
+            z_shift.append(i / lat_param[2])
+            z_shift_cart.append(i.round(4))
+        z_shift_cart.append((i + z_interval).round(4))
+        z_shift.append((i + z_interval) / lat_param[2])
+
 
     print("Total number of structures: " + str(len(x_shift) * len(y_shift) * len(z_shift)))
 
@@ -233,7 +226,7 @@ def cif_gen():
     os.mkdir(basename)
     os.chdir(basename)
     db = {'filename': [], 'x index': [], 'y index': [], 'z index':[],
-          'shifted frac x': [], 'shifted frac y': [], 'shifted frac z': [], 'stacking distance': []}
+          'shifted frac x': [], 'shifted frac y': [], 'shifted frac z': [], 'shifted cart z': []}
     xcnt = 0
     for x in x_shift:
         x_shifted_fcoords = get_shifted_structure(original_fcoords=fcoords, layer_index=layer2_index, axis=0, shift_val=x)
@@ -241,7 +234,7 @@ def cif_gen():
         for y in y_shift:
             xy_shifted_fcoords = get_shifted_structure(original_fcoords=x_shifted_fcoords, layer_index=layer2_index, axis=1, shift_val=y)
             zcnt = 0
-            for z in z_shift:
+            for i, z in enumerate(z_shift):
                 xyz_shifted_fcoords = get_shifted_structure(original_fcoords=xy_shifted_fcoords, layer_index=layer2_index, axis=2, shift_val=z)
                 filename = (basename + "_x%3d" % xcnt + "y%3d" % ycnt + "z%3d" % zcnt).replace(" ","0") + ".cif"
                 pmg_structure = IStructure(lattice_v, atoms, xyz_shifted_fcoords)
@@ -252,12 +245,8 @@ def cif_gen():
                 db['z index'].append(zcnt)
                 db['shifted frac x'].append(x)
                 db['shifted frac y'].append(y)
-                db['shifted frac z'].append(z)
-
-                # inter layer distance
-                shifted_layer_distance = round(np.dot(z, lattice_v)[2][2], 4)
-                stacking_distance = layer_distance - shifted_layer_distance
-                db['stacking distance'].append(stacking_distance)
+                db['shifted frac z'].append(z)               
+                db['shifted cart z'].append(z_shift_cart[i])
                 zcnt += 1
             ycnt += 1
         xcnt += 1
@@ -380,13 +369,7 @@ def get_3d_plot(df, e_unit='eV', plot_group=False):
         plt.plot(grp5_x, grp5_y, marker="x", color="r", lw=0)
 
     # -- make levels
-    unit = (abs(Z.min() - Z.max())) / 50
-    lev = []
-    lev_val = Z.min()
-    while lev_val < Z.max() - 0.3:
-        lev_val = round(lev_val, 2)
-        lev.append(lev_val)
-        lev_val += unit
+    lev = np.linspace(Z.min(), Z.max(), 50)
     
     plt.contourf(X, Y, Z, cmap=cm.jet, levels=lev, extend="both")
     cbar = plt.colorbar()
@@ -403,10 +386,10 @@ def get_2d_plot(df):
     fixed_axis_df = get_fixed_axis_df(df, 'x')
     fixed_axis_df = get_fixed_axis_df(fixed_axis_df, 'y')
 
-    x = fixed_axis_df['stacking distance']
+    x = fixed_axis_df['shifted cart z']
     y = fixed_axis_df['final energy (eV)']
     #x_label = r"$\Delta$ z"
-    x_label = r"Stacking distance ($\mathrm{\AA}$)"
+    x_label = r"Shifted distance of c-axis ($\mathrm{\AA}$)"
     y_label = "Energy (eV)"
 
     plt.xlabel(x_label, fontsize=19)
@@ -472,8 +455,9 @@ if __name__ == "__main__":
                 df = get_final_energies()
             else:
                 df = pd.read_csv(final_dbname)
-            df = df.sort_values(by='stacking distance')            
+            df = df.sort_values(by='shifted cart z')            
             get_2d_plot(df)
+
 
 
 
