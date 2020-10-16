@@ -349,15 +349,20 @@ def selectVASPOutputs(directory_path, dir_list=None, ask=True, sub=False, additi
     elif sub:
         def get_valid_paths(path):
             (parent, subdirs, files) = path
-            if "Band-DOS" in subdirs:
-                return [parent]
-            if (not parent.endswith("/Band-DOS")) and (
-               len(glob.glob(os.path.join(parent, "vasprun.xml*"))) > 0 or (
+#            if "Band-DOS" in subdirs:
+#                return [parent]
+#            if (not parent.endswith("/Band-DOS")) and (
+#               len(glob.glob(os.path.join(parent, "vasprun.xml*"))) > 0 or (
+#               len(glob.glob(os.path.join(parent, "POSCAR*"))) > 0 and
+#               len(glob.glob(os.path.join(parent, "INCAR*"))) > 0 and
+#               len(glob.glob(os.path.join(parent, "KPOINTS*"))) > 0 and
+#               len(glob.glob(os.path.join(parent, "POTCAR*"))) > 0)
+#          ):
+            if len(glob.glob(os.path.join(parent, "vasprun.xml*"))) > 0 or (
                len(glob.glob(os.path.join(parent, "POSCAR*"))) > 0 and
                len(glob.glob(os.path.join(parent, "INCAR*"))) > 0 and
                len(glob.glob(os.path.join(parent, "KPOINTS*"))) > 0 and
-               len(glob.glob(os.path.join(parent, "POTCAR*"))) > 0)
-           ):
+               len(glob.glob(os.path.join(parent, "POTCAR*"))) > 0):
                 return [parent]
             return []
         all_dirs = []

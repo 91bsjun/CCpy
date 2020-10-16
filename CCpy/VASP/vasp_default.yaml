@@ -18,21 +18,20 @@ INCAR:
   LWAVE : .FALSE.
   LCHARG: .FALSE.
   
-  SECTION2: '# -- Electronic Relaxation 1'
-  NELM: 100
-  EDIFF: 1E-05
-  BMIX: 3.00
+  SECTION2: '# -- Electronic Relaxation'
   ENCUT: 500
-  
-  SECTION3: '# -- Electronic Relaxation 1'
-  '# IALGO': 48
+  NELM: 100
+  EDIFF: 1E-04
+  BMIX: 3.00
   LDIAG: T
   LREAL: Auto
   PREC: Normal
   '# NBANDS': 30
+  '# IALGO': 48
   
   SECTION4: '# -- Ionic Relaxation'
   NSW: 200
+  EDIFFG: -0.04
   NBLOCK: 1
   KBLOCK: 10
   IBRION: 2
@@ -40,7 +39,6 @@ INCAR:
   ISYM: 2
   '# SYMPREC': 1e-6
   LCORR: T
-  EDIFFG: -0.02
   POTIM: 0.50
   SMASS: 3.00
   
@@ -55,22 +53,24 @@ INCAR:
   '# NELECT': 100
   '# NUPDOWN': 2
   
+  SECTION7: '# -- Spin related values'
+  ISPIN: 1
+  '# MAGMOM': 28*0.0 4*0.6 24*0.6
+  
   SECTION6: '# -- Parallelizationoption'
   LPLANE: T
   NCORE: 4
   LSCALU: F
   NSIM: 4
-  ISPIN: 1
-  '# MAGMOM': 28*0.0 4*0.6 24*0.6
-  
-  SECTION7: '# -- optB86b-vdW functional requires vdw_kernel.bindat'
+
+  SECTION8: '# -- optB86b-vdW functional requires vdw_kernel.bindat'
   '# GGA': MK
   '# PARAM1': 0.1234
   '# PARAM2': 1.0000
   '# LUSE_VDW': .TRUE.
   '# AGGAC': 0.0000
   
-  SECTION8: '# -- TS calculation   default:Nudged Elestic Band method'
+  SECTION9: '# -- TS calculation   default:Nudged Elestic Band method'
   '# ICHAIN': 0
   '# SPRING': -5
   '# IMAGES': 3
@@ -79,11 +79,11 @@ INCAR:
   '# LDNEB': .true.
   '# NEBCELL': .true.
   
-  SECTION9: '# -- Dipole Correctionoption'
+  SECTION10: '# -- Dipole Correctionoption'
   '# IDIPOL': 3
   '# LDIPOL':  
   
-  SECTION10: '# -- LDAU+U parameters'
+  SECTION11: '# -- LDAU+U parameters'
   '# LMAXMIX': 4
   '# LDAU': .TRUE.
   '# LDAUTYPE': 2
@@ -91,7 +91,7 @@ INCAR:
   '# LDAUU': 0 0 0
   '# LDAUJ': 0 0 0
   
-  SECTION11: '# -- vdW corrections'
+  SECTION12: '# -- vdW corrections'
   '# IVDW': 12
   
 LDAU:

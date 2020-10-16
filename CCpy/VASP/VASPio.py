@@ -19,6 +19,7 @@ from pymatgen.core import IStructure as pmgIS
 from pymatgen.io.vasp import Vasprun
 from pymatgen.io.vasp.inputs import Incar, Poscar, Potcar, Kpoints, Kpoints_supported_modes
 from pymatgen.io.vasp.sets import *
+from pymatgen.util.io_utils import clean_lines
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -207,12 +208,13 @@ class VASPInput():
         # -- Load previous INCAR when additional calc and INCAR in keep_files
         elif self.additional_calc and 'INCAR' in self.keep_files:
             # 1. load default  -->  2. update using previous calc --> 3. update using preset_yaml
-            tmp_incar_dict = self.default_incar_dict
+            #tmp_incar_dict = self.default_incar_dict
             os.chdir(dirname)
-            pre_calc_incar = Incar.from_file("../" + pre_dir + '/INCAR')
+            pre_calc_incar = read_incar("../" + pre_dir + '/INCAR')
             os.chdir(pwd)
-            tmp_incar_dict = update_incar(tmp_incar_dict, pre_calc_incar)
-            incar_dict = update_incar(tmp_incar_dict, self.incar_dict)
+            #tmp_incar_dict = update_incar(tmp_incar_dict, pre_calc_incar)
+            #incar_dict = update_incar(tmp_incar_dict, self.incar_dict)
+            incar_dict = update_incar(pre_calc_incar, self.incar_dict)
         else:
             incar_dict = self.incar_dict
 
@@ -262,10 +264,12 @@ class VASPInput():
                 mag_string += str(n_of_atoms[i]) + "*" + str(magmom[elts[i]]) + " "
             except:
                 mag_string += str(n_of_atoms[i]) + "*" + str(0.6) + " "
+        if self.additional_calc and 'MAGMOM' in incar_dict.keys():
+            mag_string = incar_dict['MAGMOM']
 
         if mag:
             incar_dict = update_incar(incar_dict, {"MAGMOM": mag_string}) 
-        else:
+        elif 'MAGMOM' in incar_dict.keys() or '# MAGMOM' in incar_dict.keys():
             incar_dict = update_incar(incar_dict, {"MAGMOM": mag_string}, maintain_block=True)
 
 
@@ -289,6 +293,8 @@ class VASPInput():
                 LDAUL_string += str(LDAUL[elts[i]]) + " "
             except:
                 LDAUL_string += str(2) + " "
+        if self.additional_calc and 'LDAUL' in incar_dict.keys():
+            LDAUL_string = incar_dict['LDAUL']
 
         LDAUU_string = ""
         for i in range(len(elts)):
@@ -296,6 +302,8 @@ class VASPInput():
                 LDAUU_string += str(LDAUU[elts[i]]) + " "
             except:
                 LDAUU_string += str(0) + " "
+        if self.additional_calc and 'LDAUU' in incar_dict.keys():
+            LDAUU_string = incar_dict['LDAUU']
 
         LDAUJ_string = ""
         for i in range(len(elts)):
@@ -303,16 +311,19 @@ class VASPInput():
                 LDAUJ_string += str(LDAUJ[elts[i]]) + " "
             except:
                 LDAUJ_string += str(0) + " "
+        if self.additional_calc and 'LDAUJ' in incar_dict.keys():
+            LDAUJ_string = incar_dict['LDAUJ']
 
-        val_ldau = incar_dict["LDAU"] if "LDAU" in incar_dict.keys() else incar_dict["# LDAU"]
-        val_lmix = incar_dict["LMAXMIX"] if "LMAXMIX" in incar_dict.keys() else incar_dict["# LMAXMIX"]
-        val_ldau_type = incar_dict["LDAUTYPE"] if "LDAUTYPE" in incar_dict.keys() else incar_dict["# LDAUTYPE"]
-        update_ldau = {"LDAU": val_ldau, "LMAXMIX": val_lmix, "LDAUTYPE": val_ldau_type,
-                       "LDAUL": LDAUL_string, "LDAUU": LDAUU_string, "LDAUJ": LDAUJ_string}
-        if ldau:           # if use ldau option, uncomment LDAU options
-            incar_dict = update_incar(incar_dict, update_ldau)
-        else:              # else, up to yaml file
-            incar_dict = update_incar(incar_dict, update_ldau, maintain_block=True)
+        if "LDAU" in incar_dict.keys() or "# LDAU" in incar_dict.keys():  
+            val_ldau = incar_dict["LDAU"] if "LDAU" in incar_dict.keys() else incar_dict["# LDAU"]
+            val_lmix = incar_dict["LMAXMIX"] if "LMAXMIX" in incar_dict.keys() else incar_dict["# LMAXMIX"]
+            val_ldau_type = incar_dict["LDAUTYPE"] if "LDAUTYPE" in incar_dict.keys() else incar_dict["# LDAUTYPE"]
+            update_ldau = {"LDAU": val_ldau, "LMAXMIX": val_lmix, "LDAUTYPE": val_ldau_type,
+                           "LDAUL": LDAUL_string, "LDAUU": LDAUU_string, "LDAUJ": LDAUJ_string}
+            if ldau:           # if use ldau option, uncomment LDAU options
+                incar_dict = update_incar(incar_dict, update_ldau)
+            else:              # else, up to yaml file
+                incar_dict = update_incar(incar_dict, update_ldau, maintain_block=True)
 
         # vdw parameters
         if vdw:
@@ -389,7 +400,7 @@ class VASPInput():
         else:
             # -- INCAR
             print(dirname)
-            highlights = ["NSW", "ISPIN", "ISIF", "PREC", "EDIFF", "IVDW"]
+            highlights = ["NSW", "ISPIN", "ISIF", "PREC", "EDIFF", "EDIFFG", "IVDW"]
             warnings = []
             if not get_pre_incar:        # This process is for avoiding multiple inputs generation.
                 print(bcolors.OKGREEN + "\n# ---------- Read INCAR option from %s ---------- #" % self.yaml_file + bcolors.ENDC)
@@ -1149,7 +1160,7 @@ class VASPOutput():
 
             if minimize:
                 gzip_exec(['OUTCAR', 'vasprun.xml', 'XDATCAR'])
-                rm_exec(['CHG', 'CHG.gz', 'CHGCAR', 'CHGCAR.gz', 'DOSCAR', 'DOSCAR.gz', 'PROCAR', 'PROCAR.gz'])
+                rm_exec(['CHG', 'CHG.gz', 'CHGCAR', 'CHGCAR.gz', 'DOSCAR', 'DOSCAR.gz', 'PROCAR', 'PROCAR.gz', 'WAVECAR', 'WAVECAR.gz'])
             else:
                 gzip_exec(['CHG', 'CHGCAR', 'DOSCAR', 'OUTCAR', 'PROCAR', 'vasprun.xml', 'XDATCAR'])
 
@@ -1231,7 +1242,26 @@ def update_incar(incar_dict, input_option, maintain_block=False):
     return incar_dict
 
 
+def read_incar(incar_file):
+    #string = open(incar_file, "r").read()
+    #lines = list(clean_lines(string.splitlines()))
+    params = {}
+    cnt = 1
+    lines = open(incar_file, "r").readlines()
+    for line in lines:
+        for sline in line.split(";"):
+            m = re.match(r"(\w+)\s*=\s*(.*)", sline.strip())
+            if m:
+                key = m.group(1).strip()
+                val = m.group(2).strip()
+                params[key] = val
+                if '!' in val:
+                    params[key] = val.split("!")[0]
+        if '# --' in line:
+            params['SECTION%d' % cnt] = line.replace('\n', '')
+            cnt += 1
 
+    return params
 
 
 
