@@ -20,6 +20,7 @@ temp = int(sys.argv[2])
 specie = sys.argv[3]
 screen = sys.argv[4]
 structure = IStructure.from_file(structure_filename)
+structure.perturb(0.1)
 
 vasp = "/opt/vasp/vasp.5.4.1/bin/vasp_std"
 NCORE = 4
@@ -154,8 +155,7 @@ def running(temp, pre, crt):
     os.system("rm -rf vasprun.xml vasprun.xml.gz")
     os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
     time.sleep(5)
-    os.system("gzip OUTCAR vasprun.xml")
-    os.system("rm -rf DOSCAR XDATCAR")
+    os.system("gzip vasprun.xml")
     write_log("try: %d" % total_try)
     properly_terminated = terminated_check(crt_nsw)
     while not properly_terminated:
@@ -164,15 +164,15 @@ def running(temp, pre, crt):
         os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
         time.sleep(5)
         os.system("gzip vasprun.xml")
-        os.system("rm -rf DOSCAR XDATCAR")
         write_log("try: %d" % total_try)
         properly_terminated = terminated_check(crt_nsw)        
     os.system("touch vasp.done")    
     os.chdir("../")
     # -- remove files in previous directory to reduce stroage
-    os.system("rm -rf %s/WAVECAR" % pre_dir)
-    os.system("rm -rf %s/OUTCAR" % pre_dir)
-    os.system("rm -rf %s/PROCAR" % pre_dir)
+    rms = ['DOSCAR', 'XDATCAR', 'CHG', 'CHGCAR', 'WAVECAR', 'OUTCAR', 'vasp.out', 'EIGENVAL', 'PROCAR', 'XDATCAR', 'IBZKPT', 'PCDAT'
+, 'REPORT', 'OSZICAR']
+    for rm in rms:
+        os.system("rm -rf %s/%s" % (pre_dir, rm))
 
 
 def write_data(crt):
