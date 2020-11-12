@@ -460,7 +460,7 @@ class VASPInput():
                 os.remove("POSCAR")
                 os.rename("CONTCAR", "POSCAR")
             os.chdir(pwd)
-        else:
+        elif self.filename:
             # -- backup structure file
             if "structures" not in os.listdir():
                 os.mkdir("structures")
@@ -1250,7 +1250,7 @@ def read_incar(incar_file):
     lines = open(incar_file, "r").readlines()
     for line in lines:
         for sline in line.split(";"):
-            m = re.match(r"(\w+)\s*=\s*(.*)", sline.strip())
+            m = re.match(r"([#]{0,1}\s*\w+)\s*=\s*(.*)", sline.strip())
             if m:
                 key = m.group(1).strip()
                 val = m.group(2).strip()
