@@ -132,7 +132,7 @@ def running(temp, pre, crt):
     crt_dir = ("run%03d" % crt)
     # -- initiating
     if crt == 0:
-        structure = IStructure.from_file("../" + structure_filename)
+        structure = Structure.from_file("../" + structure_filename)
         structure.perturb(0.1)
         crt_nsw = heating_nsw
         user_incar["SMASS"] = -1
