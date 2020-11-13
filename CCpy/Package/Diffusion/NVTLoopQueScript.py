@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from pymatgen.io.vasp import Vasprun
 from pymatgen.io.vasp.sets import MITMDSet, MPMDSet
-from pymatgen.core.structure import IStructure
+from pymatgen.core.structure import IStructure, Structure
 from pymatgen.analysis.diffusion_analyzer import DiffusionAnalyzer
 import warnings
 warnings.filterwarnings("ignore")
@@ -19,8 +19,6 @@ structure_filename = sys.argv[1]
 temp = int(sys.argv[2])
 specie = sys.argv[3]
 screen = sys.argv[4]
-structure = IStructure.from_file(structure_filename)
-structure.perturb(0.1)
 
 vasp = "/opt/vasp/vasp.5.4.1/bin/vasp_std"
 NCORE = 4
@@ -135,6 +133,7 @@ def running(temp, pre, crt):
     # -- initiating
     if crt == 0:
         structure = IStructure.from_file("../" + structure_filename)
+        structure.perturb(0.1)
         crt_nsw = heating_nsw
         user_incar["SMASS"] = -1
         inputset = MITMDSet(structure, 100.0, float(temp), heating_nsw, user_incar_settings=user_incar)
@@ -305,7 +304,7 @@ def check_converged(crt_step, RSD, ASD):
 
 
 if __name__ == "__main__":
-    structure = IStructure.from_file(structure_filename)
+    structure = Structure.from_file(structure_filename)
     # -- Find neighboring specie distance
     sites = structure.sites
     specie_sites = [s for s in sites if s.specie.symbol == specie]
