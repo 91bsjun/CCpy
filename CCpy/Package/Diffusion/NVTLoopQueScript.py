@@ -19,6 +19,7 @@ structure_filename = sys.argv[1]
 temp = int(sys.argv[2])
 specie = sys.argv[3]
 screen = sys.argv[4]
+max_step = int(sys.argv[5])
 
 vasp = "/opt/vasp/vasp.5.4.1/bin/vasp_std"
 NCORE = 4
@@ -32,7 +33,6 @@ nsw = 1000
 min_step = 50
 min_RSD = 0.25
 min_ASD = 7
-max_step = 250
 if screen == 'screen':
     heating_nsw = 1000
     nsw = 1000

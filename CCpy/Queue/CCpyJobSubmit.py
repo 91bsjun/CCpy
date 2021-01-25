@@ -229,7 +229,7 @@ class JobInitiator:
             myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.pbs_runner()
 
-    def AIMD_NVT_Loop(self, temp=None, specie="Li", screen="no_screen"):
+    def AIMD_NVT_Loop(self, temp=None, specie="Li", screen="no_screen", max_step=250):
         # --- COLLECT INPUT FILES
         input_marker = [".cif", "POSCAR", "CONTCAR"]
         inputs = selectInputs(input_marker, "./", ask=ask)
@@ -238,15 +238,15 @@ class JobInitiator:
             quit()
 
         myJS = JS(inputs[0], self.queue, self.n_of_cpu, node=self.node)
-        myJS.AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp, specie=specie, screen=screen)
+        myJS.AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp, specie=specie, screen=screen, max_step=max_step)
 
-    def AIMD_NVT_Loop_batch(self, temp=None, specie="Li", screen="no_screen"):
+    def AIMD_NVT_Loop_batch(self, temp=None, specie="Li", screen="no_screen", max_step=250):
         # --- COLLECT INPUT FILES
         input_marker = [".cif", "POSCAR", "CONTCAR"]
         inputs = selectInputs(input_marker, "./", ask=ask)
 
         myJS = JS(inputs, self.queue, self.n_of_cpu, node=self.node)
-        myJS.AIMD_NVT_Loop_batch(structure_files = inputs, temp=temp, specie=specie, screen=screen)
+        myJS.AIMD_NVT_Loop_batch(structure_files = inputs, temp=temp, specie=specie, screen=screen, max_step=max_step)
 
     def casm_run(self):
         # --- SUBMIT QUEUE
@@ -400,8 +400,9 @@ Please check the example of scheduler config file at https://github.com/91bsjun/
     sub = False
     loop = False
     node = None
-    specie = "Li"
-    screen = "no_screen"
+    specie = "Li"               # AIMD option
+    screen = "no_screen"        # AIMD option
+    max_step = 250              # AIMD option
     additional_dir = None       # additional calc for VASP
     for s in sys.argv:
         if "-n=" in s:
@@ -430,6 +431,8 @@ Please check the example of scheduler config file at https://github.com/91bsjun/
             screen = 'screen'
         if '-dir=' in s:
             additional_dir = s.split("=")[1]
+        if '-max_step=' in s:
+            max_step = s.split("=")[1]
 
     job_init = JobInitiator(queue=queue, node=node, n_of_cpu=n_of_cpu)
 
@@ -473,9 +476,9 @@ Please check the example of scheduler config file at https://github.com/91bsjun/
             print("Temperature must be assigned. (ex: -T=1000)")
             quit()
         if "-batch" in sys.argv:
-            job_init.AIMD_NVT_Loop_batch(temp=temp, specie=specie, screen=screen)
+            job_init.AIMD_NVT_Loop_batch(temp=temp, specie=specie, screen=screen, max_step=max_step)
         else:
-            job_init.AIMD_NVT_Loop(temp=temp, specie=specie, screen=screen)
+            job_init.AIMD_NVT_Loop(temp=temp, specie=specie, screen=screen, max_step=max_step)
 
     ## ------ VASP NVT LOOP
     elif sys.argv[1] == "10":
