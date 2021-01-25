@@ -358,6 +358,7 @@ class VASPInput():
         # -- if user input the k-points in command
         if kpoints:
             kpts = kpoints
+            kpoints = dirname+"\n0\nMonkhorst-Pack\n"+str(kpts[0])+" "+str(kpts[1])+" "+str(kpts[2])+"\n0 0 0\n"
 #        else:
 #            lattice_vector = structure.lattice.matrix
 #            lattice = latticeGen(lattice_vector[0],lattice_vector[1],lattice_vector[2])
