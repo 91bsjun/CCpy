@@ -93,6 +93,8 @@ INCAR:
   
   SECTION12: '# -- vdW corrections'
   '# IVDW': 12
+
+  SECTION13: '# -- Additional options'
   
 LDAU:
   LDAUU:

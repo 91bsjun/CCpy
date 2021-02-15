@@ -212,6 +212,7 @@ cd $SGE_O_WORKDIR
             script_path = os.getcwd() + "/" + script_filename
             # self.vasp_run = "%s %s\nrm %s" % (self.python_path, script_path, script_path)
             self.vasp_run = "%s %s" % (self.python_path, script_path)
+            jobname = "VL" + inputfile
         else:
             jobname = "V" + inputfile
         jobname = jobname.replace(".", "_").replace("-", "_").replace("/", "_")
