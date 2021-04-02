@@ -249,7 +249,8 @@ class VASPInput():
 
         # -- edit magmom parameters
         magmom = self.magmom
-        if mag and not batch and not magmom_dict:
+        #if mag and not batch and not magmom_dict:
+        if mag and not batch:
             print(bcolors.OKGREEN + "\n# ---------- Read MAGMOM value from %s ---------- #" % self.yaml_file + bcolors.ENDC)
             magmom_keys = list(magmom.keys())
             magmom_keys.sort()
@@ -277,7 +278,8 @@ class VASPInput():
         LDAUU = self.LDAUU
         LDAUL = self.LDAUL
         LDAUJ = self.LDAUJ
-        if ldau and not batch and not ldau_dict:
+        #if ldau and not batch and not ldau_dict:
+        if ldau and not batch:
             print(bcolors.OKGREEN + "\n# ---------- Read LDA U parameters from %s ---------- #" % self.yaml_file + bcolors.ENDC)
             LDAUU_keys = LDAUU.keys()
             #LDAUU_keys.sort()
@@ -380,19 +382,22 @@ class VASPInput():
             kpoints = str(Kpoints.automatic_density_by_vol(structure, self.kpt_density))
 
         ## -------------------------------- POTCAR -------------------------------- ##
-        if pseudo:
-            pot_elt = []
-            for e in elements:
-                chk=False
-                for p in pseudo:
-                    if e == p.split("_")[0]:
-                        chk=True
-                        pot_elt.append(p)
-                if not chk:
-                    pot_elt.append(e)
+        if "POTCAR" in self.keep_files:
+            potcar = ""
         else:
-            pot_elt = elements
-        potcar = Potcar(symbols=pot_elt, functional=functional)
+            if pseudo:
+                pot_elt = []
+                for e in elements:
+                    chk=False
+                    for p in pseudo:
+                        if e == p.split("_")[0]:
+                            chk=True
+                            pot_elt.append(p)
+                    if not chk:
+                        pot_elt.append(e)
+            else:
+                pot_elt = elements
+            potcar = Potcar(symbols=pot_elt, functional=functional)
 
 
         ## --------------------------- Update INCAR  values -------------------------- ##

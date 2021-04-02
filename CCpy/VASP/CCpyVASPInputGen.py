@@ -135,7 +135,7 @@ if sys.argv[1] == "1":
         else:
             VI.cms_vasp_set(single_point=single_point,isif=isif,vdw=vdw,kpoints=kpoints,spin=spin,mag=mag,ldau=ldau,
                             pseudo=pseudo, functional=functional,
-                            get_pre_incar=".prev_incar.yaml")
+                            get_pre_incar=".prev_incar.yaml", batch=True)
 
 elif sys.argv[1] == "2":
     inputs = selectVASPOutputs("./")
