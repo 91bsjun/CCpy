@@ -99,9 +99,14 @@ def cif_gen():
             y_ratio = float(s.replace("-y=",""))
         elif "-z" in s:
             z_input= s.replace("-z=","").split(",")
-            z_min = float(z_input[0])
-            z_max = float(z_input[1])
-            z_interval = float(z_input[2])
+            if len(z_input) == 1:
+                z_min = 0
+                z_max = 0
+                z_interval = 0
+            else:
+                z_min = float(z_input[0])
+                z_max = float(z_input[1])
+                z_interval = float(z_input[2])
 
     # ---------- Distinct layer
     '''
@@ -194,6 +199,7 @@ def cif_gen():
 
     if z_interval == 0:
         z_shift.append(0)
+        z_shift_cart.append(0)
     else:
         for i in np.arange(z_min, z_max, z_interval):            
             z_shift.append(i / lat_param[2])
