@@ -403,6 +403,7 @@ class VASPInput():
         ## --------------------------- Update INCAR  values -------------------------- ##
         if batch:
             incar = incar_dict_to_str(incar_dict, incar_dict_desc)
+            print(dirname)
         else:
             # -- INCAR
             print(dirname)
