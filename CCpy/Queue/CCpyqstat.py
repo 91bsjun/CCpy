@@ -71,6 +71,9 @@ def CCpyqstat(in_user="*", in_status="", node_check=False):
                 queues.append(requeue[i].split()[3] + "@" + renode[i].split("=")[1].split(" ")[0])
             else:
                 queues.append(requeue[i].split()[3])
+    if len(requeue) == 0:
+        for i in range(len(jobnames)):
+            queues.append("")
 
     run_time = []
     for t in start_time:
@@ -233,7 +236,10 @@ if __name__=="__main__":
             quit()
 
     if username == "*":
-        CCpyqstat(username, status, node_check=True)
+        try:
+            CCpyqstat(username, status, node_check=True)
+        except:
+            CCpyqstat(username, status)
     else:
         CCpyqstat(username, status)
 
