@@ -6,6 +6,7 @@ import os, sys
 from subprocess import call as shl
 from collections import OrderedDict
 
+import numpy as np
 import pandas as pd
 import yaml
 
@@ -85,7 +86,7 @@ class JobInitiator:
             myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.vasp(band=band, dirpath=dirpath, loop=loop)
 
-    def vasp_batch(self, scratch=False, sub=False, loop=False, additional_dir=None):
+    def vasp_batch(self, scratch=False, sub=False, loop=False, additional_dir=None, series=False):
         # --- Collect VASP inputs
         band = False
         if "-band" in sys.argv:
@@ -120,7 +121,17 @@ class JobInitiator:
                 dirpath += "/" + additional_dir
             dirs.append(dirpath)
         myJS = JS("batch_job", self.queue, self.n_of_cpu, node=self.node)
-        myJS.vasp_batch(dirs=dirs, scratch=scratch, loop=loop)
+        if not series:
+            myJS.vasp_batch(dirs=dirs, scratch=scratch, loop=loop)
+        else:
+            block_number = int(input("Block number: "))
+            base_name = input("Base name: ")
+            block_number += 1
+            sn = np.linspace(0, len(dirs), block_number, dtype="int")
+            for i in range(len(sn) -1):
+                series_dirs = dirs[sn[i]:sn[i+1]]
+                jobname = "%s_%d_%d" % (base_name, sn[i]+1, sn[i+1])
+                myJS.vasp_batch(dirs=series_dirs, scratch=scratch, loop=loop, jobname=jobname)
 
     def qchem(self):
         # --- Collect inputs
@@ -404,6 +415,7 @@ Please check the example of scheduler config file at https://github.com/91bsjun/
     screen = "no_screen"        # AIMD option
     max_step = 250              # AIMD option
     additional_dir = None       # additional calc for VASP
+    series = False              # series batch job submit
     for s in sys.argv:
         if "-n=" in s:
             n_of_cpu = int(s.split("=")[1])
@@ -433,6 +445,8 @@ Please check the example of scheduler config file at https://github.com/91bsjun/
             additional_dir = s.split("=")[1]
         if '-max_step=' in s:
             max_step = s.split("=")[1]
+        if '-series' in s:
+            series = True
 
     job_init = JobInitiator(queue=queue, node=node, n_of_cpu=n_of_cpu)
 
@@ -446,7 +460,7 @@ Please check the example of scheduler config file at https://github.com/91bsjun/
     ## ------ VASP
     elif sys.argv[1] == "2":
         if "-batch" in sys.argv:
-            job_init.vasp_batch(scratch=scratch, sub=sub, loop=loop, additional_dir=additional_dir)
+            job_init.vasp_batch(scratch=scratch, sub=sub, loop=loop, additional_dir=additional_dir, series=series)
         else:
             job_init.vasp(sub=sub, loop=loop, additional_dir=additional_dir)
 

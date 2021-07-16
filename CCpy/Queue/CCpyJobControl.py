@@ -249,11 +249,12 @@ touch vasp.done
         shl("rm -rf ./mpi.sh", shell=True)
         os.chdir(pwd)
 
-    def vasp_batch(self, dirs=None, scratch=False, loop=False):
+    def vasp_batch(self, dirs=None, scratch=False, loop=False, jobname=None):
         """
         Run multiple VASP jobs in a single queue
         """
-        jobname = raw_input("Jobname for this job \n: ")
+        if not jobname:
+            jobname = raw_input("Jobname for this job \n: ")
 
         runs = ""
         script_path = None
