@@ -82,6 +82,7 @@ functional = "PBE_54"
 ismear = 0
 additional_dir = None
 pre_dir = "./"
+batch = False
 
 for arg in sys.argv:
     if "-sp" == arg:
@@ -111,11 +112,16 @@ for arg in sys.argv:
         additional_dir = arg.split("=")[1]
     elif "-pre_dir" in arg:
         pre_dir = arg.split("=")[1]
+    elif "-batch" in arg:
+        batch = True
     
 
 if sys.argv[1] == "1":
     input_marker = [".xsd", ".cif", "POSCAR", "CONTCAR"]
-    inputs = selectInputs(input_marker, "./")
+    if batch:
+        inputs = selectInputs(input_marker, "./", ask=False)
+    else:
+        inputs = selectInputs(input_marker, "./")
     chk = True
     for each_input in inputs:
         VI = VASPInput(each_input, preset_yaml=incar_preset)
@@ -125,8 +131,8 @@ if sys.argv[1] == "1":
         if chk:
             VI.cms_vasp_set(single_point=single_point, isif=isif, vdw=vdw, kpoints=kpoints, spin=spin, mag=mag, ldau=ldau,
                             functional=functional, pseudo=pseudo,
-                            get_pre_incar=None)
-            if len(inputs) >= 2:
+                            get_pre_incar=None, batch=batch)
+            if len(inputs) >= 2 and not batch:
                 same_inputs = raw_input(bcolors.OKGREEN + "\n* Use this INCAR to others? (y/n)" + bcolors.ENDC)
                 if same_inputs == "y":
                     chk = False
@@ -166,7 +172,7 @@ elif sys.argv[1] == "add":
 
     inputs = selectVASPOutputs("./")
     for each_input in inputs:
-        print(each_input + "/" + additional_dir)
+        #print(each_input + "/" + additional_dir)
         VI = VASPInput(additional_dir=additional_dir, dirname=each_input, preset_yaml=incar_preset)
         VI.cms_vasp_set(single_point=single_point, isif=isif, vdw=vdw, kpoints=kpoints, spin=spin, mag=mag, ldau=ldau,
                         functional=functional, pseudo=pseudo,
