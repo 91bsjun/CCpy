@@ -37,7 +37,7 @@ class JobSubmit:
             MODULE_DIR = Path(__file__).resolve().parent
             default_queue_config = str(MODULE_DIR) + "/queue_config.yaml"
             if ".CCpy" not in os.listdir(home):
-                os.mkdir("%/.CCpy" % home)
+                os.mkdir("%s/.CCpy" % home)
             os.system('cp %s %s' % (default_queue_config, user_queue_config))
 
         if init_only:
