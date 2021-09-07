@@ -968,7 +968,7 @@ class VASPOutput():
             # -- check converged
             # -- using vasp.out
             from custodian.vasp.handlers import VaspErrorHandler
-            if "vasp.out" not in os.listdir("./"):
+            if "vasp.out" not in os.listdir("./") and "vasp.out.gz" not in os.listdir("./"):
                 converged, electronic_converged, ionic_converged = "False", "False", "False"
             else:
                 subset = VaspErrorHandler.error_msgs
@@ -1166,10 +1166,33 @@ class VASPOutput():
             #sys.stdout.write("\b" * len(msg))
 
             if minimize:
-                gzip_exec(['OUTCAR', 'vasprun.xml', 'XDATCAR'])
-                rm_exec(['CHG', 'CHG.gz', 'CHGCAR', 'CHGCAR.gz', 'DOSCAR', 'DOSCAR.gz', 'PROCAR', 'PROCAR.gz', 'WAVECAR', 'WAVECAR.gz'])
+                to_zips = ['OUTCAR', 'vasprun.xml']
+                to_rms = ['CHG', 'CHGCAR', 'DOSCAR', 'PROCAR', 'WAVECAR', 'IBZKPT', 'EIGENVAL', 'PCDAT', 'REPORT']
+                zip_files = []
+                rm_files = []
+                for f in os.listdir():
+                    for to_zip in to_zips:
+                        if to_zip in f and f not in zip_files and '.gz' not in f:
+                            zip_files.append(f)
+                    for to_rm in to_rms:
+                        if to_rm in f and f not in rm_files:
+                            rm_files.append(f)
+                gzip_exec(zip_files)
+                rm_exec(rm_files)
             else:
-                gzip_exec(['CHG', 'CHGCAR', 'DOSCAR', 'OUTCAR', 'PROCAR', 'vasprun.xml', 'XDATCAR'])
+                to_zips = ['CHG', 'CHGCAR', 'DOSCAR', 'OUTCAR', 'PROCAR', 'vasprun.xml', 'XDATCAR']
+                to_rms = ['WAVECAR', 'IBZKPT', 'EIGENVAL', 'PCDAT', 'REPORT']
+                zip_files = []
+                rm_files = []
+                for f in os.listdir():
+                    for to_zip in to_zips:
+                        if to_zip in f and f not in zip_files and '.gz' not in f:
+                            zip_files.append(f)
+                    for to_rm in to_rms:
+                        if to_rm in f and f not in rm_files:
+                            rm_files.append(f)
+                gzip_exec(zip_files)
+                rm_exec(rm_files)
 
             cnt+=1
             os.chdir(pwd)
