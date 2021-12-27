@@ -43,6 +43,8 @@ ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_s
     -vdw=D3     : zero damping DFT-D3 method of Grimme      (VASP.5.3.4)
     -vdw=D3damp : DFT-D3 method with Becke-Jonson damping   (VASP.5.3.4)
     -vdw=dDsC   : dDsC dispersion correction method         (VASP.5.4.1)
+    -vdw=optb88 : optb88 method
+    -vdw=optb86b: optb86b method
 
     < KPOINTS OPTION >
     -kp=#,#,#                                (DEFAULT : reciprocal parameter as devided by 20)

@@ -186,6 +186,7 @@ class VASPInput():
         home = self.home
         incar_dict_desc = self.incar_dict_desc
         pwd = os.getcwd()
+        MODULE_DIR = str(Path(__file__).resolve().parent)
 
         ## ----------------------- Prepare write inputs ------------------------- ##
         try:
@@ -343,6 +344,20 @@ class VASPInput():
                 incar_dict['VDW_D']=20.0
                 incar_dict['VDW_C6']=C6
                 incar_dict['VDW_R0']=R0
+            elif vdw == "optb88":
+                incar_dict['LUSE_VDW'] = True
+                incar_dict['AGGAC'] = 0.0
+                incar_dict['GGA'] = "BO"
+                incar_dict['PARAM1'] = 0.183333333
+                incar_dict['PARAM2'] = 0.22
+                shutil.copy('%s' % MODULE_DIR + '/vdw_kernel.bindat', './%s/' % dirname)
+            elif vdw == "optb86b":
+                incar_dict['LUSE_VDW'] = True
+                incar_dict['AGGAC'] = 0.0
+                incar_dict['GGA'] = "MK"
+                incar_dict['PARAM1'] = 0.1234
+                incar_dict['PARAM2'] = 1.0
+                shutil.copy('%s' % MODULE_DIR + '/vdw_kernel.bindat', './%s/' % dirname)
             else:
                 if "LVDW" in incar_dict.keys():     # If LVDW=.TRUE. is defined, IVDW is automatically set to 1
                     incar_dict = change_dict_key(incar_dict, "LVDW", "# LVDW", ".FALSE.")
