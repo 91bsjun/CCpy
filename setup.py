@@ -27,5 +27,4 @@ setup(
     author_email='bjun915@gmail.com',
     description='',
     scripts=script_files
-
 )
