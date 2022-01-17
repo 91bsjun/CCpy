@@ -9,6 +9,7 @@ import yaml
 from CCpy.Queue import CCpyJobControl
 
 queue_path = ""
+
 # -- Queue and nodes settings
 try:
     CCpy_SCHEDULER_CONFIG = os.environ['CCpy_SCHEDULER_CONFIG']
