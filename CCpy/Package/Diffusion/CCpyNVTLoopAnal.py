@@ -412,8 +412,9 @@ def diffusivity_plotter(csv_files, xaxis):
         plt.plot(x, d, color=colors[i], label=label)
         plt.fill_between(x, d_err_up, d_err_dn, facecolor=colors[i], alpha=0.3)
 
-    ax = plt.axes()
-    ax.set_yscale('log')
+    #ax = plt.axes()
+    #ax.set_yscale('log')
+    plt.yscale('log')
     if xaxis == 'r':
         plt.xlabel("Run step")
     else:
@@ -487,7 +488,7 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True, for
     total_rng_conductivity_from = []
     total_rng_conductivity_to = []
 
-    width = 8
+    '''
     #golden_ratio = (math.sqrt(5) - 1) / 2
     #height = int(width * golden_ratio)
     #print(height)
@@ -523,6 +524,10 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True, for
     #ax.set_xlabel(ax.get_xlabel(), size=labelsize, fontproperties=prop)
     ax.set_xlabel(ax.get_xlabel(), size=labelsize)
     ax.set_ylabel(ax.get_ylabel(), size=labelsize)
+    '''
+
+    width = 8
+    fig = plt_deco(width, 7.5)
 
     ax1 = fig.add_subplot(111)
 
@@ -565,8 +570,9 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True, for
         crt_ymax = max(crt_ymax, ymax)
 
 
-    ax = plt.axes()
-    ax.set_yscale('log')
+    #ax = plt.axes()
+    #ax.set_yscale('log')
+    plt.yscale('log')
 
     ax1.set_ylabel("Diffusivity (cm$^2$/s)")
     ax1.set_xlabel("1000/$T$ (K$^{-1}$)")
@@ -587,8 +593,10 @@ def arrhenius_plotter(csv_files, specie="Li", temp=300, show_room_temp=True, for
     ax1_ticks = 1000. / temps
     ax2.set_xlim(ax1.get_xlim())
     ax2.set_xticks(ax1_ticks)
-    ax2.set_xticklabels(temps, fontsize=ticksize)
-    ax2.set_xlabel("$T$ (K)", fontsize=labelsize)
+    #ax2.set_xticklabels(temps, fontsize=ticksize)
+    #ax2.set_xlabel("$T$ (K)", fontsize=labelsize)
+    ax2.set_xticklabels(temps)
+    ax2.set_xlabel("$T$ (K)")
 
     #legend = plt.legend(prop={'size': width * 3}, borderpad=0.5, edgecolor='k', fancybox=False)
     #legend = plt.legend(prop={'size': width * 2}, fontsize=width*3, edgecolor='k', fancybox=False)
