@@ -160,8 +160,9 @@ def plot_diffusivity(mode, files, xaxis):
         plt.xlabel("Run step", fontsize=24)
     else:
         plt.xlabel("Time step (ps)", fontsize=24)
-    ax = plt.axes()
-    ax.set_yscale('log')
+    #ax = plt.axes()
+    #ax.set_yscale('log')
+    plt.yscale('log')
     plt.ylabel(r"Diffusivity (cm$^2$/s)", fontsize=24)
     plt.tick_params(axis='both', which='major', labelsize=16)
     plt.grid()
