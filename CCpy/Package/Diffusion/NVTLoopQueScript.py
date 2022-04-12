@@ -20,13 +20,19 @@ temp = int(sys.argv[2])
 specie = sys.argv[3]
 screen = sys.argv[4]
 max_step = int(sys.argv[5])
+vdw = sys.argv[6]
 
-vasp = "/opt/vasp/vasp.5.4.1/bin/vasp_std"
+# vasp = "/opt/vasp/vasp.5.4.1/bin/vasp_std"   # cms
+vasp = "/usr/apps/vasp/vasp.6.2.1/bin/vasp_std"   # hmc
+# mpirun = "mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp   # cms
+mpirun = "mpirun -launcher rsh -np 16 -machinefile $PBS_NODEFILE %s < /dev/null > vasp.out" % vasp
 NCORE = 4
 #user_incar = {"NCORE": NCORE, "ENCUT": 400, "LREAL": "Auto", "PREC": "Normal", "ALGO": "Fast", "EDIFF": 1E-05, "ICHARG": 0, "IALGO": 48}
 #user_incar = {"NCORE": NCORE, "PREC": "Normal", "ALGO": "Fast", "ICHARG": 0}
 #user_incar = {"NCORE": NCORE, "ICHARG": 0, "EDIFF": 1E-05, "ISIF": 2, "MDALGO": 3, "LANGEVIN_GAMMA": [10] * structure.ntypesp, "LANGEVIN_GAMMA_L": 1}   # Langevin NVT
 user_incar = {"NCORE": NCORE, "ICHARG": 0, "PREC": "Normal"}
+if vdw == 'True':
+    user_incar = {"NCORE": NCORE, "IVDW": 1}
 
 heating_nsw = 2000
 nsw = 1000
@@ -152,7 +158,7 @@ def running(temp, pre, crt):
         os.system("cp %s/WAVECAR %s" % (pre_dir, crt_dir))
     os.chdir(crt_dir)    
     os.system("rm -rf vasprun.xml vasprun.xml.gz")
-    os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
+    os.system(mpirun)
     time.sleep(5)
     os.system("gzip vasprun.xml")
     write_log("try: %d" % total_try)
@@ -160,7 +166,7 @@ def running(temp, pre, crt):
     while not properly_terminated:
         total_try += 1
         os.system("rm -rf vasprun.xml vasprun.xml.gz")
-        os.system("mpirun -np $NSLOTS %s < /dev/null > vasp.out" % vasp)
+        os.system(mpirun)
         time.sleep(5)
         os.system("gzip vasprun.xml")
         write_log("try: %d" % total_try)

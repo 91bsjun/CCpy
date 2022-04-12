@@ -531,7 +531,7 @@ cd $SGE_O_WORKDIR
         shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
-    def AIMD_NVT_Loop(self, structure_filename=None, temp=None, specie="Li", screen='no_screen', max_step=250):
+    def AIMD_NVT_Loop(self, structure_filename=None, temp=None, specie="Li", screen='no_screen', max_step=250, vdw=False):
         # -- load loop queue script
         from CCpy.Package.Diffusion.NVTLoopQueScript import NVTLoopQueScriptString
         script_string = NVTLoopQueScriptString()
@@ -559,9 +559,9 @@ cd $SGE_O_WORKDIR
 #$ -cwd
 
 
-%s %s %s %s %s %s %s
+%s %s %s %s %s %s %s %s
 ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.python_path,
-       script_filename, structure_filename, temp, specie, screen, max_step)
+       script_filename, structure_filename, temp, specie, screen, max_step, vdw)
 
         f = open("mpi.sh", "w")
         f.write(mpi)
@@ -570,7 +570,7 @@ cd $SGE_O_WORKDIR
         shl(self.qsub + " mpi.sh", shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
-    def AIMD_NVT_Loop_batch(self, structure_files=None, temp=None, specie="Li", screen='no_screen', max_step=250):
+    def AIMD_NVT_Loop_batch(self, structure_files=None, temp=None, specie="Li", screen='no_screen', max_step=250, vdw=False):
         # -- load loop queue script
         from CCpy.Package.Diffusion.NVTLoopQueScript import NVTLoopQueScriptString
         script_string = NVTLoopQueScriptString()
@@ -588,7 +588,7 @@ cd $SGE_O_WORKDIR
         for structure_filename in structure_files:
             dirname = structure_filename.replace(".cif", "")
             runs += "cp %s structures; mkdir %s; mv %s %s; cp %s %s; cd %s\n" % (structure_filename, dirname, structure_filename, dirname, script_filename, dirname, dirname)
-            runs += "%s %s %s %s %s %s %s \n\n" % (self.python_path, script_filename, structure_filename, temp, specie, screen, max_step)
+            runs += "%s %s %s %s %s %s %s \n\n" % (self.python_path, script_filename, structure_filename, temp, specie, screen, max_step, vdw)
             runs += "cd %s \n" % pwd
 
         mpi = '''#!/bin/csh
