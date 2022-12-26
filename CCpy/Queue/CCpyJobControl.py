@@ -2,6 +2,7 @@ import os, sys
 from subprocess import call as shl
 from collections import OrderedDict
 import yaml
+import time
 def represent_dictionary_order(self, dict_data):
     return self.represent_mapping('tag:yaml.org,2002:map', dict_data.items())
 yaml.add_representer(OrderedDict, represent_dictionary_order)
@@ -14,51 +15,86 @@ if version[0] == '3':
 # -------------------- Config ---------------------#
 """
 Up to own HPC system
-Only SGE queue system allowed
 """
 
-# -- Queue and nodes settings
-try:
-    CCpy_SCHEDULER_CONFIG = os.environ['CCpy_SCHEDULER_CONFIG']
-except:
-    print('''Error while load $CCpy_SCHEDULER_CONFIG file.
-Please check the example of scheduler config file at https://github.com/91bsjun/CCpy/tree/master/CCpy/Queue''')
-    quit()
+SGE_submit_file_framework = """#!/bin/csh
+#$ -q {qname}
+#$ -N {jobname}
+#$ -pe mpi_{ncpu} {ncpu}
+#$ -V
+#$ -cwd
+"""
 
-queue_info = yaml.load(open(CCpy_SCHEDULER_CONFIG, 'r'))
+PBS_submit_file_framework = """#!/bin/sh -x
+#PBS -l select={nselect}:ncpus=16:mpiprocs=16:Qlist=vasp
+#PBS -q {qname}
+#PBS -N {jobname}
 
+cd $PBS_O_WORKDIR
+
+nodes=`cat $PBS_NODEFILE`      # Nodes in job
+
+jobidcut=`echo $PBS_JOBID|cut -d. -f1`
+          bhosts=bhosts
+          lamhosts=lamhosts
+          rm -f $bhosts
+          rm -f $lamhosts.*
+          #Need to truncate anything after a '.'
+          nodes=`echo $nodes | sed 's/\.\w*//g'`
+          for node in $nodes; do
+              nodecut=`echo $node|cut -d- -f1`
+              echo "$nodecut       slots=${{NCPUS}}" >> $bhosts
+          done
+
+source /opt/intel/oneapi/setvars.sh
+export LD_LIBRARY_PATH=/usr/apps/openmpi_1_8/lib:/usr/apps/fftw-2.1.5/double/lib:$LD_LIBRARY_PATH
+export PATH=/opt/intel/oneapi/mpi/2021.4.0/bin:$PATH
+NP=`/usr/bin/wc -l $PBS_NODEFILE | awk '{{ print $1 }}'`
+"""  
+
+Slurm_submit_file_framework = ""
 
 class JobSubmit:
     def __init__(self, inputfile, queue, n_of_cpu, node=None, init_only=False):
         home = os.getenv("HOME")
-        user_queue_config = "%s/.CCpy/queue_config.yaml" % home
+        user_queue_config = f"{home}/.CCpy/queue_config.yaml"
         if not os.path.isfile(user_queue_config):
             from pathlib import Path
             MODULE_DIR = Path(__file__).resolve().parent
             default_queue_config = str(MODULE_DIR) + "/queue_config.yaml"
             if ".CCpy" not in os.listdir(home):
-                os.mkdir("%s/.CCpy" % home)
-            os.system('cp %s %s' % (default_queue_config, user_queue_config))
+                os.mkdir(f"{home}/.CCpy")
+            os.system(f"cp {default_queue_config} {user_queue_config}")
 
         if init_only:
             return
 
         self.inputfile = inputfile
-        cpu, mem, q = queue_info[queue][0], queue_info[queue][1], queue_info[queue][2]
+
+        # -- read configs from queue_config.yaml            
+        yaml_string = open(user_queue_config, "r").read()
+        queue_config = yaml.load(yaml_string)
+
+        if queue not in queue_config['queues'].keys():
+            print(f"'{queue}' queue argument is not in queue configuration file ({user_queue_config}), \nCurrent available:", list(queue_config['queues'].keys()))
+            quit()
+        
+        cpu = queue_config['queues'][queue]['ncpu']
+        mem = queue_config['queues'][queue]['mem']
+        q = queue_config['queues'][queue]['q_name']
 
         self.cpu = cpu
         self.mem = mem
         self.q = q
+        self.n_of_nodes = 1 # select multi nodes
         if n_of_cpu:
             self.n_of_cpu = n_of_cpu
         else:
             self.n_of_cpu = cpu
         self.divided = cpu / self.n_of_cpu
+        if self.n_of_cpu > cpu: # select multi nodes
+            self.n_of_nodes = int(self.n_of_cpu / cpu) # select multi nodes
 
-        # -- read configs from queue_config.yaml            
-        yaml_string = open(user_queue_config, "r").read()
-        queue_config = yaml.load(yaml_string)
-            
         self.qsub = queue_config['qsub']
 
         self.python_path = queue_config['python_path']
@@ -66,8 +102,8 @@ class JobSubmit:
 
         self.atk_mpi_run = queue_config['atk_mpi_run']
 
-        vasp_path = queue_config['vasp_path']
-        self.vasp_run = "%s -np $NSLOTS %s < /dev/null > vasp.out" % (self.mpi_run, vasp_path)
+        self.vasp_path = queue_config['vasp_path']
+        self.vasp_run = queue_config['vasp_run']
 
         self.g09_path = queue_config['g09_path']
         self.atk_path = queue_config['atk_path']
@@ -77,13 +113,24 @@ class JobSubmit:
         
         self.siesta_path = queue_config['siesta_path']
 
-
         # -- queue settings
-        self.pe_request = "#$ -pe mpi_%d %d" % (self.n_of_cpu, self.n_of_cpu)
-        self.queue_name = "#$ -q %s" % self.q if self.q else ""
-        self.node_assign = ""
-        if node:
-            self.node_assign = "#$ -l h=%s" % node
+        #self.pe_request = "#$ -pe mpi_%d %d" % (self.n_of_cpu, self.n_of_cpu)
+        #self.queue_name = "#$ -q %s" % self.q if self.q else ""
+
+
+        if queue_config['scheduler_type'] == "PBS":
+            mpi = PBS_submit_file_framework
+        elif queue_config['scheduler_type'] == "SGE":
+            mpi = SGE_submit_file_framework
+        elif queue_config['scheduler_type'] == "Slurm":
+            mpi = Slurm_submit_file_framework
+
+        if node and queue_config['scheduler_type'] == "SGE":
+            mpi += f"#$ -l h={node}\n"
+            
+        self.mpi = mpi
+        
+            
 
     def gaussian(self, ):
         inputfile = self.inputfile
@@ -188,18 +235,19 @@ cd $SGE_O_WORKDIR
 
 ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, runs)
 
-        f = open("mpi.sh", "w")
+        mpi_filename = "mpi_%s.sh" % jobname
+        f = open(mpi_filename, "w")
         f.write(mpi)
         f.close()
 
-        shl(self.qsub + " mpi.sh", shell=True)
+        shl(self.qsub + " %s" % mpi_filename, shell=True)
         shl("rm -rf ./mpi.sh", shell=True)
 
 
-    def vasp(self, band=False, dirpath=None, loop=False):
+    def vasp(self, band=False, dirpath=None, loop=False, sequence=False, refine_poscar=False):
         inputfile = self.inputfile
 
-        vasp_run = self.vasp_run
+        #vasp_run = self.vasp_run
         # -- Band calculation after previous calculation
         if band:
             jobname = "VB" + inputfile
@@ -207,49 +255,57 @@ cd $SGE_O_WORKDIR
             from pathlib import Path
             MODULE_DIR = Path(__file__).resolve().parent
             loop_opt_script = str(MODULE_DIR) + "/../Package/VASPOptLoop.py"
-            os.system('cp %s ./.VASPOptLoop.py' % loop_opt_script)
+            os.system(f'cp {loop_opt_script} ./.VASPOptLoop.py')
             script_filename = ".VASPOptLoop.py"
             script_path = os.getcwd() + "/" + script_filename
             # self.vasp_run = "%s %s\nrm %s" % (self.python_path, script_path, script_path)
-            self.vasp_run = "%s %s" % (self.python_path, script_path)
+            self.vasp_run = f"{self.python_path} {script_path}"
             jobname = "VL" + inputfile
+        elif sequence:
+            from pathlib import Path
+            MODULE_DIR = Path(__file__).resolve().parent
+            sequence_job_script = str(MODULE_DIR) + "/../Package/VASPSequenceJobs.py"
+            os.system(f'cp {sequence_job_script} ./.VASPSequenceJobs.py')
+            script_filename = ".VASPSequenceJobs.py"
+            script_path = os.getcwd() + "/" + script_filename
+            
+            sequence_file = sequence
+
+            loop_opt_script = str(MODULE_DIR) + "/../Package/VASPOptLoop.py"
+            os.system(f'cp {loop_opt_script} ./.VASPOptLoop.py')
+            loop_opt_script_filename = ".VASPOptLoop.py"
+            loop_opt_script_path = os.getcwd() + "/" + loop_opt_script_filename
+            
+            self.vasp_run = f"{self.python_path} {script_path} {inputfile} {sequence_file} {self.python_path} {loop_opt_script_path} {refine_poscar}"
+            jobname = "VLS" + inputfile
         else:
             jobname = "V" + inputfile
-        jobname = jobname.replace(".", "_").replace("-", "_").replace("/", "_")
-        mpi = '''#!/bin/csh
-# Job name 
-#$ -N %s
+        jobname = jobname.replace(".", "_").replace("-", "_").replace("/", "_").replace("(", "_").replace(")", "_")
+        
+        tmp_dirpath = dirpath.replace("(", "\(").replace(")", "\)")
 
-# pe request
-%s
+        mpi = self.mpi.format(nselect=self.n_of_nodes, qname=self.q, jobname=jobname)
+        if not sequence:
+            mpi += f"cd {tmp_dirpath} \n"
+            mpi += f"{self.vasp_run}\n"
+            mpi += "touch vasp.done \n"
 
-# queue name
-%s
-
-# node
-%s
-
-#$ -V
-#$ -cwd
-
-cd %s
-%s
-touch vasp.done
-
- ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, dirpath, vasp_run)
-
-        pwd = os.getcwd()
-        os.chdir(dirpath)
-        if 'vasp.done' in os.listdir():
-            os.remove('vasp.done')
-        f = open("mpi.sh", "w")
+            pwd = os.getcwd()
+            os.chdir(dirpath)
+            if 'vasp.done' in os.listdir():
+                os.remove('vasp.done')
+        else:
+            mpi += f"{self.vasp_run}\n"
+        mpi_filename = f"mpi_{jobname}.sh"
+        f = open(mpi_filename, "w")
         f.write(mpi)
         f.close()
-        shl(self.qsub + " mpi.sh", shell=True)
-        shl("rm -rf ./mpi.sh", shell=True)
-        os.chdir(pwd)
+        shl(f"{self.qsub} {mpi_filename}", shell=True)
+        time.sleep(0.5)
+        #shl("rm -rf ./%s" % mpi_filename, shell=True)
+        #os.chdir(pwd)
 
-    def vasp_batch(self, dirs=None, scratch=False, loop=False, jobname=None):
+    def vasp_batch(self, dirs=None, scratch=False, loop=False, jobname=None, sequence=False, refine_poscar=False):
         """
         Run multiple VASP jobs in a single queue
         """
@@ -259,66 +315,73 @@ touch vasp.done
         runs = ""
         script_path = None
 
-        vasp_run = self.vasp_run
         pwd = os.getcwd()
         if loop:
-            from CCpy.Package.VASPOptLoopQueScript import VASPOptLoopQueScriptString
-            script_string = VASPOptLoopQueScriptString()
+            from pathlib import Path
+            MODULE_DIR = Path(__file__).resolve().parent
+            loop_opt_script = str(MODULE_DIR) + "/../Package/VASPOptLoop.py"
+            os.system(f'cp {loop_opt_script} ./.VASPOptLoop.py')
             script_filename = ".VASPOptLoop.py"
-            f = open(script_filename, "w")
-            f.write(script_string)
-            f.close()
             script_path = os.getcwd() + "/" + script_filename
-            each_run = "%s %s\ntouch vasp.done\nsleep 30\n" % (self.python_path, script_path)
+            each_run = f"{self.python_path} {script_path}\n"
+            each_run += "touch vasp.done\n"
+            each_run += "sleep 30\n"
+        elif sequence:
+            from pathlib import Path
+            MODULE_DIR = Path(__file__).resolve().parent
+            sequence_job_script = str(MODULE_DIR) + "/../Package/VASPSequenceJobs.py"
+            os.system(f'cp {sequence_job_script} ./.VASPSequenceJobs.py')
+            script_filename = ".VASPSequenceJobs.py"
+            script_path = os.getcwd() + "/" + script_filename
+            sequence_file = sequence
+
+            loop_opt_script = str(MODULE_DIR) + "/../Package/VASPOptLoop.py"
+            os.system(f'cp {loop_opt_script} ./.VASPOptLoop.py')
+            loop_opt_script_filename = ".VASPOptLoop.py"
+            loop_opt_script_path = os.getcwd() + "/" + loop_opt_script_filename            
         else:
-            each_run = "%s\ntouch vasp.done\nsleep 30\n" % vasp_run
+            each_run = f"{self.vasp_run}\n"
+            each_run += "touch vasp.done\n"
+            each_run += "sleep 30\n" 
+            
         for d in dirs:
             # if use scratch, copy input to /scratch/vasp and run job in that dir,
             # when finished, copy to original working directory
             # scratch is recommended when perform small jobs
-            os.chdir(d)
-            if 'vasp.done' in os.listdir():
-                os.remove('vasp.done')
-            os.chdir(pwd)
-            if scratch:
-                dir_path = "/scratch/vasp" + d
-                runs += "mkdir -p " + dir_path + "\n"  # make dir under /scratch/vasp
-                runs += "cp " + d + "/* " + dir_path + "\n"  # copy original to /scratch/vasp
-                runs += "cd " + dir_path + "\n"  # chg dir to /scratch/vasp
-                runs += each_run + "\n"  # run vasp
-                runs += "cp " + dir_path + "/* " + d + "\n"  # copy finished job to original dir
-                runs += "rm -rf " + dir_path + "\n\n"  # remove finished job under /scratch/vasp
-            # change dir to each input and run 'each_run'
+            if not sequence:
+                os.chdir(d)
+                d = d.replace("(", "\(").replace(")", "\)")
+                if 'vasp.done' in os.listdir():
+                    os.remove('vasp.done')
+                os.chdir(pwd)
+                if scratch:
+                    dir_path = "/scratch/vasp" + d
+                    runs += "mkdir -p " + dir_path + "\n"  # make dir under /scratch/vasp
+                    runs += "cp " + d + "/* " + dir_path + "\n"  # copy original to /scratch/vasp
+                    runs += "cd " + dir_path + "\n"  # chg dir to /scratch/vasp
+                    runs += each_run + "\n"  # run vasp
+                    runs += "cp " + dir_path + "/* " + d + "\n"  # copy finished job to original dir
+                    runs += "rm -rf " + dir_path + "\n\n"  # remove finished job under /scratch/vasp
+                # change dir to each input and run 'each_run'
+                else:
+                    runs += "cd " + d + "\n"
+                    runs += each_run
             else:
-                runs += "cd " + d + "\n"
-                runs += each_run
-        # if loop:
-        #    runs += "rm %s" % script_path
-        mpi = '''#!/bin/csh
-# Job name 
-#$ -N %s
+                inputfile = d    # vasp input files (d) is cif file when sequence run
+                runs += f"{self.python_path} {script_path} {inputfile} {sequence_file} {self.python_path} {loop_opt_script_path} {refine_poscar}\n"
+                runs += "sleep 30\n\n"
 
-# pe request
-%s
-
-# node
-%s
-
-# queue name
-%s
-
-#$ -V
-#$ -cwd
-
-%s
-         ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, runs)
+        mpi = self.mpi.format(nselect=self.n_of_nodes, qname=self.q, jobname=jobname)
+        mpi += runs
 
         pwd = os.getcwd()
-        f = open("mpi.sh", "w")
+        mpi_filename = f"mpi_{jobname}.sh"
+        f = open(mpi_filename, "w")
         f.write(mpi)
         f.close()
-        shl(self.qsub + " mpi.sh", shell=True)
-        shl("rm -rf ./mpi.sh", shell=True)
+        shl(f"{self.qsub} {mpi_filename}", shell=True)
+        time.sleep(0.5)
+        #shl("rm -rf ./%s" % mpi_filename, shell=True)
 
     def qchem(self):
         inputfile = self.inputfile
@@ -532,36 +595,17 @@ cd $SGE_O_WORKDIR
         shl("rm -rf ./mpi.sh", shell=True)
 
     def AIMD_NVT_Loop(self, structure_filename=None, temp=None, specie="Li", screen='no_screen', max_step=250, vdw=False):
-        # -- load loop queue script
-        from CCpy.Package.Diffusion.NVTLoopQueScript import NVTLoopQueScriptString
-        script_string = NVTLoopQueScriptString()
-        script_filename = ".AIMDLoop.py"
-        f = open(script_filename, "w")
-        f.write(script_string)
-        f.close()
+        from pathlib import Path
+        MODULE_DIR = Path(__file__).resolve().parent
+        loop_opt_script = str(MODULE_DIR) + "/../Package/Diffusion/NVTLoopQueScript.py"
+        os.system('cp %s ./.NVTLoopQueScript.py' % loop_opt_script)
+        script_filename = ".NVTLoopQueScript.py"
+        script_path = os.getcwd() + "/" + script_filename
 
         jobname = "NVT%s_%dK" % (structure_filename.replace(".cif", ""), temp)
 
-        mpi = '''#!/bin/csh
-# Job name 
-#$ -N %s
-
-# pe request
-%s
-
-# queue name
-%s
-
-# node
-%s
-
-#$ -V
-#$ -cwd
-
-
-%s %s %s %s %s %s %s %s
-''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.python_path,
-       script_filename, structure_filename, temp, specie, screen, max_step, vdw)
+        mpi = self.mpi.format(nselect=self.n_of_nodes, qname=self.q, jobname=jobname)
+        mpi += f"{self.python_path} {script_filename} {structure_filename} {temp} {specie} {screen} {max_step} {vdw}\n"
 
         f = open("mpi.sh", "w")
         f.write(mpi)
@@ -571,13 +615,12 @@ cd $SGE_O_WORKDIR
         shl("rm -rf ./mpi.sh", shell=True)
 
     def AIMD_NVT_Loop_batch(self, structure_files=None, temp=None, specie="Li", screen='no_screen', max_step=250, vdw=False):
-        # -- load loop queue script
-        from CCpy.Package.Diffusion.NVTLoopQueScript import NVTLoopQueScriptString
-        script_string = NVTLoopQueScriptString()
-        script_filename = ".AIMDLoop.py"
-        f = open(script_filename, "w")
-        f.write(script_string)
-        f.close()
+        from pathlib import Path
+        MODULE_DIR = Path(__file__).resolve().parent
+        loop_opt_script = str(MODULE_DIR) + "/../Package/Diffusion/NVTLoopQueScript.py"
+        os.system('cp %s ./.NVTLoopQueScript.py' % loop_opt_script)
+        script_filename = ".NVTLoopQueScript.py"
+        script_path = os.getcwd() + "/" + script_filename
 
         jobname = input("Job name: ")
 
@@ -588,28 +631,11 @@ cd $SGE_O_WORKDIR
         for structure_filename in structure_files:
             dirname = structure_filename.replace(".cif", "")
             runs += "cp %s structures; mkdir %s; mv %s %s; cp %s %s; cd %s\n" % (structure_filename, dirname, structure_filename, dirname, script_filename, dirname, dirname)
-            runs += "%s %s %s %s %s %s %s \n\n" % (self.python_path, script_filename, structure_filename, temp, specie, screen, max_step, vdw)
+            runs += "%s %s %s %s %s %s %s %s\n\n" % (self.python_path, script_filename, structure_filename, temp, specie, screen, max_step, vdw)
             runs += "cd %s \n" % pwd
 
-        mpi = '''#!/bin/csh
-# Job name 
-#$ -N %s
-
-# pe request
-%s
-
-# queue name
-%s
-
-# node
-%s
-
-#$ -V
-#$ -cwd
-
-
-%s
-''' % (jobname, self.pe_request, self.queue_name, self.node_assign, runs)
+        mpi = self.mpi.format(nselect=self.n_of_nodes, qname=self.q, jobname=jobname)
+        mpi += runs
 
         f = open("mpi.sh", "w")
         f.write(mpi)
