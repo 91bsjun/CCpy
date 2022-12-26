@@ -19,10 +19,10 @@ except:
     quit()
 
 # -- Check node00 for CMS member
-ip = get_ip()
-if ip == "166.104.249.31":
-    print("DO AT NODE00 !!")
-    quit()
+#ip = get_ip()
+#if ip == "166.104.249.31":
+#    print("DO AT NODE00 !!")
+#    quit()
 
 # -- Queue command location
 # queue_path = "/opt/sge/bin/lx24-amd64/"
@@ -67,6 +67,10 @@ elif sys.argv[1] == "2":
     for i in range(len(names)):
         if lat in names[i]:
             nums.append(i)
+            print('id: ', ids[i], '  jobname: ', names[i])
+    tmp = raw_input("Above jobs will be deleted. (y/n): ")
+    if "y" not in tmp:
+        quit()
 
     for i in nums:
         job_id = ids[i]
