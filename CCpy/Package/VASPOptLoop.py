@@ -51,7 +51,10 @@ def get_final_energy():
     strings = findE.findall(OUTCAR)
     e = []
     for s in strings:
-        e.append(float(s.split()[4]))
+        try:
+            e.append(float(s.split()[4]))
+        except:
+            return "err", "err"
 
     if len(e) == 0:
         return "err", "err"
@@ -69,13 +72,13 @@ def get_structure_info(filename):
 
 def write_log(msg):
     f = open("job_log", "a")
-    f.write(msg + "\\n")
+    f.write(msg + "\n")
     f.close()
 
 
 def write_energy(x, y):
     f = open("final_energy.csv", "a")
-    f.write(str(x) + "," + str(y) + "\\n")
+    f.write(str(x) + "," + str(y) + "\n")
     f.close()
 
 
@@ -95,16 +98,17 @@ if __name__ == "__main__":
     if "final_energy.csv" in os.listdir("./"):
         os.remove("final_energy.csv")
     f = open("final_energy.csv", "w")
-    f.write("Loop index,Final energy (eV)\\n")
+    f.write("Loop index,Final energy (eV)\n")
     f.close()
     # -- first calc begin
     lat = get_structure_info("POSCAR")
-    write_log("Initial structure.  a: %.2f  b: %.2f  c: %2.f  alpha: %.2f  beta: %.2f  gamma: %.2f  volume: %.2f" % (lat[0], lat[1], lat[2], lat[3], lat[4], lat[5], lat[6]))
+    write_log("Initial structure.  a: %.2f  b: %.2f  c: %.2f  alpha: %.2f  beta: %.2f  gamma: %.2f  volume: %.2f" % (lat[0], lat[1], lat[2], lat[3], lat[4], lat[5], lat[6]))
     write_log("Start first relaxation")
     
     loop = 0
-    write_log("\\nLoop: " + str(loop))
-    os.system("mpirun -np $NSLOTS vasp < /dev/null > vasp.out")
+    write_log("\nLoop: " + str(loop))
+    #os.system("mpirun -np $NSLOTS vasp < /dev/null > vasp.out")
+    os.system("mpirun -launcher rsh -np 16 -machinefile $PBS_NODEFILE /usr/apps/vasp/vasp.6.2.1/bin/vasp_std < /dev/null > vasp.out")
     time.sleep(30)
 
     # -- parsing output
@@ -122,9 +126,10 @@ if __name__ == "__main__":
         # -- new calc begin
         loop += 1
         os.system("rm vasp.done")
-        os.system("mpirun -np $NSLOTS vasp < /dev/null > vasp.out")
+        #os.system("mpirun -np $NSLOTS vasp < /dev/null > vasp.out")
+        os.system("mpirun -launcher rsh -np 16 -machinefile $PBS_NODEFILE /usr/apps/vasp/vasp.6.2.1/bin/vasp_std < /dev/null > vasp.out")
         time.sleep(30)
-        write_log("\\nLoop: " + str(loop))
+        write_log("\nLoop: " + str(loop))
         c = get_vasp_status()
         init_e, final_e = get_final_energy()        
         if init_e == "err":
@@ -135,6 +140,12 @@ if __name__ == "__main__":
             lat = get_structure_info("CONTCAR")
             write_log("Final structure.  a: %.2f  b: %.2f  c: %2.f  alpha: %.2f  beta: %.2f  gamma: %.2f  volume: %.2f" % (lat[0], lat[1], lat[2], lat[3], lat[4], lat[5], lat[6]))
         write_energy(loop, final_e)
-    write_log("\\nConvergence done!")
+        # -- terminate max loop cretiera
+        if loop == 20:
+            c = "Failed"
+    if c == "Failed":
+        write_log("\nConvergence Failed!")
+    else:
+        write_log("\nConvergence done!")
     os.system("touch loop.done")
     quit()
