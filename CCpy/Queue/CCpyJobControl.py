@@ -26,7 +26,7 @@ SGE_submit_file_framework = """#!/bin/csh
 """
 
 PBS_submit_file_framework = """#!/bin/sh -x
-#PBS -l select={nselect}:ncpus=16:mpiprocs=16:Qlist=vasp
+#PBS -l select={nselect}:ncpus={ncpu}:mpiprocs={ncpu}:Qlist=vasp
 #PBS -q {qname}
 #PBS -N {jobname}
 
@@ -74,6 +74,7 @@ class JobSubmit:
         # -- read configs from queue_config.yaml            
         yaml_string = open(user_queue_config, "r").read()
         queue_config = yaml.load(yaml_string)
+        self.queue_config = queue_config
 
         if queue not in queue_config['queues'].keys():
             print(f"'{queue}' queue argument is not in queue configuration file ({user_queue_config}), \nCurrent available:", list(queue_config['queues'].keys()))
@@ -285,7 +286,10 @@ cd $SGE_O_WORKDIR
         
         tmp_dirpath = dirpath.replace("(", "\(").replace(")", "\)")
 
-        mpi = self.mpi.format(nselect=self.n_of_nodes, qname=self.q, jobname=jobname)
+        if self.queue_config['scheduler_type'] == "PBS":
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
+        else:
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
         if not sequence:
             mpi += f"cd {tmp_dirpath} \n"
             mpi += f"{self.vasp_run}\n"
@@ -372,7 +376,10 @@ cd $SGE_O_WORKDIR
                 runs += f"{self.python_path} {script_path} {inputfile} {sequence_file} {self.python_path} {loop_opt_script_path} {refine_poscar}\n"
                 runs += "sleep 30\n\n"
 
-        mpi = self.mpi.format(nselect=self.n_of_nodes, qname=self.q, jobname=jobname)
+        if self.queue_config['scheduler_type'] == "PBS":
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
+        else:
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
         mpi += runs
 
         pwd = os.getcwd()
@@ -605,7 +612,10 @@ cd $SGE_O_WORKDIR
 
         jobname = "NVT%s_%dK" % (structure_filename.replace(".cif", ""), temp)
 
-        mpi = self.mpi.format(nselect=self.n_of_nodes, qname=self.q, jobname=jobname)
+        if self.queue_config['scheduler_type'] == "PBS":
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
+        else:
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
         mpi += f"{self.python_path} {script_filename} {structure_filename} {temp} {specie} {screen} {max_step} {vdw}\n"
 
         f = open("mpi.sh", "w")
@@ -635,7 +645,10 @@ cd $SGE_O_WORKDIR
             runs += "%s %s %s %s %s %s %s %s\n\n" % (self.python_path, script_filename, structure_filename, temp, specie, screen, max_step, vdw)
             runs += "cd %s \n" % pwd
 
-        mpi = self.mpi.format(nselect=self.n_of_nodes, qname=self.q, jobname=jobname)
+        if self.queue_config['scheduler_type'] == "PBS":
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
+        else:
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
         mpi += runs
 
         f = open("mpi.sh", "w")
