@@ -274,6 +274,8 @@ class CMSBand():
         datafile.close()
         print("* Save band data : band.dat")
 
+        return bgap, cbm, vbm
+
     def save_band_structure(self):
         plotter = self.plotter
         data = plotter.bs_plot_data(zero_to_efermi=True)
@@ -320,7 +322,7 @@ def load_pickle_data(name=None):
     sys.stdout.write("Done!\n")
     return loaded
 
-def main_run():
+def main_run(dirname):
     # -- parsing options
     ylim = [-5, 5]
     miny = min(ylim)
@@ -378,7 +380,15 @@ def main_run():
 
     if sys.argv[1] == "0":
         cms_band = CMSBand()
-        cms_band.get_minimal_band_data()
+        bgap, cbm, vbm = cms_band.get_minimal_band_data()
+        datafile_path = '../band_data.csv'
+        if not os.path.exists(datafile_path):
+            f = open(datafile_path, 'w')
+            f.write('Dirname,Band gap,cbm,vbm\n')
+            f.close()
+        f = open(datafile_path, 'a')
+        f.write(f'{dirname},{bgap},{cbm},{vbm}\n')
+        f.close()
 
     # -- blue band
     elif sys.argv[1] == "1":
@@ -582,5 +592,5 @@ n            : Do not show figure, just save figure and band.dat
     for each_input in inputs:
         os.chdir(each_input)
         print("* Current directory : " + each_input)
-        main_run()
+        main_run(each_input)
         os.chdir("../")

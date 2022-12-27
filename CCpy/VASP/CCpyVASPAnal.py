@@ -40,6 +40,8 @@ except:
  4 : Generate cif file from POSCAR or CONTCAR
     ex) CCpyVASPAnal.py 4
 
+ -elastic : Analyze mechanical properties
+
 -e : Handling errors listed '01_unconverged_jobs.csv' file 
      based on Materials Project's custodian module.
 
@@ -152,6 +154,11 @@ elif sys.argv[1] == "4":
     for each_input in inputs:
         VO = VASPOutput()
         VO.getFinalStructure(filename=each_input, path="./")
+
+elif sys.argv[1] == "-elastic":
+    inputs = selectVASPOutputs("./", sub=sub, additional_dir=additional_dir)
+    VO = VASPOutput()
+    VO.get_mechanical_properties(dirs=inputs)
 
 elif sys.argv[1] == "-zip":
     """

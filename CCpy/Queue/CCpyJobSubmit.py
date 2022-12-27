@@ -21,10 +21,10 @@ if version[0] == '3':
     raw_input = input
 
 # -- Check node00
-ip = get_ip()
-if ip == "166.104.249.31":
-    print("DO AT NODE00 !!")
-    quit()
+#ip = get_ip()
+#if ip == "166.104.249.31":
+#    print("DO AT NODE00 !!")
+#    quit()
 
 
 class JobInitiator:
@@ -51,7 +51,7 @@ class JobInitiator:
         myJS = JS("batch_job", self.queue, self.n_of_cpu, node=self.node)
         myJS.gaussian_batch(inputs)
 
-    def vasp(self, sub=None, loop=None, additional_dir=None):
+    def vasp(self, sub=None, loop=None, additional_dir=None, sequence=None, refine_poscar=False):
         # --- Collect VASP inputs
         band = False
         if "-band" in sys.argv:
@@ -71,6 +71,8 @@ class JobInitiator:
             inputs = selectVASPInputs("./", dir_list=df['Directory'].tolist())
         elif additional_dir:
             inputs = selectVASPInputs("./", ask=ask, sub=sub, additional_dir=additional_dir)
+        elif sequence:
+            inputs = selectInputs(['.cif'], "./")
         else:
             inputs = selectVASPInputs("./", ask=ask, sub=sub)
 
@@ -84,9 +86,9 @@ class JobInitiator:
             elif additional_dir:
                 dirpath += "/" + additional_dir
             myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
-            myJS.vasp(band=band, dirpath=dirpath, loop=loop)
+            myJS.vasp(band=band, dirpath=dirpath, loop=loop, sequence=sequence, refine_poscar=refine_poscar)
 
-    def vasp_batch(self, scratch=False, sub=False, loop=False, additional_dir=None, series=False):
+    def vasp_batch(self, scratch=False, sub=False, loop=False, additional_dir=None, series=False, sequence=False, refine_poscar=False):
         # --- Collect VASP inputs
         band = False
         if "-band" in sys.argv:
@@ -106,6 +108,8 @@ class JobInitiator:
                 pass
             print("\n* Unconverged job list in 01_unconverged_jobs.csv")
             inputs = selectVASPInputs("./", dir_list=df['Directory'].tolist())
+        elif sequence:
+            inputs = selectInputs(['.cif'], "./")
         else:
             inputs = selectVASPInputs("./", ask=ask, sub=sub)
 
@@ -119,10 +123,12 @@ class JobInitiator:
                 dirpath += "/Band-DOS"
             elif additional_dir:
                 dirpath += "/" + additional_dir
+            elif sequence:
+                dirpath = each_input
             dirs.append(dirpath)
         myJS = JS("batch_job", self.queue, self.n_of_cpu, node=self.node)
         if not series:
-            myJS.vasp_batch(dirs=dirs, scratch=scratch, loop=loop)
+            myJS.vasp_batch(dirs=dirs, scratch=scratch, loop=loop, sequence=sequence, refine_poscar=refine_poscar)
         else:
             block_number = int(input("Block number: "))
             base_name = input("Base name: ")
@@ -131,7 +137,7 @@ class JobInitiator:
             for i in range(len(sn) -1):
                 series_dirs = dirs[sn[i]:sn[i+1]]
                 jobname = "%s_%d_%d" % (base_name, sn[i]+1, sn[i+1])
-                myJS.vasp_batch(dirs=series_dirs, scratch=scratch, loop=loop, jobname=jobname)
+                myJS.vasp_batch(dirs=series_dirs, scratch=scratch, loop=loop, jobname=jobname, sequence=sequence, refine_poscar=refine_poscar)
 
     def qchem(self):
         # --- Collect inputs
@@ -240,24 +246,26 @@ class JobInitiator:
             myJS = JS(each_input, self.queue, self.n_of_cpu, node=self.node)
             myJS.pbs_runner()
 
-    def AIMD_NVT_Loop(self, temp=None, specie="Li", screen="no_screen", max_step=250):
-        # --- COLLECT INPUT FILES
-        input_marker = [".cif", "POSCAR", "CONTCAR"]
-        inputs = selectInputs(input_marker, "./", ask=ask)
-        if len(inputs) != 1:
-            print("Only single file available.")
-            quit()
+    def AIMD_NVT_Loop(self, input_file=None, temp=None, specie="Li", screen="no_screen", max_step=250, vdw=False):
+        if not input_file:
+            # --- COLLECT INPUT FILES
+            input_marker = [".cif", "POSCAR", "CONTCAR"]
+            inputs = selectInputs(input_marker, "./", ask=ask)
+            if len(inputs) != 1:
+                print("Only single file available.")
+                quit()
+            input_file = inputs[0]
 
-        myJS = JS(inputs[0], self.queue, self.n_of_cpu, node=self.node)
-        myJS.AIMD_NVT_Loop(structure_filename=inputs[0], temp=temp, specie=specie, screen=screen, max_step=max_step)
+        myJS = JS(input_file, self.queue, self.n_of_cpu, node=self.node)
+        myJS.AIMD_NVT_Loop(structure_filename=input_file, temp=temp, specie=specie, screen=screen, max_step=max_step, vdw=vdw)
 
-    def AIMD_NVT_Loop_batch(self, temp=None, specie="Li", screen="no_screen", max_step=250):
+    def AIMD_NVT_Loop_batch(self, temp=None, specie="Li", screen="no_screen", max_step=250, vdw=False):
         # --- COLLECT INPUT FILES
         input_marker = [".cif", "POSCAR", "CONTCAR"]
         inputs = selectInputs(input_marker, "./", ask=ask)
 
         myJS = JS(inputs, self.queue, self.n_of_cpu, node=self.node)
-        myJS.AIMD_NVT_Loop_batch(structure_files = inputs, temp=temp, specie=specie, screen=screen, max_step=max_step)
+        myJS.AIMD_NVT_Loop_batch(structure_files = inputs, temp=temp, specie=specie, screen=screen, max_step=max_step, vdw=vdw)
 
     def casm_run(self):
         # --- SUBMIT QUEUE
@@ -334,6 +342,8 @@ if __name__ == "__main__":
                       ex) CCpyJobSubmit.py 2 xeon4 -sub
                       ex) CCpyJobSubmit.py 2 xeon5 -batch -sub
 
+    -series         : series batch jobs
+
     -r              : re-calculate unconverged VASP jobs from '01_unconverged_jobs.csv'
                       ex) CCpyJobSubmit.py 2 xeon3 -r
                       --> '01_unconverged_jobs.csv' required which is generated by 'CCpyVASPAnaly.py 0'
@@ -370,6 +380,15 @@ if __name__ == "__main__":
                       ./graphene/DOS
                       ex) CCpyJobSubmit.py 2 xeon2 -dir=DOS
 
+    -sequence=[FILENAME] : sequence calculation based on presets and dirname in [FILENAME]
+    -refine_poscar : option can be used with this option.
+    [Sequence file example] 
+    default  ./
+    static   ./static
+    band     ./Band-DOS
+
+
+
     '''
               )
         home = os.getenv("HOME")
@@ -383,22 +402,9 @@ if __name__ == "__main__":
         quit()
 
     try:
-        CCpy_SCHEDULER_CONFIG = os.environ['CCpy_SCHEDULER_CONFIG']
-    except:
-        print('''Error while load $CCpy_SCHEDULER_CONFIG file.
-Please check the example of scheduler config file at https://github.com/91bsjun/CCpy/tree/master/CCpy/Queue''')
-        quit()
-
-    queue_info = yaml.load(open(CCpy_SCHEDULER_CONFIG, 'r'))
-
-    # --- Queue name check
-    queues = list(queue_info.keys())
-    try:
         queue = sys.argv[2]
     except:
-        queue = raw_input("Queue (xeon1, xeon2, ...) : ")
-    if queue not in queues:
-        print("%s not in %s" % (queue, str(queues)))
+        print('queue name is not assigned.')
         quit()
 
     # --- Suboption parsing
@@ -413,9 +419,13 @@ Please check the example of scheduler config file at https://github.com/91bsjun/
     node = None
     specie = "Li"               # AIMD option
     screen = "no_screen"        # AIMD option
-    max_step = 250              # AIMD option
+    max_step = 100              # AIMD option
     additional_dir = None       # additional calc for VASP
     series = False              # series batch job submit
+    vdw = False                 # optB88 at AIMD LVT Loop
+    input_file = None           # input single file
+    sequence = None
+    refine_poscar = False
     for s in sys.argv:
         if "-n=" in s:
             n_of_cpu = int(s.split("=")[1])
@@ -447,6 +457,14 @@ Please check the example of scheduler config file at https://github.com/91bsjun/
             max_step = s.split("=")[1]
         if '-series' in s:
             series = True
+        if '-vdw' in s:
+            vdw = s.split("=")[1]
+        if '-input=' in s:
+            input_file = s.split("=")[1]
+        if '-sequence=' in s:
+            sequence = s.split("=")[1]
+        if '-refine_poscar' in s:
+            refine_poscar = True
 
     job_init = JobInitiator(queue=queue, node=node, n_of_cpu=n_of_cpu)
 
@@ -460,9 +478,9 @@ Please check the example of scheduler config file at https://github.com/91bsjun/
     ## ------ VASP
     elif sys.argv[1] == "2":
         if "-batch" in sys.argv:
-            job_init.vasp_batch(scratch=scratch, sub=sub, loop=loop, additional_dir=additional_dir, series=series)
+            job_init.vasp_batch(scratch=scratch, sub=sub, loop=loop, additional_dir=additional_dir, series=series, sequence=sequence, refine_poscar=refine_poscar)
         else:
-            job_init.vasp(sub=sub, loop=loop, additional_dir=additional_dir)
+            job_init.vasp(sub=sub, loop=loop, additional_dir=additional_dir, sequence=sequence, refine_poscar=refine_poscar)
 
     ## ------ ATK
     elif sys.argv[1] == "3":
@@ -490,9 +508,11 @@ Please check the example of scheduler config file at https://github.com/91bsjun/
             print("Temperature must be assigned. (ex: -T=1000)")
             quit()
         if "-batch" in sys.argv:
-            job_init.AIMD_NVT_Loop_batch(temp=temp, specie=specie, screen=screen, max_step=max_step)
+            job_init.AIMD_NVT_Loop_batch(temp=temp, specie=specie, screen=screen, max_step=max_step, vdw=vdw)
+        elif input_file:
+            job_init.AIMD_NVT_Loop(input_file=input_file, temp=temp, specie=specie, screen=screen, max_step=max_step, vdw=vdw)
         else:
-            job_init.AIMD_NVT_Loop(temp=temp, specie=specie, screen=screen, max_step=max_step)
+            job_init.AIMD_NVT_Loop(temp=temp, specie=specie, screen=screen, max_step=max_step, vdw=vdw)
 
     ## ------ VASP NVT LOOP
     elif sys.argv[1] == "10":
