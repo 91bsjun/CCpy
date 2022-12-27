@@ -103,7 +103,8 @@ class JobSubmit:
         self.atk_mpi_run = queue_config['atk_mpi_run']
 
         self.vasp_path = queue_config['vasp_path']
-        self.vasp_run = queue_config['vasp_run']
+        # !!! change vasprun up to your system !!!
+        self.vasp_run = f"mpirun -launcher rsh -np $NP -machinefile $PBS_NODEFILE {self.vasp_path} < /dev/null > vasp.out"
 
         self.g09_path = queue_config['g09_path']
         self.atk_path = queue_config['atk_path']
