@@ -56,7 +56,9 @@ Slurm_submit_file_framework = ""
 
 class JobSubmit:
     def __init__(self, inputfile, queue, n_of_cpu, node=None, init_only=False):
+        self.inputfile = inputfile
         home = os.getenv("HOME")
+        # -- read configs from queue_config.yaml
         user_queue_config = f"{home}/.CCpy/queue_config.yaml"
         if not os.path.isfile(user_queue_config):
             from pathlib import Path
@@ -69,20 +71,27 @@ class JobSubmit:
         if init_only:
             return
 
-        self.inputfile = inputfile
-
-        # -- read configs from queue_config.yaml            
         yaml_string = open(user_queue_config, "r").read()
         queue_config = yaml.load(yaml_string)
         self.queue_config = queue_config
+        
+
+        # -- Queue and nodes settings
+        try:
+            CCpy_SCHEDULER_CONFIG = os.environ['CCpy_SCHEDULER_CONFIG']
+        except:
+            print('''Error while load $CCpy_SCHEDULER_CONFIG file.
+            Please check the example of scheduler config file at https://github.com/91bsjun/CCpy/tree/master/CCpy/Queue''')
+            quit()
+        scheduler_config = yaml.load(open(CCpy_SCHEDULER_CONFIG, 'r'))
 
         if queue not in queue_config['queues'].keys():
             print(f"'{queue}' queue argument is not in queue configuration file ({user_queue_config}), \nCurrent available:", list(queue_config['queues'].keys()))
             quit()
-        
-        cpu = queue_config['queues'][queue]['ncpu']
-        mem = queue_config['queues'][queue]['mem']
-        q = queue_config['queues'][queue]['q_name']
+
+        cpu = scheduler_config['queue'][queue]['ncpu']
+        mem = scheduler_config['queue'][queue]['mem']
+        q = scheduler_config['queue'][queue]['q_name']
 
         self.cpu = cpu
         self.mem = mem
@@ -119,15 +128,16 @@ class JobSubmit:
         #self.pe_request = "#$ -pe mpi_%d %d" % (self.n_of_cpu, self.n_of_cpu)
         #self.queue_name = "#$ -q %s" % self.q if self.q else ""
 
+        self.scheduler_type = scheduler_config['scheduler_type']
 
-        if queue_config['scheduler_type'] == "PBS":
+        if self.scheduler_type == "PBS":
             mpi = PBS_submit_file_framework
-        elif queue_config['scheduler_type'] == "SGE":
+        elif self.scheduler_type == "SGE":
             mpi = SGE_submit_file_framework
-        elif queue_config['scheduler_type'] == "Slurm":
+        elif self.scheduler_type == "Slurm":
             mpi = Slurm_submit_file_framework
 
-        if node and queue_config['scheduler_type'] == "SGE":
+        if node and self.scheduler_type == "SGE":
             mpi += f"#$ -l h={node}\n"
             
         self.mpi = mpi
@@ -158,28 +168,11 @@ class JobSubmit:
         jobname = "G" + inputfile.replace(".com", "")
         jobname = jobname.replace(".", "_").replace("-", "_")
 
-        mpi = '''#!/bin/csh
-# Job name 
-#$ -N %s
-
-# pe request
-%s
-
-# queue name
-%s
-
-# node
-%s
-
-#$ -V
-#$ -cwd
-
-
-cd $SGE_O_WORKDIR
-
-%s %s
-
-''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.g09_path, inputfile)
+        if self.scheduler_type == "PBS":
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
+        else:
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+        mpi += f"{self.g09_path} {inputfile}\n"
 
         f = open("mpi.sh", "w")
         f.write(mpi)
@@ -214,28 +207,11 @@ cd $SGE_O_WORKDIR
         for each_input in input_files:
             runs += "%s %s\nsleep 10\n" % (self.g09_path, each_input)
 
-        mpi = '''#!/bin/csh
-# Job name 
-#$ -N %s
-
-# pe request
-%s
-
-# queue name
-%s
-
-# node
-%s
-
-#$ -V
-#$ -cwd
-
-
-cd $SGE_O_WORKDIR
-
-%s
-
-''' % (jobname, self.pe_request, self.queue_name, self.node_assign, runs)
+        if self.scheduler_type == "PBS":
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
+        else:
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+        mpi += runs
 
         mpi_filename = "mpi_%s.sh" % jobname
         f = open(mpi_filename, "w")
@@ -286,10 +262,11 @@ cd $SGE_O_WORKDIR
         
         tmp_dirpath = dirpath.replace("(", "\(").replace(")", "\)")
 
-        if self.queue_config['scheduler_type'] == "PBS":
+        if self.scheduler_type == "PBS":
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
         else:
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+
         if not sequence:
             mpi += f"cd {tmp_dirpath} \n"
             mpi += f"{self.vasp_run}\n"
@@ -376,7 +353,7 @@ cd $SGE_O_WORKDIR
                 runs += f"{self.python_path} {script_path} {inputfile} {sequence_file} {self.python_path} {loop_opt_script_path} {refine_poscar}\n"
                 runs += "sleep 30\n\n"
 
-        if self.queue_config['scheduler_type'] == "PBS":
+        if self.scheduler_type == "PBS":
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
         else:
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
@@ -398,34 +375,16 @@ cd $SGE_O_WORKDIR
         jobname = "Q" + inputfile.replace(".in", "")
         jobname = jobname.replace(".", "_").replace("-", "_")
 
-        mpi = '''#!/bin/csh
-# Job name 
-#$ -N %s
-
-# pe request
-%s
-
-# queue name
-%s
-
-# node
-%s
-
-#$ -V
-#$ -cwd
-
-set  MPI_HOME=/opt/mpi/intel-parallel-studio2013sp1/openmpi-1.6.5
-set  MPI_EXEC=%s
-
-setenv QCSCRATCH /scratch
-setenv QCAUX /opt/QChem4.2/qcaux
-source /opt/QChem4.2/qcenv.csh
-
-cd $SGE_O_WORKDIR
-
-qchem %s %s
-
-''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.mpi_run, inputfile, outputfile)
+        if self.scheduler_type == "PBS":
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
+        else:
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+        mpi += "set  MPI_HOME=/opt/mpi/intel-parallel-studio2013sp1/openmpi-1.6.5\n"
+        mpi += f"set  MPI_EXEC={self.mpi_run}\n\n"
+        mpi += "setenv QCSCRATCH /scratch\n"
+        mpi += "setenv QCAUX /opt/QChem4.2/qcaux\n"
+        mpi += "source /opt/QChem4.2/qcenv.csh\n\n"
+        mpi += f"qchem {inputfile} {outputfile}\n"
 
         f = open("mpi.sh", "w")
         f.write(mpi)
@@ -441,42 +400,15 @@ qchem %s %s
         jobname = jobname.replace(".", "_").replace("-", "_")
         outputfile = inputfile.replace(".py", ".out")
 
-        mpi = '''#!/bin/csh
-# Job name 
-#$ -N %s
-
-# pe request
-%s
-
-# queue name
-%s
-
-# node
-%s
-
-#$ -V
-#$ -cwd
-
-echo "Got $NSLOTS slots."
-cat $TMPDIR/machines
-
-#set MPI_HOME=/opt/intel/mpi-rt/4.0.0
-#set MPI_EXEC=$MPI_HOME/bin/mpirun
-set MPI_EXEC=%s
-
-setenv OMP_NUM_THREADS 1
-setenv OMP_DYNAMIC FALSE
-# setenv LD_PRELOAD "libGLU.so libstdc++.so.6"
-
-setenv QUANTUM_LICENSE_PATH 6200@166.104.249.249
-
-cd $SGE_O_WORKDIR
-
-env | grep PRELOAD
-$MPI_EXEC -n %d %s %s > %s
-
-''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.atk_mpi_run, self.n_of_cpu, self.atk_path,
-       inputfile, outputfile)
+        if self.scheduler_type == "PBS":
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
+        else:
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+        mpi += f"set MPI_EXEC={self.atk_mpi_run}\n"
+        mpi += "setenv OMP_NUM_THREADS 1\n"
+        mpi += "setenv OMP_DYNAMIC FALSE\n\n"
+        mpi += "setenv QUANTUM_LICENSE_PATH 6200@166.104.249.249\n\n"
+        mpi += f"$MPI_EXEC -n {self.n_of_cpu} {self.atk_path} {inputfile} {outputfile}\n"
 
         f = open("mpi.sh", "w")
         f.write(mpi)
@@ -498,30 +430,14 @@ $MPI_EXEC -n %d %s %s > %s
         jobname = jobname.replace(".", "_").replace("-", "_").replace("+", "_")
 
         os.chdir(inputfile)
-        mpi = '''#!/bin/csh
-# Job name 
-#$ -N %s
 
-# pe request
-%s
+        if self.scheduler_type == "PBS":
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
+        else:
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
 
-# queue name
-%s
-
-# node
-%s
-
-#$ -V
-#$ -cwd
-
-echo "Got $NSLOTS slots."
-cat $TMPDIR/machines
-
-cd $SGE_O_WORKDIR
-
-runstruct_vasp -ng mpirun -np %d
-rm wait
- ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.n_of_cpu)
+        mpi += f"runstruct_vasp -ng mpirun -np {self.n_of_cpu}\n"
+        mpi += "rm wait\n"
 
         f = open("mpi.sh", "w")
         f.write(mpi)
@@ -572,28 +488,12 @@ python %s
         jobname = "L" + inputfile.replace("in.", "")
         jobname = jobname.replace(".", "_").replace("-", "_")
 
-        mpi = '''#!/bin/csh
-# Job name 
-#$ -N %s
+        if self.scheduler_type == "PBS":
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
+        else:
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
 
-# pe request
-%s
-
-# queue name
-%s
-
-# node
-%s
-
-#$ -V
-#$ -cwd
-
-cd $SGE_O_WORKDIR
-
-%s -np %d %s < %s | tee %s
-
-    ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.lammps_mpirun_path, self.n_of_cpu,
-           self.lammps_path, inputfile, outputfile)
+        mpi += f"{self.lammps_mpirun_path} -np {self.n_of_cpu} {self.lammps_path} {inputfile} {outputfile}\n"
 
         f = open("mpi.sh", "w")
         f.write(mpi)
@@ -612,7 +512,7 @@ cd $SGE_O_WORKDIR
 
         jobname = "NVT%s_%dK" % (structure_filename.replace(".cif", ""), temp)
 
-        if self.queue_config['scheduler_type'] == "PBS":
+        if self.scheduler_type == "PBS":
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
         else:
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
@@ -645,7 +545,7 @@ cd $SGE_O_WORKDIR
             runs += "%s %s %s %s %s %s %s %s\n\n" % (self.python_path, script_filename, structure_filename, temp, specie, screen, max_step, vdw)
             runs += "cd %s \n" % pwd
 
-        if self.queue_config['scheduler_type'] == "PBS":
+        if self.scheduler_type == "PBS":
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
         else:
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
@@ -661,25 +561,12 @@ cd $SGE_O_WORKDIR
     def casm_run(self):
         jobname = raw_input("Job name: ")
 
-        mpi = '''#!/bin/csh
-# Job name 
-#$ -N %s
+        if self.scheduler_type == "PBS":
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
+        else:
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
 
-# pe request
-%s
-
-# queue name
-%s
-
-# node
-%s
-
-#$ -V
-#$ -cwd
-
-casm-calc --run
-
-        ''' % (jobname, self.pe_request, self.queue_name, self.node_assign)
+        mpi += "casm-calc --run\n"
 
         f = open("mpi.sh", "w")
         f.write(mpi)
@@ -692,26 +579,13 @@ casm-calc --run
         input_filename = self.inputfile.split("/")[-1]
         dir_path = self.inputfile.replace(input_filename, "")
         jobname = "S" + input_filename.replace(".fdf", "")
-        mpi = '''#!/bin/csh
-# Job name 
-#$ -N %s
 
-# pe request
-%s
+        if self.scheduler_type == "PBS":
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
+        else:
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
 
-# queue name
-%s
-
-# node
-%s
-
-#$ -V
-#$ -cwd
-
-cd %s
-mpirun -np $NSLOTS %s < %s > siesta.out
-
-        ''' % (jobname, self.pe_request, self.queue_name, self.node_assign, dir_path, self.siesta_path, input_filename)
+        mpi += f"{self.mpirun} -np {self.n_of_cpu} {self.siesta_path} < {dirpath} > siesta.out\n"
 
         f = open("mpi.sh", "w")
         f.write(mpi)
@@ -731,26 +605,12 @@ mpirun -np $NSLOTS %s < %s > siesta.out
 
         jobname = "SNVT%s_%dK" % (structure_filename.replace(".cif", ""), temp)
 
-        mpi = '''#!/bin/csh
-# Job name 
-#$ -N %s
+        if self.scheduler_type == "PBS":
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
+        else:
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
 
-# pe request
-%s
-
-# queue name
-%s
-
-# node
-%s
-
-#$ -V
-#$ -cwd
-
-
-%s %s %s %s %s
-''' % (jobname, self.pe_request, self.queue_name, self.node_assign, self.python_path,
-        script_filename, structure_filename, temp, specie)
+        mpi += f"{self.python_path} {script_filename} {structure_filename} {temp} {specie}\n"
 
         f = open("mpi.sh", "w")
         f.write(mpi)
