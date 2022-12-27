@@ -20,6 +20,7 @@ from pymatgen.io.vasp import Vasprun
 from pymatgen.io.vasp.inputs import Incar, Poscar, Potcar, Kpoints, Kpoints_supported_modes
 from pymatgen.io.vasp.sets import *
 from pymatgen.util.io_utils import clean_lines
+from pymatgen.symmetry.analyzer import SpacegroupAnalyzer
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -29,11 +30,13 @@ if version[0] == '3':
     raw_input = input
 
 class VASPInput():
-    def __init__(self, filename=None, dirname=None, preset_yaml=None, additional_dir=False, keep_files=[]):
+    def __init__(self, filename=None, dirname=None, preset_yaml=None, additional_dir=False, refine_poscar=False, keep_files=[]):
         """
         filename: structure filename (*.cif, *POSCAR*, *CONTCAR*)
         dirname: when using additional calc
         additional:
+        refine_poscar: Deny get refined structure using spglib
+        keep_files: files to keep when additional calc
         """
         self.additional_calc = False
         self.additional_dir = additional_dir
@@ -68,6 +71,10 @@ class VASPInput():
                 dirname = jobname
 
         self.filename = filename
+        if refine_poscar == "False":
+            refine_poscar = False
+        if refine_poscar:  # structure is none when init run 
+            structure = SpacegroupAnalyzer(structure).get_refined_structure()
         self.structure = structure
         self.dirname = dirname
 
@@ -148,6 +155,12 @@ class VASPInput():
         self.kpt_linemode_use_all_path = kpt_linemode_use_all_path
         self.kpt_linemode_show_brill = kpt_linemode_show_brill
         
+        try:
+            potcar_pseudo_potential = load_yaml(yaml_file, "POTCAR")
+        except:
+            potcar_pseudo_potential = load_yaml(default_yaml_file, "POTCAR")
+        self.potcar_pseudo_potential = potcar_pseudo_potential
+
         self.yaml_file = yaml_file
         self.default_incar_dict = default_incar_dict
         self.incar_dict_desc = load_yaml(MODULE_DIR + '/vasp_incar_desc.yaml')
@@ -350,14 +363,14 @@ class VASPInput():
                 incar_dict['GGA'] = "BO"
                 incar_dict['PARAM1'] = 0.183333333
                 incar_dict['PARAM2'] = 0.22
-                shutil.copy('%s' % MODULE_DIR + '/vdw_kernel.bindat', './%s/' % dirname)
+                #shutil.copy('%s' % MODULE_DIR + '/vdw_kernel.bindat', './%s/' % dirname)
             elif vdw == "optb86b":
                 incar_dict['LUSE_VDW'] = True
                 incar_dict['AGGAC'] = 0.0
                 incar_dict['GGA'] = "MK"
                 incar_dict['PARAM1'] = 0.1234
                 incar_dict['PARAM2'] = 1.0
-                shutil.copy('%s' % MODULE_DIR + '/vdw_kernel.bindat', './%s/' % dirname)
+                #shutil.copy('%s' % MODULE_DIR + '/vdw_kernel.bindat', './%s/' % dirname)
             else:
                 if "LVDW" in incar_dict.keys():     # If LVDW=.TRUE. is defined, IVDW is automatically set to 1
                     incar_dict = change_dict_key(incar_dict, "LVDW", "# LVDW", ".FALSE.")
@@ -368,6 +381,9 @@ class VASPInput():
                 elif vdw == "dDsC":
                     ivdw = "4"
                 incar_dict = update_incar(incar_dict, {"IVDW": ivdw})
+        if 'LUSE_VDW' in incar_dict.keys():
+            if incar_dict['LUSE_VDW'] in [True, "True", ".True.", ".TRUE.", "T"]:
+                shutil.copy('%s' % MODULE_DIR + '/vdw_kernel.bindat', './%s/' % dirname)
 
 
 
@@ -411,7 +427,9 @@ class VASPInput():
                     if not chk:
                         pot_elt.append(e)
             else:
-                pot_elt = elements
+                pot_elt = []
+                for e in elements:
+                    pot_elt.append(self.potcar_pseudo_potential[e])
             potcar = Potcar(symbols=pot_elt, functional=functional)
 
 
@@ -484,8 +502,10 @@ class VASPInput():
             os.chdir(pwd)
         elif self.filename:
             # -- backup structure file
-            if "structures" not in os.listdir():
+            try:
                 os.mkdir("structures")
+            except:
+                pass
             os.rename(self.filename, "./structures/"+self.filename)
 
 
@@ -1146,6 +1166,60 @@ class VASPOutput():
         print("* Handled error log saved: 02_error_handled.yaml")
         print("\nDone.")
 
+
+    def get_mechanical_properties(self, dirs):
+        from pymatgen.analysis.elasticity.elastic import ElasticTensor, ElasticTensorExpansion, NthOrderElasticTensor
+        import itertools
+        import numpy as np
+        def Voigt_6x6_to_full_3x3x3x3(C):
+            C = np.asarray(C)
+            C_out = np.zeros((3,3,3,3), dtype=float)
+            for i, j, k, l in itertools.product(range(3), range(3), range(3), range(3)):
+                Voigt_i = full_3x3_to_Voigt_6_index(i, j)
+                Voigt_j = full_3x3_to_Voigt_6_index(k, l)
+                C_out[i, j, k, l] = C[Voigt_i, Voigt_j]
+            return C_out
+        def full_3x3_to_Voigt_6_index(i, j):
+            if i == j:
+                return i
+            return 6-i-j
+
+        data = {'filename': [], 'B': [], 'G': [], 'E': [], 'nu': []}
+
+        for dir in dirs:
+            print(dir)
+            outcar_file = dir + '/OUTCAR'
+            outcar = Outcar(outcar_file)
+            outcar.read_elastic_tensor()
+
+            et_array = outcar.data['elastic_tensor']
+            et_array = np.array(et_array) / 10
+            print(et_array)
+
+            et_3333 = Voigt_6x6_to_full_3x3x3x3(et_array)
+
+            pmg_et = ElasticTensor(et_3333)
+
+            y_mod = pmg_et.y_mod * 1e-9
+            print('K_vrh, bulk modulus  (B) :', pmg_et.k_vrh)
+            print('G_vrh, shear moudlus (G) :', pmg_et.g_vrh)
+            print('Youngs modulus       (E) :', y_mod)
+            print('homogeneous poisson  (mu):', pmg_et.homogeneous_poisson)
+            data['filename'].append(outcar_file)
+            data['B'].append(pmg_et.k_vrh)
+            data['G'].append(pmg_et.g_vrh)
+            data['E'].append(y_mod)
+            data['nu'].append(pmg_et.homogeneous_poisson)
+
+            print('--\n')
+
+        import pandas as pd
+        df = pd.DataFrame(data)
+        print(df)
+        df.to_csv('mechanical_properties_data.csv')
+        print('mechanical_properties_data.csv')
+
+
     def vasp_zip(self, dirs, minimize=False):
         cnt = 0
         pwd = os.getcwd()
@@ -1219,7 +1293,10 @@ def load_yaml(yaml_file, key=None):
 
     return dict
 
-def incar_dict_to_str(incar_dict, incar_dict_desc, highlights=[], warnings=[]):
+def incar_dict_to_str(incar_dict, incar_dict_desc=None, highlights=[], warnings=[]):
+    if not incar_dict_desc:
+        MODULE_DIR = str(Path(__file__).resolve().parent)
+        incar_dict_desc = load_yaml(MODULE_DIR + '/vasp_incar_desc.yaml')
     incar_keys = incar_dict.keys()
     incar_string = ""
     for key in incar_keys:
