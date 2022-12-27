@@ -7,3 +7,17 @@ g09_path: g09
 atk_path: /opt/Quantumwise/VNL-ATK-2019.12SP1/bin/atkpython
 lammps_path: lmp_g++
 siesta_path: siesta
+scheduler_type: PBS
+queues:
+  ba:
+    ncpu: 16
+    mem: 256
+    q_name: vasp_ba
+    nodes:
+    - nodeXX
+  test:
+    ncpu: 16
+    mem: 256
+    q_name: vasp_test
+    nodes:
+    - nodeXX
