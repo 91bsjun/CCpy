@@ -85,8 +85,8 @@ class JobSubmit:
             quit()
         scheduler_config = yaml.load(open(CCpy_SCHEDULER_CONFIG, 'r'))
 
-        if queue not in queue_config['queues'].keys():
-            print(f"'{queue}' queue argument is not in queue configuration file ({user_queue_config}), \nCurrent available:", list(queue_config['queues'].keys()))
+        if queue not in scheduler_config['queue'].keys():
+            print(f"'{queue}' queue argument is not in queue configuration file ({user_queue_config}), \nCurrent available:", list(scheduler_config['queue'].keys()))
             quit()
 
         cpu = scheduler_config['queue'][queue]['ncpu']
@@ -113,8 +113,8 @@ class JobSubmit:
         self.atk_mpi_run = queue_config['atk_mpi_run']
 
         self.vasp_path = queue_config['vasp_path']
-        # !!! change vasprun up to your system !!!
-        self.vasp_run = f"mpirun -launcher rsh -np $NP -machinefile $PBS_NODEFILE {self.vasp_path} < /dev/null > vasp.out"
+# >>>>>>>>>>>>>>>>>>>>>>> !!! modify below line up to your system !!! <<<<<<<<<<<<<<<<<<<<<<<<< #
+        self.vasp_run = f"{self.mpi_run} -np $NSLOTS {self.vasp_path} < /dev/null > vasp.out" # !!!! <-- to edit !!!!
 
         self.g09_path = queue_config['g09_path']
         self.atk_path = queue_config['atk_path']
@@ -265,7 +265,7 @@ class JobSubmit:
         if self.scheduler_type == "PBS":
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
         else:
-            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.n_of_cpu)
 
         if not sequence:
             mpi += f"cd {tmp_dirpath} \n"
@@ -356,7 +356,7 @@ class JobSubmit:
         if self.scheduler_type == "PBS":
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
         else:
-            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.n_of_cpu)
         mpi += runs
 
         pwd = os.getcwd()
@@ -378,7 +378,7 @@ class JobSubmit:
         if self.scheduler_type == "PBS":
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
         else:
-            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.n_of_cpu)
         mpi += "set  MPI_HOME=/opt/mpi/intel-parallel-studio2013sp1/openmpi-1.6.5\n"
         mpi += f"set  MPI_EXEC={self.mpi_run}\n\n"
         mpi += "setenv QCSCRATCH /scratch\n"
@@ -403,7 +403,7 @@ class JobSubmit:
         if self.scheduler_type == "PBS":
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
         else:
-            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.n_of_cpu)
         mpi += f"set MPI_EXEC={self.atk_mpi_run}\n"
         mpi += "setenv OMP_NUM_THREADS 1\n"
         mpi += "setenv OMP_DYNAMIC FALSE\n\n"
@@ -434,7 +434,7 @@ class JobSubmit:
         if self.scheduler_type == "PBS":
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
         else:
-            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.n_of_cpu)
 
         mpi += f"runstruct_vasp -ng mpirun -np {self.n_of_cpu}\n"
         mpi += "rm wait\n"
@@ -491,7 +491,7 @@ python %s
         if self.scheduler_type == "PBS":
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
         else:
-            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.n_of_cpu)
 
         mpi += f"{self.lammps_mpirun_path} -np {self.n_of_cpu} {self.lammps_path} {inputfile} {outputfile}\n"
 
@@ -515,7 +515,7 @@ python %s
         if self.scheduler_type == "PBS":
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
         else:
-            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.n_of_cpu)
         mpi += f"{self.python_path} {script_filename} {structure_filename} {temp} {specie} {screen} {max_step} {vdw}\n"
 
         f = open("mpi.sh", "w")
@@ -548,7 +548,7 @@ python %s
         if self.scheduler_type == "PBS":
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
         else:
-            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.n_of_cpu)
         mpi += runs
 
         f = open("mpi.sh", "w")
@@ -564,7 +564,7 @@ python %s
         if self.scheduler_type == "PBS":
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
         else:
-            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.n_of_cpu)
 
         mpi += "casm-calc --run\n"
 
@@ -583,7 +583,7 @@ python %s
         if self.scheduler_type == "PBS":
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
         else:
-            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.n_of_cpu)
 
         mpi += f"{self.mpirun} -np {self.n_of_cpu} {self.siesta_path} < {dirpath} > siesta.out\n"
 
@@ -608,7 +608,7 @@ python %s
         if self.scheduler_type == "PBS":
             mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu, nselect=self.n_of_nodes)
         else:
-            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.cpu)
+            mpi = self.mpi.format(qname=self.q, jobname=jobname, ncpu=self.n_of_cpu)
 
         mpi += f"{self.python_path} {script_filename} {structure_filename} {temp} {specie}\n"
 

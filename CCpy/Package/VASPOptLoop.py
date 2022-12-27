@@ -90,6 +90,20 @@ def check_empty():
             os.system("touch loop.done")
             quit()
 
+home = os.getenv("HOME")
+user_queue_config = f"{home}/.CCpy/queue_config.yaml"
+MODULE_DIR = Path(__file__).resolve().parent
+if not os.path.isfile(user_queue_config):
+    default_queue_config = str(MODULE_DIR) + "/queue_config.yaml"
+    if ".CCpy" not in os.listdir(home):
+        os.mkdir(f"{home}/.CCpy")
+    os.system(f"cp {default_queue_config} {user_queue_config}")
+# -- read configs from queue_config.yaml
+yaml_string = open(user_queue_config, "r").read()
+queue_config = yaml.load(yaml_string)
+vasp_path = queue_config['vasp_path']
+# >>>>>>>>>>>>>>>>>>>>>>> !!! modify below line up to your system !!! <<<<<<<<<<<<<<<<<<<<<<<<< #
+vasp_run = f"mpirun -launcher rsh -np 16 -machinefile $PBS_NODEFILE {vasp_path} < /dev/null > vasp.out" # !!!! <-- to edit !!!!
 
 if __name__ == "__main__":
     # -- reset logfile
@@ -108,7 +122,7 @@ if __name__ == "__main__":
     loop = 0
     write_log("\nLoop: " + str(loop))
     #os.system("mpirun -np $NSLOTS vasp < /dev/null > vasp.out")
-    os.system("mpirun -launcher rsh -np 16 -machinefile $PBS_NODEFILE /usr/apps/vasp/vasp.6.2.1/bin/vasp_std < /dev/null > vasp.out")
+    os.system(vasp_run)
     time.sleep(30)
 
     # -- parsing output
@@ -127,7 +141,7 @@ if __name__ == "__main__":
         loop += 1
         os.system("rm vasp.done")
         #os.system("mpirun -np $NSLOTS vasp < /dev/null > vasp.out")
-        os.system("mpirun -launcher rsh -np 16 -machinefile $PBS_NODEFILE /usr/apps/vasp/vasp.6.2.1/bin/vasp_std < /dev/null > vasp.out")
+        os.system(vasp_run)
         time.sleep(30)
         write_log("\nLoop: " + str(loop))
         c = get_vasp_status()
@@ -140,7 +154,7 @@ if __name__ == "__main__":
             lat = get_structure_info("CONTCAR")
             write_log("Final structure.  a: %.2f  b: %.2f  c: %2.f  alpha: %.2f  beta: %.2f  gamma: %.2f  volume: %.2f" % (lat[0], lat[1], lat[2], lat[3], lat[4], lat[5], lat[6]))
         write_energy(loop, final_e)
-        # -- terminate max loop cretiera
+        # -- terminate max loop creteria
         if loop == 20:
             c = "Failed"
     if c == "Failed":

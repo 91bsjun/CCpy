@@ -34,12 +34,12 @@ if not os.path.isfile(user_queue_config):
 yaml_string = open(user_queue_config, "r").read()
 queue_config = yaml.load(yaml_string)
 vasp_path = queue_config['vasp_path']
-# !!! modify below line up to your system !!!
-vasp_run = f"mpirun -launcher rsh -np 16 -machinefile $PBS_NODEFILE {vasp_path} < /dev/null > vasp.out"
+# >>>>>>>>>>>>>>>>>>>>>>> !!! modify below line up to your system !!! <<<<<<<<<<<<<<<<<<<<<<<<< #
+vasp_run = f"mpirun -launcher rsh -np 16 -machinefile $PBS_NODEFILE {vasp_path} < /dev/null > vasp.out" # !!!! <-- to edit !!!!
 
 vasp_mpirun = vasp_run
-# !!! modify below line up to your system !!!
-Mo_analyze_aimd = "/hpchome2/7230508/.conda/envs/cms_bjun/bin/analyze_aimd.py"    # !!!! <-- to edit each system !!!!
+# >>>>>>>>>>>>>>>>>>>>>>> !!! modify below line up to your system !!! <<<<<<<<<<<<<<<<<<<<<<<<< #
+Mo_analyze_aimd = "/hpchome2/7230508/.conda/envs/cms_bjun/bin/analyze_aimd.py"    # !!!! <-- to edit !!!!
 NCORE = 4
 #user_incar = {"NCORE": NCORE, "PREC": "Normal", "ALGO": "Fast", "ICHARG": 0}
 user_incar = {"NCORE": NCORE}
