@@ -13,9 +13,7 @@ if version[0] == '3':
     raw_input = input
 
 
-try:
-    chk = sys.argv[1]
-except:
+if len(sys.argv) <= 1:
     print("\nHow to use : " + sys.argv[0].split("/")[-1] + " [option] [sub_option1] [sub_option2..]")
     print('''--------------------------------------
 [options]
@@ -30,6 +28,9 @@ ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_s
 
     < USE PRESET >
     -preset=[NAME] : [NAME].yaml in ~/.CCpy/vasp/
+
+    < STRUCTURE OPTION >
+    -refine_poscar : Use refined structure with space group (sym prec 0.1)
 
     < INCAR OPTION >
     -sp      : Single point calculation      (DEFAULT : NSW = 200)
@@ -49,7 +50,7 @@ ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_s
     < KPOINTS OPTION >
     -kp=#,#,#                                (DEFAULT : reciprocal parameter as devided by 20)
 
-    < POTCAR OPTION>
+    < POTCAR OPTION >
     -pot=PBE_54 : VASP potential setting     (DEFAULT : PBE_54)
                   Possible potentials = PBE, PBE_52, PBE_54, LDA, LDA_52, LDA_54, PW91, LDA_US, PW91_US
     -pseudo=    : Select pseudo potential    (DEFAULT : normal)
@@ -60,6 +61,14 @@ ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_s
     -dir=[DIRNAME]     : Additional calculation dir under previous run
     -pre_dir=[DIRNAME] : Previous directory name to copy CONTCAR, ... (default ./)
     -preset=[NAME]     : [NAME].yaml in ~/.CCpy/vasp/
+
+    < SEQUENTIAL JOB >
+    This method can be used with CCpyJobSubmit.py without vasp input generation.
+    -sequence=[FILENAME] : sequence calculation based on presets and dirname in [FILENAME]
+    [file example]
+    default  ./
+    static   ./static
+    band     ./Band-DOS
  
 
 [preset options]
@@ -85,6 +94,7 @@ ismear = 0
 additional_dir = None
 pre_dir = "./"
 batch = False
+refine_poscar = False
 
 for arg in sys.argv:
     if "-sp" == arg:
@@ -116,6 +126,8 @@ for arg in sys.argv:
         pre_dir = arg.split("=")[1]
     elif "-batch" in arg:
         batch = True
+    elif "-refine_poscar" in arg:
+        refine_poscar = True
     
 
 if sys.argv[1] == "1":
@@ -126,7 +138,7 @@ if sys.argv[1] == "1":
         inputs = selectInputs(input_marker, "./")
     chk = True
     for each_input in inputs:
-        VI = VASPInput(each_input, preset_yaml=incar_preset)
+        VI = VASPInput(each_input, preset_yaml=incar_preset, refine_poscar=refine_poscar)
 
         # -- First process of edit INCAR, KPOINTS while create Inputs
         # -- If user want to use same options go to else
@@ -175,7 +187,7 @@ elif sys.argv[1] == "add":
     inputs = selectVASPOutputs("./")
     for each_input in inputs:
         #print(each_input + "/" + additional_dir)
-        VI = VASPInput(additional_dir=additional_dir, dirname=each_input, preset_yaml=incar_preset)
+        VI = VASPInput(additional_dir=additional_dir, dirname=each_input, preset_yaml=incar_preset, refine_poscar=refine_poscar)
         VI.cms_vasp_set(single_point=single_point, isif=isif, vdw=vdw, kpoints=kpoints, spin=spin, mag=mag, ldau=ldau,
                         functional=functional, pseudo=pseudo,
                         get_pre_incar=None, batch=True, pre_dir=pre_dir)
