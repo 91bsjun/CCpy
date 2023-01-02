@@ -86,7 +86,7 @@ class JobSubmit:
         scheduler_config = yaml.load(open(CCpy_SCHEDULER_CONFIG, 'r'))
 
         if queue not in scheduler_config['queue'].keys():
-            print(f"'{queue}' queue argument is not in queue configuration file ({user_queue_config}), \nCurrent available:", list(scheduler_config['queue'].keys()))
+            print(f"'{queue}' queue argument is not in queue configuration file ({CCpy_SCHEDULER_CONFIG}), \nCurrent available:", list(scheduler_config['queue'].keys()))
             quit()
 
         cpu = scheduler_config['queue'][queue]['ncpu']
