@@ -114,7 +114,8 @@ class JobSubmit:
 
         self.vasp_path = queue_config['vasp_path']
 # >>>>>>>>>>>>>>>>>>>>>>> !!! modify below line up to your system !!! <<<<<<<<<<<<<<<<<<<<<<<<< #
-        self.vasp_run = f"{self.mpi_run} -np $NSLOTS {self.vasp_path} < /dev/null > vasp.out" # !!!! <-- to edit !!!!
+        self.vasp_run = f"{self.mpi_run} -launcher rsh -np $NP -machinefile $PBS_NODEFILE {self.vasp_path} < /dev/null > vasp.out" # !!!! <-- HMC vasp run type
+        # self.vasp_run = f"{self.mpi_run} -np $NSLOTS {self.vasp_path} < /dev/null > vasp.out" # !!!! <-- CMS vasp run type
 
         self.g09_path = queue_config['g09_path']
         self.atk_path = queue_config['atk_path']
