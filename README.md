@@ -235,7 +235,7 @@ Run <code>CCpyJobSubmit.py</code>
 
 </pre>
 
-#### 3.1.4. Modify queue config file
+### 3.2. Modify queue config file
 If <code>CCpyJobSubmit.py</code> had been executed successfully, <code>queue_config.yaml</code> would have been created under <code>$HOME/.CCpy/</code>.
 <pre>
 qsub: qsub
@@ -249,3 +249,7 @@ lammps_path: lmp_g++
 siesta_path: siesta
 </pre>
 This file contains various executable commands that <code>CCpyJobSubmit.py</code> loads when it runs.
+
+### 3.3. Descriptions of detailed job submission methods
+https://github.com/91bsjun/CCpy/tree/master/CCpy/Queue
+
