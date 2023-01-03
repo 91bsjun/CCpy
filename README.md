@@ -1,4 +1,9 @@
-### Python scripts for Computational Chemistry.
+# CCpy: Python scripts for Computational Chemistry.
+- Aim of this library is automated workflow of computational chemistry.
+- First development of this library from Computational Materials Science Lab in Hanyang University. 
+- It is currently being jointly developed with Hyundai Motor Company.
+- All codes do not contain research results or confidential methodologies.
+- All copyrights belong to the library developers and distribution for commercial use is prohibited.
 
 # 1. Initial setup
 ### 1.1. Clone to your PC or Cluster
@@ -105,7 +110,10 @@ ex) CCpyVASPInputGen.py 1 -isif=2 -spin -mag -kp=4,4,2 -vdw=D3damp, -pseudo=Nb_s
 
 ### 2.3. Descriptions of VASP input/output
 https://github.com/91bsjun/CCpy/tree/master/CCpy/VASP
-
+#### Key features
+- Generation of multiple VASP inputs with preset options.
+- Analysis of multiple VASP jobs and conver to .csv file type.
+- Sequential jobs using presets (ex. relax -> charge calculation -> DOS).
 
 # 3. Job scheduler settings
 #### HPC scheduler highly depends on each HPC system. It should be modified very carefully based on the understanding of scheduler.
@@ -132,7 +140,7 @@ queue:
     - node05
 </pre>
 - scheduler_type: PBS, SGE or slurm
-- xeon1, xeon2 is the alias of each .q to use in <code> CCpyJobSubmit.py </code> scripts.
+- xeon1, xeon2 is the alias of each .q to use in <code>CCpyJobSubmit.py</code> scripts.
 - nodes are name of each node in q
 
 #### 3.1.2. Add environment
@@ -251,9 +259,14 @@ siesta_path: siesta
 </pre>
 This file contains various executable commands that <code>CCpyJobSubmit.py</code> loads when it runs.
 
-### 3.3. Modify mpirun methods to automated vasp jobs
+### 3.3. Modify queue submission script
+- Open <code>./CCpy/Queue/CCpyJobControl.py</code>
+- Modify submission file framework at the beginning of line20. 
+- The common parameters (qname, jobname, ncpu) are listed in this framework.
+
+### 3.4. Modify mpirun methods to automated vasp jobs
 mpirun command for parralell calculation highly up to each hpc system, so you have to modify it in some python files.
-- <code>./Queue/CCpyJobControl.py</code>
+- <code>./CCpy/Queue/CCpyJobControl.py</code>
 edit <code>self.vasp_run</code>
 <pre>
 ln 115         self.vasp_path = queue_config['vasp_path']
@@ -261,7 +274,7 @@ ln 116 # >>>>>>>>>>>>>>>>>>>>>>> !!! modify below line up to your system !!! <<<
 ln 117         self.vasp_run = f"{self.mpi_run} -launcher rsh -np $NP -machinefile $PBS_NODEFILE {self.vasp_path} < /dev/null > vasp.out" # !!!! <-- HMC vasp run type
 ln 118         # self.vasp_run = f"{self.mpi_run} -np $NSLOTS {self.vasp_path} < /dev/null > vasp.out" # !!!! <-- CMS vasp run type
 </pre>
-- <code>./Package/VASPOptLoop.py</code>
+- <code>./CCpy/Package/VASPOptLoop.py</code>
 edit <code>vasp_run</code>
 <pre>
 ln 107 mpi_run = queue_config['mpi_run']
@@ -269,7 +282,7 @@ ln 108 # >>>>>>>>>>>>>>>>>>>>>>> !!! modify below line up to your system !!! <<<
 ln 109 vasp_run = f"{mpirun} -launcher rsh -np $NP -machinefile $PBS_NODEFILE {vasp_path} < /dev/null > vasp.out" # !!!! <-- HMC vasp run type
 ln 110 # vasp_run = f"{mpirun} -np $NSLOTS {vasp_path} < /dev/null > vasp.out" # !!!! <-- CMS vasp run type
 </pre>
-- <code>./Package/Diffusion/NVTLoopQueScript.py</code>
+- <code>./CCpy/Package/Diffusion/NVTLoopQueScript.py</code>
 edit <code>vasp_run</code>
 <pre>
 ln  37 mpi_run = queue_config['mpi_run']
@@ -277,6 +290,16 @@ ln  38 # >>>>>>>>>>>>>>>>>>>>>>> !!! modify below line up to your system !!! <<<
 ln  39 vasp_run = f"{mpirun} -launcher rsh -np $NP -machinefile $PBS_NODEFILE {vasp_path} < /dev/null > vasp.out" # !!!! <-- HMC vasp run type
 ln  40 # vasp_run = f"{mpirun} -np $NSLOTS {vasp_path} < /dev/null > vasp.out" # !!!! <-- CMS vasp run type
 </pre>
-### 3.4. Descriptions of detailed job submission methods
-https://github.com/91bsjun/CCpy/tree/master/CCpy/Queue
 
+### 3.5. Reinstallation of CCpy
+Run <code>python setup.py install</code> again.
+<pre>
+(CCpy) [user@localhost CCpy]$ python setup.py install
+</pre>
+
+### 3.5. Descriptions of detailed job submission methods
+https://github.com/91bsjun/CCpy/tree/master/CCpy/Queue
+#### Key features
+- Submitting multiple jobs in desired batches
+- Deleting multiple jobs using job id or keyword of jobname
+- Show job status as better format than default qstat
