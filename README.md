@@ -39,7 +39,7 @@ https://pymatgen.org/installation.html
 
 
 # 2. VASP setup
-### 2.1. Set VASP potential environment of Pymatgen (If you use CCpyVASPInputGen.py)
+### 2.1. Setup VASP potential environment of Pymatgen (If you use CCpyVASPInputGen.py)
 https://pymatgen.org/installation.html#potcar-setup
 
 ### 2.2. TEST
