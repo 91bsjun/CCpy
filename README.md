@@ -38,6 +38,7 @@ https://pymatgen.org/installation.html
 https://pymatgen.org/installation.html#potcar-setup
 
 ### 2.2. TEST
+Run <code>CCpyVASPInputGen.py</code>
 <pre>
 (CCpy) [user@localhost ~]$ CCpyVASPInputGen.py 
 
@@ -250,6 +251,32 @@ siesta_path: siesta
 </pre>
 This file contains various executable commands that <code>CCpyJobSubmit.py</code> loads when it runs.
 
-### 3.3. Descriptions of detailed job submission methods
+### 3.3. Modify mpirun methods to automated vasp jobs
+mpirun command for parralell calculation highly up to each hpc system, so you have to modify it in some python files.
+- <code>./Queue/CCpyJobControl.py</code>
+edit <code>self.vasp_run</code>
+<pre>
+ln 115         self.vasp_path = queue_config['vasp_path']
+ln 116 # >>>>>>>>>>>>>>>>>>>>>>> !!! modify below line up to your system !!! <<<<<<<<<<<<<<<<<<<<<<<<< #
+ln 117         self.vasp_run = f"{self.mpi_run} -launcher rsh -np $NP -machinefile $PBS_NODEFILE {self.vasp_path} < /dev/null > vasp.out" # !!!! <-- HMC vasp run type
+ln 118         # self.vasp_run = f"{self.mpi_run} -np $NSLOTS {self.vasp_path} < /dev/null > vasp.out" # !!!! <-- CMS vasp run type
+</pre>
+- <code>./Package/VASPOptLoop.py</code>
+edit <code>vasp_run</code>
+<pre>
+ln 107 mpi_run = queue_config['mpi_run']
+ln 108 # >>>>>>>>>>>>>>>>>>>>>>> !!! modify below line up to your system !!! <<<<<<<<<<<<<<<<<<<<<<<<< #
+ln 109 vasp_run = f"{mpirun} -launcher rsh -np $NP -machinefile $PBS_NODEFILE {vasp_path} < /dev/null > vasp.out" # !!!! <-- HMC vasp run type
+ln 110 # vasp_run = f"{mpirun} -np $NSLOTS {vasp_path} < /dev/null > vasp.out" # !!!! <-- CMS vasp run type
+</pre>
+- <code>./Package/Diffusion/NVTLoopQueScript.py</code>
+edit <code>vasp_run</code>
+<pre>
+ln  37 mpi_run = queue_config['mpi_run']
+ln  38 # >>>>>>>>>>>>>>>>>>>>>>> !!! modify below line up to your system !!! <<<<<<<<<<<<<<<<<<<<<<<<< #
+ln  39 vasp_run = f"{mpirun} -launcher rsh -np $NP -machinefile $PBS_NODEFILE {vasp_path} < /dev/null > vasp.out" # !!!! <-- HMC vasp run type
+ln  40 # vasp_run = f"{mpirun} -np $NSLOTS {vasp_path} < /dev/null > vasp.out" # !!!! <-- CMS vasp run type
+</pre>
+### 3.4. Descriptions of detailed job submission methods
 https://github.com/91bsjun/CCpy/tree/master/CCpy/Queue
 
