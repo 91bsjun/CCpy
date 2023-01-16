@@ -104,9 +104,9 @@ if not os.path.isfile(user_queue_config):
 yaml_string = open(user_queue_config, "r").read()
 queue_config = yaml.load(yaml_string)
 vasp_path = queue_config['vasp_path']
-mpi_run = queue_config['mpi_run']
+mpirun = queue_config['mpi_run']
 # >>>>>>>>>>>>>>>>>>>>>>> !!! modify below line up to your system !!! <<<<<<<<<<<<<<<<<<<<<<<<< #
-vasp_run = f"{mpirun} -launcher rsh -np $NP -machinefile $PBS_NODEFILE {vasp_path} < /dev/null > vasp.out" # !!!! <-- HMC vasp run type
+vasp_run = f"{mpirun} -launcher rsh -np 16 -machinefile $PBS_NODEFILE {vasp_path} < /dev/null > vasp.out" # !!!! <-- HMC vasp run type
 # vasp_run = f"{mpirun} -np $NSLOTS {vasp_path} < /dev/null > vasp.out" # !!!! <-- CMS vasp run type
 
 if __name__ == "__main__":
