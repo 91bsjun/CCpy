@@ -1,7 +1,9 @@
 # CCpy: Python scripts for Computational Chemistry.
 - Aim of this library is automated workflow of computational chemistry.
 - First development of this library from Computational Materials Science Lab in Hanyang University. 
-- It is currently being jointly developed with Hyundai Motor Company.
+- Active development groups
+  - Hyundai Motor Company.
+  - Computational Materials Science Lab (http://cmschem.skku.edu/) in Sungkyunkwan University.
 - All codes do not contain research results or confidential methodologies.
 - All copyrights belong to the library developers and distribution for commercial use is prohibited.
 
